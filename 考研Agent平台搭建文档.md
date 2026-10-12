@@ -6,6 +6,8 @@
 
 **当前交付状态：可运行模块骨架已实现。** 账号、知识问答工程演示、任务历史和三层调用可用；完整领域业务仍按本文设计分阶段开发。真实调研、正式领域资料、模型验证和公网部署待完成。当前实际能力以[README](README.md)、[接口约定](docs/接口约定.md)和[验证记录](docs/验证记录.md)为准。
 
+结构更新：Java 后端现拆为 `kaoyan-common`、`kaoyan-pojo`、`kaoyan-server` 三个 Maven 模块。本文的源码入口与目录说明已同步；上述骨架运行结果属于历史记录，多模块调整后的构建、联调和容器验证仍待完成，运行入口及旧脚本限制见[README](README.md)。
+
 项目工作约定见[项目级AGENTS.md](AGENTS.md)。本文是项目设计和开发任务的统一入口，后续变更在对应章节维护。
 
 ## 阅读导航
@@ -105,7 +107,7 @@
 
 优先参考以下入口：
 
-- Java：[任务调用](backend/src/main/java/course/kaoyan/task/AgentClient.java)、[账号服务](backend/src/main/java/course/kaoyan/auth/AuthService.java)。
+- Java：[任务调用](backend/kaoyan-server/src/main/java/course/kaoyan/task/AgentClient.java)、[账号服务](backend/kaoyan-server/src/main/java/course/kaoyan/auth/AuthService.java)。
 - Python：[流程执行](agent/agent_service/runner.py)、[输入输出模型](agent/agent_service/schemas.py)、[资料检索](agent/agent_service/knowledge.py)、[模型适配](agent/agent_service/model_client.py)。
 - 验证：[评估入口](agent/evaluation/evaluate.py)、[链路冒烟](scripts/smoke.py)。现有评估脚本只处理原始文本任务，需要扩展后才支持本文的类型化上下文。
 
@@ -244,19 +246,24 @@ flowchart LR
 
 图为拟实现架构。数据库保存账号、领域记录与发布元数据；Python读取已发布资料并处理任务，结果返回Java校验和保存。
 
-### 5.2 目录与模块建议
+### 5.2 目录与模块职责
 
-下列为完整设计的目录建议。当前已建立核心工程目录，实际已实现文件以仓库为准；正式资料、管理发布与领域评估仍待建设：
+下列为当前核心工程目录。正式资料、管理发布与独立领域评估仍待建设；前端后续可按页面拆分脚本和样式，但未创建的目录不作为已有实现：
 
 ```text
 考研agent平台搭建/
 ├── 考研Agent平台搭建文档.md
 ├── frontend/
 │   ├── index.html
-│   ├── css/
-│   └── js/                   # api、会话、路由、各页面与共享组件
+│   ├── app.js
+│   ├── style.css
+│   └── js/api.js             # 统一业务请求
 ├── backend/
-│   └── src/                  # auth、profile、catalog、practice、task、admin、shared
+│   ├── pom.xml               # Maven 父工程
+│   ├── kaoyan-common/        # 通用异常与领域枚举
+│   ├── kaoyan-pojo/          # JPA 实体、DTO 与接口契约
+│   └── kaoyan-server/        # 应用入口、业务、权限、Agent 调用与测试
+│       └── src/main/resources/static/  # Java 实际提供的同源页面
 ├── agent/
 │   ├── agent_service/        # schemas、retrieval、workflows、tools、model_client
 │   ├── knowledge/            # 示例资料；正式版本按发布流程读取
@@ -269,6 +276,8 @@ flowchart LR
 ├── .env.example
 └── .gitignore
 ```
+
+Java 依赖方向为 `kaoyan-pojo → kaoyan-common`、`kaoyan-server → kaoyan-pojo + kaoyan-common`；父工程聚合构建，server 生成可运行 JAR。Java 配置与测试分别位于 server 的 `src/main/resources/application.properties`、`src/test/java/`。`frontend/` 和 server 静态资源当前需手动保持一致，构建方式见[后端 README](backend/README.md)。
 
 | 层 | 职责 | 数据和调用边界 |
 | --- | --- | --- |
