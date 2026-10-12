@@ -1,0 +1,60 @@
+[
+  {
+    "id": "demo-ds",
+    "input": "请解释栈与队列的工程演示概念",
+    "expectedStatus": "completed",
+    "expectedSources": [
+      "demo-ds"
+    ]
+  },
+  {
+    "id": "demo-co",
+    "input": "请解释存储层次与缓存的工程演示概念",
+    "expectedStatus": "completed",
+    "expectedSources": [
+      "demo-co"
+    ]
+  },
+  {
+    "id": "demo-os",
+    "input": "请解释进程与线程的工程演示概念",
+    "expectedStatus": "completed",
+    "expectedSources": [
+      "demo-os"
+    ]
+  },
+  {
+    "id": "demo-cn",
+    "input": "请解释TCP可靠传输的工程演示概念",
+    "expectedStatus": "completed",
+    "expectedSources": [
+      "demo-cn"
+    ]
+  },
+  {
+    "id": "unknown",
+    "input": "请解释海水观赏鱼繁育方法",
+    "expectedStatus": "unsupported",
+    "expectedSources": []
+  },
+  {
+    "id": "needs-input",
+    "input": "帮帮我",
+    "expectedStatus": "needs_input",
+    "expectedSources": []
+  },
+  {
+    "id": "school-pending",
+    "taskType": "school_recommendation",
+    "input": "请根据档案推荐院校专业",
+    "expectedStatus": "unsupported",
+    "expectedSources": []
+  },
+  {
+    "id": "wrong-pending",
+    "taskType": "wrong_question_tutor",
+    "input": "请解释我的错题并推荐练习",
+    "expectedStatus": "unsupported",
+    "expectedSources": []
+  }
+]

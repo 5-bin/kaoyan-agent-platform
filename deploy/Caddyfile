@@ -1,0 +1,9 @@
+{$SITE_ADDRESS} {
+    encode gzip
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy same-origin
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    }
+    reverse_proxy backend:8080
+}

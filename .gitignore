@@ -1,0 +1,17 @@
+.env
+.venv/
+.cache/
+backend/.mvn/wrapper/maven-wrapper.jar
+__pycache__/
+.pytest_cache/
+*.pyc
+backend/target/
+backend/data/
+*.log
+.DS_Store
+docs/验证输出/
+backups/
+
+node_modules/
+*.mv.db
+*.trace.db
