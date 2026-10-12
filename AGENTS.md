@@ -31,7 +31,7 @@
 - 本地按 README 从 `backend/` 构建并启动 `kaoyan-server/target/kaoyan-server-0.1.0.jar`，保持同一数据库路径；IDE 工作目录也设为 `backend/`。复用虚拟环境可以用于验证，但仓库运行说明必须支持独立创建环境。
 - Java 与 Python 必须显式加载同一份环境配置，内部凭证通过 `scripts/init-env.py` 生成或环境变量提供。配置中现有的 Java 默认值不能代替双端配置，不在文档中传播该值。
 - 修改 Java 后在 `backend/` 运行 `./mvnw -B test`，覆盖三个模块；Windows 使用 `mvnw.cmd`。打包在父工程执行 `./mvnw -B package`，不要对所有模块直接执行 `spring-boot:run`。修改 Python 后在 `agent/` 运行 `../.venv/bin/python -m pytest -q`。纯文档修改检查链接、路径和 JSON，不跑无关服务。
-- 完整链路使用 `scripts/smoke.py` 的临时端口与独立数据库；执行前检查脚本引用的 JAR 路径是否与当前 server 产物一致。当前脚本及 Dockerfile 尚引用旧单模块结构，适配后才能重新验证，不能通过复制旧 JAR 制造通过记录。
+- 完整链路使用 `scripts/smoke.py` 的临时端口与独立数据库；脚本与 Dockerfile 使用 `backend/kaoyan-server/target/kaoyan-server-0.1.0.jar`。调整模块或产物名称时同步两处路径、README 与验证记录，不能通过复制旧 JAR 制造通过记录。Docker 构建上下文继续排除各模块 `target/`。
 - 页面验证使用隔离浏览器上下文，不读取日常浏览器资料。实际用例与限制写入验证记录；文档静态检查通过不等于链路、容器或公网验收通过。
 - 模型测试默认模拟，不产生付费调用；真实模型评估和公开部署按用户当前授权范围执行。容器配置存在不代表PostgreSQL或公网已经验证。
 - 当前仅单Java和单Python实例；管理员权限由服务端控制，公开注册不能选择管理员。

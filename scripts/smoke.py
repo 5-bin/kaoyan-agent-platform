@@ -65,9 +65,9 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error("报告已存在，请使用新的文件名")
-    jar = ROOT / "backend/target/kaoyan-agent-platform-0.1.0.jar"
+    jar = ROOT / "backend/kaoyan-server/target/kaoyan-server-0.1.0.jar"
     if not jar.exists():
-        parser.error("请先构建 Java JAR")
+        parser.error("未找到 kaoyan-server JAR，请先在 backend/ 执行 ./mvnw -B package")
     checks = []
     def check(name, condition):
         checks.append({"name": name, "passed": bool(condition)})

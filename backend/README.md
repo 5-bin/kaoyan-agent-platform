@@ -1,6 +1,6 @@
 # 考研 Agent 后端
 
-由原单模块后端拆分为 Maven 多模块工程，采用 Java 17 和 Spring Boot 3.5.16。本文描述当前构建结构与启动方式；拆分后的业务等价性和完整联调仍需实际验证。
+由原单模块后端拆分为 Maven 多模块工程，采用 Java 17 和 Spring Boot 3.5.16。多模块构建与本地演示链路已验证，范围见[验证记录](../docs/验证记录.md)；完整领域业务及容器验收仍待完成。
 
 ## 模块
 
@@ -46,4 +46,4 @@ Windows PowerShell 需先将根目录 `.env` 中的配置加载为进程环境�
 - Java 与 Python 使用一致的 `AGENT_INTERNAL_KEY`，由根目录 `scripts/init-env.py` 生成或通过环境变量设置。不要依赖 Java 配置文件中的默认值，不在文档或日志中记录真实凭证。
 - 数据库配置使用 `DB_URL`、`DB_USER`、`DB_PASSWORD`，Agent 地址使用 `AGENT_BASE_URL`；完整示例见根目录 `.env.example`。
 - `frontend/` 与 server 的 `src/main/resources/static/` 当前各保存一份页面，POM 没有自动复制配置。修改前端需同步打包资源，重新构建后才会反映到 JAR 页面。
-- `scripts/smoke.py` 和 `backend/Dockerfile` 仍引用旧单模块路径，更新后才能用于当前结构的联调与容器构建；详见[项目 README](../README.md)。
+- `scripts/smoke.py` 和 `backend/Dockerfile` 已使用 server 的新 JAR 路径；Dockerfile 从父工程构建三个模块，构建上下文排除各模块 `target/`。实际联调结果与容器验证范围见[验证记录](../docs/验证记录.md)。

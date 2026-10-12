@@ -4,7 +4,7 @@
 .cache
 **/__pycache__
 **/.pytest_cache
-backend/target
+**/target
 backend/data
 docs
 backups

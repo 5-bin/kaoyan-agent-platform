@@ -1,6 +1,6 @@
 # 考研 Agent 平台
 
-面向计算机考研／408的模块骨架：原生 Web 前端 → Spring Boot 业务后端 → FastAPI Agent。Java 后端现采用 Maven 多模块结构；历史骨架验证见验证记录，结构调整后的运行与联调需要重新验证。
+面向计算机考研／408的模块骨架：原生 Web 前端 → Spring Boot 业务后端 → FastAPI Agent。Java 后端采用 Maven 多模块结构；冒烟脚本和 Dockerfile 已同步到新结构，实际验证范围见[验证记录](docs/验证记录.md)。
 
 ## 当前能力
 
@@ -28,7 +28,7 @@
 ├── scripts/                           # 环境初始化、文档与联调检查
 ├── docs/                              # 接口、部署、验证与复用说明
 ├── deploy/                            # Caddy 配置
-└── compose.yaml                       # 容器编排配置，结构适配待完成
+└── compose.yaml                       # 容器编排配置，容器运行待验证
 ```
 
 后端依赖方向为 `kaoyan-pojo → kaoyan-common`，`kaoyan-server → kaoyan-pojo + kaoyan-common`。父工程只聚合构建，可运行 JAR 由 `kaoyan-server` 生成，详见[后端 README](backend/README.md)。
@@ -95,9 +95,7 @@ export MAVEN_USER_HOME="$PWD/.cache/maven"
 
 `scripts/check-docs.py` 检查文档链接、JSON 与部分静态配置，不验证 Maven 构建、Docker 镜像或业务运行。
 
-**多模块适配待完成：** `scripts/smoke.py` 仍查找旧的 `backend/target/kaoyan-agent-platform-0.1.0.jar`，`backend/Dockerfile` 仍复制旧的 `backend/src/` 并引用旧 JAR。更新这些路径前，不能把以下冒烟命令或容器部署视为当前结构下可用的入口；CI 的链路检查也受此影响。
-
-适配后的冒烟检查入口如下。检查前需已有新 JAR；脚本使用临时进程、随机端口与独立 H2 文件库，结束后关闭。报告已存在时拒绝覆盖。
+冒烟脚本读取 `backend/kaoyan-server/target/kaoyan-server-0.1.0.jar`，检查前需先在 `backend/` 执行 `./mvnw -B package`。脚本使用临时进程、随机端口与独立 H2 文件库，结束后关闭；不会启动日常开发服务或修改已有业务库。报告已存在时拒绝覆盖。
 
 ```bash
 ./.venv/bin/python scripts/smoke.py --output docs/验证输出/新的冒烟报告.json
@@ -109,14 +107,14 @@ export MAVEN_USER_HOME="$PWD/.cache/maven"
 ./.venv/bin/python scripts/smoke.py --output docs/验证输出/新的页面联调.json --browser-check --node node
 ```
 
-上述页面命令同样需先完成冒烟脚本适配。脚本在临时后端上执行真实页面操作和迟到响应隔离检查，创建独立上下文，不读取日常浏览器数据。390 宽度检查不是实机手机验收。现有 CI 配置包含 Java、Python、语法、文档和离线链路检查，不依赖模型密钥；历史通过记录不代表本次多模块结构已通过。
+脚本在临时后端上执行真实页面操作和迟到响应隔离检查，创建独立上下文，不读取日常浏览器数据。390 宽度检查不是实机手机验收。现有 CI 配置包含 Java、Python、语法、文档和离线链路检查，不依赖模型密钥；每次结果以对应提交的实际运行记录为准。
 
 ## 模型与部署
 
 已有chat/completions适配层，但真实供应商未验证。配置MODEL_BASE_URL、MODEL_API_KEY、MODEL_NAME并开启model会产生供应商请求；当前资料仍是未审核演示内容，不能据此声称正式领域能力。
 
-容器、PostgreSQL 和 Caddy 配置见[部署说明](docs/部署说明.md)，使用前需完成上述 Dockerfile 的多模块适配并重新验证。没有自动公开部署；应用网站的访问地址与 GitHub 仓库地址不同。
+Dockerfile 已改为复制三个模块并构建 server JAR，构建上下文排除各模块 `target/`。容器、PostgreSQL 和 Caddy 配置见[部署说明](docs/部署说明.md)；本次未运行容器验收。没有自动公开部署；应用网站的访问地址与 GitHub 仓库地址不同。
 
 ## 下一步
 
-先完成冒烟脚本与 Dockerfile 的适配，并重新验证多模块构建和三层联调。`backend/.gitignore` 已通过 `**/target/` 排除各模块构建产物，交付时仍需检查实际文件清单。之后按完整设计逐步实现真实资料审核、中文 BM25、档案与招生工具、刷题判分及批次保存；随后执行领域案例对比与公网验收。未新增项目开源许可证；Maven Wrapper 保留其 Apache 许可头，第三方依赖遵循各自许可证。
+在具备 Docker 的环境验证多模块镜像与 PostgreSQL 联调。`backend/.gitignore` 已通过 `**/target/` 排除各模块构建产物，交付时仍需检查实际文件清单。之后按完整设计逐步实现真实资料审核、中文 BM25、档案与招生工具、刷题判分及批次保存；随后执行领域案例对比与公网验收。未新增项目开源许可证；Maven Wrapper 保留其 Apache 许可头，第三方依赖遵循各自许可证。

@@ -6,7 +6,7 @@
 
 **当前交付状态：可运行模块骨架已实现。** 账号、知识问答工程演示、任务历史和三层调用可用；完整领域业务仍按本文设计分阶段开发。真实调研、正式领域资料、模型验证和公网部署待完成。当前实际能力以[README](README.md)、[接口约定](docs/接口约定.md)和[验证记录](docs/验证记录.md)为准。
 
-结构更新：Java 后端现拆为 `kaoyan-common`、`kaoyan-pojo`、`kaoyan-server` 三个 Maven 模块。本文的源码入口与目录说明已同步；上述骨架运行结果属于历史记录，多模块调整后的构建、联调和容器验证仍待完成，运行入口及旧脚本限制见[README](README.md)。
+结构更新：Java 后端现拆为 `kaoyan-common`、`kaoyan-pojo`、`kaoyan-server` 三个 Maven 模块。源码入口、目录说明、冒烟脚本与 Dockerfile 已同步到新结构；多模块构建与联调的实际结果见[验证记录](docs/验证记录.md)，容器运行仍待验证，运行入口见[README](README.md)。
 
 项目工作约定见[项目级AGENTS.md](AGENTS.md)。本文是项目设计和开发任务的统一入口，后续变更在对应章节维护。
 
