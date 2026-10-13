@@ -6,8 +6,10 @@ import java.util.*;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.core.annotation.Order;
 
 @Component
+@Order(0)
 public class PracticeDemoData implements ApplicationRunner {
     private final QuestionRepository questions;
     public PracticeDemoData(QuestionRepository questions) { this.questions = questions; }

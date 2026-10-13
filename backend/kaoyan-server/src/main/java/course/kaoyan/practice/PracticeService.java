@@ -2,6 +2,7 @@ package course.kaoyan.practice;
 
 import course.kaoyan.catalog.CatalogService;
 import course.kaoyan.catalog.QuestionRepository;
+import course.kaoyan.catalog.QuestionVersionStore;
 import course.kaoyan.common.enums.DomainTypes.*;
 import course.kaoyan.common.exception.ApiException;
 import course.kaoyan.pojo.dto.practice.PracticeContracts;
@@ -15,16 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PracticeService {
     private final QuestionRepository questions;
+    private final QuestionVersionStore versions;
     private final PracticeSessionRepository sessions;
     private final PracticeSessionItemRepository items;
     private final PracticeAttemptRepository attempts;
     private final WrongQuestionRepository wrongQuestions;
     private final QuestionFavoriteRepository favorites;
 
-    public PracticeService(QuestionRepository questions, PracticeSessionRepository sessions,
+    public PracticeService(QuestionRepository questions, QuestionVersionStore versions, PracticeSessionRepository sessions,
             PracticeSessionItemRepository items, PracticeAttemptRepository attempts,
             WrongQuestionRepository wrongQuestions, QuestionFavoriteRepository favorites) {
-        this.questions = questions; this.sessions = sessions; this.items = items;
+        this.questions = questions; this.versions = versions; this.sessions = sessions; this.items = items;
         this.attempts = attempts; this.wrongQuestions = wrongQuestions; this.favorites = favorites;
     }
 
@@ -47,6 +49,7 @@ public class PracticeService {
         if (input.mode() == PracticeMode.random) Collections.shuffle(candidates, new java.security.SecureRandom());
         int actual = Math.min(input.questionCount(), candidates.size());
         if (actual == 0) throw new ApiException(400, "EMPTY_PRACTICE_POOL", "当前筛选条件下没有可练习题目");
+        for (Question q : candidates.subList(0, actual)) versions.require(q.id, q.versionId);
         PracticeSession session = sessions.saveAndFlush(new PracticeSession(owner, input.mode().name(),
             input.subject() == null ? null : input.subject().name(),
             input.knowledgePointId() == null ? null : input.knowledgePointId().toString(),
@@ -75,7 +78,7 @@ public class PracticeService {
         PracticeSession session = ownedSession(owner, sessionId);
         PracticeSessionItem item = items.findByIdAndSessionId(itemId.toString(), session.id)
             .orElseThrow(() -> notFound("练习项目不存在或无权访问"));
-        Question q = questions.findById(item.questionId).orElseThrow(() -> notFound("题目不存在"));
+        Question q = versions.require(item.questionId, item.questionVersionId);
         PracticeAttempt attempt = item.attemptId == null ? null : attempts.findById(item.attemptId).orElse(null);
         boolean submitted = attempt != null;
         return new PracticeContracts.ItemView(UUID.fromString(item.id), item.ordinal, UUID.fromString(q.id),
@@ -100,7 +103,8 @@ public class PracticeService {
             PracticeSessionItem item = byId.get(draft.itemId().toString());
             if (item == null) throw new ApiException(404, "NOT_FOUND", "草稿项目不存在或不属于该批次");
             if (item.attemptId != null) throw new ApiException(409, "ALREADY_SUBMITTED", "已提交题目不能修改草稿");
-            if (draft.selectedOption() != null) validateOption(question(item.questionId), draft.selectedOption());
+            Question q = itemQuestion(item);
+            if (draft.selectedOption() != null) validateOption(q, draft.selectedOption());
             item.selectedOptionDraft = draft.selectedOption(); items.save(item);
         }
         session.currentOrdinal = input.currentOrdinal(); session.revision++;
@@ -116,7 +120,7 @@ public class PracticeService {
         if (item.attemptId != null) throw new ApiException(409, "ALREADY_SUBMITTED", "已提交题目不能继续查看提示");
         if (level == 2 && item.hintLevelUsed < 1)
             throw new ApiException(409, "HINT_ORDER", "请先查看一级提示");
-        Question q = question(item.questionId);
+        Question q = itemQuestion(item);
         String content = level == 1 ? q.hintConcept : q.hintApproach;
         if (content == null || content.isBlank()) return new PracticeContracts.HintView(level, false, null, item.hintLevelUsed);
         item.hintLevelUsed = Math.max(item.hintLevelUsed, level); items.saveAndFlush(item);
@@ -136,20 +140,25 @@ public class PracticeService {
             if (!same) throw new ApiException(409, "REQUEST_CONFLICT", "相同请求编号对应了不同作答");
             return attemptView(existing);
         }
-        Question q = question(input.questionId().toString());
-        if (!q.versionId.equals(input.questionVersionId().toString()))
-            throw new ApiException(409, "QUESTION_VERSION_CHANGED", "题目版本不匹配，请重新获取题目");
-        validateOption(q, input.selectedOption());
+        Question q;
         PracticeSession session = null; PracticeSessionItem item = null; int hintLevel = 0;
         if (input.sessionId() != null) {
             session = activeSession(owner, input.sessionId());
             item = items.findByIdAndSessionId(input.sessionItemId().toString(), session.id)
                 .orElseThrow(() -> notFound("练习项目不存在或无权访问"));
-            if (!item.questionId.equals(q.id) || !item.questionVersionId.equals(q.versionId))
+            if (!item.questionId.equals(input.questionId().toString())
+                    || !item.questionVersionId.equals(input.questionVersionId().toString()))
                 throw new ApiException(409, "SESSION_QUESTION_MISMATCH", "题目不属于该练习项目");
             if (item.attemptId != null) throw new ApiException(409, "ALREADY_SUBMITTED", "该练习项目已经提交");
+            q = itemQuestion(item);
             hintLevel = item.hintLevelUsed;
+        } else {
+            Question current = question(input.questionId().toString());
+            if (!current.versionId.equals(input.questionVersionId().toString()))
+                throw new ApiException(409, "QUESTION_VERSION_CHANGED", "题目版本不匹配，请重新获取题目");
+            q = versions.require(current.id, current.versionId);
         }
+        validateOption(q, input.selectedOption());
         boolean correct = q.correctOption.equals(input.selectedOption());
         PracticeAttempt attempt = attempts.saveAndFlush(new PracticeAttempt(owner, q.id, q.versionId,
             input.selectedOption(), correct, input.clientRequestId().toString(), text(input.sessionId()),
@@ -236,7 +245,7 @@ public class PracticeService {
             session.releaseId, session.createdAt, session.finishedAt, views);
     }
     private PracticeContracts.AttemptView attemptView(PracticeAttempt attempt) {
-        Question q = questions.findById(attempt.questionId).orElseThrow(() -> notFound("题目不存在"));
+        Question q = versions.require(attempt.questionId, attempt.questionVersionId);
         return new PracticeContracts.AttemptView(UUID.fromString(attempt.id), UUID.fromString(q.id), UUID.fromString(q.versionId),
             attempt.selectedOption, attempt.correct, attempt.hintLevelUsed, attempt.createdAt, q.explanation,
             q.sourceTitle, q.sourceUrl, q.sourceLocator, uuid(attempt.sessionId), uuid(attempt.sessionItemId));
@@ -275,6 +284,12 @@ public class PracticeService {
     }
     private Question question(String id) {
         return questions.findByIdAndActiveTrue(id).orElseThrow(() -> notFound("题目不存在或已撤回"));
+    }
+    private Question itemQuestion(PracticeSessionItem item) {
+        question(item.questionId); // Preserve the existing logical-question availability check.
+        if (!"available".equals(item.availability))
+            throw new ApiException(409, "QUESTION_WITHDRAWN", "该练习题目已撤回");
+        return versions.require(item.questionId, item.questionVersionId);
     }
     private void validateOption(Question q, String selected) {
         if (!CatalogService.options(q).containsKey(selected)) throw new ApiException(400, "INVALID_OPTION", "选项不属于该题目");
