@@ -85,16 +85,16 @@ def test_model_settings_require_https_and_credentials(settings):
 
 @pytest.mark.parametrize("bad_url", ["javascript:alert(1)", "//evil.test", "/references/../secret", "https://user:pass@example.test"])
 def test_knowledge_rejects_unsafe_links(settings, tmp_path, bad_url):
-    records = json.loads(settings.knowledge_path.read_text())
+    records = json.loads(settings.knowledge_path.read_text(encoding="utf-8"))
     records[0]["url"] = bad_url
-    path = tmp_path / "sources.json"; path.write_text(json.dumps(records))
+    path = tmp_path / "sources.json"; path.write_text(json.dumps(records), encoding="utf-8")
     with pytest.raises(ValueError):
         KnowledgeBase(path)
 
 
 def test_duplicate_sources_rejected(settings, tmp_path):
-    records = json.loads(settings.knowledge_path.read_text()); records.append(records[0])
-    path = tmp_path / "sources.json"; path.write_text(json.dumps(records))
+    records = json.loads(settings.knowledge_path.read_text(encoding="utf-8")); records.append(records[0])
+    path = tmp_path / "sources.json"; path.write_text(json.dumps(records), encoding="utf-8")
     with pytest.raises(ValueError):
         KnowledgeBase(path)
 

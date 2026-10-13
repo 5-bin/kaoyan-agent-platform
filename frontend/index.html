@@ -8,7 +8,7 @@
 <body>
   <header><a class="brand" href="#home">考研 Agent<span>408 学习工作台</span></a><div id="user-bar" hidden><span id="username"></span><button id="logout" class="subtle">退出</button></div></header>
   <main>
-    <section class="intro"><p class="eyebrow">计算机考研 · 从一个问题开始</p><h1>连接知识、目标和练习</h1><p>在自己的学习工作区中提问、查看依据和回顾记录。</p><p class="notice">当前为工程骨架。默认知识问答使用待审核的演示资料，未调用大模型；择校、刷题与错题等功能正在开发中。</p></section>
+    <section class="intro"><p class="eyebrow">计算机考研 · 从一个问题开始</p><h1>连接知识、目标和练习</h1><p>在自己的学习工作区中提问、练习、整理错题并回顾记录。</p><p class="notice">当前知识问答和刷题闭环使用待审核的自编演示资料，不作为正式备考题库；院校推荐等功能仍在开发中。</p></section>
     <p id="message" role="status" aria-live="polite"></p>
     <section id="auth-panel" class="card auth"><h2>进入学习工作区</h2><p>每个账号拥有独立任务记录。</p>
       <form id="auth-form"><label for="auth-name">用户名</label><input id="auth-name" name="username" autocomplete="username" required minlength="3" maxlength="32" pattern="[A-Za-z0-9_-]{3,32}" placeholder="3—32位字母、数字、下划线或短横线">
@@ -24,12 +24,12 @@
       <section id="home-panel" class="card"><h2>从这里开始</h2><p>知识问答与任务记录已接入服务，其他模块显示真实开发状态。</p>
         <div class="feature-cards"><a href="#knowledge"><h3>知识问答</h3><p>提交408演示问题，检查来源和处理结果。</p><span class="badge">工程演示可用</span></a>
         <a href="#schools"><h3>院校推荐</h3><p>将按个人条件和招生年份比较专业。</p><span class="badge">开发中</span></a>
-        <a href="#practice"><h3>刷题中心</h3><p>将连接章节、随机、错题和收藏练习。</p><span class="badge">开发中</span></a></div>
+        <a href="#practice"><h3>刷题中心</h3><p>章节、随机、错题和收藏练习，支持续做与确定性判分。</p><span class="badge">演示可用</span></a></div>
       </section>
       <section id="knowledge-panel" hidden>
         <div class="grid">
           <section class="card"><h2>专业知识问答</h2><form id="task-form">
-            <label for="task-subject">科目</label><select id="task-subject"><option value="">全部科目</option value="data_structure">数据结构</option><option value="computer_organization">计算机组成原理</option><option value="operating_system">操作系统</option><option value="computer_network">计算机网络</option></select>
+            <label for="task-subject">科目</label><select id="task-subject"><option value="">全部科目</option><option value="data_structure">数据结构</option><option value="computer_organization">计算机组成原理</option><option value="operating_system">操作系统</option><option value="computer_network">计算机网络</option></select>
             <label for="task-input">你希望理解什么？</label><textarea id="task-input" rows="7" required maxlength="8000" placeholder="例如：请解释进程与线程的基本概念。"></textarea>
             <p class="hint">演示覆盖栈与队列、存储层次、进程与线程、TCP可靠传输。资料待审核，不作为正式备考答案。</p>
             <div class="actions"><button id="submit-task" type="submit">提交问题</button><button id="example" type="button" class="secondary">填入演示问题</button></div><p id="progress" role="status" hidden>正在处理，请稍候。刷新后可在学习记录查看任务。</p>
@@ -39,9 +39,29 @@
           </section>
         </div>
       </section>
-      <section id="records-panel" class="card history" hidden><div class="section-head"><h2>我的任务记录</h2><button id="refresh" class="secondary">刷新记录</button></div><p class="hint">当前记录真实问答任务；练习统计尚未实现。</p><p id="history-empty" class="hint">暂无记录。</p><div id="history-items"></div><div class="pagination"><button id="prev" class="secondary">上一页</button><span id="page-info"></span><button id="next" class="secondary">下一页</button></div></section>
+      <section id="practice-panel" hidden>
+        <div class="grid practice-layout">
+          <section class="card"><div class="section-head"><h2>创建练习</h2><button id="reload-sessions" class="secondary" type="button">刷新</button></div>
+            <form id="practice-form"><label for="practice-mode">练习模式</label><select id="practice-mode"><option value="chapter">章节练习</option><option value="random">随机练习</option><option value="wrong">错题重练</option><option value="favorite">收藏练习</option></select>
+              <label for="practice-subject">科目</label><select id="practice-subject"><option value="">全部科目</option><option value="data_structure">数据结构</option><option value="computer_organization">计算机组成原理</option><option value="operating_system">操作系统</option><option value="computer_network">计算机网络</option></select>
+              <label for="practice-difficulty">难度</label><select id="practice-difficulty"><option value="">全部难度</option><option value="easy">简单</option><option value="medium">中等</option><option value="hard">困难</option></select>
+              <label for="practice-count">题目数量</label><input id="practice-count" type="number" min="1" max="50" value="10" required>
+              <button type="submit">开始练习</button><p class="hint">当前题目是待复核的自编演示题；候选不足时按实际数量创建。</p>
+            </form><h3>进行中的练习</h3><p id="session-empty" class="hint">暂无进行中的练习。</p><div id="session-list"></div>
+          </section>
+          <section id="practice-workspace" class="card" hidden><div class="section-head"><div><h2 id="practice-title">练习</h2><p id="practice-meta" class="hint"></p></div><button id="favorite-question" class="secondary" type="button">收藏</button></div>
+            <p id="question-point" class="eyebrow"></p><h3 id="question-stem" class="question-stem"></h3><form id="answer-form"><div id="question-options" class="question-options"></div>
+              <p id="draft-state" class="hint"></p><div class="actions"><button id="hint-one" class="secondary" type="button">概念提示</button><button id="hint-two" class="secondary" type="button">解题思路</button><button id="submit-answer" type="submit">提交答案</button></div>
+            </form><p id="hint-content" class="practice-feedback" hidden></p><div id="answer-feedback" class="practice-feedback" hidden></div>
+            <div class="practice-nav"><button id="previous-question" class="secondary" type="button">上一题</button><span id="question-position"></span><button id="next-question" class="secondary" type="button">下一题</button><button id="finish-session" class="secondary" type="button">结束练习</button></div>
+          </section>
+        </div>
+        <section id="practice-result" class="card result-block" hidden><div class="section-head"><h2>练习结果</h2><button id="close-result" class="secondary" type="button">返回练习</button></div><div id="result-metrics" class="metric-grid"></div></section>
+      </section>
+      <section id="wrong-panel" class="card history" hidden><div class="section-head"><h2>错题本</h2><div class="actions compact"><button id="start-wrong-practice" type="button">错题重练</button><button id="refresh-wrong" class="secondary" type="button">刷新</button></div></div><p class="hint">错题连续两次无提示答对后标记为已掌握；使用提示答对不会推进掌握状态。</p><p id="wrong-empty" class="hint">暂无错题。</p><div id="wrong-items"></div></section>
+      <section id="records-panel" class="card history" hidden><div class="section-head"><h2>学习记录</h2><button id="refresh" class="secondary">刷新记录</button></div><div id="study-summary" class="metric-grid"></div><h3>Agent任务</h3><p id="history-empty" class="hint">暂无记录。</p><div id="history-items"></div><div class="pagination"><button id="prev" class="secondary">上一页</button><span id="page-info"></span><button id="next" class="secondary">下一页</button></div></section>
       <section id="feature-panel" class="card" hidden><span class="badge">开发中</span><h2 id="feature-title"></h2><p id="feature-description"></p><ul id="feature-items"></ul><button id="feature-action" disabled>功能尚未开放</button><p class="hint">当前没有正式业务数据或可执行操作。可返回知识问答体验工程链路。</p><a href="#knowledge">进入知识问答</a></section>
     </div>
-  </main><footer>考研 Agent 平台 · 当前为可运行模块骨架，正式领域软件仍在建设中。</footer>
+  </main><footer>考研 Agent 平台 · 刷题与错题功能使用待复核自编演示题，正式领域资料仍在建设中。</footer>
 </body>
 </html>

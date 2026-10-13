@@ -3,11 +3,13 @@ import java.util.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import course.kaoyan.common.enums.DomainTypes.*;
-/** 首批入参契约，完整领域字段在后续业务实现时扩展。 */
 public final class StudyContracts {
     private StudyContracts() {}
 
-    public record Summary(long validAttempts, long uniqueQuestions, Double accuracy, Double independentAccuracy) {}
+    public record KnowledgePointStat(String knowledgePointId, String knowledgePointName,
+            long attempts, long correct, Double accuracy) {}
+    public record Summary(long validAttempts, long uniqueQuestions, long hintsUsed,
+            Double accuracy, Double independentAccuracy, List<KnowledgePointStat> knowledgePoints) {}
 }
 
 
