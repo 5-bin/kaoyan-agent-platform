@@ -90,15 +90,6 @@ function metric(label, value) {
   const span = document.createElement("span"); span.textContent = label;
   box.append(strong, span); return box;
 }
-async function loadStudySummary() {
-  const current = epoch; const data = await api("/api/study/summary"); if (current !== epoch) return;
-  const target = $("study-summary"); target.replaceChildren(
-    metric("有效作答", data.validAttempts), metric("练习题数", data.uniqueQuestions),
-    metric("正确率", percent(data.accuracy)), metric("独立正确率", percent(data.independentAccuracy)),
-    metric("使用提示", data.hintsUsed)
-  );
-}
-
 async function loadPracticeHome() {
   const current = epoch; const data = await api("/api/practice-sessions?status=active&page=0"); if (current !== epoch) return;
   $("session-list").replaceChildren(); $("session-empty").hidden = Boolean(data.items.length);
@@ -241,7 +232,7 @@ $("task-form").addEventListener("submit", async event => {
 });
 $("example").addEventListener("click", () => { $("task-input").value = "请解释进程与线程的基本概念。"; $("task-input").focus(); });
 for (const [id, change] of [["refresh", 0], ["prev", -1], ["next", 1]]) {
-  $(id).addEventListener("click", async () => { const current = epoch; page = Math.max(0, page + change); message(); try { await Promise.all([history(), loadStudySummary()]); } catch (error) { if (current === epoch) handleError(error); } });
+  $(id).addEventListener("click", async () => { const current = epoch; page = Math.max(0, page + change); message(); try { await history(); } catch (error) { if (current === epoch) handleError(error); } });
 }
 
 $("practice-form").addEventListener("submit", async event => {
@@ -293,7 +284,6 @@ function renderRoute() {
   }
   if (name === "practice") loadPracticeHome().catch(handleError);
   if (name === "wrong") loadWrongQuestions().catch(handleError);
-  if (name === "records") loadStudySummary().catch(handleError);
 }
 window.addEventListener("hashchange", renderRoute);
 

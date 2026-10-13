@@ -16,7 +16,7 @@ public class StudyController {
     @GetMapping("/summary") public Object summary(Authentication a, @RequestParam(required=false) java.time.LocalDate from,
             @RequestParam(required=false) java.time.LocalDate to) {
         if (from != null && to != null && from.isAfter(to)) throw new course.kaoyan.common.exception.ApiException(400, "INVALID_INPUT", "开始日期不能晚于结束日期");
-        return service.summary(owner(a), from, to);
+        return service.execute(owner(a), "summary", null);
     }
 }
 

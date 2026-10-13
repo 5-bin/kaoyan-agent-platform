@@ -114,13 +114,10 @@ class PracticeTest {
         mvc.perform(get("/api/favorites").header("Authorization","Bearer "+token)).andExpect(jsonPath("$.totalItems").value(1));
     }
 
-    @Test void completedSessionAndStudySummaryUsePersistedAttempts() throws Exception {
+    @Test void completedSessionResultUsesPersistedAttempts() throws Exception {
         String token=token(register()); JsonNode session=create(token,"chapter"); JsonNode answer=submit(token,session,item(token,session),"B",UUID.randomUUID());
         assertTrue(answer.path("correct").asBoolean());
         mvc.perform(get("/api/practice-sessions/"+session.path("id").asText()+"/result").header("Authorization","Bearer "+token))
             .andExpect(status().isOk()).andExpect(jsonPath("$.answered").value(1)).andExpect(jsonPath("$.accuracy").value(1.0));
-        mvc.perform(get("/api/study/summary").header("Authorization","Bearer "+token))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.validAttempts").value(1))
-            .andExpect(jsonPath("$.uniqueQuestions").value(1)).andExpect(jsonPath("$.knowledgePoints[0].attempts").value(1));
     }
 }

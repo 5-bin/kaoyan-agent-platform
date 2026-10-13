@@ -145,9 +145,11 @@ class BusinessTest {
             .andExpect(status().isBadRequest());
     }
 
-    @Test void authenticatedPendingProfileAndRecommendationReturn501AndNeverCreateTasks() throws Exception {
+    @Test void authenticatedPendingProfileStudyAndRecommendationReturn501AndNeverCreateTasks() throws Exception {
         var login=register(); String token=login.path("token").asText(); long before=tasks.count();
         mvc.perform(get("/api/profile").header("Authorization","Bearer "+token))
+            .andExpect(status().isNotImplemented()).andExpect(jsonPath("$.code").value("FEATURE_NOT_IMPLEMENTED"));
+        mvc.perform(get("/api/study/summary").header("Authorization","Bearer "+token))
             .andExpect(status().isNotImplemented()).andExpect(jsonPath("$.code").value("FEATURE_NOT_IMPLEMENTED"));
         mvc.perform(post("/api/tasks").header("Authorization","Bearer "+token).contentType("application/json")
             .content("{\"taskType\":\"school_recommendation\",\"input\":\"请根据档案推荐专业\"}"))

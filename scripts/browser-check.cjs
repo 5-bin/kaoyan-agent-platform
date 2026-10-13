@@ -80,9 +80,6 @@ async function main() {
     await page.waitForFunction(() => document.getElementById("practice-title").textContent === "错题重练");
     check("错题可以直接创建重练批次", (await page.locator("#practice-title").textContent()) === "错题重练");
     await page.screenshot({ path: screenshots[0], fullPage: true });
-    await page.getByRole("link", { name: "学习记录", exact: true }).click();
-    await page.waitForFunction(() => document.querySelectorAll("#study-summary .metric").length === 5);
-    check("学习统计反映已保存作答", (await page.locator("#study-summary").textContent()).includes("有效作答"));
     check("学生页面不开放管理员入口", await page.locator("#admin-link").isHidden());
 
     let reached;
