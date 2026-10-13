@@ -54,13 +54,13 @@ def main():
     for p in files():
         if p.suffix == ".json":
             json.loads(p.read_text(encoding="utf-8"))
-    compose = yaml.safe_load((ROOT / "compose.yaml").read_text())
+    compose = yaml.safe_load((ROOT / "compose.yaml").read_text(encoding="utf-8"))
     assert "ports" not in compose["services"]["agent"]
     assert "ports" not in compose["services"]["database"]
     assert compose["services"]["backend"]["ports"] == ["127.0.0.1:8080:8080"]
-    workflow = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())
+    workflow = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8"))
     assert workflow["permissions"] == {"contents": "read"}
-    design = (ROOT / "考研Agent平台搭建文档.md").read_text()
+    design = (ROOT / "考研Agent平台搭建文档.md").read_text(encoding="utf-8")
     assert re.findall(r"^## (\d+)\.", design, re.M) == [str(i) for i in range(1, 11)]
     assert not errors, errors
     print(json.dumps({"checks": counts, "result": "passed", "configScope": "static YAML only"}, ensure_ascii=False))

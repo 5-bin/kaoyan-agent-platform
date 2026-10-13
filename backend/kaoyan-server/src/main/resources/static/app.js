@@ -6,6 +6,10 @@ const statuses = { running: "处理中", completed: "已完成", needs_input: "�
 let token = sessionStorage.getItem("kaoyan_token") || "";
 let currentUser = null;
 let epoch = 0, selection = 0, historyVersion = 0, page = 0, pages = 0, busy = false;
+let practiceSession = null, practiceItem = null, practiceIndex = 0, savingDraft = false;
+
+const subjectNames = { data_structure: "数据结构", computer_organization: "计算机组成原理", operating_system: "操作系统", computer_network: "计算机网络" };
+const modeNames = { chapter: "章节练习", random: "随机练习", wrong: "错题重练", favorite: "收藏练习" };
 
 function message(text = "") { $("message").textContent = text; }
 function api(path, options = {}) { return request(path, { ...options, token }); }
@@ -25,7 +29,9 @@ function showUser(user) {
 }
 function clearSession() {
   epoch++; selection++; historyVersion++; token = ""; sessionStorage.removeItem("kaoyan_token");
-  page = 0; pages = 0; setBusy(false); showUser(null); resetResult(); $("history-items").replaceChildren(); $("task-input").value = ""; $("task-subject").value = "";
+  page = 0; pages = 0; practiceSession = null; practiceItem = null; setBusy(false); showUser(null); resetResult();
+  $("history-items").replaceChildren(); $("session-list").replaceChildren(); $("wrong-items").replaceChildren();
+  $("task-input").value = ""; $("task-subject").value = "";
 }
 function handleError(error) { if (error.status === 401) clearSession(); message(error.message); }
 function listText(id, items) {
@@ -76,6 +82,128 @@ async function history() {
   $("page-info").textContent = `第 ${pages ? page + 1 : 0} / ${pages} 页 · ${data.totalItems} 项`;
   $("prev").disabled = page === 0; $("next").disabled = page + 1 >= pages;
 }
+
+function percent(value) { return value == null ? "暂无数据" : `${(value * 100).toFixed(1)}%`; }
+function metric(label, value) {
+  const box = document.createElement("div"); box.className = "metric";
+  const strong = document.createElement("strong"); strong.textContent = value;
+  const span = document.createElement("span"); span.textContent = label;
+  box.append(strong, span); return box;
+}
+async function loadPracticeHome() {
+  const current = epoch; const data = await api("/api/practice-sessions?status=active&page=0"); if (current !== epoch) return;
+  $("session-list").replaceChildren(); $("session-empty").hidden = Boolean(data.items.length);
+  for (const session of data.items) {
+    const row = document.createElement("div"); row.className = "history-item";
+    const text = document.createElement("div");
+    const title = document.createElement("p"); title.textContent = `${modeNames[session.mode]} · ${session.actualCount}题`;
+    const meta = document.createElement("small"); meta.textContent = `${session.subject ? subjectNames[session.subject] : "全部科目"} · 第${session.currentOrdinal}题`;
+    const button = document.createElement("button"); button.className = "secondary"; button.textContent = "继续练习";
+    button.addEventListener("click", () => openPracticeSession(session.id).catch(handleError));
+    text.append(title, meta); row.append(text, button); $("session-list").append(row);
+  }
+}
+async function createPractice(payload) {
+  const session = await api("/api/practice-sessions", { method: "POST", body: JSON.stringify(payload) });
+  await loadPracticeHome(); await openPracticeSession(session.id); return session;
+}
+async function openPracticeSession(id) {
+  practiceSession = await api(`/api/practice-sessions/${encodeURIComponent(id)}`);
+  practiceIndex = Math.max(0, Math.min(practiceSession.currentOrdinal - 1, practiceSession.items.length - 1));
+  $("practice-workspace").hidden = false; $("practice-result").hidden = true;
+  if (practiceSession.status === "completed") { await showPracticeResult(); return; }
+  await openPracticeItem(practiceIndex);
+}
+async function openPracticeItem(index) {
+  if (!practiceSession?.items?.length) return;
+  practiceIndex = Math.max(0, Math.min(index, practiceSession.items.length - 1));
+  const summary = practiceSession.items[practiceIndex];
+  practiceItem = await api(`/api/practice-sessions/${practiceSession.id}/items/${summary.id}`);
+  $("practice-title").textContent = modeNames[practiceSession.mode];
+  $("practice-meta").textContent = `${practiceSession.subject ? subjectNames[practiceSession.subject] : "综合练习"} · ${practiceSession.actualCount}题`;
+  $("question-point").textContent = `${subjectNames[practiceItem.subject]} · ${practiceItem.knowledgePointName}`;
+  $("question-stem").textContent = practiceItem.stem; $("question-options").replaceChildren();
+  for (const [key, value] of Object.entries(practiceItem.options)) {
+    const label = document.createElement("label"); label.className = "option-row";
+    const radio = document.createElement("input"); radio.type = "radio"; radio.name = "answer"; radio.value = key;
+    radio.checked = (practiceItem.submitted ? practiceItem.selectedOption : practiceItem.selectedOptionDraft) === key;
+    radio.disabled = practiceItem.submitted;
+    radio.addEventListener("change", () => saveDraft().catch(handleError));
+    const mark = document.createElement("strong"); mark.textContent = key;
+    const text = document.createElement("span"); text.textContent = value;
+    label.append(radio, mark, text); $("question-options").append(label);
+  }
+  $("favorite-question").textContent = practiceItem.favorite ? "取消收藏" : "收藏";
+  $("question-position").textContent = `${practiceIndex + 1} / ${practiceSession.actualCount}`;
+  $("previous-question").disabled = practiceIndex === 0; $("next-question").disabled = practiceIndex + 1 >= practiceSession.actualCount;
+  $("submit-answer").disabled = practiceItem.submitted; $("hint-one").disabled = practiceItem.submitted;
+  $("hint-two").disabled = practiceItem.submitted || practiceItem.hintLevelUsed < 1;
+  $("draft-state").textContent = practiceItem.submitted ? "答案已提交，当前批次不能修改。" : (practiceItem.selectedOptionDraft ? "草稿已保存" : "选择选项后自动保存草稿");
+  $("hint-content").hidden = true; $("answer-feedback").hidden = !practiceItem.submitted;
+  if (practiceItem.submitted) showAnswerFeedback(); else $("answer-feedback").replaceChildren();
+}
+function selectedAnswer() { return document.querySelector('input[name="answer"]:checked')?.value || null; }
+async function saveDraft() {
+  if (!practiceSession || !practiceItem || practiceItem.submitted || savingDraft) return;
+  savingDraft = true; $("draft-state").textContent = "正在保存...";
+  try {
+    practiceSession = await api(`/api/practice-sessions/${practiceSession.id}/progress`, { method: "PUT", body: JSON.stringify({
+      expectedRevision: practiceSession.revision, currentOrdinal: practiceIndex + 1,
+      drafts: [{ itemId: practiceItem.id, selectedOption: selectedAnswer() }]
+    }) });
+    practiceItem.selectedOptionDraft = selectedAnswer(); $("draft-state").textContent = "草稿已保存";
+  } finally { savingDraft = false; }
+}
+function showAnswerFeedback() {
+  const target = $("answer-feedback"); target.replaceChildren(); target.hidden = false;
+  const title = document.createElement("strong"); title.textContent = practiceItem.correct ? "回答正确" : "回答错误";
+  const explanation = document.createElement("p"); explanation.textContent = practiceItem.explanation;
+  const source = document.createElement("p"); source.className = "hint"; source.textContent = `${practiceItem.sourceTitle} · ${practiceItem.sourceLocator}`;
+  target.append(title, explanation, source);
+}
+async function requestHint(level) {
+  const hint = await api(`/api/practice-sessions/${practiceSession.id}/items/${practiceItem.id}/hints`, { method: "POST", body: JSON.stringify({ level }) });
+  practiceItem.hintLevelUsed = hint.hintLevelUsed; $("hint-two").disabled = hint.hintLevelUsed < 1;
+  $("hint-content").hidden = false; $("hint-content").textContent = hint.available ? hint.content : "该题暂未提供此级提示。";
+}
+async function toggleFavorite() {
+  const method = practiceItem.favorite ? "DELETE" : "PUT";
+  const state = await api(`/api/favorites/${practiceItem.questionId}`, { method });
+  practiceItem.favorite = state.favorite; $("favorite-question").textContent = state.favorite ? "取消收藏" : "收藏";
+}
+async function submitPracticeAnswer(event) {
+  event.preventDefault(); const answer = selectedAnswer(); if (!answer) { message("请先选择一个答案"); return; }
+  await saveDraft();
+  await api("/api/attempts", { method: "POST", body: JSON.stringify({ questionId: practiceItem.questionId,
+    questionVersionId: practiceItem.questionVersionId, selectedOption: answer, clientRequestId: crypto.randomUUID(),
+    sessionId: practiceSession.id, sessionItemId: practiceItem.id }) });
+  practiceSession = await api(`/api/practice-sessions/${practiceSession.id}`);
+  await openPracticeItem(practiceIndex);
+  if (practiceSession.status === "completed") await showPracticeResult();
+  await loadPracticeHome();
+}
+async function finishPractice() {
+  practiceSession = await api(`/api/practice-sessions/${practiceSession.id}/finish`, { method: "POST" });
+  await showPracticeResult(); await loadPracticeHome();
+}
+async function showPracticeResult() {
+  const data = await api(`/api/practice-sessions/${practiceSession.id}/result`);
+  $("practice-workspace").hidden = true; $("practice-result").hidden = false;
+  $("result-metrics").replaceChildren(metric("实际题数", data.actualCount), metric("已作答", data.answered),
+    metric("未作答", data.unanswered), metric("答对", data.correct), metric("答错", data.wrong),
+    metric("使用提示", data.hintsUsed), metric("正确率", percent(data.accuracy)), metric("独立正确率", percent(data.independentAccuracy)));
+}
+async function loadWrongQuestions() {
+  const current = epoch; const data = await api("/api/wrong-questions?page=0"); if (current !== epoch) return;
+  $("wrong-items").replaceChildren(); $("wrong-empty").hidden = Boolean(data.items.length);
+  for (const wrong of data.items) {
+    const row = document.createElement("div"); row.className = "wrong-row";
+    const title = document.createElement("strong"); title.textContent = wrong.stem;
+    const meta = document.createElement("p"); meta.className = "hint";
+    meta.textContent = `${subjectNames[wrong.subject]} · ${wrong.knowledgePointName} · 错误${wrong.wrongCount}次 · ${wrong.status === "mastered" ? "已掌握" : `连续独立答对${wrong.consecutiveCorrect}/2`}`;
+    row.append(title, meta); $("wrong-items").append(row);
+  }
+}
 $("auth-form").addEventListener("submit", async event => {
   event.preventDefault(); const current = epoch; let activeEpoch = current; message();
   $("login").disabled = true; $("register").disabled = true;
@@ -107,21 +235,43 @@ for (const [id, change] of [["refresh", 0], ["prev", -1], ["next", 1]]) {
   $(id).addEventListener("click", async () => { const current = epoch; page = Math.max(0, page + change); message(); try { await history(); } catch (error) { if (current === epoch) handleError(error); } });
 }
 
+$("practice-form").addEventListener("submit", async event => {
+  event.preventDefault(); message();
+  try { await createPractice({ mode: $("practice-mode").value, questionCount: Number($("practice-count").value),
+    ...($("practice-subject").value ? { subject: $("practice-subject").value } : {}),
+    ...($("practice-difficulty").value ? { difficulty: $("practice-difficulty").value } : {}) }); }
+  catch (error) { handleError(error); }
+});
+$("reload-sessions").addEventListener("click", () => loadPracticeHome().catch(handleError));
+$("answer-form").addEventListener("submit", event => submitPracticeAnswer(event).catch(handleError));
+$("hint-one").addEventListener("click", () => requestHint(1).catch(handleError));
+$("hint-two").addEventListener("click", () => requestHint(2).catch(handleError));
+$("favorite-question").addEventListener("click", () => toggleFavorite().catch(handleError));
+$("previous-question").addEventListener("click", () => openPracticeItem(practiceIndex - 1).catch(handleError));
+$("next-question").addEventListener("click", () => openPracticeItem(practiceIndex + 1).catch(handleError));
+$("finish-session").addEventListener("click", () => finishPractice().catch(handleError));
+$("close-result").addEventListener("click", () => { $("practice-result").hidden = true; loadPracticeHome().catch(handleError); });
+$("refresh-wrong").addEventListener("click", () => loadWrongQuestions().catch(handleError));
+$("start-wrong-practice").addEventListener("click", async () => {
+  try { location.hash = "practice"; await createPractice({ mode: "wrong", questionCount: 10 }); }
+  catch (error) { handleError(error); }
+});
+
 
 const features = {
   profile: ["个人档案", "将保存报考年份、目标专业、地区偏好和学习基础。", ["按账号保存个人条件", "允许逐步补充资料"]],
   schools: ["院校推荐", "将结合个人条件和经核验的招生资料比较候选专业。", ["按年份与专业匹配", "展示条件和来源", "保留推荐记录"]],
-  practice: ["刷题中心", "将以审核题库组织完整练习批次。", ["章节、随机、错题与收藏模式", "答题卡、草稿保存与继续练习", "分步提示、确定性判分与批次结果"]],
-  wrong: ["错题本", "将关联真实作答、知识点和复习记录。", ["错题归集与重练", "掌握状态", "有依据的Agent辅导"]],
   admin: ["资料管理", "资料、招生记录与题目将通过管理员审核后发布。", ["来源与使用权限登记", "资料版本和发布", "管理员权限校验"]]
 };
 function renderRoute() {
   if (!currentUser) return;
   const route = location.hash.slice(1) || "home";
-  const name = route in features || ["home", "knowledge", "records"].includes(route) ? route : "home";
+  const name = route in features || ["home", "knowledge", "practice", "wrong", "records"].includes(route) ? route : "home";
   $("home-panel").hidden = name !== "home";
   $("knowledge-panel").hidden = name !== "knowledge";
   $("records-panel").hidden = name !== "records";
+  $("practice-panel").hidden = name !== "practice";
+  $("wrong-panel").hidden = name !== "wrong";
   $("feature-panel").hidden = !(name in features);
   for (const link of $("navigation").querySelectorAll("a")) {
     if (link.hash === `#${name}`) link.setAttribute("aria-current", "page"); else link.removeAttribute("aria-current");
@@ -132,6 +282,8 @@ function renderRoute() {
     $("feature-description").textContent = name === "admin" && currentUser.role !== "admin" ? "该入口仅供管理员使用。" : description;
     listText("feature-items", name === "admin" && currentUser.role !== "admin" ? [] : items);
   }
+  if (name === "practice") loadPracticeHome().catch(handleError);
+  if (name === "wrong") loadWrongQuestions().catch(handleError);
 }
 window.addEventListener("hashchange", renderRoute);
 
