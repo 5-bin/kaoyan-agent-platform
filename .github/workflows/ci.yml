@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  java:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -24,27 +24,37 @@ jobs:
           java-version: '17'
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.13'
-          cache: pip
-          cache-dependency-path: agent/requirements-dev.lock.txt
+          python-version: '3.12'
+      - run: python -m pip install -r kaoyan-agent/requirements-dev.txt
+      - name: Build backend and run isolated tests
+        working-directory: kaoyan-B
+        run: ./mvnw -B verify dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt
+      - name: Verify real Java to Python HTTP contract with isolated test services
+        run: python scripts/smoke-current.py --output .cache/ci-smoke-current.json
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r kaoyan-agent/requirements-dev.txt
+      - name: Agent contract tests without paid model or database
+        working-directory: kaoyan-agent
+        run: python -m pytest -q
+      - run: python scripts/check-framework.py
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: '24'
-          package-manager-cache: false
-      - name: Build Java and run tests
-        working-directory: backend
-        run: ./mvnw -B package
-      - name: Install Python test dependencies
-        run: python -m pip install -r agent/requirements-dev.lock.txt
-      - name: Test Python with mock model
-        working-directory: agent
-        run: python -m pytest -q
-      - name: Check frontend and test script syntax
-        run: |
-          node --input-type=module --check < frontend/app.js
-          node --input-type=module --check < frontend/js/api.js
-          node --check scripts/browser-check.cjs
-      - name: Validate repository files
-        run: python scripts/check-docs.py
-      - name: Test real Java to Python chain in demo mode
-        run: python scripts/smoke.py --output .cache/ci-smoke.json
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: kaoyan-frontend/package-lock.json
+      - run: npm ci
+        working-directory: kaoyan-frontend
+      - run: npm run build
+        working-directory: kaoyan-frontend
