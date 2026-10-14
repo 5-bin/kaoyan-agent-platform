@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { login as apiLogin, register as apiRegister } from '@/api/auth'
+import { login as apiLogin, register as apiRegister, logout as apiLogout } from '@/api/auth'
 import { getCurrentUser } from '@/api/user'
 import type { User } from '@/types/api'
 
@@ -9,11 +9,16 @@ interface UserState {
   userInfo: User | null
 }
 
+function readCachedUser(): User | null {
+  try { return JSON.parse(localStorage.getItem('userInfo') || 'null') }
+  catch { return null }
+}
+
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     token: localStorage.getItem('token') || '',
     refreshToken: localStorage.getItem('refreshToken') || '',
-    userInfo: JSON.parse(localStorage.getItem('userInfo') || 'null')
+    userInfo: readCachedUser()
   }),
   getters: {
     isLoggedIn: (s) => !!s.token,
@@ -41,7 +46,12 @@ export const useUserStore = defineStore('user', {
       this.userInfo = u
       localStorage.setItem('userInfo', JSON.stringify(u))
     },
-    logout() {
+    async logout() {
+      const token = this.token
+      try { if (token) await apiLogout() }
+      finally { if (token === this.token) this.clearSession() }
+    },
+    clearSession() {
       this.token = ''
       this.refreshToken = ''
       this.userInfo = null

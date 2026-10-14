@@ -24,6 +24,7 @@
         <div class="menu-group">
           <div class="group-label">资源</div>
           <el-menu-item index="/schools"><el-icon><School /></el-icon><span>院校库</span></el-menu-item>
+          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>Agent 任务</span></el-menu-item>
           <el-menu-item index="/documents"><el-icon><Folder /></el-icon><span>备考资料</span></el-menu-item>
         </div>
         <div v-if="userStore.isAdmin" class="menu-group">
@@ -79,14 +80,17 @@ const activeMenu = computed(() => '/' + (route.path.split('/')[1] || ''))
 const crumbMap: Record<string, string> = {
   '': '首页', practice: '刷题', wrong: '错题本', favorite: '收藏',
   stat: '学习统计', schools: '院校库', documents: '备考资料',
-  profile: '个人中心'
+  profile: '个人中心', tasks: 'Agent 任务'
 }
 const crumbName = computed(() => crumbMap[route.path.split('/')[1]] || '首页')
 
-const onLogout = () => {
-  userStore.logout()
-  ElMessage.success('已退出')
-  router.push('/login')
+const onLogout = async () => {
+  try {
+    await userStore.logout()
+    ElMessage.success('已退出')
+  } finally {
+    if (!userStore.isLoggedIn) await router.replace({ path: '/login', query: { redirect: route.fullPath } })
+  }
 }
 </script>
 

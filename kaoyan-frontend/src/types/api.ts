@@ -26,7 +26,7 @@ export interface User {
 export interface Task {
   id: string
   userId: number
-  taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND'
+  taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND' | 'PRACTICE_SUMMARY' | 'CHAT'
   status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED'
   inputPayload?: Record<string, unknown>
   resultPayload?: Record<string, unknown>

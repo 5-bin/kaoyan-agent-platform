@@ -23,9 +23,9 @@ const rows = ref<Question[]>([])
 onMounted(async () => {
   loading.value = true
   try {
-    // 后端待审核题目接口预留：GET /api/questions/admin/pending
+    // 后端返回分页对象，表格使用其中的 list。
     const { getAdminPending } = await import('@/api/question')
-    rows.value = await getAdminPending({ pageNum: 1, pageSize: 50 })
+    rows.value = (await getAdminPending({ pageNum: 1, pageSize: 50 })).list
   } catch { rows.value = [] }
   finally { loading.value = false }
 })

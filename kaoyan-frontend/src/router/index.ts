@@ -17,6 +17,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'schools', name: 'schools', component: () => import('@/views/SchoolList.vue') },
       { path: 'schools/:id', name: 'school-detail', component: () => import('@/views/SchoolDetail.vue') },
       { path: 'documents', name: 'documents', component: () => import('@/views/DocumentList.vue') },
+      { path: 'tasks', name: 'tasks', component: () => import('@/views/TaskList.vue') },
       { path: 'profile', name: 'profile', component: () => import('@/views/Profile.vue') },
       { path: 'admin/documents', name: 'admin-documents', component: () => import('@/views/admin/AdminDocuments.vue'), meta: { admin: true } },
       { path: 'admin/questions', name: 'admin-questions', component: () => import('@/views/admin/AdminQuestions.vue'), meta: { admin: true } }
