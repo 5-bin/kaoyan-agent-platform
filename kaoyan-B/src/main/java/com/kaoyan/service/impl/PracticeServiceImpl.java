@@ -75,6 +75,12 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
         r.setUserAnswer(userAnswer);
         r.setIsCorrect(correct ? 1 : 0);
         r.setAnsweredAt(LocalDateTime.now());
+        Map<String, Object> snapshot = new java.util.LinkedHashMap<>();
+        snapshot.put("id", q.getId()); snapshot.put("subject", q.getSubject());
+        snapshot.put("knowledgePoint", q.getKnowledgePoint()); snapshot.put("content", q.getContent());
+        snapshot.put("answer", q.getAnswer()); snapshot.put("analysis", q.getAnalysis());
+        snapshot.put("version", q.getVersion());
+        r.setQuestionSnapshot(snapshot);
         updateById(r);
 
         if (!correct) {

@@ -15,7 +15,7 @@
       <el-table v-else :data="rows" stripe>
         <el-table-column prop="taskType" label="类型" width="180">
           <template #default="{ row }">
-            <el-tag effect="plain">{{ row.taskType === 'KNOWLEDGE_QA' ? '知识问答' : '择校推荐' }}</el-tag>
+            <el-tag effect="plain">{{ typeLabels[row.taskType as Task['taskType']] }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
@@ -28,10 +28,11 @@
         <el-table-column prop="createdAt" label="创建时间" width="200" />
         <el-table-column label="结果">
           <template #default="{ row }">
-            <span style="color: var(--c-ink-2)">{{ row.resultPayload ? JSON.stringify(row.resultPayload) : '—' }}</span>
+            <el-button size="small" @click="selected = row">查看结果与来源</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination v-model:current-page="page" :page-size="20" :total="total" layout="prev, pager, next" @current-change="load" />
     </div>
 
     <el-dialog v-model="dialog" title="提交任务" width="480px">
@@ -40,16 +41,21 @@
           <el-select v-model="form.taskType" style="width:100%">
             <el-option label="知识问答" value="KNOWLEDGE_QA" />
             <el-option label="择校推荐" value="SCHOOL_RECOMMEND" />
+            <el-option label="自动识别" value="CHAT" />
           </el-select>
         </el-form-item>
         <el-form-item label="输入">
           <el-input v-model="form.input" type="textarea" :rows="4" placeholder="描述你的问题" />
         </el-form-item>
+        <p v-if="form.taskType === 'SCHOOL_RECOMMEND'"><router-link to="/schools">前往院校页面设置专业、学位等推荐条件</router-link></p>
       </el-form>
       <template #footer>
         <el-button @click="dialog = false">取消</el-button>
         <el-button type="primary" :loading="submitting" @click="submit">提交</el-button>
       </template>
+    </el-dialog>
+    <el-dialog :model-value="!!selected" title="任务结果" width="min(760px, 94vw)" @close="selected = null">
+      <TaskResultView v-if="selected" :task="selected" />
     </el-dialog>
   </div>
 </template>
@@ -58,18 +64,23 @@
 import { onMounted, reactive, ref } from 'vue'
 import { getTaskList, submitTask } from '@/api/task'
 import type { Task } from '@/types/api'
+import TaskResultView from '@/components/TaskResultView.vue'
 
 const dialog = ref(false)
 const submitting = ref(false)
 const loading = ref(false)
 const rows = ref<Task[]>([])
+const selected = ref<Task | null>(null)
+const page = ref(1), total = ref(0)
+const typeLabels: Record<Task['taskType'], string> = { KNOWLEDGE_QA: '知识问答', SCHOOL_RECOMMEND: '院校推荐', PRACTICE_SUMMARY: '练习总结', CHAT: '自动识别' }
 const form = reactive({ taskType: 'KNOWLEDGE_QA', input: '' })
 
 const load = async () => {
   loading.value = true
   try {
-    const r = await getTaskList({ pageNum: 1, pageSize: 20 })
+    const r = await getTaskList({ pageNum: page.value, pageSize: 20 })
     rows.value = r.list
+    total.value = r.total
   } finally { loading.value = false }
 }
 const submit = async () => {

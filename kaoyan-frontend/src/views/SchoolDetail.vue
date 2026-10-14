@@ -1,6 +1,7 @@
 <template>
   <div class="page" v-loading="loading">
     <el-page-header @back="router.back()" title="返回院校库" />
+    <el-alert title="此处旧种子数据含估计值，仅用于页面演示。请通过条件推荐查看带官方来源的2027年资料。" type="warning" :closable="false" />
     <div class="card hero">
       <div class="hero-icon">{{ detail.school?.name?.[0] }}</div>
       <div>

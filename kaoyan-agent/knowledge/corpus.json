@@ -1,0 +1,259 @@
+[
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "ds-deque",
+    "domain": "knowledge",
+    "subject": "数据结构",
+    "title": "栈、队列与双端队列",
+    "url": "https://docs.python.org/3/library/collections.html#collections.deque",
+    "locator": "collections.deque；两端插入与删除操作",
+    "version": "knowledge-408-v1",
+    "content": "栈通常使用后进先出（LIFO）次序，队列通常使用先进先出（FIFO）次序。双端队列允许在两端插入和删除。Python deque 的 append/pop 可实现栈，append/popleft 可实现队列。应区分抽象访问规则与具体底层实现。",
+    "keywords": [
+      "栈",
+      "队列",
+      "双端队列",
+      "LIFO",
+      "FIFO",
+      "deque"
+    ]
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "os-threads",
+    "domain": "knowledge",
+    "subject": "操作系统",
+    "title": "进程与线程",
+    "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-intro.pdf",
+    "locator": "Concurrency: An Introduction，第1—2页",
+    "version": "knowledge-408-v1",
+    "content": "进程与线程都与程序执行有关。同一进程的多个线程共享地址空间，但每个线程保留自己的程序计数器、寄存器状态和栈。共享可变数据带来并发同步问题，不能把共享地址空间理解成线程拥有完全相同的执行状态。",
+    "keywords": [
+      "进程",
+      "线程",
+      "地址空间"
+    ]
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "co-memory",
+    "domain": "knowledge",
+    "subject": "计算机组成原理",
+    "title": "存储层次与主存容量",
+    "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/vm-beyondphys.pdf",
+    "locator": "Beyond Physical Memory: Mechanisms，第1—2页",
+    "version": "knowledge-408-v1",
+    "content": "存储层次使用速度、容量和成本不同的介质组织数据。主存容量有限，虚拟内存机制可以把部分页置于较慢的后备存储；访问不在主存中的页可能触发缺页处理。应区分主存命中与访问后备存储的开销，不能把虚拟地址空间大小当作物理内存容量。",
+    "keywords": [
+      "存储层次",
+      "主存",
+      "虚拟内存",
+      "缺页"
+    ]
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "cn-tcp",
+    "domain": "knowledge",
+    "subject": "计算机网络",
+    "title": "TCP可靠传输",
+    "url": "https://www.rfc-editor.org/rfc/rfc9293.html",
+    "locator": "RFC 9293，3.3 Sequence Numbers、3.8 Data Communication",
+    "version": "knowledge-408-v1",
+    "content": "TCP向应用提供可靠、有序的字节流。序号、确认和重传等机制用于发现与恢复传输中的丢失，接收方按序向应用交付数据。TCP不保留应用消息边界；可靠传输不表示网络不会丢包，也不保证任意时刻都能完成传输。",
+    "keywords": [
+      "TCP",
+      "可靠传输",
+      "重传",
+      "字节流"
+    ]
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "nau-2027-081200",
+    "domain": "school",
+    "title": "南京审计大学2027年计算机科学与技术目录核验摘要",
+    "url": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+    "locator": "计算机学院；081200；全日制；普通项目（不包含代招生及中外合作项目）",
+    "version": "admissions-2027-v1",
+    "content": "南京审计大学计算机学院2027年全日制计算机科学与技术（081200），学术学位，初试科目代码为101、201、301、408。这是专业与科目的目录摘要；报考资格、研究方向及最新调整须结合当年章程核对。未收录录取概率、历史复试线、报录比或招生名额。",
+    "metadata": {
+      "programId": "nau-2027-081200-full-time",
+      "school": "南京审计大学",
+      "college": "计算机学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "江苏",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-14"
+    }
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "nau-2027-085404",
+    "domain": "school",
+    "title": "南京审计大学2027年计算机技术目录核验摘要",
+    "url": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+    "locator": "计算机学院；085404；全日制；普通项目（不包含代招生及中外合作项目）",
+    "version": "admissions-2027-v1",
+    "content": "南京审计大学计算机学院2027年全日制计算机技术（085404），专业学位，初试科目代码为101、204、302、408。这是专业与科目的目录摘要；报考资格、研究方向及最新调整须结合当年章程核对。未收录录取概率、历史复试线、报录比或招生名额。",
+    "metadata": {
+      "programId": "nau-2027-085404-full-time",
+      "school": "南京审计大学",
+      "college": "计算机学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "江苏",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-14"
+    }
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "ucas-2027-081200",
+    "domain": "school",
+    "title": "中国科学院大学2027年计算机科学与技术目录核验摘要",
+    "url": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+    "locator": "计算机科学与技术学院（校部）；081200；全日制；普通项目（不包含代招生及中外合作项目）",
+    "version": "admissions-2027-v1",
+    "content": "中国科学院大学计算机科学与技术学院（校部）2027年全日制计算机科学与技术（081200），学术学位，初试科目代码为101、201、301、408。这是专业与科目的目录摘要；报考资格、研究方向及最新调整须结合当年章程核对。未收录录取概率、历史复试线、报录比或招生名额。",
+    "metadata": {
+      "programId": "ucas-2027-081200-full-time",
+      "school": "中国科学院大学",
+      "college": "计算机科学与技术学院（校部）",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-14"
+    }
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "ucas-2027-085404",
+    "domain": "school",
+    "title": "中国科学院大学2027年计算机技术目录核验摘要",
+    "url": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+    "locator": "计算机科学与技术学院（校部）；085404；全日制；普通项目（不包含代招生及中外合作项目）",
+    "version": "admissions-2027-v1",
+    "content": "中国科学院大学计算机科学与技术学院（校部）2027年全日制计算机技术（085404），专业学位，初试科目代码为101、204、302、408。这是专业与科目的目录摘要；报考资格、研究方向及最新调整须结合当年章程核对。未收录录取概率、历史复试线、报录比或招生名额。",
+    "metadata": {
+      "programId": "ucas-2027-085404-full-time",
+      "school": "中国科学院大学",
+      "college": "计算机科学与技术学院（校部）",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-14"
+    }
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "cuc-2027-081200",
+    "domain": "school",
+    "title": "中国传媒大学2027年计算机科学与技术目录核验摘要",
+    "url": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+    "locator": "计算机与网络空间安全学院；081200；全日制；普通项目（不包含代招生及中外合作项目）",
+    "version": "admissions-2027-v1",
+    "content": "中国传媒大学计算机与网络空间安全学院2027年全日制计算机科学与技术（081200），学术学位，初试科目代码为101、201、301、408。这是专业与科目的目录摘要；报考资格、研究方向及最新调整须结合当年章程核对。未收录录取概率、历史复试线、报录比或招生名额。",
+    "metadata": {
+      "programId": "cuc-2027-081200-full-time",
+      "school": "中国传媒大学",
+      "college": "计算机与网络空间安全学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-14"
+    }
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "cuc-2027-085404",
+    "domain": "school",
+    "title": "中国传媒大学2027年计算机技术目录核验摘要",
+    "url": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+    "locator": "计算机与网络空间安全学院；085404；全日制；普通项目（不包含代招生及中外合作项目）",
+    "version": "admissions-2027-v1",
+    "content": "中国传媒大学计算机与网络空间安全学院2027年全日制计算机技术（085404），专业学位，初试科目代码为101、204、302、408。这是专业与科目的目录摘要；报考资格、研究方向及最新调整须结合当年章程核对。未收录录取概率、历史复试线、报录比或招生名额。",
+    "metadata": {
+      "programId": "cuc-2027-085404-full-time",
+      "school": "中国传媒大学",
+      "college": "计算机与网络空间安全学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-14"
+    }
+  }
+]

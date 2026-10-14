@@ -25,7 +25,7 @@ onMounted(async () => {
   try {
     // 后端待审核题目接口预留：GET /api/questions/admin/pending
     const { getAdminPending } = await import('@/api/question')
-    rows.value = await getAdminPending({ pageNum: 1, pageSize: 50 })
+    rows.value = (await getAdminPending({ pageNum: 1, pageSize: 50 })).list
   } catch { rows.value = [] }
   finally { loading.value = false }
 })

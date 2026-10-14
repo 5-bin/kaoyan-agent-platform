@@ -14,6 +14,7 @@
           <div class="group-label">学习</div>
           <el-menu-item index="/"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
           <el-menu-item index="/practice"><el-icon><EditPen /></el-icon><span>刷题</span></el-menu-item>
+          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>智能问答</span></el-menu-item>
         </div>
         <div class="menu-group">
           <div class="group-label">复习</div>
@@ -79,7 +80,7 @@ const activeMenu = computed(() => '/' + (route.path.split('/')[1] || ''))
 const crumbMap: Record<string, string> = {
   '': '首页', practice: '刷题', wrong: '错题本', favorite: '收藏',
   stat: '学习统计', schools: '院校库', documents: '备考资料',
-  profile: '个人中心'
+  profile: '个人中心', tasks: '智能问答'
 }
 const crumbName = computed(() => crumbMap[route.path.split('/')[1]] || '首页')
 
@@ -146,4 +147,15 @@ const onLogout = () => {
 .avatar { background: var(--c-primary); color: #fff; }
 .uname { font-weight: 600; font-size: 14px; }
 .content { flex: 1; overflow-y: auto; padding-bottom: 40px; }
+@media(max-width:640px) {
+  .sidebar { width: 64px; padding: 12px 6px; }
+  .logo { padding: 0 0 12px; justify-content: center; }
+  .logo > div, .group-label { display: none; }
+  :deep(.el-menu-item) { padding: 0 !important; justify-content: center; }
+  :deep(.el-menu-item > span) { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+  :deep(.el-menu-item .el-icon) { margin: 0; }
+  .topbar { padding: 0 12px; }
+  .user .el-tag { display: none; }
+  .uname { max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+}
 </style>

@@ -1,19 +1,14 @@
-name: Framework checks
-
+name: Platform checks
 on:
   push:
     branches: [main]
   pull_request:
-
 permissions:
   contents: read
-
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      MAVEN_USER_HOME: ${{ github.workspace }}/.cache/maven
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
         with:
@@ -22,29 +17,45 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          cache: maven
+          cache-dependency-path: kaoyan-B/pom.xml
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
           cache: pip
-          cache-dependency-path: agent/requirements-dev.lock.txt
+          cache-dependency-path: |
+            kaoyan-agent/requirements.txt
+            kaoyan-agent/requirements-dev.txt
       - uses: actions/setup-node@v7
         with:
-          node-version: '24'
-          package-manager-cache: false
-      - name: Build Java and run tests
-        working-directory: backend
-        run: ./mvnw -B package
-      - name: Install Python test dependencies
-        run: python -m pip install -r agent/requirements-dev.lock.txt
-      - name: Test Python with mock model
-        working-directory: agent
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: kaoyan-frontend/package-lock.json
+      - name: Install isolated Python dependencies
+        run: python -m pip install -r kaoyan-agent/requirements-dev.txt
+      - name: Test workflows and persistent Qdrant (mock embeddings/models)
+        working-directory: kaoyan-agent
         run: python -m pytest -q
-      - name: Check frontend and test script syntax
+      - name: Check current docs and contracts
+        run: python scripts/check-project.py
+      - name: Build Java and test the real Java to Python chain
+        working-directory: kaoyan-B
+        run: bash mvnw -B -ntp verify
+      - name: Install and build frontend
+        working-directory: kaoyan-frontend
+        run: npm ci && npm run build
+      - name: Check patches
+        run: git diff --check
+      - name: Browser checks with isolated mock API
+        working-directory: kaoyan-frontend
         run: |
-          node --input-type=module --check < frontend/app.js
-          node --input-type=module --check < frontend/js/api.js
-          node --check scripts/browser-check.cjs
-      - name: Validate repository files
-        run: python scripts/check-docs.py
-      - name: Test real Java to Python chain in demo mode
-        run: python scripts/smoke.py --output .cache/ci-smoke.json
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: test-diagnostics
+          path: |
+            kaoyan-B/target/surefire-reports/
+            kaoyan-B/target/agent-chain.log
+            kaoyan-frontend/test-results/

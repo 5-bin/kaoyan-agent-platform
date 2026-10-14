@@ -36,6 +36,9 @@ public class OssUtil {
 
     @PostConstruct
     public void init() {
+        if (props.getEndpoint() == null || props.getEndpoint().isBlank()
+                || props.getAccessKeyId() == null || props.getAccessKeyId().isBlank()
+                || props.getAccessKeySecret() == null || props.getAccessKeySecret().isBlank()) return;
         this.ossClient = new OSSClientBuilder()
                 .build(props.getEndpoint(), props.getAccessKeyId(), props.getAccessKeySecret());
     }
@@ -55,6 +58,7 @@ public class OssUtil {
      * @return objectKey
      */
     public String upload(MultipartFile file, String module) {
+        if (ossClient == null) throw new ApiException(503, "文件存储尚未配置");
         if (file == null || file.isEmpty()) {
             throw new ApiException(400, 400, "文件不能为空");
         }
@@ -87,6 +91,7 @@ public class OssUtil {
      * @param objectKey 对象键
      */
     public void delete(String objectKey) {
+        if (ossClient == null) throw new ApiException(503, "文件存储尚未配置");
         try {
             ossClient.deleteObject(props.getBucketName(), objectKey);
         } catch (Exception e) {

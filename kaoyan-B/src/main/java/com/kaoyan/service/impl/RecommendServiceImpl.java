@@ -1,66 +1,30 @@
 package com.kaoyan.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.kaoyan.entity.Task;
 import com.kaoyan.common.ApiException;
-import com.kaoyan.entity.RecommendRecord;
-import com.kaoyan.entity.School;
-import com.kaoyan.mapper.RecommendRecordMapper;
 import com.kaoyan.service.RecommendService;
-import com.kaoyan.service.SchoolService;
+import com.kaoyan.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
-/**
- * 择校推荐 Service 实现
- */
+/** One pipeline and one canonical history; never writes placeholder recommendation rows. */
 @Service
 @RequiredArgsConstructor
-public class RecommendServiceImpl extends ServiceImpl<RecommendRecordMapper, RecommendRecord>
-        implements RecommendService {
-
-    private final SchoolService schoolService;
-
-    @Override
-    @Transactional
-    public List<RecommendRecord> generate(Long userId) {
-        // 占位实现：取前 5 所院校生成推荐；接入真实 Agent 后替换为模型输出
-        List<School> schools = schoolService.list();
-        if (schools.size() > 5) {
-            schools = schools.subList(0, 5);
-        }
-        for (School s : schools) {
-            RecommendRecord r = new RecommendRecord();
-            r.setUserId(userId);
-            r.setSchoolId(s.getId());
-            r.setReason("占位推荐：" + s.getName());
-            r.setScore(BigDecimal.ZERO);
-            save(r);
-        }
-        return listByUser(userId);
+public class RecommendServiceImpl implements RecommendService {
+    private final TaskService tasks;
+    @Override public Task generate(Long userId, Map<String, Object> input) {
+        return tasks.submit(userId, "SCHOOL_RECOMMEND", input == null
+            ? Map.of("query", "请根据已保存档案比较2027年院校专业") : input);
     }
-
-    @Override
-    public List<RecommendRecord> listByUser(Long userId) {
-        return lambdaQuery()
-                .eq(RecommendRecord::getUserId, userId)
-                .orderByDesc(RecommendRecord::getCreatedAt)
-                .list();
+    @Override public List<Task> listByUser(Long userId) {
+        return tasks.historyPage(userId, 1, 100, "SCHOOL_RECOMMEND").getList();
     }
-
-    @Override
-    @Transactional
-    public void delete(Long recordId, Long userId) {
-        RecommendRecord r = getById(recordId);
-        if (r == null) {
-            throw new ApiException(404, 404, "推荐记录不存在");
-        }
-        if (!r.getUserId().equals(userId)) {
-            throw new ApiException(403, 403, "无权访问");
-        }
-        removeById(recordId);
+    @Override public void delete(String taskId, Long userId) {
+        Task task = tasks.detail(userId, taskId);
+        if (!"SCHOOL_RECOMMEND".equals(task.getTaskType())) throw new ApiException(404, "推荐记录不存在");
+        if ("RUNNING".equals(task.getStatus())) throw new ApiException(409, "任务处理中，不能删除");
+        tasks.removeById(taskId);
     }
 }

@@ -1,63 +1,59 @@
 server:
-  port: 8080
-
+  port: ${PORT:8080}
+  error:
+    include-message: never
 spring:
-  profiles:
-    active: dev
-  main:
-    allow-circular-references: true
   datasource:
-    driver-class-name: ${kaoyan.datasource.driver-class-name}
-    url: jdbc:mysql://${kaoyan.datasource.host}:${kaoyan.datasource.port}/${kaoyan.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-    username: ${kaoyan.datasource.username}
-    password: ${kaoyan.datasource.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:kaoyan}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8
+    username: ${DB_USER:kaoyan_app}
+    password: ${DB_PASSWORD:}
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
   data:
     redis:
-      host: ${kaoyan.redis.host}
-      port: ${kaoyan.redis.port}
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
-
+  cloud:
+    openfeign:
+      client:
+        config:
+          agent:
+            connectTimeout: 3000
+            readTimeout: 45000
+            loggerLevel: none
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
   global-config:
     db-config:
       id-type: auto
-
 jwt:
-  secret: ${JWT_SECRET:kaoyan-dev-jwt-secret-key-0123456789abcdefghijklmnopqrstuvwxyz}
-  access-expire-minutes: 5256000
-  refresh-expire-days: 3650
+  secret: ${JWT_SECRET}
+  access-expire-minutes: 60
+  refresh-expire-days: 14
   issuer: kaoyan-agent
-
+kaoyan:
+  agent:
+    base-url: ${AGENT_BASE_URL:http://127.0.0.1:8001}
+    internal-key: ${AGENT_INTERNAL_KEY:}
+    daily-task-limit: ${DAILY_TASK_LIMIT:30}
+    minute-task-limit: ${MINUTE_TASK_LIMIT:6}
 oss:
-  endpoint: ${kaoyan.alioss.end-point}
-  access-key-id: ${kaoyan.alioss.access-key-id}
-  access-key-secret: ${kaoyan.alioss.access-key-secret}
-  bucket-name: ${kaoyan.alioss.bucket-name}
+  endpoint: ${OSS_ENDPOINT:}
+  access-key-id: ${OSS_ACCESS_KEY_ID:}
+  access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
+  bucket-name: ${OSS_BUCKET_NAME:}
   url-prefix: ${OSS_URL_PREFIX:}
-
-logging:
-  level:
-    com:
-      kaoyan:
-        mapper: debug
-        service: info
-        controller: info
-
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: alpha
-    persist-authorization: true
-
 knife4j:
   enable: true
-  setting:
-    language: zh_cn

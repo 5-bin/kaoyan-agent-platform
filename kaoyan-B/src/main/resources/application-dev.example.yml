@@ -1,0 +1,6 @@
+# Optional local profile: copy to application-dev.yml and use --spring.profiles.active=dev.
+# Prefer environment variables; never commit actual credentials.
+spring:
+  datasource:
+    username: ${DB_USER:kaoyan_app}
+    password: ${DB_PASSWORD:}

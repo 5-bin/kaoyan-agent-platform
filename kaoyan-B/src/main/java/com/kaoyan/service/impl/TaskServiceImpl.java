@@ -1,135 +1,228 @@
 package com.kaoyan.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kaoyan.common.ApiException;
+import com.kaoyan.common.PageResult;
 import com.kaoyan.config.AgentProperties;
 import com.kaoyan.dto.agent.AgentRequest;
 import com.kaoyan.dto.agent.AgentResponse;
-import com.kaoyan.entity.PracticeRecord;
-import com.kaoyan.entity.Task;
-import com.kaoyan.entity.User;
+import com.kaoyan.entity.*;
 import com.kaoyan.feign.AgentFeignClient;
-import com.kaoyan.mapper.PracticeRecordMapper;
-import com.kaoyan.mapper.TaskMapper;
-import com.kaoyan.mapper.UserMapper;
+import com.kaoyan.mapper.*;
 import com.kaoyan.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import java.net.URI;
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Agent 任务 Service 实现：提交后同步调 FastAPI 并落结果。
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements TaskService {
-
+public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements TaskService, ApplicationRunner {
+    private static final Set<String> TYPES = Set.of("KNOWLEDGE_QA", "SCHOOL_RECOMMEND", "PRACTICE_SUMMARY", "CHAT");
     private final AgentFeignClient agentClient;
     private final AgentProperties agentProps;
     private final UserMapper userMapper;
     private final PracticeRecordMapper practiceRecordMapper;
+    private final QuestionMapper questionMapper;
+    private final TaskStore store;
 
     @Override
-    @Transactional
     public Task submit(Long userId, String taskType, Map<String, Object> input) {
-        Task t = new Task();
-        t.setUserId(userId);
-        t.setTaskType(taskType);
-        t.setStatus("RUNNING");
-        t.setInputPayload(input == null ? new HashMap<>() : new HashMap<>(input));
-        save(t);
+        if (taskType == null || !TYPES.contains(taskType)) throw new ApiException(400, "未知任务类型");
+        Map<String, Object> fields = input == null ? Map.of() : input;
+        Set<String> allowed = switch (taskType) {
+            case "PRACTICE_SUMMARY" -> Set.of("sessionId");
+            case "SCHOOL_RECOMMEND", "CHAT" -> Set.of("query", "preferences", "messages");
+            default -> Set.of("query", "messages");
+        };
+        if (!allowed.containsAll(fields.keySet())) throw new ApiException(400, "请求包含不适用的字段");
+        Task task = new Task();
+        task.setId(UUID.randomUUID().toString());
+        task.setUserId(userId);
+        task.setTaskType(taskType);
+        task.setStatus("RUNNING");
+        AgentRequest request = buildRequest(userId, taskType, task.getId(), fields);
+        // Save the exact authorized context, not a client-supplied profile or owner.
+        Map<String, Object> snapshot = new LinkedHashMap<>(fields);
+        snapshot.put("profileSnapshot", request.getProfile());
+        if (request.getQuestions() != null) snapshot.put("questions", request.getQuestions());
+        task.setInputPayload(snapshot);
+        synchronized (store) { store.begin(task); }
         try {
-            AgentRequest req = buildRequest(userId, taskType, t.getId(), input);
-            AgentResponse resp = agentClient.chat(agentProps.getInternalKey(), req);
-            if (resp != null && "SUCCESS".equals(resp.getStatus())) {
-                t.setStatus("SUCCESS");
-                t.setResultPayload(toMap(resp.getResult()));
-            } else {
-                t.setStatus("FAILED");
-                t.setErrorMessage(resp == null ? "no response" : resp.getErrorMessage());
-            }
+            AgentResponse response = agentClient.chat(agentProps.getInternalKey(), request);
+            validateResponse(task, response);
+            task.setStatus(response.getStatus());
+            task.setReleaseId(response.getReleaseId());
+            if ("SUCCESS".equals(response.getStatus())) {
+                Map<String, Object> result = new LinkedHashMap<>(asMap(response.getResult()));
+                result.put("references", response.getReferences());
+                task.setResultPayload(result);
+            } else task.setErrorMessage("Agent处理失败，请稍后重试");
         } catch (Exception e) {
-            log.warn("agent call failed taskId={} err={}", t.getId(), e.getMessage());
-            t.setStatus("FAILED");
-            t.setErrorMessage(e.getMessage());
+            log.warn("task={} agentFailure={}", task.getId(), e.getClass().getSimpleName());
+            task.setStatus("FAILED");
+            task.setErrorMessage("Agent暂时不可用或响应不符合契约，请按任务编号检查日志");
         }
-        updateById(t);
-        return t;
+        store.finish(task);
+        return task;
+    }
+
+    private AgentRequest buildRequest(Long userId, String type, String id, Map<String, Object> input) {
+        User user = userMapper.selectById(userId);
+        if (user == null) throw new ApiException(401, "账号不存在");
+        AgentRequest request = new AgentRequest();
+        request.setTaskId(id);
+        request.setUserId(userId);
+        request.setTaskType(type);
+        Map<String, Object> profile = new LinkedHashMap<>();
+        profile.put("targetSchool", user.getTargetSchool());
+        profile.put("targetMajor", user.getTargetMajor());
+        profile.put("examYear", user.getExamYear());
+        profile.put("background", user.getBackground());
+        request.setProfile(profile);
+        if (!"PRACTICE_SUMMARY".equals(type)) {
+            Object query = input.get("query");
+            if (!(query instanceof String text) || text.isBlank() || text.strip().length() > 8000)
+                throw new ApiException(400, "问题长度需为1—8000字符");
+            request.setUserInput(text.strip());
+        }
+        if (input.containsKey("preferences")) {
+            Map<String, Object> prefs = asMap(input.get("preferences"));
+            if (!Set.of("majorCodes", "degreeType", "regions", "regionConstraint", "studyMode", "examSubjects", "explainWithAi")
+                    .containsAll(prefs.keySet())) throw new ApiException(400, "未知推荐偏好");
+            for (Map.Entry<String, Set<String>> rule : Map.of(
+                    "degreeType", Set.of("academic", "professional"), "regionConstraint", Set.of("required", "preferred"),
+                    "studyMode", Set.of("full_time", "part_time")).entrySet()) {
+                Object value = prefs.get(rule.getKey());
+                if (value != null && !rule.getValue().contains(value)) throw new ApiException(400, "推荐偏好枚举无效");
+            }
+            for (String key : List.of("majorCodes", "regions", "examSubjects")) {
+                Object value = prefs.get(key);
+                if (value == null) continue;
+                int max = key.equals("majorCodes") ? 10 : key.equals("examSubjects") ? 4 : 30;
+                if (!(value instanceof List<?> list) || list.size() > max) throw new ApiException(400, "推荐条件数量不合法");
+                for (Object item : list) {
+                    if (!(item instanceof String text) || text.isBlank() || text.length() > 50
+                            || key.equals("majorCodes") && !text.matches("[0-9]{6}")
+                            || key.equals("examSubjects") && !text.matches("[0-9]{3}"))
+                        throw new ApiException(400, "推荐条件格式不合法");
+                }
+            }
+            if (prefs.containsKey("explainWithAi") && !(prefs.get("explainWithAi") instanceof Boolean))
+                throw new ApiException(400, "explainWithAi需为布尔值");
+            request.setPreferences(prefs);
+        }
+        if (input.containsKey("messages")) {
+            if (!(input.get("messages") instanceof List<?> history) || history.size() > 6)
+                throw new ApiException(400, "对话历史最多6条");
+            for (Object item : history) {
+                Map<String, Object> message = asMap(item);
+                if (!message.keySet().equals(Set.of("role", "content"))
+                        || !Set.of("user", "assistant").contains(message.get("role"))
+                        || !(message.get("content") instanceof String content) || content.isBlank() || content.length() > 4000)
+                    throw new ApiException(400, "对话历史格式不合法");
+            }
+            request.setMessages(new ArrayList<>(history));
+        }
+        if ("PRACTICE_SUMMARY".equals(type)) {
+            if (!(input.get("sessionId") instanceof String session) || session.isBlank() || session.length() > 64)
+                throw new ApiException(400, "缺少合法练习批次");
+            List<PracticeRecord> records = practiceRecordMapper.selectList(new LambdaQueryWrapper<PracticeRecord>()
+                .eq(PracticeRecord::getUserId, userId).eq(PracticeRecord::getSessionId, session)
+                .orderByAsc(PracticeRecord::getOrderIndex));
+            if (records.isEmpty()) throw new ApiException(404, "练习批次不存在或无权访问");
+            List<Map<String, Object>> snapshots = new ArrayList<>();
+            for (PracticeRecord record : records) {
+                if (record.getIsCorrect() == null || !"valid".equals(record.getGradingStatus())) continue;
+                if (record.getQuestionSnapshot() == null) continue;
+                Map<String, Object> q = new LinkedHashMap<>(record.getQuestionSnapshot());
+                q.put("correct", record.getIsCorrect() == 1);
+                snapshots.add(q);
+            }
+            if (snapshots.size() > 50) throw new ApiException(400, "总结最多50题");
+            request.setSessionId(session);
+            request.setQuestions(snapshots);
+        }
+        return request;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> asMap(Object value) {
+        if (!(value instanceof Map<?, ?> map) || map.keySet().stream().anyMatch(k -> !(k instanceof String)))
+            throw new ApiException(400, "对象格式不合法");
+        return (Map<String, Object>) map;
+    }
+
+    static void validateResponse(Task task, AgentResponse response) {
+        if (response == null || !task.getId().equals(response.getTaskId())
+                || response.getStatus() == null || !Set.of("SUCCESS", "FAILED").contains(response.getStatus())
+                || response.getReleaseId() == null || !response.getReleaseId().matches("rag-v1-[a-f0-9]{16}"))
+            throw new IllegalStateException("Agent response mismatch");
+        if (!"SUCCESS".equals(response.getStatus())) return;
+        Map<String, Object> result = asMap(response.getResult());
+        if (result.get("outcome") == null || !Set.of("COMPLETED", "NEEDS_INPUT", "UNSUPPORTED").contains(result.get("outcome"))
+                || !response.getReleaseId().equals(result.get("releaseId"))
+                || result.get("explanationMode") == null || !Set.of("rules", "ai", "fallback").contains(result.get("explanationMode"))
+                || result.get("resolvedTaskType") == null || !TYPES.contains(result.get("resolvedTaskType"))
+                || (!"CHAT".equals(task.getTaskType()) && !Objects.equals(task.getTaskType(), result.get("resolvedTaskType")))
+                || !(result.get("answer") instanceof String answer) || answer.length() > 20000
+                || response.getReferences() == null || response.getReferences().size() > 20)
+            throw new IllegalStateException("Agent result mismatch");
+        Set<String> sourceIds = new HashSet<>();
+        for (Object item : response.getReferences()) {
+            Map<String, Object> ref = asMap(item);
+            URI uri = URI.create(Objects.toString(ref.get("url"), ""));
+            if (!"https".equals(uri.getScheme()) || uri.getHost() == null || uri.getUserInfo() != null
+                    || !(ref.get("id") instanceof String sourceId) || !sourceIds.add(sourceId)
+                    || !(ref.get("version") instanceof String)) throw new IllegalStateException("Invalid reference");
+            for (String field : List.of("title", "locator", "version", "retrievedAt", "excerpt"))
+                if (!(ref.get(field) instanceof String value) || value.isBlank() || value.length() > 4000)
+                    throw new IllegalStateException("Incomplete reference");
+        }
+        if (result.get("candidates") instanceof List<?> candidates) {
+            if (candidates.size() > 5) throw new IllegalStateException("Too many candidates");
+            Set<Object> ids = new HashSet<>();
+            for (Object item : candidates) {
+                Map<String, Object> candidate = asMap(item);
+                if (!(candidate.get("programId") instanceof String) || !ids.add(candidate.get("programId"))
+                        || !(candidate.get("sourceIds") instanceof List<?> cited) || cited.isEmpty()
+                        || !sourceIds.containsAll(cited)) throw new IllegalStateException("Invalid candidate");
+            }
+        }
     }
 
     @Override
     public List<Task> history(Long userId, int page, int size) {
+        return historyPage(userId, page, size, null).getList();
+    }
+
+    @Override
+    public PageResult<Task> historyPage(Long userId, int page, int size, String taskType) {
         Page<Task> p = Page.of(Math.max(page, 1), Math.min(Math.max(size, 1), 100));
-        return lambdaQuery()
-                .eq(Task::getUserId, userId)
-                .orderByDesc(Task::getCreatedAt)
-                .page(p)
-                .getRecords();
+        Page<Task> result = baseMapper.selectPage(p, new LambdaQueryWrapper<Task>()
+            .eq(Task::getUserId, userId).eq(taskType != null, Task::getTaskType, taskType)
+            .orderByDesc(Task::getCreatedAt).orderByDesc(Task::getId));
+        return PageResult.of(result.getTotal(), p.getCurrent(), p.getSize(), result.getRecords());
     }
 
     @Override
     public Task detail(Long userId, String taskId) {
-        Task t = getById(taskId);
-        if (t == null) {
-            throw new ApiException(404, 404, "任务不存在");
-        }
-        if (!t.getUserId().equals(userId)) {
-            throw new ApiException(403, 403, "无权访问");
-        }
-        return t;
+        Task task = getById(taskId);
+        if (task == null || !task.getUserId().equals(userId)) throw new ApiException(404, "任务不存在或无权访问");
+        return task;
     }
 
-    private AgentRequest buildRequest(Long userId, String taskType, String taskId, Map<String, Object> input) {
-        User u = userMapper.selectById(userId);
-        AgentRequest req = new AgentRequest();
-        req.setTaskId(taskId);
-        req.setUserId(userId);
-        req.setTaskType(taskType);
-        req.setProfile(buildProfile(u));
-        if (input != null) {
-            req.setUserInput((String) input.get("query"));
-            req.setSessionId((String) input.get("sessionId"));
+    @Override
+    public void run(ApplicationArguments args) {
+        // Deployment contract: exactly one Java instance owns these synchronous tasks.
+        for (Task task : baseMapper.selectList(new LambdaQueryWrapper<Task>().eq(Task::getStatus, "RUNNING"))) {
+            task.setStatus("FAILED"); task.setErrorMessage("服务重启导致任务中断，请重新提交"); store.finish(task);
         }
-        // 批次总结场景：从 practice_record 拉对错 id
-        if ("PRACTICE_SUMMARY".equals(taskType) && input != null && input.get("sessionId") != null) {
-            String sessionId = (String) input.get("sessionId");
-            List<PracticeRecord> records = practiceRecordMapper.selectList(
-                    new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<PracticeRecord>()
-                            .eq(PracticeRecord::getUserId, userId)
-                            .eq(PracticeRecord::getSessionId, sessionId));
-            List<Long> correct = records.stream().filter(r -> r.getIsCorrect() != null && r.getIsCorrect() == 1)
-                    .map(PracticeRecord::getQuestionId).toList();
-            List<Long> wrong = records.stream().filter(r -> r.getIsCorrect() != null && r.getIsCorrect() == 0)
-                    .map(PracticeRecord::getQuestionId).toList();
-            req.setCorrectQuestionIds(correct);
-            req.setWrongQuestionIds(wrong);
-        }
-        return req;
-    }
-
-    private Map<String, Object> buildProfile(User u) {
-        Map<String, Object> p = new HashMap<>();
-        if (u != null) {
-            p.put("targetSchool", u.getTargetSchool());
-            p.put("targetMajor", u.getTargetMajor());
-            p.put("examYear", u.getExamYear());
-            p.put("background", u.getBackground());
-        }
-        return p;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> toMap(Object o) {
-        if (o instanceof Map) return (Map<String, Object>) o;
-        Map<String, Object> m = new HashMap<>();
-        m.put("data", o);
-        return m;
     }
 }

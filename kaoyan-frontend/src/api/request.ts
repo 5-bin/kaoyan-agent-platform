@@ -5,7 +5,7 @@ import router from '@/router'
 
 const request: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 15000
+  timeout: 55000
 })
 
 request.interceptors.request.use((config) => {
@@ -18,6 +18,9 @@ request.interceptors.request.use((config) => {
 
 request.interceptors.response.use(
   (response) => {
+    const sent = response.config.headers.Authorization
+    const current = useUserStore().token
+    if (sent && sent !== `Bearer ${current}`) return Promise.reject(new Error('SESSION_CHANGED'))
     const res = response.data
     if (res.code === 0) {
       return res.data
@@ -27,6 +30,8 @@ request.interceptors.response.use(
   },
   (error) => {
     const status = error.response?.status
+    const sent = error.config?.headers?.Authorization
+    if (sent && sent !== `Bearer ${useUserStore().token}`) return Promise.reject(new Error('SESSION_CHANGED'))
     if (status === 401) {
       const userStore = useUserStore()
       userStore.logout()
@@ -35,7 +40,9 @@ request.interceptors.response.use(
     } else if (status === 403) {
       ElMessage.error('无权访问')
     } else {
-      ElMessage.error(error.response?.data?.message || '网络异常')
+      ElMessage.error(error.code === 'ECONNABORTED'
+        ? '等待超时，任务可能仍在处理。请先查看任务历史，避免重复提交。'
+        : error.response?.data?.message || '网络异常')
     }
     return Promise.reject(error)
   }
