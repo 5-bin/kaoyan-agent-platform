@@ -1,0 +1,63 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    driver-class-name: ${kaoyan.datasource.driver-class-name}
+    url: jdbc:mysql://${kaoyan.datasource.host}:${kaoyan.datasource.port}/${kaoyan.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${kaoyan.datasource.username}
+    password: ${kaoyan.datasource.password}
+  data:
+    redis:
+      host: ${kaoyan.redis.host}
+      port: ${kaoyan.redis.port}
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+
+jwt:
+  secret: ${JWT_SECRET:kaoyan-dev-jwt-secret-key-0123456789abcdefghijklmnopqrstuvwxyz}
+  access-expire-minutes: 5256000
+  refresh-expire-days: 3650
+  issuer: kaoyan-agent
+
+oss:
+  endpoint: ${kaoyan.alioss.end-point}
+  access-key-id: ${kaoyan.alioss.access-key-id}
+  access-key-secret: ${kaoyan.alioss.access-key-secret}
+  bucket-name: ${kaoyan.alioss.bucket-name}
+  url-prefix: ${OSS_URL_PREFIX:}
+
+logging:
+  level:
+    com:
+      kaoyan:
+        mapper: debug
+        service: info
+        controller: info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    persist-authorization: true
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

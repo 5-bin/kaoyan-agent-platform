@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kaoyan.mapper.SchoolMapper">
+
+    <!-- 多条件搜索院校：province / level / majorName 任意组合，都不传才查全部 -->
+    <select id="search" resultType="com.kaoyan.entity.School">
+        SELECT DISTINCT s.*
+        FROM school s
+        LEFT JOIN school_detail d ON d.school_id = s.id
+        <where>
+            <if test="province != null and province != ''">
+                AND s.province = #{province}
+            </if>
+            <if test="level != null and level != ''">
+                AND s.level = #{level}
+            </if>
+            <if test="majorName != null and majorName != ''">
+                AND d.major_name LIKE CONCAT('%', #{majorName}, '%')
+            </if>
+        </where>
+        ORDER BY s.id
+    </select>
+
+</mapper>
