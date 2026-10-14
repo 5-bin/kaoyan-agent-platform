@@ -35,6 +35,8 @@ async def handle(req) -> dict:
 
     questions = await get_questions_by_ids(all_ids)
     qmap = {q["id"]: q for q in questions}
+    if set(qmap) != set(all_ids):
+        raise ValueError("总结题目已撤回、未审核或不存在")
 
     correct_list = _format_questions(
         [qmap[i] for i in req.correctQuestionIds if i in qmap], "答对")
@@ -57,6 +59,14 @@ async def handle(req) -> dict:
         "background": req.profile.get("background", "未填写"),
     }.items():
         system = system.replace("${" + k + "}", str(v))
-    return await llm_chat(
+    result = await llm_chat(
         model=settings.LLM_MODEL_MAIN, system=system, user="请生成本次练习的总结。"
     )
+
+    for item in result.get("wrong_analysis", []):
+        if item.get("question_id") not in req.wrongQuestionIds:
+            raise ValueError("模型引用未授权错题")
+    for item in result.get("weak_points", []):
+        if not set(item.get("related_question_ids", [])).issubset(set(all_ids)):
+            raise ValueError("模型引用未授权题目")
+    return result
