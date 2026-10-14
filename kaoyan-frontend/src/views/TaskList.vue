@@ -32,7 +32,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination v-model:current-page="page" :page-size="20" :total="total" layout="prev, pager, next" @current-change="load" />
+      <el-pagination v-model:current-page="page" :page-size="20" :total="total" layout="prev, pager, next, total" @current-change="load" />
     </div>
 
     <el-dialog v-model="dialog" title="提交任务" width="480px">
@@ -45,13 +45,13 @@
           </el-select>
         </el-form-item>
         <el-form-item label="输入">
-          <el-input v-model="form.input" type="textarea" :rows="4" placeholder="描述你的问题" />
+          <el-input v-model="form.input" :maxlength="8000" show-word-limit type="textarea" :rows="4" placeholder="描述你的问题" />
         </el-form-item>
         <p v-if="form.taskType === 'SCHOOL_RECOMMEND'"><router-link to="/schools">前往院校页面设置专业、学位等推荐条件</router-link></p>
       </el-form>
       <template #footer>
         <el-button @click="dialog = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="submit">提交</el-button>
+        <el-button type="primary" :loading="submitting" :disabled="!form.input.trim()" @click="submit">提交</el-button>
       </template>
     </el-dialog>
     <el-dialog :model-value="!!selected" title="任务结果" width="min(760px, 94vw)" @close="selected = null">
@@ -84,12 +84,14 @@ const load = async () => {
   } finally { loading.value = false }
 }
 const submit = async () => {
+  if (submitting.value || !form.input.trim()) return
   submitting.value = true
   try {
     await submitTask({ taskType: form.taskType, input: { query: form.input } })
     dialog.value = false
     form.input = ''
-    load()
+    page.value = 1
+    await load()
   } finally { submitting.value = false }
 }
 onMounted(load)

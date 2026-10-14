@@ -10,6 +10,7 @@ target/
 *.class
 *.jar
 !.mvn/wrapper/*.jar
+kaoyan-B/.mvn/wrapper/maven-wrapper.jar
 .mvn/wrapper/dependency/
 .idea/
 *.iml

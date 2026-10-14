@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.kaoyan.entity.Task;
 import com.kaoyan.common.PageResult;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +29,7 @@ public interface TaskService extends IService<Task> {
      * @param size   每页条数
      * @return 任务列表
      */
-    List<Task> history(Long userId, int page, int size);
+    PageResult<Task> history(Long userId, int page, int size);
     PageResult<Task> historyPage(Long userId, int page, int size, String taskType);
 
     /**

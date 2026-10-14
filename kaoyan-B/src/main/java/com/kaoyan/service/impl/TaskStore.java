@@ -1,6 +1,5 @@
 package com.kaoyan.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kaoyan.common.ApiException;
 import com.kaoyan.config.AgentProperties;
 import com.kaoyan.entity.Task;
@@ -9,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.time.Clock;
+import java.time.ZoneOffset;
 
 /** Single Java instance: short reservation/finalization transactions, never remote calls. */
 @Service
@@ -16,16 +17,17 @@ import java.time.LocalDateTime;
 public class TaskStore {
     private final TaskMapper mapper;
     private final AgentProperties props;
+    private Clock clock = Clock.systemDefaultZone();
 
     @Transactional
     public synchronized void begin(Task task) {
-        LocalDateTime now = LocalDateTime.now();
-        long daily = mapper.selectCount(new LambdaQueryWrapper<Task>().eq(Task::getUserId, task.getUserId())
-                .ge(Task::getCreatedAt, now.toLocalDate().atStartOfDay()));
-        long minute = mapper.selectCount(new LambdaQueryWrapper<Task>().eq(Task::getUserId, task.getUserId())
-                .ge(Task::getCreatedAt, now.minusMinutes(1)));
+        var instant = clock.instant();
+        LocalDateTime now = LocalDateTime.ofInstant(instant, clock.getZone());
+        var dayStart = instant.atOffset(ZoneOffset.UTC).toLocalDate().atStartOfDay().toInstant(ZoneOffset.UTC);
+        long daily = mapper.countForUserSince(task.getUserId(), LocalDateTime.ofInstant(dayStart, clock.getZone()));
+        long minute = mapper.countForUserSince(task.getUserId(), now.minusMinutes(1));
         if (daily >= props.getDailyTaskLimit() || minute >= props.getMinuteTaskLimit())
-            throw new ApiException(429, "任务次数达到上限，请稍后再试");
+            throw new ApiException(429, "任务次数达到上限；每日限额于UTC次日重置，分钟限额稍后恢复");
         task.setCreatedAt(now);
         task.setUpdatedAt(now);
         mapper.insert(task);
@@ -33,7 +35,7 @@ public class TaskStore {
 
     @Transactional
     public void finish(Task task) {
-        task.setUpdatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now(clock));
         if (mapper.updateById(task) != 1) throw new IllegalStateException("任务结果未保存");
     }
 }

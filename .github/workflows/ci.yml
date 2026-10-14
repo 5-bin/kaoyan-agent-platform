@@ -37,10 +37,12 @@ jobs:
         working-directory: kaoyan-agent
         run: python -m pytest -q
       - name: Check current docs and contracts
-        run: python scripts/check-project.py
+        run: |
+          python scripts/check-project.py
+          python scripts/check-framework.py
       - name: Build Java and test the real Java to Python chain
         working-directory: kaoyan-B
-        run: bash mvnw -B -ntp verify
+        run: bash mvnw -B -ntp verify dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt
       - name: Install and build frontend
         working-directory: kaoyan-frontend
         run: npm ci && npm run build
@@ -51,6 +53,8 @@ jobs:
         run: |
           npx playwright install --with-deps chromium
           npm run test:e2e
+      - name: Real HTTP and browser regression with isolated H2 and Redis/model doubles
+        run: python scripts/smoke-current.py --output .cache/ci-merge-http.json --browser-check --node node
       - uses: actions/upload-artifact@v6
         if: failure()
         with:
@@ -59,3 +63,4 @@ jobs:
             kaoyan-B/target/surefire-reports/
             kaoyan-B/target/agent-chain.log
             kaoyan-frontend/test-results/
+            .cache/smoke-debug-*/

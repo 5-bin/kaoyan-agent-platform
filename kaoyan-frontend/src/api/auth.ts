@@ -1,8 +1,8 @@
-﻿import request from './request'
+import request from './request'
 
 export interface LoginResult {
   accessToken: string
-  refreshToken: string
+  refreshToken?: string
 }
 
 export const login = (data: { username: string; password: string }) =>

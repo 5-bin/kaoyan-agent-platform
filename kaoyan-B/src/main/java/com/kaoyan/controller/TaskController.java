@@ -43,7 +43,7 @@ public class TaskController {
     public Result<PageResult<Task>> history(PageQuery query) {
         int page = query.pageNum();
         int size = query.pageSize();
-        return Result.ok(taskService.historyPage(UserContext.currentUserId(), page, size, null));
+        return Result.ok(taskService.history(UserContext.currentUserId(), page, size));
     }
 
     /**

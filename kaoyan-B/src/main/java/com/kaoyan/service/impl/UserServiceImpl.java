@@ -66,6 +66,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!"refresh".equals(c.get("type", String.class))) {
             throw new ApiException(401, 401, "refresh Token 无效");
         }
+        if (jwtService.isRevoked(c.getId())) throw new ApiException(401, 401, "refresh Token 已撤销");
         User u = getById(Long.valueOf(c.getSubject()));
         if (u == null || u.getStatus() == null || u.getStatus() != 1) {
             throw new ApiException(401, 401, "用户不存在或已禁用");

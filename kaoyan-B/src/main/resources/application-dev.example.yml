@@ -1,6 +1,15 @@
-# Optional local profile: copy to application-dev.yml and use --spring.profiles.active=dev.
-# Prefer environment variables; never commit actual credentials.
-spring:
+# 可选的本地覆盖模板。复制为 application-dev.yml 后填写，文件已被忽略。
+# 推荐直接从项目根目录 .env 加载环境变量，不必复制本文件。
+# 不要修改 application.yml 中的默认配置来存放本机密码。
+kaoyan:
   datasource:
-    username: ${DB_USER:kaoyan_app}
+    host: ${DB_HOST:127.0.0.1}
+    port: ${DB_PORT:3306}
+    database: ${DB_NAME:kaoyan}
+    username: ${DB_USER:kaoyan}
     password: ${DB_PASSWORD:}
+  agent:
+    base-url: ${AGENT_BASE_URL:http://127.0.0.1:8001}
+    internal-key: ${AGENT_INTERNAL_KEY:}
+jwt:
+  secret: ${JWT_SECRET:}

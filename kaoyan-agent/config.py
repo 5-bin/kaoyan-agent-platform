@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_settings(self):
-        if len(self.AGENT_INTERNAL_KEY) < 16 or not self.AGENT_INTERNAL_KEY.isascii():
+        if len(self.AGENT_INTERNAL_KEY) < 16 or any(not 33 <= ord(c) <= 126 for c in self.AGENT_INTERNAL_KEY):
             raise ValueError("AGENT_INTERNAL_KEY 必须显式设置为至少16位ASCII字符")
         if self.LLM_ENABLED and (not self.LLM_API_KEY or not self.LLM_BASE_URL.startswith("https://")):
             raise ValueError("启用模型需要 API key 和 HTTPS 模型地址")

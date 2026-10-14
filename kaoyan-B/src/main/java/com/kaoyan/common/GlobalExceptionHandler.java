@@ -7,7 +7,6 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 
 /**
  * 全局异常处理
@@ -15,11 +14,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Result<Void>> handleUnreadable(HttpMessageNotReadableException e) {
-        return ResponseEntity.badRequest().body(Result.fail(400, "输入字段或格式不合法"));
-    }
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Result<Void>> handleApi(ApiException e) {
@@ -33,6 +27,12 @@ public class GlobalExceptionHandler {
                 ? "参数校验失败"
                 : e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return ResponseEntity.status(400).body(Result.fail(400, msg));
+    }
+
+    @ExceptionHandler({org.springframework.http.converter.HttpMessageNotReadableException.class,
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<Result<Void>> handleFormat(Exception e) {
+        return ResponseEntity.badRequest().body(Result.fail(400, "输入格式不正确"));
     }
 
     @ExceptionHandler(Exception.class)

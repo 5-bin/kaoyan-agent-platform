@@ -42,6 +42,8 @@ def create_app(settings=None, model=None, retriever=None):
     async def chat(req: ChatRequest):
         try:
             result = await asyncio.wait_for(engine.run(req), timeout=42)
+            if not isinstance(result, dict) or result.get("outcome") not in {"COMPLETED", "NEEDS_INPUT", "UNSUPPORTED"}:
+                raise ValueError("invalid_workflow_result")
             return ChatResponse(taskId=req.taskId, status="SUCCESS", result=result,
                 references=result["references"], releaseId=corpus.release_id)
         except Exception as e:

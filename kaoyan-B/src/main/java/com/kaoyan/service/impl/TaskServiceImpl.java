@@ -137,6 +137,9 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
                 .eq(PracticeRecord::getUserId, userId).eq(PracticeRecord::getSessionId, session)
                 .orderByAsc(PracticeRecord::getOrderIndex));
             if (records.isEmpty()) throw new ApiException(404, "练习批次不存在或无权访问");
+            if (records.stream().noneMatch(r -> "valid".equals(r.getGradingStatus()))
+                    || records.stream().anyMatch(r -> "valid".equals(r.getGradingStatus()) && r.getIsCorrect() == null))
+                throw new ApiException(409, "批次尚未完成或无有效作答，不能生成总结");
             List<Map<String, Object>> snapshots = new ArrayList<>();
             for (PracticeRecord record : records) {
                 if (record.getIsCorrect() == null || !"valid".equals(record.getGradingStatus())) continue;
@@ -198,8 +201,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     }
 
     @Override
-    public List<Task> history(Long userId, int page, int size) {
-        return historyPage(userId, page, size, null).getList();
+    public PageResult<Task> history(Long userId, int page, int size) {
+        return historyPage(userId, page, size, null);
     }
 
     @Override

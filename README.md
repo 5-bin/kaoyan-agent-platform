@@ -1,8 +1,17 @@
 # 考研 Agent 智能备考平台
 
-Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
+Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。Redis用于JWT注销撤销，是Java业务接口的运行依赖。
+
+当前整合同学的框架适配（上游main `6383c92`）与RAG工作流。保留实时账号状态／角色检查、Redis注销撤销、分页参数兼容和隔离HTTP检查。
 
 本轮实现内部接口加固、408与院校独立检索副本、确定性择校、场景识别及可选LLM解释。具体协议、验收和限制见 [RAG说明](docs/rag.md)。`docs/work*.md`、`docs/agent.md` 是历史生成提示词，不是当前运行说明。
+
+## 文档入口
+
+- [完整平台搭建文档](考研Agent平台搭建文档.md)：需求、当前契约与后续建设目标。
+- [框架适配历史记录](docs/当前框架适配.md)：同学在合并前的验证与限制。
+- [合并审查记录](docs/merge-review-2026-10-14.md)：本次冲突处理和重新验证范围。
+- [RAG详细契约](docs/rag.md)：资料、筛选、快照、引用与版本。
 
 ## 当前能力
 
@@ -17,7 +26,7 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 
 ## 准备环境
 
-需要 Java 17、Python 3.13、Node.js 22（含 npm）；业务运行另需 MySQL 8。
+需要 Java 17、Python 3.13、Node.js 22（含 npm）；业务运行另需 MySQL 8 和 Redis。
 
 从根目录执行（Windows PowerShell）：
 
@@ -27,7 +36,7 @@ py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe scripts/init-env.py
 ```
 
-所有服务使用根目录 `.env`。脚本生成随机内部凭证与JWT签名密钥，不覆盖已有文件、不打印凭证。填写自己MySQL的 `DB_USER`、`DB_PASSWORD`，不要沿用历史代码中的密码。Python自动读取根 `.env`；Java由启动脚本显式加载。OSS可不配置，未配置时文件接口返回503，不阻止核心服务启动。
+所有服务使用根目录 `.env`。脚本生成随机内部凭证与JWT签名密钥，不覆盖已有文件、不打印凭证。填写自己MySQL的 `DB_USER`、`DB_PASSWORD` 及 Redis 的 `REDIS_HOST`、`REDIS_PORT`、可选 `REDIS_PASSWORD`，不要沿用历史代码中的密码。Redis不可用时受保护接口会失败，不能通过关闭注销撤销来绕过。Python自动读取根 `.env`；Java由启动脚本显式加载。OSS可不配置，未配置时文件接口返回503，不阻止核心服务启动。
 
 ### 数据库
 
@@ -36,6 +45,8 @@ py -3.13 -m venv .venv
 已有数据库只执行一次V7，为作答增加 `question_snapshot`。不需要修改或清空旧数据。旧作答没有快照时不纳入新总结，以免用最新题目冒充历史版本。V2—V6属于旧演示种子，不是新推荐的数据源，V6的估计分数线不应导入正式库。迁移当前由开发者显式执行；尚未启用全仓库自动迁移。
 
 ### 启动服务
+
+先启动自己的MySQL和Redis，再运行以下服务。默认Java端口8080；若被占用，在后端终端设置 `$env:PORT="8081"`，前端终端设置 `$env:API_PROXY_TARGET="http://127.0.0.1:8081"`。
 
 终端A：
 
@@ -101,3 +112,20 @@ npm run test:e2e
 Java测试在独立H2库启动真实Python子进程，不读日常MySQL，也不调用模型；子进程结束后清理。浏览器测试使用隔离上下文和模拟API，验证页面、历史显示、来源、文本安全和390宽度；不等于整站真实手机验收。
 
 浏览器也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定本机Chrome或Edge；不读取日常浏览器资料。CI已按三个新目录执行Python、Java真实链路、前端构建与浏览器测试。实际验证结果见 [本轮验证记录](docs/validation-rag.md)。
+
+## 隔离HTTP与真实后端浏览器检查
+
+保留并更新上游的链路脚本，使用随机端口、临时H2、Redis／模型替身，不读取日常业务数据。先在kaoyan-B生成测试类路径：
+
+```powershell
+.\mvnw.cmd -B -ntp test-compile dependency:build-classpath '-Dmdep.includeScope=test' '-Dmdep.outputFile=target/test-classpath.txt'
+```
+
+再从根目录运行（报告路径必须尚不存在）：
+
+```powershell
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = '本机Chrome或Edge可执行文件的绝对路径'
+.\.venv\Scripts\python.exe -X utf8 scripts/smoke-current.py --output .cache/new-http-report.json --browser-check --node node
+```
+
+无本机浏览器时先安装前端Playwright Chromium；省略浏览器环境变量即可使用其默认浏览器。Linux/macOS使用 `.venv/bin/python`。脚本验证实际HTTP调用、分页、注销、跨账号、超时前落库、真实进程重启和来源结果展示；不代表真实Redis／模型供应商验收。任务配额按UTC日重置，单Java实例通过短事务保存，不在调用Python时持有数据库事务。

@@ -14,7 +14,7 @@
           <div class="group-label">学习</div>
           <el-menu-item index="/"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
           <el-menu-item index="/practice"><el-icon><EditPen /></el-icon><span>刷题</span></el-menu-item>
-          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>智能问答</span></el-menu-item>
+          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>Agent 任务</span></el-menu-item>
         </div>
         <div class="menu-group">
           <div class="group-label">复习</div>
@@ -80,14 +80,17 @@ const activeMenu = computed(() => '/' + (route.path.split('/')[1] || ''))
 const crumbMap: Record<string, string> = {
   '': '首页', practice: '刷题', wrong: '错题本', favorite: '收藏',
   stat: '学习统计', schools: '院校库', documents: '备考资料',
-  profile: '个人中心', tasks: '智能问答'
+  profile: '个人中心', tasks: 'Agent 任务'
 }
 const crumbName = computed(() => crumbMap[route.path.split('/')[1]] || '首页')
 
-const onLogout = () => {
-  userStore.logout()
-  ElMessage.success('已退出')
-  router.push('/login')
+const onLogout = async () => {
+  try {
+    await userStore.logout()
+    ElMessage.success('已退出')
+  } finally {
+    if (!userStore.isLoggedIn) await router.replace({ path: '/login', query: { redirect: route.fullPath } })
+  }
 }
 </script>
 

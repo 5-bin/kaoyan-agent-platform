@@ -1,26 +1,46 @@
 """Lazy, bounded calls; no automatic retries and no calls in default mode."""
-import asyncio
 import json
 from datetime import datetime, timezone
+from threading import Lock
 from openai import AsyncOpenAI
+
+
+class ModelBudget:
+    """Thread-safe UTC daily attempt budget for one Agent process."""
+    def __init__(self, today=None):
+        self.today = today or (lambda: datetime.now(timezone.utc).date())
+        self.day, self.calls = None, 0
+        self.lock = Lock()
+
+    def consume(self, limit):
+        with self.lock:
+            day = self.today()
+            if day != self.day:
+                self.day, self.calls = day, 0
+            if self.calls >= limit:
+                raise RuntimeError("model_limit: 模型每日尝试次数已达上限")
+            self.calls += 1
+
+
+def _parse(content):
+    content = content.strip()
+    if content.startswith("```") and content.endswith("```"):
+        content = content[3:-3].removeprefix("json").strip()
+    value = json.loads(content)
+    if not isinstance(value, dict) or not value:
+        raise ValueError("模型结果必须是非空JSON对象")
+    return value
 
 
 class ModelClient:
     def __init__(self, settings):
         self.settings, self.client = settings, None
-        self.lock = asyncio.Lock()
-        self.day, self.calls = None, 0
+        self.budget = ModelBudget()
 
     async def generate(self, instruction, payload, schema, router=False):
         if not self.settings.LLM_ENABLED:
             raise RuntimeError("model_disabled")
-        async with self.lock:
-            today = datetime.now(timezone.utc).date()
-            if self.day != today:
-                self.day, self.calls = today, 0
-            if self.calls >= self.settings.MAX_MODEL_CALLS_PER_DAY:
-                raise RuntimeError("model_limit")
-            self.calls += 1
+        self.budget.consume(self.settings.MAX_MODEL_CALLS_PER_DAY)
         if self.client is None:
             self.client = AsyncOpenAI(api_key=self.settings.LLM_API_KEY, base_url=self.settings.LLM_BASE_URL,
                                       timeout=self.settings.LLM_TIMEOUT, max_retries=0)
@@ -32,7 +52,7 @@ class ModelClient:
             messages=[{"role": "system", "content": system},
                       {"role": "user", "content": json.dumps(payload, ensure_ascii=False)}],
             response_format={"type": "json_object"}, temperature=0, max_tokens=2200)
-        return schema.model_validate_json(response.choices[0].message.content or "{}")
+        return schema.model_validate(_parse(response.choices[0].message.content or "{}"))
 
     async def close(self):
         if self.client:

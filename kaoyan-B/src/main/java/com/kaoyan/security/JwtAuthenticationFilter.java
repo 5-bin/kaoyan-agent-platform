@@ -24,6 +24,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final com.kaoyan.mapper.UserMapper userMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -47,14 +48,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
             Long userId = Long.valueOf(claims.getSubject());
-            String username = claims.get("username", String.class);
-            String role = claims.get("role", String.class);
+            var user = userMapper.selectById(userId);
+            if (user == null || !Integer.valueOf(1).equals(user.getStatus())) {
+                SecurityContextHolder.clearContext();
+                chain.doFilter(request, response);
+                return;
+            }
+            String username = user.getUsername();
+            String role = user.getRole();
             AuthUser principal = new AuthUser(userId, username, role);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     principal, null,
                     List.of(new SimpleGrantedAuthority("ROLE_" + role)));
             SecurityContextHolder.getContext().setAuthentication(auth);
-        } catch (ApiException e) {
+        } catch (ApiException | IllegalArgumentException e) {
             SecurityContextHolder.clearContext();
         }
         chain.doFilter(request, response);

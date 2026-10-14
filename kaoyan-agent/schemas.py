@@ -49,7 +49,7 @@ class QuestionSnapshot(StrictModel):
 
 
 class ChatRequest(StrictModel):
-    taskId: str = Field(min_length=1, max_length=64)
+    taskId: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
     userId: int = Field(gt=0)
     taskType: TaskType
     userInput: str | None = Field(default=None, max_length=8000)
@@ -71,6 +71,8 @@ class ChatRequest(StrictModel):
 
     @model_validator(mode="after")
     def task_fields(self):
+        if self.taskType == "PRACTICE_SUMMARY" and not self.sessionId:
+            raise ValueError("总结需要合法批次编号")
         if self.taskType != "PRACTICE_SUMMARY" and not self.userInput:
             raise ValueError("该任务需要非空 userInput")
         if self.taskType != "PRACTICE_SUMMARY" and (self.questions or self.sessionId):
