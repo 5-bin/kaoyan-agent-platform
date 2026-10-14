@@ -1,0 +1,95 @@
+:root {
+  /* 主色 */
+  --c-primary: #3b6cff;
+  --c-primary-hover: #2b5ae6;
+  --c-primary-light: #eef3ff;
+
+  /* 中性色 */
+  --c-bg: #f5f7fa;
+  --c-surface: #ffffff;
+  --c-ink: #1f2329;
+  --c-ink-2: #646a73;
+  --c-ink-3: #8f959e;
+  --c-line: #e5e8ee;
+
+  /* 语义色 */
+  --c-success: #16a34a;
+  --c-success-light: #eaf7ee;
+  --c-danger: #dc2626;
+  --c-danger-light: #fdeeee;
+  --c-warning: #d97706;
+
+  /* 形状 */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(31, 35, 41, 0.04);
+  --shadow-md: 0 4px 16px rgba(31, 35, 41, 0.06);
+}
+
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; margin: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--c-primary); text-decoration: none; }
+
+/* 通用卡片 */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 页面 */
+.page { padding: 24px; max-width: 1200px; margin: 0 auto; }
+.page-head { margin-bottom: 20px; }
+.page-title { font-size: 20px; font-weight: 700; margin: 0; }
+.page-sub { color: var(--c-ink-2); font-size: 13px; margin-top: 4px; }
+
+/* Element Plus 主色覆盖 */
+.el-button--primary {
+  --el-button-bg-color: var(--c-primary);
+  --el-button-border-color: var(--c-primary);
+  --el-button-hover-bg-color: var(--c-primary-hover);
+  --el-button-hover-border-color: var(--c-primary-hover);
+  --el-button-active-bg-color: var(--c-primary-hover);
+}
+.el-menu { border-right: none !important; }
+.el-menu-item.is-active { color: var(--c-primary) !important; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d5d9e0; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #b8bec8; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 兼容旧代码 */
+:root {
+  --ka-bg: var(--c-bg);
+  --ka-surface: var(--c-surface);
+  --ka-ink: var(--c-ink);
+  --ka-ink-soft: var(--c-ink-2);
+  --ka-line: var(--c-line);
+  --ka-primary: var(--c-primary);
+  --ka-primary-2: #6d5cff;
+  --ka-gradient: linear-gradient(135deg, #3b6cff, #6d5cff);
+  --ka-radius: 12px;
+  --ka-shadow: var(--shadow-sm);
+}
+.ka-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
+.ka-gradient-text {
+  background: var(--ka-gradient);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}

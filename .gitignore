@@ -1,17 +1,50 @@
-.env
-.venv/
-.cache/
-backend/.mvn/wrapper/maven-wrapper.jar
-__pycache__/
-.pytest_cache/
-*.pyc
-backend/target/
-backend/data/
-*.log
-.DS_Store
-docs/验证输出/
-backups/
-
+# ---- Node / 前端 ----
 node_modules/
-*.mv.db
-*.trace.db
+dist/
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# ---- Java / 后端 ----
+target/
+*.class
+*.jar
+!.mvn/wrapper/*.jar
+.mvn/wrapper/dependency/
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+HELP.md
+# 本地开发配置（含数据库/OSS/JWT 密钥），不要提交
+kaoyan-B/src/main/resources/application-dev.yml
+src/main/resources/application-local.yml
+src/main/resources/application-prod.yml
+
+# ---- Python / Agent ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.env
+.env.local
+.env.*.local
+
+# ---- 系统 ----
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---- 上传/临时 ----
+uploads/
+logs/
+*.log
+temp/
+.cache/
