@@ -3,18 +3,21 @@ server:
 
 spring:
   profiles:
-    active: dev
-  main:
-    allow-circular-references: true
+    default: dev
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
   datasource:
-    driver-class-name: ${kaoyan.datasource.driver-class-name}
-    url: jdbc:mysql://${kaoyan.datasource.host}:${kaoyan.datasource.port}/${kaoyan.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-    username: ${kaoyan.datasource.username}
-    password: ${kaoyan.datasource.password}
+    driver-class-name: ${kaoyan.datasource.driver-class-name:com.mysql.cj.jdbc.Driver}
+    url: jdbc:mysql://${kaoyan.datasource.host:${DB_HOST:127.0.0.1}}:${kaoyan.datasource.port:${DB_PORT:3306}}/${kaoyan.datasource.database:${DB_NAME:kaoyan}}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${kaoyan.datasource.username:${DB_USER:kaoyan}}
+    password: ${kaoyan.datasource.password:${DB_PASSWORD:}}
   data:
     redis:
-      host: ${kaoyan.redis.host}
-      port: ${kaoyan.redis.port}
+      host: ${kaoyan.redis.host:${REDIS_HOST:127.0.0.1}}
+      port: ${kaoyan.redis.port:${REDIS_PORT:6379}}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2s
   servlet:
     multipart:
       max-file-size: 5MB
@@ -28,23 +31,23 @@ mybatis-plus:
       id-type: auto
 
 jwt:
-  secret: ${JWT_SECRET:kaoyan-dev-jwt-secret-key-0123456789abcdefghijklmnopqrstuvwxyz}
-  access-expire-minutes: 5256000
-  refresh-expire-days: 3650
+  secret: ${JWT_SECRET:}
+  access-expire-minutes: 60
+  refresh-expire-days: 14
   issuer: kaoyan-agent
 
 oss:
-  endpoint: ${kaoyan.alioss.end-point}
-  access-key-id: ${kaoyan.alioss.access-key-id}
-  access-key-secret: ${kaoyan.alioss.access-key-secret}
-  bucket-name: ${kaoyan.alioss.bucket-name}
+  endpoint: ${kaoyan.alioss.end-point:${OSS_ENDPOINT:}}
+  access-key-id: ${kaoyan.alioss.access-key-id:${OSS_ACCESS_KEY_ID:}}
+  access-key-secret: ${kaoyan.alioss.access-key-secret:${OSS_ACCESS_KEY_SECRET:}}
+  bucket-name: ${kaoyan.alioss.bucket-name:${OSS_BUCKET_NAME:}}
   url-prefix: ${OSS_URL_PREFIX:}
 
 logging:
   level:
     com:
       kaoyan:
-        mapper: debug
+        mapper: info
         service: info
         controller: info
 
@@ -61,3 +64,14 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
+
+kaoyan:
+  agent:
+    base-url: ${AGENT_BASE_URL:http://127.0.0.1:8001}
+    internal-key: ${AGENT_INTERNAL_KEY:}
+    daily-task-limit: ${DAILY_TASK_LIMIT:30}
+    minute-task-limit: ${MINUTE_TASK_LIMIT:6}
+
+spring.cloud.openfeign.client.config.agent:
+  connectTimeout: 3000
+  readTimeout: 45000

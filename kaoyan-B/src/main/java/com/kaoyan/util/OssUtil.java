@@ -36,6 +36,10 @@ public class OssUtil {
 
     @PostConstruct
     public void init() {
+        if (!org.springframework.util.StringUtils.hasText(props.getEndpoint())
+                || !org.springframework.util.StringUtils.hasText(props.getAccessKeyId())
+                || !org.springframework.util.StringUtils.hasText(props.getAccessKeySecret())
+                || !org.springframework.util.StringUtils.hasText(props.getBucketName())) return;
         this.ossClient = new OSSClientBuilder()
                 .build(props.getEndpoint(), props.getAccessKeyId(), props.getAccessKeySecret());
     }
@@ -55,6 +59,7 @@ public class OssUtil {
      * @return objectKey
      */
     public String upload(MultipartFile file, String module) {
+        requireConfigured();
         if (file == null || file.isEmpty()) {
             throw new ApiException(400, 400, "文件不能为空");
         }
@@ -87,6 +92,7 @@ public class OssUtil {
      * @param objectKey 对象键
      */
     public void delete(String objectKey) {
+        requireConfigured();
         try {
             ossClient.deleteObject(props.getBucketName(), objectKey);
         } catch (Exception e) {
@@ -100,7 +106,12 @@ public class OssUtil {
      * @param objectKey 对象键
      * @return 完整 URL
      */
+    private void requireConfigured() {
+        if (ossClient == null) throw new ApiException(503, 503, "文件上传服务尚未配置");
+    }
+
     public String buildUrl(String objectKey) {
+        requireConfigured();
         String prefix = props.getUrlPrefix();
         if (prefix == null || prefix.isBlank()) {
             String host = props.getEndpoint()

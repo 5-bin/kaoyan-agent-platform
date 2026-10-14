@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
  * FastAPI Agent 远程调用客户端。
- * base-url 由 kaoyan.agent.base-url 指定，默认 http://127.0.0.1:8000。
+ * base-url 由 kaoyan.agent.base-url 指定，默认 http://127.0.0.1:8001。
  */
-@FeignClient(name = "agent", url = "${kaoyan.agent.base-url:http://127.0.0.1:8000}")
+@FeignClient(name = "agent", url = "${kaoyan.agent.base-url:http://127.0.0.1:8001}")
 public interface AgentFeignClient {
 
     @PostMapping(value = "/internal/rag/chat", consumes = MediaType.APPLICATION_JSON_VALUE)

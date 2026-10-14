@@ -7,7 +7,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-// import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -27,7 +27,7 @@ public class JwtService {
     private static final String BLACKLIST_PREFIX = "jwt:blacklist:";
 
     private final JwtProperties props;
-    // private final StringRedisTemplate redis;  // 暂时不用 Redis
+    private final StringRedisTemplate redis;
 
     private SecretKey key() {
         return Keys.hmacShaKeyFor(props.getSecret().getBytes(StandardCharsets.UTF_8));
@@ -65,7 +65,7 @@ public class JwtService {
                 .issuer(props.getIssuer())
                 .issuedAt(now)
                 .expiration(exp)
-                .signWith(key())
+                .signWith(key(), Jwts.SIG.HS256)
                 .compact();
     }
 
@@ -77,7 +77,7 @@ public class JwtService {
      */
     public Claims parse(String token) {
         try {
-            return Jwts.parser().verifyWith(key()).build()
+            return Jwts.parser().verifyWith(key()).requireIssuer(props.getIssuer()).build()
                     .parseSignedClaims(token).getPayload();
         } catch (Exception e) {
             throw new ApiException(401, 401, "登录已失效，请重新登录");
@@ -91,9 +91,8 @@ public class JwtService {
      * @param ttlSeconds 剩余有效期（秒）
      */
     public void revoke(String jti, long ttlSeconds) {
-        // Redis 黑名单暂时关闭：直接 no-op
-        // if (jti == null || ttlSeconds <= 0) return;
-        // redis.opsForValue().set(BLACKLIST_PREFIX + jti, "1", ttlSeconds, TimeUnit.SECONDS);
+        if (jti == null || ttlSeconds <= 0) return;
+        redis.opsForValue().set(BLACKLIST_PREFIX + jti, "1", ttlSeconds, TimeUnit.SECONDS);
     }
 
     /**
@@ -103,7 +102,6 @@ public class JwtService {
      * @return true 表示已吊销
      */
     public boolean isRevoked(String jti) {
-        // Redis 黑名单暂时关闭：一律按未吊销处理
-        return false;
+        return jti == null || Boolean.TRUE.equals(redis.hasKey(BLACKLIST_PREFIX + jti));
     }
 }

@@ -29,6 +29,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(400).body(Result.fail(400, msg));
     }
 
+    @ExceptionHandler({org.springframework.http.converter.HttpMessageNotReadableException.class,
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<Result<Void>> handleFormat(Exception e) {
+        return ResponseEntity.badRequest().body(Result.fail(400, "输入格式不正确"));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result<Void>> handleOther(Exception e, HttpServletRequest req) {
         log.error("未处理异常 uri={}", req.getRequestURI(), e);
