@@ -14,6 +14,7 @@
           <div class="group-label">学习</div>
           <el-menu-item index="/"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
           <el-menu-item index="/practice"><el-icon><EditPen /></el-icon><span>刷题</span></el-menu-item>
+          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>Agent 任务</span></el-menu-item>
         </div>
         <div class="menu-group">
           <div class="group-label">复习</div>
@@ -24,7 +25,6 @@
         <div class="menu-group">
           <div class="group-label">资源</div>
           <el-menu-item index="/schools"><el-icon><School /></el-icon><span>院校库</span></el-menu-item>
-          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>Agent 任务</span></el-menu-item>
           <el-menu-item index="/documents"><el-icon><Folder /></el-icon><span>备考资料</span></el-menu-item>
         </div>
         <div v-if="userStore.isAdmin" class="menu-group">
@@ -150,4 +150,15 @@ const onLogout = async () => {
 .avatar { background: var(--c-primary); color: #fff; }
 .uname { font-weight: 600; font-size: 14px; }
 .content { flex: 1; overflow-y: auto; padding-bottom: 40px; }
+@media(max-width:640px) {
+  .sidebar { width: 64px; padding: 12px 6px; }
+  .logo { padding: 0 0 12px; justify-content: center; }
+  .logo > div, .group-label { display: none; }
+  :deep(.el-menu-item) { padding: 0 !important; justify-content: center; }
+  :deep(.el-menu-item > span) { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+  :deep(.el-menu-item .el-icon) { margin: 0; }
+  .topbar { padding: 0 12px; }
+  .user .el-tag { display: none; }
+  .uname { max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+}
 </style>

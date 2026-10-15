@@ -1,24 +1,26 @@
-"""仅用于真实HTTP链路验证的模型替身；不连接模型供应商或业务数据库。"""
-import main
+"""Isolated HTTP fixture: real RAG envelope and routing, deterministic model output."""
 import asyncio
+from config import Settings
+from main import create_app
 
-async def answer(*args, **kwargs):
-    if args and args[0] == 'simulate-interruption':
+app = create_app(Settings(_env_file=None))
+
+async def answer(req):
+    if req.userInput == 'simulate-interruption':
         await asyncio.sleep(120)
-    return {'answer': 'HTTP链路测试的模拟答案，不代表领域回答', 'references': []}
+    return {'outcome': 'COMPLETED', 'answer': 'HTTP链路测试的模拟答案，不代表领域回答', 'references': []}
 
-async def recommend(*args, **kwargs):
-    return {'summary': 'HTTP链路测试的模拟推荐，不代表招生建议', 'references': []}
+async def recommend(req):
+    return {'outcome': 'UNSUPPORTED', 'answer': 'HTTP链路测试的模拟推荐，不代表招生建议',
+            'candidates': [], 'references': []}
 
-async def summarize(*args, **kwargs):
-    return {'summary': 'HTTP链路测试的模拟总结', 'references': []}
+async def summarize(req):
+    return {'outcome': 'NEEDS_INPUT', 'answer': 'HTTP链路测试的模拟总结', 'references': []}
 
-async def route(*args, **kwargs):
-    return {'intent': 'CHANGUI'}
+async def route(req):
+    return 'KNOWLEDGE_QA'
 
-main.wenda.handle = answer
-main.tuijian.handle = recommend
-main.summary.handle = summarize
-main.changui.handle = answer
-main.route = route
-app = main.app
+app.state.engine.qa = answer
+app.state.engine.schools = recommend
+app.state.engine.summary = summarize
+app.state.engine.resolve = route

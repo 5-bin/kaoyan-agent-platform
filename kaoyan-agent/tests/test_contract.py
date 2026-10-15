@@ -3,32 +3,38 @@ import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 import main
-from config import Settings, settings
+from config import Settings
+from main import create_app
+from llm_client import ModelClient, ModelBudget
+from schemas import Answer
 from llm_client import _parse
 from schemas import ChatRequest
 
-HEADERS = {'X-Internal-Key': settings.AGENT_INTERNAL_KEY}
+KEY = 'test-only-internal-key-123456'
+HEADERS = {'X-Internal-Key': KEY}
 BODY = {'taskId': 'task-1', 'userId': 1, 'taskType': 'KNOWLEDGE_QA', 'userInput': '进程是什么'}
 
 @pytest.fixture
 def client(monkeypatch):
-    monkeypatch.setattr(main.wenda, 'handle', AsyncMock(return_value={'answer': 'mock', 'references': []}))
-    return TestClient(main.app)
+    app = create_app(Settings(_env_file=None, AGENT_INTERNAL_KEY=KEY))
+    app.state.engine.qa = AsyncMock(return_value={'outcome': 'UNSUPPORTED', 'answer': 'mock', 'references': []})
+    with TestClient(app) as c:
+        yield c
 
 
 def test_internal_auth_is_http_401_and_never_calls_handler(client):
     assert client.post('/internal/rag/chat', json=BODY).status_code == 401
     assert client.post('/internal/rag/chat', json=BODY, headers={'X-Internal-Key': 'wrong'}).status_code == 401
-    main.wenda.handle.assert_not_called()
+    client.app.state.engine.qa.assert_not_called()
 
 
 @pytest.mark.parametrize('changes', [
-    {'taskType': 'invented'}, {'userInput': '  '}, {'userId': -1}, {'taskId': ''},
+    {'taskType': 'invented'}, {'userInput': '  '}, {'userId': -1}, {'taskId': ''}, {'taskId': '../bad'},
     {'ownerId': 2}, {'userInput': 'x' * 8001}, {'correctQuestionIds': [1]},
 ])
 def test_invalid_requests_rejected(client, changes):
     assert client.post('/internal/rag/chat', json={**BODY, **changes}, headers=HEADERS).status_code == 422
-    main.wenda.handle.assert_not_called()
+    client.app.state.engine.qa.assert_not_called()
 
 
 def test_success_and_null_container_compatibility(client):
@@ -40,12 +46,12 @@ def test_success_and_null_container_compatibility(client):
 
 @pytest.mark.parametrize('result', [{}, [], {'answer': 'mock', 'references': ['invented']}, {'other': 'wrong'}])
 def test_malformed_or_untraceable_result_fails(client, monkeypatch, result):
-    monkeypatch.setattr(main.wenda, 'handle', AsyncMock(return_value=result))
+    monkeypatch.setattr(client.app.state.engine, 'qa', AsyncMock(return_value=result))
     assert client.post('/internal/rag/chat', json=BODY, headers=HEADERS).json()['status'] == 'FAILED'
 
 
 def test_upstream_failure_does_not_leak_details(client, monkeypatch, caplog):
-    monkeypatch.setattr(main.wenda, 'handle', AsyncMock(side_effect=RuntimeError('private-upstream-detail')))
+    monkeypatch.setattr(client.app.state.engine, 'qa', AsyncMock(side_effect=RuntimeError('private-upstream-detail')))
     response = client.post('/internal/rag/chat', json=BODY, headers=HEADERS)
     assert response.json()['status'] == 'FAILED'
     assert 'private-upstream-detail' not in response.text + caplog.text
@@ -59,7 +65,7 @@ def test_summary_requires_distinct_authorized_ids(correct, wrong):
 
 
 def test_blank_internal_key_fails_configuration():
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         Settings(AGENT_INTERNAL_KEY='', _env_file=None)
 
 
@@ -69,29 +75,23 @@ def test_model_output_must_be_nonempty_object(text):
         _parse(text)
 
 
-@pytest.mark.parametrize('task_type', ['SCHOOL_RECOMMEND', 'PRACTICE_SUMMARY', 'CHAT'])
-def test_each_explicit_workflow_uses_its_own_handler(client, monkeypatch, task_type):
+@pytest.mark.parametrize('task_type,method', [('SCHOOL_RECOMMEND','schools'), ('PRACTICE_SUMMARY','summary'), ('CHAT','resolve')])
+def test_each_explicit_workflow_uses_its_own_handler(client, monkeypatch, task_type, method):
     body = {**BODY, 'taskType': task_type}
     if task_type == 'PRACTICE_SUMMARY':
-        body.update(userInput=None, sessionId='session-1', correctQuestionIds=[1], wrongQuestionIds=[2])
-        handler = AsyncMock(return_value={'summary': 'mock summary', 'references': []})
-        monkeypatch.setattr(main.summary, 'handle', handler)
-    elif task_type == 'SCHOOL_RECOMMEND':
-        handler = AsyncMock(return_value={'summary': 'mock recommendation', 'references': []})
-        monkeypatch.setattr(main.tuijian, 'handle', handler)
-    else:
-        handler = AsyncMock(return_value={'answer': 'mock chat', 'references': []})
-        monkeypatch.setattr(main, 'route', AsyncMock(return_value={'intent': 'CHANGUI'}))
-        monkeypatch.setattr(main.changui, 'handle', handler)
+        body.update(userInput=None, sessionId='session-1', questions=[])
+    value = 'CHAT' if method == 'resolve' else {'outcome': 'NEEDS_INPUT', 'answer': 'mock'}
+    handler = AsyncMock(return_value=value)
+    monkeypatch.setattr(client.app.state.engine, method, handler)
     result = client.post('/internal/rag/chat', json=body, headers=HEADERS)
     assert result.status_code == 200
     assert result.json()['status'] == 'SUCCESS'
     handler.assert_awaited_once()
-    main.wenda.handle.assert_not_called()
+    client.app.state.engine.qa.assert_not_called()
 
 
-def test_sdk_does_not_retry_failed_paid_requests(monkeypatch):
-    import asyncio
+@pytest.mark.asyncio
+async def test_sdk_does_not_retry_failed_paid_requests(monkeypatch):
     import httpx
     import llm_client
     from openai import AsyncOpenAI, InternalServerError
@@ -99,43 +99,36 @@ def test_sdk_does_not_retry_failed_paid_requests(monkeypatch):
     def respond(request):
         requests.append(request)
         return httpx.Response(500, json={'error': {'message': 'mock failure'}})
-    monkeypatch.setattr(settings, 'LLM_API_KEY', 'test-only-model-key')
     monkeypatch.setattr(llm_client, 'AsyncOpenAI', lambda **kwargs: AsyncOpenAI(
         **kwargs, http_client=httpx.AsyncClient(transport=httpx.MockTransport(respond))))
-    with pytest.raises(InternalServerError):
-        asyncio.run(llm_client.chat('mock-model', 'mock system', 'mock input'))
-    assert len(requests) == 1
+    config = Settings(_env_file=None, AGENT_INTERNAL_KEY=KEY, LLM_ENABLED=True, LLM_API_KEY='test-only')
+    model = ModelClient(config)
+    try:
+        with pytest.raises(InternalServerError):
+            await model.generate('mock system', {}, Answer)
+        assert len(requests) == 1
+    finally:
+        await model.close()
 
 
-def test_summary_rejects_missing_or_foreign_questions(monkeypatch):
-    import asyncio
-    from handlers import summary
-    req = ChatRequest(taskId='t', userId=1, taskType='PRACTICE_SUMMARY', sessionId='s',
-                      correctQuestionIds=[1], wrongQuestionIds=[2])
-    monkeypatch.setattr(summary, 'get_questions_by_ids', AsyncMock(return_value=[]))
-    with pytest.raises(ValueError, match='题目'):
-        asyncio.run(summary.handle(req))
-    questions = [{'id': i, 'subject': 'OS', 'content': 'mock stem', 'answer': 'A', 'analysis': 'mock'} for i in [1, 2]]
-    monkeypatch.setattr(summary, 'get_questions_by_ids', AsyncMock(return_value=questions))
-    monkeypatch.setattr(summary, 'llm_chat', AsyncMock(return_value={
-        'summary': 'mock', 'wrong_analysis': [{'question_id': 9}]}))
-    with pytest.raises(ValueError, match='未授权'):
-        asyncio.run(summary.handle(req))
+def test_summary_requires_distinct_snapshots_and_session():
+    q = {'id': 1, 'subject': 'OS', 'content': 'mock stem', 'answer': 'A', 'correct': False}
+    for body in ({'sessionId': 's', 'questions': [q, q]}, {'questions': [q]}):
+        with pytest.raises(ValidationError):
+            ChatRequest(taskId='t', userId=1, taskType='PRACTICE_SUMMARY', **body)
 
 
-def test_model_daily_budget_blocks_before_opening_vendor_client(monkeypatch):
-    import asyncio
+@pytest.mark.asyncio
+async def test_model_daily_budget_blocks_before_opening_vendor_client(monkeypatch):
     import llm_client
     from unittest.mock import Mock
-    limited = llm_client.ModelBudget()
-    limited.consume(1)
-    monkeypatch.setattr(llm_client, 'budget', limited)
-    monkeypatch.setattr(settings, 'MAX_MODEL_CALLS_PER_DAY', 1)
-    monkeypatch.setattr(settings, 'LLM_API_KEY', 'test-only-model-key')
+    config = Settings(_env_file=None, AGENT_INTERNAL_KEY=KEY, LLM_ENABLED=True, LLM_API_KEY='test-only', MAX_MODEL_CALLS_PER_DAY=1)
+    model = ModelClient(config)
+    model.budget.consume(1)
     factory = Mock()
     monkeypatch.setattr(llm_client, 'AsyncOpenAI', factory)
     with pytest.raises(RuntimeError, match='上限'):
-        asyncio.run(llm_client.chat('mock', 'system', 'user'))
+        await model.generate('system', {}, Answer)
     factory.assert_not_called()
 
 
@@ -165,3 +158,9 @@ def test_concurrent_model_attempts_cannot_exceed_budget():
     with ThreadPoolExecutor(max_workers=8) as pool:
         results = list(pool.map(attempt, range(8)))
     assert sum(results) == 1
+
+
+@pytest.mark.parametrize('key', ['short', 'abcdefghijklmnop\n', 'abcdefghijklmnop '])
+def test_non_printable_or_blank_internal_key_is_rejected(key):
+    with pytest.raises(ValueError):
+        Settings(_env_file=None, AGENT_INTERNAL_KEY=key)

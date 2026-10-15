@@ -1,12 +1,12 @@
 # 考研 Agent 平台搭建文档
 
-编写与代码核对日期：2026-10-14。适用项目：`kaoyan-agent-platform-adaptation/`。服务对象：计算机考研／408备考学生。
+编写与代码核对日期：2026-10-14。适用项目：`kaoyan-agent-platform/`。服务对象：计算机考研／408备考学生。
 
 本文参考同级 [原项目搭建文档](../考研agent平台搭建/考研Agent平台搭建文档.md) 的需求、领域规则和验收方法，按本项目实际 Vue + Spring Boot/MyBatis-Plus + FastAPI 工程重新组织。原项目使用的原生页面、JPA 多模块、H2/PostgreSQL 部署路线和旧任务协议不能直接套用。参考链接用于本地追溯，不是本项目运行依赖；只分发当前仓库时该同级文档不会随包携带。
 
-**当前定位：已完成框架适配，正式领域闭环仍待建设。** 当前代码具备账号、任务保存和三端调用入口，以及题目、刷题、资料、院校、收藏与统计的部分实现。没有经过核验的正式资料集合，知识问答尚无检索，正式推荐生成返回501；刷题仍存在答案提前可读、历史版本依据不完整、草稿与结束状态缺失等问题。页面和控制器存在不代表业务已通过完整验收。
+**当前定位：框架适配与RAG基础版本已整合，完整领域业务仍待验收。** 当前具备账号、Redis注销撤销、任务持久化，以及基于小范围带来源资料的知识检索、结构化院校筛选、可选模型解释和本人作答快照总结。初始资料仅4段408概念和3校6条2027专业，尚需小组内容审核与独立效果评估，不代表全国覆盖。刷题批次版本、草稿、结束状态、答案展示DTO等仍待建设。
 
-文档职责：本文统一维护业务设计、当前契约及建设阶段；[README](README.md) 维护运行入口；[AGENTS.md](AGENTS.md) 维护稳定协作规范；[当前框架适配记录](docs/当前框架适配.md) 保留历史验证与限制。本轮只编辑文档，不执行代码建设、数据库初始化、模型调用或发布。
+文档职责：本文维护业务设计、当前契约与建设阶段；[README](README.md)维护可执行入口；[AGENTS.md](AGENTS.md)维护协作约定；[RAG契约](docs/rag.md)补充检索及快照字段；[框架适配历史](docs/当前框架适配.md)、[RAG历史验证](docs/validation-rag.md)及[本次合并审查](docs/merge-review-2026-10-14.md)分别记录实际范围。本次整合不重置日常业务库、不调用付费模型或发布公网。
 
 ## 阅读导航
 
@@ -40,7 +40,7 @@
 | 交付方向 | 本项目准备内容 | 真实证据／当前边界 |
 | --- | --- | --- |
 | 用户需求 | 调研记录、用户故事、功能验收对应 | 尚无真实访谈，不填写虚构反馈 |
-| 领域定制 | 408资料、招生核验、检索、规则工具、固定工作流 | 正式资料与检索未接入 |
+| 领域定制 | 408资料、招生核验、检索、规则工具、固定工作流 | 已有小范围静态资料与可选向量检索，规模和内容评估待完成 |
 | 可运行工程 | Vue → Java → Python，认证、持久化和失败保存 | 已有隔离测试记录，真实业务验收待完成 |
 | 定制效果 | 同模型、同案例的基线与领域系统对比 | 真实模型对比未运行 |
 | 公开交付 | HTTPS入口、学生检查方式、持久数据和恢复 | 未部署，不填写不存在的访问地址 |
@@ -48,7 +48,7 @@
 
 ### 1.3 本轮成果与后续材料
 
-本轮交付为本文、AGENTS.md 和 README 导航；保留 `docs/agent.md`、`docs/work.md`、`docs/work1.md`、`docs/work2.md` 的历史提示词。后续实际产生调研、资料清单、领域案例、迁移、部署配置和报告时再建立对应文件，不提前创建空目录，不沿用其他项目报告作为本项目证据。
+文档初始交付为本文、AGENTS.md 和 README 导航；后续RAG与框架整合的实际变更见合并审查记录。保留 `docs/agent.md`、`docs/work.md`、`docs/work1.md`、`docs/work2.md` 的历史提示词。后续实际产生调研、资料清单、领域案例、迁移、部署配置和报告时再建立对应文件，不提前创建空目录，不沿用其他项目报告作为本项目证据。
 
 <a id="references"></a>
 
@@ -122,8 +122,8 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 | 模块 | 当前实现／已有证据边界 | P0目标或P1增强 |
 | --- | --- | --- |
 | 账号与档案 | STUDENT注册、JWT登录、Redis撤销；档案字段和接口存在；权限／会话有隔离测试记录 | P0：可持久、隔离的完整备考条件；管理员受控授权 |
-| 知识问答 | KNOWLEDGE_QA模型入口及任务页；无检索，缺模型密钥时任务失败 | P0：四科目录、审核资料、引用、缺信息与缺资料区分 |
-| 院校与推荐 | 院校查询和详情存在；正式生成推荐501；SCHOOL_RECOMMEND仅为实验模型入口 | P0：当年核验候选、确定性筛选排序和推荐快照 |
+| 知识问答 | KNOWLEDGE_QA检索与任务页；默认离线摘要，可选模型解释，资料不足明确说明 | P0：四科目录、审核资料、引用、缺信息与缺资料区分 |
+| 院校与推荐 | 院校查询与详情、条件推荐和来源历史；3校6专业静态副本，代码筛选，模型可选解释 | P0：当年核验候选、确定性筛选排序和推荐快照 |
 | 刷题 | 稳定顺序抽题、批次记录、Java判分及回顾；答案隐藏和完整批次规则不合格 | P0：四模式、固定版本、答题卡、草稿、审核提示、幂等提交和结果页 |
 | 错题与收藏 | 本人标记、列表和错答归集存在；连续正确掌握规则未实现 | P0：可重练、保存历史、自动掌握状态和错题辅导 |
 | 统计与任务 | 作答累加、任务分页、失败保存和重启中断处理存在；统计口径待统一 | P0：有效／未答／撤回、辅助／独立口径；P1：覆盖率和90天练习日历 |
@@ -137,8 +137,8 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 | 页面入口 | 当前角色 | 后续补齐 |
 | --- | --- | --- |
 | `/profile` | 保存当前档案 | 必填与可选条件、学位类型、地区软硬偏好、自评成绩口径 |
-| `/tasks` | 提交任务、分页查看结果及失败 | 科目、引用来源、缺信息追问、版本化结构结果 |
-| `/schools`、`/schools/:id` | 院校筛选与详情 | 学院＋专业＋年份定位、官方来源、核验状态和推荐历史 |
+| `/tasks` | 提交任务、分页查看结果及失败 | 扩大科目覆盖、改进多轮交互；引用、追问和版本结果已具备基础实现 |
+| `/schools`、`/schools/:id` | 院校筛选与详情 | 扩充院校资料与内容审核；当前已有专业／年份条件、来源及任务历史 |
 | `/practice`、`/practice/session/:sessionId` | 抽题、逐题作答、回顾和AI总结 | 四模式、答题卡、续做、提示、服务器判分结果及结束入口 |
 | `/wrong`、`/favorite` | 本人错题和收藏 | 重练批次、撤回提示、掌握状态与辅导入口 |
 | `/stat` | 学习统计 | 统一口径、样本量、独立正确率和覆盖范围 |
@@ -166,7 +166,7 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 - **结果**：区分实际题数、有效已答、未答、撤回、正确、错误、辅助题数和独立正确率。正确率按有效已答计算，独立正确率仅含hintLevelUsed=0的有效作答，分母为0展示暂无数据。
 - **错题与增强统计**：错答进入reviewing；连续独立答对2次进入mastered，辅助答对不推进，之后答错恢复reviewing。少于3次知识点作答只显示样本不足。覆盖率基于明确资料版本的去重有效题数；90天日历按Asia/Shanghai自然日统计有效作答，不把批次起止间隔或草稿操作当成学习时长。
 
-当前缺口：抽题实际上按stable_order返回且上限100；没有上述mode、1—50约束、版本快照、草稿／revision、提示和批次状态；答案详情、回顾和收藏列表提前可读，页面自己比较答案。顺序重复作答返回409，但缺少完整重放／并发保证。当前DELETE批次会删除记录；总结按总题数计算正确率，而分页批次列表按已答计算，必须统一。以上都是待修复事实，不是本轮完成项。
+当前缺口：抽题实际上按stable_order返回且上限100；没有上述mode、1—50约束、抽题时固定版本快照、草稿／revision、提示和批次状态（仅判分时保存题目快照供总结）；答案详情、回顾和收藏列表提前可读，页面已使用服务器判分结果判断正误，完整答案展示DTO仍待实现。顺序重复作答返回409，但缺少完整重放／并发保证。当前DELETE批次会删除记录；总结按总题数计算正确率，而分页批次列表按已答计算，必须统一。以上都是待修复事实，不是本轮完成项。
 
 <a id="architecture"></a>
 
@@ -181,17 +181,17 @@ flowchart LR
     J --> D[(MySQL业务库)]
     J --> R[(Redis令牌撤销)]
     J -->|OpenFeign与内部凭证| A[FastAPI Agent]
-    A -->|总结只读已审核题目| D
+    A --> K[(版本化只读资料 / 独立Qdrant)]
     A --> M[OpenAI兼容模型接口]
     J --> O[可选OSS上传]
 ```
 
-图为当前代码结构，模型供应商和MySQL真实环境未验收。正式建设另增加Java审核发布、只读版本资料包、BM25检索及授权快照；当前没有这些节点的运行实现。
+图为当前代码结构；模型默认关闭，可选本地Qdrant。Java提供本人题目快照，Python不访问业务数据库。内容在线审核发布、完整批次业务、远程Qdrant及真实模型供应商仍需建设或验收；本机MySQL连接历史与本轮隔离验证分别记录。
 
 ### 5.2 当前目录与技术栈
 
 ```text
-kaoyan-agent-platform-adaptation/
+kaoyan-agent-platform/
 ├── AGENTS.md / README.md / 考研Agent平台搭建文档.md
 ├── kaoyan-frontend/          # Vue、TS、Vite、Pinia、Element Plus、Axios
 │   └── src/                 # api、types、stores、router、views、layouts
@@ -201,23 +201,21 @@ kaoyan-agent-platform-adaptation/
 │       ├── main/java/com/kaoyan/  # controller、service、mapper、entity、dto等
 │       ├── main/resources/       # application.yml、mapper、db初始化与种子SQL
 │       └── test/                 # 隔离测试及链路启动辅助
-├── kaoyan-agent/             # FastAPI、Pydantic、SQLAlchemy async、aiomysql
+├── kaoyan-agent/             # FastAPI、Pydantic、FastEmbed、Qdrant
 │   ├── main.py / schemas.py / config.py / llm_client.py
-│   ├── db.py / repository.py / router.py / prompts.py
-│   └── handlers/ / prompts/ / tests/
+│   ├── workflows.py / retrieval.py / ingest.py / prompts.py
+│   └── knowledge/ / prompts/ / tests/
 ├── scripts/                 # init-env、check-framework、smoke-current、browser-current
 ├── docs/                    # 当前适配记录和历史生成提示词
 ├── .github/workflows/ci.yml
 └── .env.example / .gitignore
 ```
 
-配置版本以 [后端 POM](kaoyan-B/pom.xml)、[前端依赖](kaoyan-frontend/package.json) 与 [Python依赖](kaoyan-agent/requirements.txt) 为准：Spring Boot 3.5系列、Java编译目标17，Python依赖固定版本，前端以package-lock安装。推荐及CI环境为JDK17／Python3.12／Node20；历史本机验证使用JDK25编译目标17、Python3.13、Node24，不能混称。
+配置版本以 [后端 POM](kaoyan-B/pom.xml)、[前端依赖](kaoyan-frontend/package.json) 与 [Python依赖](kaoyan-agent/requirements.txt) 为准：Spring Boot 3.5系列、Java编译目标17，Python依赖固定版本，前端以package-lock安装。当前CI配置为JDK17／Python3.13／Node22；本轮本机JDK17、Python3.13，Node版本与实际结果见合并审查。上游历史JDK25／Python3.13／Node24的结果独立保留。
 
 ### 5.3 职责与数据流
 
-Java从认证上下文识别账号，在调用前读取必要档案和本人作答。PRACTICE_SUMMARY过滤valid记录，必须有记录且全部有效项目已答；对错编号由Java计算。Python接收内部凭证保护的请求，按类型处理；当前总结再查询现行question表，无法保证旧题版本还原。
-
-正式方案由Java传递题目／判分与候选快照，Python处理只读发布资料和规则工具，返回编号、引用和解释供Java复核保存。账号、密码哈希、会话令牌及完整个人信息不进入模型上下文。逐步替换只读现行题表时同步Java DTO、Python模型和测试，不直接移除当前查询造成总结不可用。
+Java读取当前账号、本人的档案与批次作答，执行判分和权限检查。总结要求valid项目全部已答且快照完整，仅将判分时已保存的题目快照传给Python；缺少快照的批次在创建任务前409拒绝，不查询现行题表补造。推荐由Python对独立版本资料按硬条件筛选与稳定排序，Java保存当次授权输入、候选结果、引用和releaseId。Python不连接业务数据库，不接受客户端或模型提供的owner、SQL及业务写入。
 
 ### 5.4 任务、限额与失败
 
@@ -225,7 +223,7 @@ Java从认证上下文识别账号，在调用前读取必要档案和本人作�
 
 每账号默认每UTC日30项、滚动60秒内6项，使用持久任务记录计数；UTC零点对应北京时间08:00。仅支持单Java实例的串行检查。Python默认每UTC日100次模型尝试，失败同样计数，进程重启会重置，仅支持单Python实例；不是跨重启账单硬上限。CHAT路由和回答可能产生两次显式模型请求。
 
-当前超时预算：模型30秒、Python完整任务40秒、Java连接3秒／读取45秒、前端55秒。SDK与模型适配层没有自动重试。页面超时先查历史，人工重新提交是新任务并消耗配额；当前任务提交不承诺幂等。
+当前超时预算：模型默认20秒（可配置1—30秒）、Python完整任务42秒、Java连接3秒／读取45秒、前端55秒。SDK与模型适配层没有自动重试。页面超时先查历史，人工重新提交是新任务并消耗配额；当前任务提交不承诺幂等。
 
 ### 5.5 正式资料发布目标
 
@@ -263,7 +261,7 @@ Java从认证上下文识别账号，在调用前读取必要档案和本人作�
 
 ### 6.3 中文 BM25 检索目标
 
-BM25根据查询词与资料的匹配程度排序，首版采用可解释的词项检索。当前尚无检索集合或BM25入口，`jieba`、`rank-bm25` 不在当前依赖中，新增时需核对兼容性。
+BM25根据查询词与资料的匹配程度排序，首版采用可解释的词项检索。当前已实现中文术语／词项匹配基线与可选FastEmbed＋Qdrant，并非BM25；`jieba`、`rank-bm25`不在依赖中。下列BM25规则仍是可选优化设计，不能把词项实现写成BM25已完成。
 
 1. 按科目、知识点、招生年份和releaseId限制候选，缺科目可搜索四科；不能把不同年份的招生字段拼成同一条依据。
 2. 中文分词保留408词汇、英文缩写、公式和否定词，维护经审核的词典与同义词。
@@ -276,20 +274,20 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 ### 6.4 工作流与受约束工具
 
-当前main.py按明确任务类型调用handler，CHAT才执行意图路由。正式建设维持一个领域Agent、固定代码流程和白名单工具；模型不自行执行任意SQL、代码、网络访问或业务写入。
+当前main.py工厂创建固定Workflows，明确任务直接执行，CHAT才执行意图识别。正式建设维持一个领域Agent、固定代码流程和白名单工具；模型不自行执行任意SQL、代码、网络访问或业务写入。
 
-| 目标工具（未实现） | 输入 | 输出与校验 |
+| 工具／规则（当前范围见说明） | 输入 | 输出与校验 |
 | --- | --- | --- |
 | retrieve_knowledge | 问题、科目／知识点、releaseId | 资料块及完整来源，只读已发布版本 |
 | filter_programs | Java授权候选、档案与硬约束 | 符合候选、排除原因、缺失资格项 |
 | rank_programs | 已筛选候选及软偏好 | 稳定排序、匹配理由，不预测录取概率 |
 | recommend_questions | 已审核题目元数据、知识点与本人练习摘要 | 最多5个授权题目编号；不足说明实际数量 |
 
-确定性单选判分是Java业务函数，不属于模型工具；只读题目查询是当前实现，不等于上述推荐工具已存在。
+确定性单选判分是Java业务函数，不属于模型工具。当前retrieve_knowledge、filter_programs、rank_programs在固定代码流程实现基础行为，尚无通用模型工具调度接口；recommend_questions未实现。
 
 ### 6.5 知识问答
 
-当前KNOWLEDGE_QA将“暂无参考资料”填入模板后调用模型，要求非空answer，拒绝非空references；因此属于无检索模型回答，不能宣传为RAG或可追溯专业答疑。
+当前KNOWLEDGE_QA只检索版本化资料，资料覆盖时返回带引用摘要；模型启用后可解释，并校验sourceIds属于本次证据。默认无需模型；无资料返回UNSUPPORTED。当前只有4段概念，尚不能声称覆盖完整408或已经验证领域回答效果。
 
 目标流程：问题与长度检查 → 必要条件检查 → 按科目检索当前资料 → 检查依据覆盖 → 生成概念、前提、示例和易混点 → 校验结构与引用 → 保存资料版本。缺少对象或关键条件进入needs_input，资料不覆盖进入unsupported，异常或非法引用进入failed；只有依据充分的回答进入completed。
 
@@ -297,7 +295,7 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 ### 6.6 院校推荐
 
-当前SCHOOL_RECOMMEND接收Java读取的targetSchool、targetMajor、examYear、background档案，但没有核验招生候选；正式 `/api/recommends/generate` 返回501且不写记录。实验任务可能返回模型建议，不能据此认定满足当年资格或形成正式推荐。
+当前SCHOOL_RECOMMEND接收Java授权档案及本次结构偏好，在小范围版本化副本上按年份、专业代码、学位、地区、学习方式和科目筛选排序。`/api/recommends/generate`已接入同一任务流程，返回Task而非旧RecommendRecord；引用与历史快照可查看，不推断录取概率。全部招生资格仍以官方要求及待确认项为准。
 
 目标要求报考年份、专业范围和学硕／专硕意向；地区偏好区分required与preferred，自评成绩标明科目及满分。Java提供本人档案、临时偏好和当年候选，临时偏好只作用于该任务，持久修改另走档案接口。
 
@@ -307,7 +305,7 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 ### 6.7 错题辅导与批次总结
 
-当前PRACTICE_SUMMARY基于本人已完成有效记录计算对错ID，再读现行审核题表；题目缺失／停用／未审核则失败。模型wrong_analysis和weak_points中的题目编号须属于授权集合，但尚无历史题目快照和知识检索，不能称为正式错题辅导。
+当前PRACTICE_SUMMARY要求本人批次valid项目全部已答，且每条question_snapshot非NULL、非空对象。快照缺失时Java返回409及历史依据缺失说明，不创建任务、不调用Agent、不消耗任务额度。快照完整时读取全部有效作答，代码计算正确题数与正确率，模型仅可解释；不能用新题目冒充旧依据。判分时快照不等于抽题时固定整个批次，正式错题辅导、提示与重练仍待建设。
 
 目标错题流程：Java验证本人attemptId → 读取题目版本与判分快照 → Python关联知识点并检索 → 解释选择错误的条件和正确解法 → 推荐已审核题目 → 检查与标准答案一致 → Java保存任务。答案与资料冲突时待管理员核查，保留既有判分，不静默改答案。
 
@@ -339,10 +337,10 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 | 当前表 | 主要字段／关系 | 不能据此声称的能力 |
 | --- | --- | --- |
 | user | 数字id、账号、密码哈希、role／status及目标院校／专业／年份／背景 | 完整专业资格、学位与成绩档案 |
-| task | 字符串id、userId、taskType、status、inputPayload、resultPayload、releaseId、错误与时间 | releaseId已实际激活、结构化领域终态已接入 |
+| task | 字符串id、userId、taskType、status、inputPayload、resultPayload、releaseId、错误与时间、内部deletedAt | 独立用量账本、用户可见的删除时间或自动数据清理 |
 | document | 标题、科目、正文、sourceUrl、status及创建／审核人 | 来源定位、许可、不可变知识版本和检索索引 |
 | school、school_detail | 院校及专业代码／名称／年份／人数／分数线 | 学院、完整条件、来源核验及跨口径可比性 |
-| recommend_record | 本人推荐记录与结果载荷 | 正式推荐生成；当前生成入口501 |
+| recommend_record | 旧占位推荐表，保留兼容 | 新推荐统一保存task，不读写占位推荐历史 |
 | question | 数字id、题干选项、answer／analysis、科目／知识点、difficulty、version、active及审核信息 | 单行version字段等于历史版本快照 |
 | practice_record | userId、sessionId、questionId、orderIndex、答案／判分／时间、gradingStatus | 独立批次状态、持久草稿、提示、请求幂等及历史题目依据 |
 | user_question_mark | 本人题目收藏／错题标记、错次与时间 | 连续独立答对掌握机制或撤回重算 |
@@ -359,10 +357,10 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 | POST `/api/auth/register`、`/api/auth/login`、`/api/auth/logout` | 注册／登录账号密码；退出Authorization | 注册仅STUDENT，登录accessToken，退出Redis撤销 |
 | POST `/api/auth/refresh` | refreshToken | 当前登录不下发refreshToken，保留兼容入口 |
 | GET `/api/users/me`、PUT `/api/users/profile`、PUT `/api/users/avatar` | 本人展示资料、允许档案、头像 | 归属从认证取，不能设置role |
-| GET／POST `/api/tasks`、GET `/api/tasks/{taskId}` | 分页历史、类型化输入、本人任务 | 同步调用并保存状态，跨账号详情404 |
+| GET／POST `/api/tasks`、GET `/api/tasks/{taskId}` | 分页历史、类型化输入、本人任务 | 同步调用并保存状态；历史及total排除已删除项，跨账号或已删除详情404 |
 | GET `/api/documents` | subject，可返回已发布资料列表 | 尚非Agent知识检索接口 |
 | GET `/api/schools`、POST `/api/schools/search`、GET `/api/schools/{schoolId}` | province／level／majorName，院校及专业详情 | 列表不是核验推荐，未提供完整当年专业条件筛选 |
-| POST `/api/recommends/generate`、GET `/api/recommends`、DELETE `/api/recommends/{id}` | 推荐生成、本人历史／删除 | 正式生成501，不能写占位成功记录 |
+| POST `/api/recommends/generate`、GET `/api/recommends`、DELETE `/api/recommends/{taskId}` | `{query,preferences}`、本人近期Task历史／字符串taskId删除 | 与任务同一流程；仅隐藏本人SUCCESS／FAILED推荐并保留额度，重复删除404，未结束409 |
 | GET `/api/questions/practice`、GET `/api/questions/{id}` | subject／difficulty／knowledgePoint／limit，题目实体 | 抽题限审核启用；仍含答案，详情不能作为合格学生DTO |
 | POST `/api/practice/sessions` | subject、difficulty、count；返回sessionId | 固定stable_order及记录，上限100在Service截取；无正式状态与版本 |
 | POST `/api/practice/sessions/{sessionId}/answer` | questionId、answer；返回data:null | Java判分，但未返回权威判分视图，需改造页面与DTO |
@@ -379,11 +377,11 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 统一响应：`code=0`表示请求业务包装成功，任务是否成功还须检查data.status。分页为 `{total,page,size,list}`，页码从1起；任务、题目审核和管理资料列表接收pageNum／pageSize并兼容page／size，默认1／10。批次和标记分页按各自Controller参数，不能把兼容范围扩大到所有接口。
 
-本轮静态检查另发现 `/api/users/me` 直接返回User实体，实体包含passwordHash且未设置字段隐藏；注册响应也需纳入敏感字段核对。这不是已修复项，正式建设应使用账号展示DTO，只返回允许字段，并用HTTP检查确认没有密码哈希。收藏／错题列表同样含answer和analysis，不能作为绕过提交前答案隐藏的入口；只对有本人有效已提交作答的记录开放相应历史解析。
+当前User实体passwordHash已设置@JsonIgnore，注册不返回哈希；完整账号白名单DTO仍需后续建设，持续通过HTTP检查敏感字段。收藏／错题列表同样含answer和analysis，不能作为绕过提交前答案隐藏的入口；只对有本人有效已提交作答的记录开放相应历史解析。
 
 ### 7.3 当前任务入参与示例
 
-KNOWLEDGE_QA、SCHOOL_RECOMMEND、CHAT仅接受 `input.query`，必须为非空字符串，最长8000字符；PRACTICE_SUMMARY仅接受 `input.sessionId`，非空且最长64字符。input未知字段拒绝，客户端不能提交userId、profile或对错ID。示例为契约演示，编号不代表已有数据或已执行请求。
+文本任务接受非空 `input.query`，最长8000字符，可附最多6条user／assistant历史；SCHOOL_RECOMMEND和CHAT可附白名单preferences。PRACTICE_SUMMARY仅接受非空且最长64字符的input.sessionId。客户端不能提交userId、profile或作答快照，Java从本人业务记录构造上下文；详细字段上限见[RAG契约](docs/rag.md)。示例为契约演示，编号不代表已有数据或已执行请求。
 
 ```json
 {
@@ -399,39 +397,24 @@ KNOWLEDGE_QA、SCHOOL_RECOMMEND、CHAT仅接受 `input.query`，必须为非空�
 }
 ```
 
-任务数据包含id、userId、taskType、status、inputPayload、resultPayload、releaseId、errorMessage、createdAt、updatedAt。现行服务只形成RUNNING／SUCCESS／FAILED，非空结果对象检查不等于事实正确。现行releaseId可为空，不能在例子中伪装已有正式发布版本。
+任务数据包含id、userId、taskType、status、inputPayload、resultPayload、releaseId、errorMessage、createdAt、updatedAt。现行服务只形成RUNNING／SUCCESS／FAILED，非空结果对象检查不等于事实正确。新结果含由语料内容计算的rag-v1版本及outcome，旧任务按旧格式只读显示，不倒填新资料来源。
 
 ### 7.4 当前 Java → Python 契约
 
-内部 `POST /internal/rag/chat` 使用 `X-Internal-Key`，仅Java或授权隔离测试调用。请求含taskId、userId、taskType、userInput、sessionId、correctQuestionIds、wrongQuestionIds、messages、profile。Pydantic拒绝额外字段；taskId为1—64字符的字母／数字／下划线／连字符，userId为正整数；总结题目ID须为不重复正数，每个对错列表最多100项，messages最多100项。
+内部`POST /internal/rag/chat`使用X-Internal-Key；401表示凭证无效，422表示输入非法，处理异常返回status=FAILED并保存简短原因。main以`create_app`工厂启动，默认LLM_ENABLED=false，Python不需要数据库账号。
 
-知识任务的档案当前为空；其他类型由Java读取必要字段。当前Java没有构建持久对话历史，不能将messages字段存在写成多轮记忆已实现。
-
-```json
-{
-  "taskId": "example-task-1",
-  "userId": 1,
-  "taskType": "KNOWLEDGE_QA",
-  "userInput": "解释进程与线程的区别。",
-  "sessionId": null,
-  "correctQuestionIds": [],
-  "wrongQuestionIds": [],
-  "messages": [],
-  "profile": {}
-}
-```
+Java发送taskId、userId、taskType，以及适用于该任务的userInput、sessionId、questions、messages、profile、preferences；questions为本人已判分的题目版本快照，旧correctQuestionIds／wrongQuestionIds不再接受。未知字段拒绝。messages和profile可将Java null归一为空容器，但不允许system消息或伪造归属。完整上限和筛选规则见[RAG契约](docs/rag.md)。
 
 ```json
 {
-  "taskId": "example-task-1",
-  "status": "FAILED",
-  "result": null,
-  "references": [],
-  "errorMessage": "Agent未完成任务，请检查配置或稍后重试"
+  "taskId": "example-task-1", "userId": 1, "taskType": "KNOWLEDGE_QA",
+  "userInput": "解释进程与线程的区别。", "messages": [], "profile": {}
 }
 ```
 
-Python只返回SUCCESS／FAILED。内部凭证不匹配HTTP401，模型参数校验失败HTTP422；合法请求处理异常通常HTTP200加FAILED。没有可追溯集合时返回非空references会失败；总结中的模型题目ID限制在本次授权集合。Java校验taskId、状态和非空结果对象，异常保存简短FAILED原因，不向用户返回供应商原始异常或凭证。
+响应含taskId、status、result、references、releaseId和可选errorMessage。result.outcome为大写COMPLETED／NEEDS_INPUT／UNSUPPORTED，三者均可对应SUCCESS；页面必须显示资料不足／补充条件，不能只看HTTP200或SUCCESS。新结果另含resolvedTaskType与explanationMode=rules／ai／fallback。引用包含id、title、url、locator、version、retrievedAt、excerpt，模型只能选择当前证据编号；Python补全元数据，Java核对任务身份、版本、来源及候选引用范围。
+
+Java不在远程调用时持有数据库事务。task表先保存RUNNING，再保存结果／失败；单实例重启保留记录并标记中断FAILED。当前没有持久多轮会话，messages字段不等于已实现长期记忆。
 
 ### 7.5 目标数据与接口变化（未实现）
 
@@ -449,11 +432,11 @@ Python只返回SUCCESS／FAILED。内部凭证不匹配HTTP401，模型参数校
 
 刷题目标在 `/api/practice/sessions` 路径上扩展mode、知识点和实际数量；增加 `PUT /{sessionId}/progress`、`POST /{sessionId}/items/{itemId}/hints`、`POST /{sessionId}/finish`、`GET /{sessionId}/result`。现有answer入口补充版本、itemId、clientRequestId并返回服务端判分视图；详情／回顾改为按本人提交状态隐藏答案的DTO。收藏可保留现有路径，保证添加／取消幂等及资源可访问；DELETE批次需停止破坏历史，旧页面同步切换结束动作，不能悄悄把删除当作现有完成行为。
 
-领域任务保留现有四类型，正式问答和择校分别增强KNOWLEDGE_QA／SCHOOL_RECOMMEND，新增WRONG_QUESTION_TUTOR与attemptId输入；PRACTICE_SUMMARY继续存在。CHAT只是可选交互，不替代正式领域任务类型。未来subject、preferences等白名单按类型加入，不允许客户端上传完整授权context。
+领域任务保留现有四类型，正式问答和择校分别增强KNOWLEDGE_QA／SCHOOL_RECOMMEND，新增WRONG_QUESTION_TUTOR与attemptId输入；PRACTICE_SUMMARY继续存在。CHAT只是可选交互，不替代正式领域任务类型。未来subject等新字段按类型加入；preferences已按白名单支持，不允许客户端上传完整授权context。
 
-目标仍使用 `/internal/rag/chat`，增加releaseId、类型化授权context与结构版本。版本2结果在resultPayload内加入outcome：completed／needs_input／unsupported／failed；前三种分别表示完成、用户信息不足、资料或能力不足，顶层任务状态为SUCCESS，failed为FAILED，页面必须按outcome显示，不能统称“任务完成”。旧版本1继续按原status展示。该兼容方案是目标设计，当前不支持这些新字段或终态。
+当前内部入口、releaseId、类型化授权快照及大写outcome已实现，见7.4；未来增加resultSchemaVersion或新任务前须同步三端和兼容测试。旧记录保留旧格式，不按新语料改写，不引入与现行大小写不同的终态。
 
-目标引用包含id、title、url或原始文件、locator、version、retrievedAt、excerpt；模型仅选sourceIds，Python从本次证据集合补齐，Java复核版本和对象归属。目标answer最多20000字符、操作步骤最多10项、后续建议最多5项；各任务data使用专用模型验证，不接受任意候选编号。对Java/Python进行同版本升级与兼容测试后才能启用，回滚须确认数据库、协议和资料可读。
+现有引用包含id、title、url、locator、version、retrievedAt、excerpt；模型仅选sourceIds，Python从本次证据集合补齐，Java复核来源编号与版本。未来answer最多20000字符、操作步骤最多10项、后续建议最多5项仍为目标设计，不代表当前输出上限；新增任务data须使用专用模型验证，不接受任意候选编号。对Java/Python进行同版本升级与兼容测试后才能启用，回滚须确认数据库、协议和资料可读。
 
 ### 7.6 判分、统计与错误兼容
 
@@ -465,7 +448,7 @@ Python只返回SUCCESS／FAILED。内部凭证不匹配HTTP401，模型参数校
 | 非法任务／配额超限 | 400／429，创建前拒绝 | 保持边界，不自动重试 |
 | 重复作答／总结未完成 | 当前409 | 重放返回原结果、内容冲突409；未提交不计判分 |
 | 空题池 | 当前404且不创建记录 | HTTP400、code保持整数，message明确空题池原因，三端同步后切换 |
-| 正式推荐未实现 | 501，不写推荐记录 | 实现核验候选与快照后才能取消占位 |
+| 推荐缺条件／无候选 | SUCCESS＋NEEDS_INPUT／UNSUPPORTED，不自动放宽硬条件 | 扩大真实资料和审核覆盖 |
 | 模型故障／非法结果 | 已建任务通常HTTP200＋FAILED | 保留记录，日志仅编号／错误类别，区分资料与用户缺口 |
 | 无有效资料版本 | 当前没有统一发布检查 | 503资料未就绪，不创建伪领域成功结果 |
 | 持久化失败 | 可能5xx，不能声称已保存 | 统一简短错误，可查历史确认，不能将200当保存保证 |
@@ -593,17 +576,17 @@ Python只返回SUCCESS／FAILED。内部凭证不匹配HTTP401，模型参数校
 从项目根目录执行环境准备：
 
 ```bash
-python3.12 -m venv .venv
+python3.13 -m venv .venv
 ./.venv/bin/python -m pip install -r kaoyan-agent/requirements-dev.txt
 ./.venv/bin/python scripts/init-env.py
 ```
 
-`init-env.py`只在根目录.env不存在时生成JWT_SECRET与AGENT_INTERNAL_KEY随机凭证，不覆盖已有文件，不打印凭证，不初始化数据库。数据库、Redis、模型和OSS需本地填写；Python独立读取其工作目录.env，但本项目统一从根目录加载环境变量，避免不同目录的配置混用。
+`init-env.py`只在根目录.env不存在时生成JWT_SECRET与AGENT_INTERNAL_KEY随机凭证，不覆盖已有文件，不打印凭证，不初始化数据库。数据库、Redis、模型和OSS需本地填写；Python自动读取项目根.env，Java通过README的启动入口加载同一配置。
 
 | 配置组 | 已有变量／行为 | 准备方式 |
 | --- | --- | --- |
 | 认证与内部通信 | JWT_SECRET、AGENT_INTERNAL_KEY、AGENT_BASE_URL | 两端内部凭证一致；JWT密钥显式提供；Python默认8001 |
-| MySQL | DB_HOST、DB_PORT、DB_NAME、DB_USER、DB_PASSWORD | 预先准备独立库和表；Python建议单独question只读账号 |
+| MySQL | DB_HOST、DB_PORT、DB_NAME、DB_USER、DB_PASSWORD | 预先准备独立库和表；仅Java访问，Python不配置业务库账号 |
 | Redis | REDIS_HOST、REDIS_PORT、REDIS_PASSWORD | 会话撤销运行依赖，不能写成可选 |
 | 模型 | LLM_API_KEY、LLM_BASE_URL、LLM_MODEL_ROUTER、LLM_MODEL_MAIN | HTTPS兼容地址；默认示例供应商与模型名未真实验证，可为空做隔离检查 |
 | 限额 | DAILY_TASK_LIMIT、MINUTE_TASK_LIMIT、MAX_MODEL_CALLS_PER_DAY | 默认30／6／100，必须为正数，口径见5.4节 |
@@ -613,6 +596,8 @@ python3.12 -m venv .venv
 可选 [application-dev.example.yml](kaoyan-B/src/main/resources/application-dev.example.yml) 复制为已忽略的application-dev.yml后本地填写；已有kaoyan.datasource／redis等覆盖项可能优先于环境变量，连接错误时核对生效配置，不输出真实密码。
 
 数据库负责人仅在明确可丢弃的空开发／测试库准备表；`V1__init.sql`逐表DROP，严禁对已有业务库重跑。其余V2—V6种子含演示用户、题目和院校，不自动导入为正式资料，也不公开其中账号作为真实访问方式。没有自动安全迁移入口时不能写成启动自动完成建库。
+
+本版本需要`V7__practice_snapshot.sql`为practice_record增加question_snapshot列，以及`V8__task_soft_delete.sql`为task增加deleted_at列。新空库按V1→V7→V8执行；已有库核对已应用记录，仅执行尚未应用的增量脚本，每份一次，V8必须先于本版Java启动。迁移由负责人显式执行，不清空记录或重跑V1。旧作答快照保留NULL，不从当前题目倒填；任一valid作答快照缺失或为空对象时，总结409拒绝，不创建任务、不调用Agent或消耗任务额度。
 
 ### 10.2 本地三端启动
 
@@ -628,8 +613,8 @@ set +a
 
 ```bash
 cd kaoyan-agent
-# 如使用独立题表只读账号，在此终端设置DB_USER和DB_PASSWORD。
-../.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8001
+# Python只读独立资料，不配置业务库凭证。
+../.venv/bin/python -m uvicorn main:create_app --factory --host 127.0.0.1 --port 8001
 ```
 
 终端B：
@@ -648,9 +633,9 @@ npm ci
 npm run dev
 ```
 
-默认前端localhost:5173 → /api代理Java8080 → 内部Python8001；MySQL3306、Redis6379。Python `/health`可检查进程，不能证明数据库、检索或模型可用；缺少模型密钥时任务明确FAILED。前端通过服务访问，不能直接打开源码HTML。各终端Ctrl+C关闭自己的进程，本文不主动启动或停止已有服务。
+默认前端localhost:5173 → /api代理Java8080 → 内部Python8001；MySQL3306、Redis6379。Python `/health`可检查进程，不能证明数据库、检索或模型可用；模型默认关闭时仍执行规则／资料摘要，启用后异常降级。前端通过服务访问，不能直接打开源码HTML。各终端Ctrl+C关闭自己的进程，本文不主动启动或停止已有服务。
 
-Windows使用 `py -3.12 -m venv .venv`、`.venv\Scripts\python` 和 `mvnw.cmd`；需在PowerShell／系统设置中安全加载相同环境变量，不能执行Bash的set -a。本项目未提供或验证Windows一键加载脚本，Windows运行待实际检查。
+Windows按README使用Python3.13与mvnw.cmd；Java由`scripts/start-backend.ps1`加载根.env，Python工厂自动读取同一配置，不能执行Bash的set -a。端口冲突时设置PORT和API_PROXY_TARGET。新后端必须能访问Redis。
 
 ### 10.3 现有验证入口
 
@@ -672,7 +657,7 @@ Windows使用 `py -3.12 -m venv .venv`、`.venv\Scripts\python` 和 `mvnw.cmd`�
 
 每次使用未存在的报告名，脚本拒绝覆盖。它使用临时端口、独立H2、Redis和模型替身；确认具备所需运行环境并在授权范围内执行，不指向现有业务库。测试完只关闭本次子进程。
 
-增加浏览器检查需已安装Chrome和Playwright，NODE_PATH指定包位置，CHROME_PATH指定Chrome文件；先安装前端依赖。以下同样不是本轮已执行命令：
+增加浏览器检查需已安装Playwright及其Chromium或本机Chrome／Edge，脚本自动使用前端node_modules，CHROME_PATH或PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH指定Chrome／Edge文件（不设置则使用Playwright默认浏览器）；先在kaoyan-frontend执行npm ci与npm run build。完整链路使用Vite preview及临时Java代理，缺少dist/index.html时在启动测试服务前报错。以下为复现入口，实际结果见[PR #8修复验证](docs/pr8-fix-verification-2026-10-15.md)：
 
 ```bash
 ./.venv/bin/python scripts/smoke-current.py --output .cache/browser-check-new.json --browser-check --node node
@@ -688,8 +673,8 @@ Windows使用 `py -3.12 -m venv .venv`、`.venv\Scripts\python` 和 `mvnw.cmd`�
 | MySQL连接／表不存在 | 独立开发库、账号权限、表结构及安全准备状态 | 不自动执行DROP或种子修复 |
 | 登录后401／退出失败 | 令牌过期、issuer、账号状态、Redis连接与撤销 | 前端缓存不能决定真实登录／角色 |
 | Agent FAILED | Python可达、401／422、模型配置、HTTPS、预算与结果字段 | 日志只用任务ID和错误类别，不公开供应商原异常 |
-| 总结404／409／FAILED | 本人批次、有效作答是否完整、现行题是否审核启用 | 不能用缺题生成成功总结，历史版本问题待改造 |
-| 推荐501 | 正式候选与快照未实现 | 不以任取前几所学校冒充推荐 |
+| 总结404／409／NEEDS_INPUT | 本人批次、valid项目是否全答、全部有效作答快照及V7迁移 | 快照缺失／空对象409且不创建任务，不查现行题表补造 |
+| 推荐NEEDS_INPUT／UNSUPPORTED | 档案年份、专业／学位条件及副本覆盖 | 不自动改年份、放宽硬条件或使用旧演示分数 |
 | 上传503 | OSS是否配置及授权范围 | 未配置不应阻止核心服务启动 |
 | 页面超时／旧账号结果 | 先查任务历史；核对请求时令牌与当前会话 | 不自动重试新增付费任务 |
 | 统计／回顾不一致 | 当前不同分母、未答、分页已加载数量、删除记录等 | 统一服务端完整聚合，不在前端拼凑已加载页总计 |

@@ -1,93 +1,132 @@
 # 考研 Agent 智能备考平台
 
-当前代码使用 Vue 3 + TypeScript + Vite、Spring Boot 3.5 + MyBatis-Plus + JWT/OpenFeign、FastAPI + OpenAI 兼容客户端。业务数据库是 MySQL 8，Redis 用于令牌撤销。默认每账号每UTC日30项任务、每分钟6项，限额和任务记录持久保存；重启将遗留RUNNING标记为FAILED。单Python实例另有每UTC日100次模型尝试限额，进程重启会重置，不代替供应商的账单限额。目录为 `kaoyan-frontend/`、`kaoyan-B/`、`kaoyan-agent/`。
+Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。Redis用于JWT注销撤销，是Java业务接口的运行依赖。
 
-本次在独立 Git 工作树中基于远端 `a9200f9` 适配新框架，保留现有接口路径、MySQL 表及前端风格。修改范围、验证结果与剩余限制见[当前框架适配](docs/当前框架适配.md)。`docs/work.md`、`work1.md`、`work2.md`、`agent.md` 是历史生成提示词，不能当成运行记录；本文件和适配记录描述当前代码。
+当前整合同学的框架适配（上游main `6383c92`）与RAG工作流。保留实时账号状态／角色检查、Redis注销撤销、分页参数兼容和隔离HTTP检查。
+
+本轮实现内部接口加固、408与院校独立检索副本、确定性择校、场景识别及可选LLM解释。具体协议、验收和限制见 [RAG说明](docs/rag.md)。`docs/work*.md`、`docs/agent.md` 是历史生成提示词，不是当前运行说明。
 
 ## 文档入口
 
-- [项目协作规范](AGENTS.md)：AI 开发助手的阅读顺序、三端职责、接口协作、数据保护和验证约定。
-- [完整平台搭建文档](考研Agent平台搭建文档.md)：需求、页面流程、当前架构与契约、待实现业务设计、开发阶段及运行验收入口。
-- [当前框架适配与验收](docs/当前框架适配.md)：2026-10-14 框架适配的历史证据、测试环境和剩余限制。
+- [完整平台搭建文档](考研Agent平台搭建文档.md)：需求、当前契约与后续建设目标。
+- [框架适配历史记录](docs/当前框架适配.md)：同学在合并前的验证与限制。
+- [合并审查记录](docs/merge-review-2026-10-14.md)：本次冲突处理和重新验证范围。
+- [RAG详细契约](docs/rag.md)：资料、筛选、快照、引用与版本。
+- [PR #8修复验证](docs/pr8-fix-verification-2026-10-15.md)：删除后的配额、历史快照及页面联调修复。
 
-搭建文档区分当前实现与建设目标；现有刷题和无检索模型回答尚未达到完整领域验收标准。历史提示词保留原位，其命令和操作要求不构成当前执行授权。
+## 当前能力
+
+- `/internal/rag/chat`：内部凭证认证、任务枚举、输入上限、类型化上下文、结果和引用校验。
+- 408：4段带来源的概念摘要，默认离线词项检索；可启用中文Embedding＋持久化Qdrant。覆盖范围较小，未覆盖时明确返回。
+- 院校：3所学校的6条2027年普通全日制081200/085404资料。按年份、专业、学位、地区、学习方式与考试科目筛选，最多5个候选；不估计录取概率。
+- AI：默认关闭。启用后解释候选或回答资料覆盖的问题；模型异常时保留规则结果，来源编号经过程序校验。
+- 总结：Java只传本人已判分、带题目版本快照的有效作答，Python不连接业务数据库。
+- 推荐与任务共享任务表保存快照、来源、版本和结果；历史推荐不随档案更改。
+
+旧院校列表的2025年估计值仍是演示数据，界面已标注，**不参与新推荐**。本轮未改造整个刷题/管理/认证系统，也不代表公网部署验收。
 
 ## 准备环境
 
-需要 JDK 17、Python 3.12（本地验证见适配记录）、Node 20、MySQL 8、Redis。Maven Wrapper 已包含；首次构建下载依赖到项目 `.cache/`。不使用旧版 `backend/`、`agent/` 或 `frontend/` 命令。
+需要 Java 17、Python 3.13、Node.js 22（含 npm）；业务运行另需 MySQL 8 和 Redis。
 
-从项目根目录执行：
+从根目录执行（Windows PowerShell）：
 
-```bash
-python3 -m venv .venv
-./.venv/bin/python -m pip install -r kaoyan-agent/requirements-dev.txt
-./.venv/bin/python scripts/init-env.py
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r kaoyan-agent/requirements-dev.txt
+.\.venv\Scripts\python.exe scripts/init-env.py
 ```
 
-在本地 `.env` 填入数据库账号密码、Redis 连接和可选模型／OSS配置。脚本只生成 JWT 和内部调用的随机凭证，不覆盖已有 `.env`。Java 与 Python 必须使用相同的 `AGENT_INTERNAL_KEY`。代码不提供可直接使用的默认签名密钥。
+所有服务使用根目录 `.env`。脚本生成随机内部凭证与JWT签名密钥，不覆盖已有文件、不打印凭证。填写自己MySQL的 `DB_USER`、`DB_PASSWORD` 及 Redis 的 `REDIS_HOST`、`REDIS_PORT`、可选 `REDIS_PASSWORD`，不要沿用历史代码中的密码。Redis不可用时受保护接口会失败，不能通过关闭注销撤销来绕过。Python自动读取根 `.env`；Java由启动脚本显式加载。OSS可不配置，未配置时文件接口返回503，不阻止核心服务启动。
 
-先由数据库负责人准备独立开发库。`kaoyan-B/src/main/resources/db/V1__init.sql` **包含 DROP TABLE**，仅可在明确可丢弃的空测试库初始化，不得在已有业务库直接重跑。其余种子脚本包含演示用户、题目和院校，来源与真实招生口径未验证，不自动执行或作为正式数据。本轮不改表、不执行迁移。
+### 数据库
 
-Python 当前只查询审核通过且启用的题目；建议为它设置仅有 question 表 SELECT 权限的数据库账号。未配置模型密钥时可以启动并检查健康接口，模型任务返回明确失败。OSS 未配置时核心服务可以启动，上传请求返回 503。
+仅在**全新空库**建立 `kaoyan` 并执行 `kaoyan-B/src/main/resources/db/V1__init.sql`，然后依次执行 `V7__practice_snapshot.sql` 和 `V8__task_soft_delete.sql`。V1含DROP语句，不能用于已有业务库。
 
-## 启动
+已有数据库先核对已执行的迁移：V7为作答增加 `question_snapshot`，V8为任务增加 `deleted_at`；尚未执行的脚本各执行一次，已执行的不要重跑。**V8必须在启动本版Java前完成**，它保留现有任务、结果及额度依据，不清空数据。推荐删除后在历史中隐藏，仍计入每日及分钟额度。批次中任一有效作答缺少快照时，总结返回409，不创建任务或消耗任务额度；不使用最新题目补造历史。V2—V6属于旧演示种子，不是新推荐的数据源，V6的估计分数线不应导入正式库。迁移当前由开发者显式执行；尚未启用全仓库自动迁移。
 
-macOS/Linux 的两个服务终端均先从项目根目录加载配置：
+### 启动服务
 
-```bash
-set -a
-. ./.env
-set +a
-```
+先启动自己的MySQL和Redis，再运行以下服务。默认Java端口8080；若被占用，在后端终端设置 `$env:PORT="8081"`，前端终端设置 `$env:API_PROXY_TARGET="http://127.0.0.1:8081"`。
 
-终端 A：
+终端A：
 
-```bash
+```powershell
 cd kaoyan-agent
-# 如果使用独立只读账号，在此终端覆盖 DB_USER / DB_PASSWORD。
-../.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8001
+..\.venv\Scripts\python.exe -m uvicorn main:create_app --factory --host 127.0.0.1 --port 8001
 ```
 
-终端 B：
+终端B，从根目录启动Java。确保 `JAVA_HOME` 指向JDK17：
 
-```bash
-cd kaoyan-B
-./mvnw -B package
-java -jar target/kaoyan-backend-1.0.0.jar
+```powershell
+.\scripts\start-backend.ps1
 ```
 
-终端 C：
+终端C：
 
-```bash
+```powershell
 cd kaoyan-frontend
 npm ci
 npm run dev
 ```
 
-浏览器打开 [本地前端](http://localhost:5173)。Vite 将 `/api` 代理至 Java 8080，Java 通过内部凭证请求 Python 8001。数据库 3306、Redis 6379；内部服务不应直接暴露公网。前端打包后的 `/api` 反向代理需由部署环境配置，本轮未部署。
+打开 [本地页面](http://localhost:5173)，注册并在个人中心填写2027年档案。院校库点击“条件推荐”，选择专业与学位类型；“智能问答”支持明确任务或自动识别。无MySQL时仍可独立验证Python接口和运行集成测试，不能据此声称实际MySQL联调已通过。
 
-Windows 使用 `py -3.12 -m venv .venv`、`.venv\Scripts\python` 和 `mvnw.cmd`；需先将 `.env` 加载为进程环境变量，不能执行上述 Bash 的 `set -a`。可选后端覆盖模板为 `kaoyan-B/src/main/resources/application-dev.example.yml`，复制成已忽略的 `application-dev.yml` 后填写。
+Linux/macOS使用 `python3.13 -m venv .venv` 和 `.venv/bin/python`。Java启动前在可信的根目录执行 `set -a; . ./.env; set +a`，随后进入 `kaoyan-B` 运行 `bash mvnw -B -ntp package` 和 `java -jar target/kaoyan-backend-1.0.0.jar`。运行Java测试时，设置 `PYTHON_EXECUTABLE` 为该虚拟环境Python的绝对路径。
+
+## 启用中文向量检索
+
+默认 `RAG_BACKEND=lexical`，不用下载权重即可检查规则、来源和页面。向量模式使用已实现的Qdrant＋FastEmbed，**不是把词项检索冒充Embedding**。
+
+```powershell
+cd kaoyan-agent
+..\.venv\Scripts\python.exe ingest.py
+```
+
+该命令首次下载 `BAAI/bge-small-zh-v1.5` 中文模型，建立与语料及模型绑定的不可变集合；不调用付费LLM。然后把根 `.env` 中 `RAG_BACKEND` 改为 `qdrant`，重启Agent。
+
+默认独立Qdrant数据库位于 `kaoyan-agent/.cache/rag/qdrant`，无需Docker。**本地模式仅单进程使用**：先停止Agent再导入。部署独立Qdrant服务时设置 `QDRANT_URL`、`QDRANT_API_KEY`；导入和服务需要相同资料、模型与索引标记目录。语料变更需先导入，再切换服务版本；缺少就绪标记不会返回部分索引。旧集合保留供回滚，不自动删除历史版本。
+
+## 启用AI解释
+
+在根 `.env` 填写供应商 `LLM_API_KEY`、HTTPS `LLM_BASE_URL`、模型名称，再设置 `LLM_ENABLED=true`。这将产生外部请求与可能的费用。代码默认关闭SDK重试，单次20秒、全流程42秒；Java读45秒、浏览器55秒。
+
+每日模型次数是单Python进程内的限制，重启会重置，不能代替供应商预算。真实供应商和内容效果需另行验收。自动路由只对 `CHAT` 生效，不改变明确指定的任务；AI不负责判分或授予权限。
 
 ## 验证
 
-以下验证不依赖真实模型或正式业务库：
+Windows从根目录执行：
 
-```bash
-(cd kaoyan-B && ./mvnw -B verify)
-(cd kaoyan-agent && ../.venv/bin/python -m pytest -q)
-(cd kaoyan-frontend && npm ci && npm run build)
-./.venv/bin/python scripts/check-framework.py
+```powershell
+.\.venv\Scripts\python.exe -X utf8 -m pytest -q kaoyan-agent/tests
+$env:PYTHON_EXECUTABLE = (Resolve-Path .\.venv\Scripts\python.exe).Path
+Push-Location kaoyan-B
+.\mvnw.cmd -B -ntp verify
+Pop-Location
+cd kaoyan-frontend
+npm ci
+npm run build
+npx playwright install chromium
+npm run test:e2e
 ```
 
-本地已通过25项Java测试、33项Python测试、前端类型检查及生产构建，并通过15项HTTP链路检查（包含6项桌面浏览器操作）。链路使用真实Java/Python进程、H2、Redis及模型替身，迟到响应检查使用浏览器拦截模拟。本机JDK25编译目标17、Python3.13、Node24；不扩大为JDK17／Python3.12／Node20的本地验证。
+Java测试在独立H2库启动真实Python子进程，不读日常MySQL，也不调用模型；子进程结束后清理。浏览器测试使用隔离上下文和模拟API，验证页面、历史显示、来源、文本安全和390宽度；不等于整站真实手机验收。
 
-可复现隔离HTTP检查：
+浏览器也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定本机Chrome或Edge；不读取日常浏览器资料。CI已按三个新目录执行Python、Java真实链路、前端构建与浏览器测试。实际验证结果见 [本轮验证记录](docs/validation-rag.md)。
 
-```bash
-(cd kaoyan-B && ./mvnw -B test-compile dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt)
-./.venv/bin/python scripts/smoke-current.py --output .cache/新的HTTP报告.json
+## 隔离HTTP与真实后端浏览器检查
+
+保留并更新上游的链路脚本，使用随机端口、临时H2、Redis／模型替身，不读取日常业务数据。浏览器检查使用生产构建产物及Vite preview，避免开发依赖首次优化刷新打断登录；`/api`代理仍指向本次临时Java端口。先在kaoyan-frontend执行 `npm ci`、`npm run build`，再在kaoyan-B生成测试类路径：
+
+```powershell
+.\mvnw.cmd -B -ntp test-compile dependency:build-classpath '-Dmdep.includeScope=test' '-Dmdep.outputFile=target/test-classpath.txt'
 ```
 
-增加 `--browser-check --node node` 可验证任务页面，需已有Chrome和Playwright；通过 `NODE_PATH` 指定Playwright包目录、`CHROME_PATH` 指定浏览器文件。脚本使用独立浏览器资料、随机端口，结束后关闭本次进程，报告存在时拒绝覆盖。`API_PROXY_TARGET` 只控制Vite开发代理的Java地址。
+再从根目录运行（报告路径必须尚不存在）：
 
-GitHub Actions 已切换到三个新目录，并加入真实Java→Python的隔离HTTP检查；配置更新不代表远端 CI 已运行。真实 MySQL/Redis 联调、实际后端浏览器操作、模型供应商、正式领域资料与公网验收的状态见[适配记录](docs/当前框架适配.md)。
+```powershell
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = '本机Chrome或Edge可执行文件的绝对路径'
+.\.venv\Scripts\python.exe -X utf8 scripts/smoke-current.py --output .cache/new-http-report.json --browser-check --node node
+```
+
+无本机浏览器时先安装前端Playwright Chromium；省略浏览器环境变量即可使用其默认浏览器。Linux/macOS使用 `.venv/bin/python`。脚本验证实际HTTP调用、分页、注销、跨账号、超时前落库、真实进程重启和来源结果展示；不代表真实Redis／模型供应商验收。缺少构建产物时会在启动临时服务前报错。失败诊断保存在独立的 `.cache/smoke-debug-*`，包含服务日志及可用的浏览器截图、异常类别和接口路径／状态，不记录请求头、正文或令牌。任务配额按UTC日重置，单Java实例通过短事务保存，不在调用Python时持有数据库事务。

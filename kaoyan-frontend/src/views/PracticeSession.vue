@@ -202,12 +202,12 @@ const doAiSummary = async () => {
     const t: any = await triggerAiSummary(sessionId)
     if (t.status === 'SUCCESS' && t.resultPayload) {
       const r = t.resultPayload
-      aiResult.value = r.summary
-        ? `${r.summary}\n\n${r.next_steps ? '下一步建议：' + r.next_steps : ''}`
-        : JSON.stringify(r, null, 2)
+      aiResult.value = `${r.answer || '无总结内容'}\n${r.weakPoints?.length ? '本次错题涉及：' + r.weakPoints.join('、') : ''}\n${r.explanationMode === 'ai' ? 'AI解释' : '规则总结'} · ${r.releaseId || ''}`
     } else {
       aiResult.value = 'AI 总结失败：' + (t.errorMessage || '未知错误')
     }
+  } catch {
+    // The shared request wrapper displays the server's error, including missing snapshots.
   } finally { aiLoading.value = false }
 }
 

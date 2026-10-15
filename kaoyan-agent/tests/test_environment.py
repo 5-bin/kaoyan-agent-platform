@@ -3,6 +3,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import os
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -11,11 +12,11 @@ def prepare(tmp_path):
     (tmp_path / 'scripts').mkdir()
     shutil.copyfile(ROOT / 'scripts/init-env.py', tmp_path / 'scripts/init-env.py')
     shutil.copyfile(ROOT / '.env.example', tmp_path / '.env.example')
-    return [sys.executable, str(tmp_path / 'scripts/init-env.py')]
+    return [sys.executable, '-X', 'utf8', str(tmp_path / 'scripts/init-env.py')]
 
 
 def test_init_env_generates_private_distinct_keys_without_printing_them(tmp_path):
-    result = subprocess.run(prepare(tmp_path), check=True, text=True, capture_output=True)
+    result = subprocess.run(prepare(tmp_path), check=True, text=True, encoding='utf-8', capture_output=True)
     content = (tmp_path / '.env').read_text()
     values = dict(line.split('=', 1) for line in content.splitlines() if '=' in line and not line.startswith('#'))
     assert len(values['JWT_SECRET']) == 64
@@ -23,7 +24,8 @@ def test_init_env_generates_private_distinct_keys_without_printing_them(tmp_path
     assert values['JWT_SECRET'] != values['AGENT_INTERNAL_KEY']
     assert values['JWT_SECRET'] not in result.stdout + result.stderr
     assert values['AGENT_INTERNAL_KEY'] not in result.stdout + result.stderr
-    assert (tmp_path / '.env').stat().st_mode & 0o777 == 0o600
+    if os.name != 'nt':
+        assert (tmp_path / '.env').stat().st_mode & 0o777 == 0o600
 
 
 def test_init_env_preserves_existing_configuration(tmp_path):

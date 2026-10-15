@@ -8,12 +8,14 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 
 /**
  * 刷题记录（对应 practice_record 表）
  */
 @Data
-@TableName("practice_record")
+@TableName(value = "practice_record", autoResultMap = true)
 public class PracticeRecord {
 
     /** 主键 ID */
@@ -40,6 +42,9 @@ public class PracticeRecord {
 
     /** 批改状态 */
     private String gradingStatus;
+    /** Captured at grading; legacy rows without a snapshot are excluded from AI summaries. */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> questionSnapshot;
 
     /** 作答时间 */
     private LocalDateTime answeredAt;

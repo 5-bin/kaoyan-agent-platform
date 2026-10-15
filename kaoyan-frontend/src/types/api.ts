@@ -29,9 +29,25 @@ export interface Task {
   taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND' | 'PRACTICE_SUMMARY' | 'CHAT'
   status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED'
   inputPayload?: Record<string, unknown>
-  resultPayload?: Record<string, unknown>
+  resultPayload?: TaskResult
+  releaseId?: string
   errorMessage?: string
   createdAt: string
+}
+
+export interface SourceReference {
+  id: string; title: string; url: string; locator: string; version: string; retrievedAt: string; excerpt: string
+}
+export interface SchoolCandidate {
+  programId: string; school: string; college: string; major: string; majorCode: string; year: number
+  degreeType: 'academic' | 'professional'; region: string; studyMode: string; examSubjects: string[]
+  matchedConditions: string[]; pendingChecks: string[]; sourceIds: string[]; explanation: string
+}
+export interface TaskResult {
+  outcome: 'COMPLETED' | 'NEEDS_INPUT' | 'UNSUPPORTED'; answer: string
+  resolvedTaskType: Task['taskType']; explanationMode: 'rules' | 'ai' | 'fallback'
+  releaseId: string; references: SourceReference[]; followUp?: string[]; notice?: string
+  candidates?: SchoolCandidate[]; coverage?: string; weakPoints?: string[]; accuracy?: number
 }
 
 export interface Document {

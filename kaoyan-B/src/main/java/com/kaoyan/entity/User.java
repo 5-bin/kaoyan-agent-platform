@@ -24,6 +24,7 @@ public class User {
     private String username;
 
     /** BCrypt 密码哈希 */
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String passwordHash;
 
     /** 角色：STUDENT / ADMIN */

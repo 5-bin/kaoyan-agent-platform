@@ -15,6 +15,7 @@ import urllib.error
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+LOCAL_HTTP = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 
 def free_port():
@@ -30,7 +31,7 @@ def call(base, path, method='GET', body=None, token=''):
     request = urllib.request.Request(base + path, data=json.dumps(body).encode() if body is not None else None,
                                      headers=headers, method=method)
     try:
-        response = urllib.request.urlopen(request, timeout=60)
+        response = LOCAL_HTTP.open(request, timeout=60)
     except urllib.error.HTTPError as error:
         response = error
     with response:
@@ -45,7 +46,7 @@ def wait_ready(process, base, path, expected=200):
             raise RuntimeError('隔离测试服务启动失败，检查测试日志')
         try:
             try:
-                response = urllib.request.urlopen(base + path, timeout=3)
+                response = LOCAL_HTTP.open(base + path, timeout=3)
             except urllib.error.HTTPError as error:
                 response = error
             with response:
@@ -76,6 +77,8 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error('报告已存在，使用新的文件名')
+    if args.browser_check and not (ROOT / 'kaoyan-frontend/dist/index.html').is_file():
+        parser.error('浏览器检查需要构建产物；先在kaoyan-frontend执行 npm ci 和 npm run build')
     classpath_file = ROOT / 'kaoyan-B/target/test-classpath.txt'
     if not classpath_file.is_file():
         parser.error('先在kaoyan-B执行 ./mvnw test-compile dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt')
@@ -98,8 +101,11 @@ def main():
         frontend_base = f'http://127.0.0.1:{frontend_port}'
         env = {**os.environ, 'AGENT_INTERNAL_KEY': secrets.token_hex(32), 'JWT_SECRET': secrets.token_hex(32),
                'AGENT_BASE_URL': python_base, 'LLM_API_KEY': '', 'DB_PASSWORD': '',
+               'LLM_ENABLED': 'false', 'RAG_BACKEND': 'lexical',
+               'NODE_PATH': str(ROOT / 'kaoyan-frontend/node_modules'),
                'DAILY_TASK_LIMIT': '100', 'MINUTE_TASK_LIMIT': '100'}
         log_handles = [(temporary / name).open('w') for name in ['python.log', 'java.log', 'frontend.log']]
+        browser_diagnostics = temporary / 'browser'
         try:
             python = subprocess.Popen([sys.executable, '-m', 'uvicorn', 'tests.wire_app:app', '--host', '127.0.0.1',
                                        '--port', str(python_port)], cwd=ROOT / 'kaoyan-agent', env=env,
@@ -108,7 +114,7 @@ def main():
             java_command = ['java', '-cp', classpath, 'com.kaoyan.FrameworkSmokeServer',
                 '--server.address=127.0.0.1', f'--server.port={java_port}',
                 '--spring.datasource.driver-class-name=org.h2.Driver',
-                f'--spring.datasource.url=jdbc:h2:file:{temporary}/smoke;MODE=MySQL;NON_KEYWORDS=USER',
+                f'--spring.datasource.url=jdbc:h2:file:{temporary}/smoke;MODE=MySQL;NON_KEYWORDS=USER;WRITE_DELAY=0',
                 '--spring.datasource.username=sa', '--spring.datasource.password=',
                 '--spring.sql.init.mode=always', '--spring.sql.init.schema-locations=classpath:schema-test.sql']
             java = subprocess.Popen(java_command, cwd=temporary, env=env,
@@ -137,11 +143,11 @@ def main():
             check('第二页及总数正确', status == 200 and history['data']['total'] == 25 and len(history['data']['list']) == 5)
             if args.browser_check:
                 frontend_env = {**env, 'API_PROXY_TARGET': java_base}
-                frontend = subprocess.Popen([args.node, 'node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
+                frontend = subprocess.Popen([args.node, 'node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1',
                     '--port', str(frontend_port), '--strictPort'], cwd=ROOT / 'kaoyan-frontend', env=frontend_env,
                     stdout=log_handles[2], stderr=subprocess.STDOUT)
                 wait_ready(frontend, frontend_base, '/')
-                subprocess.run([args.node, str(ROOT / 'scripts/browser-current.cjs'), frontend_base],
+                subprocess.run([args.node, str(ROOT / 'scripts/browser-current.cjs'), frontend_base, str(browser_diagnostics)],
                                cwd=ROOT, env=env, check=True, timeout=120)
                 check('实际后端任务页面与账号隔离检查', True)
             def interrupted_call():
@@ -167,7 +173,15 @@ def main():
             java = subprocess.Popen(java_command, cwd=temporary, env=env,
                                     stdout=log_handles[1], stderr=subprocess.STDOUT)
             wait_ready(java, java_base, '/api/tasks', 401)
-            status, recovered = call(java_base, '/api/tasks/' + interrupted['id'], token=token)
+            # Tomcat can serve requests before ApplicationRunner completes task recovery.
+            deadline = time.monotonic() + 10
+            while True:
+                status, recovered = call(java_base, '/api/tasks/' + interrupted['id'], token=token)
+                if status == 200 and recovered['data']['status'] == 'FAILED':
+                    break
+                if time.monotonic() >= deadline:
+                    raise AssertionError('重启任务未恢复：HTTP=' + str(status) + ', status=' + str((recovered.get('data') or {}).get('status')))
+                time.sleep(0.1)
             check('真实重启保留账号并恢复中断任务为FAILED', status == 200 and recovered['data']['status'] == 'FAILED'
                   and '服务重启' in recovered['data']['errorMessage'])
             stop(python)
@@ -183,6 +197,8 @@ def main():
             debug.mkdir(parents=True)
             for name in ('python.log', 'java.log', 'frontend.log'):
                 shutil.copyfile(temporary / name, debug / name)
+            if browser_diagnostics.is_dir():
+                shutil.copytree(browser_diagnostics, debug / 'browser')
             print('测试失败，隔离服务日志保存在:', debug, file=sys.stderr)
             raise
         finally:

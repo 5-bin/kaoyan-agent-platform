@@ -1,19 +1,14 @@
-name: Framework checks
-
+name: Platform checks
 on:
   push:
     branches: [main]
   pull_request:
-
 permissions:
   contents: read
-
 jobs:
-  java:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      MAVEN_USER_HOME: ${{ github.workspace }}/.cache/maven
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
         with:
@@ -22,39 +17,51 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          cache: maven
+          cache-dependency-path: kaoyan-B/pom.xml
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.12'
-      - run: python -m pip install -r kaoyan-agent/requirements-dev.txt
-      - name: Build backend and run isolated tests
-        working-directory: kaoyan-B
-        run: ./mvnw -B verify dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt
-      - name: Verify real Java to Python HTTP contract with isolated test services
-        run: python scripts/smoke-current.py --output .cache/ci-smoke-current.json
-  python:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -r kaoyan-agent/requirements-dev.txt
-      - name: Agent contract tests without paid model or database
-        working-directory: kaoyan-agent
-        run: python -m pytest -q
-      - run: python scripts/check-framework.py
-  frontend:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: |
+            kaoyan-agent/requirements.txt
+            kaoyan-agent/requirements-dev.txt
       - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
           cache-dependency-path: kaoyan-frontend/package-lock.json
-      - run: npm ci
+      - name: Install isolated Python dependencies
+        run: python -m pip install -r kaoyan-agent/requirements-dev.txt
+      - name: Test workflows and persistent Qdrant (mock embeddings/models)
+        working-directory: kaoyan-agent
+        run: python -m pytest -q
+      - name: Check current docs and contracts
+        run: |
+          python scripts/check-project.py
+          python scripts/check-framework.py
+      - name: Build Java and test the real Java to Python chain
+        working-directory: kaoyan-B
+        run: bash mvnw -B -ntp verify dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt
+      - name: Install and build frontend
         working-directory: kaoyan-frontend
-      - run: npm run build
+        run: npm ci && npm run build
+      - name: Check patches
+        run: git diff --check
+      - name: Browser checks with isolated mock API
         working-directory: kaoyan-frontend
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - name: Real HTTP and browser regression with isolated H2 and Redis/model doubles
+        run: python scripts/smoke-current.py --output .cache/ci-merge-http.json --browser-check --node node
+      - uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: test-diagnostics
+          include-hidden-files: true
+          path: |
+            kaoyan-B/target/surefire-reports/
+            kaoyan-B/target/agent-chain.log
+            kaoyan-frontend/test-results/
+            .cache/smoke-debug-*/

@@ -2,8 +2,8 @@ package com.kaoyan.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kaoyan.entity.Task;
-
 import com.kaoyan.common.PageResult;
+
 import java.util.Map;
 
 /**
@@ -30,6 +30,7 @@ public interface TaskService extends IService<Task> {
      * @return 任务列表
      */
     PageResult<Task> history(Long userId, int page, int size);
+    PageResult<Task> historyPage(Long userId, int page, int size, String taskType);
 
     /**
      * 任务详情
@@ -39,4 +40,7 @@ public interface TaskService extends IService<Task> {
      * @return 任务
      */
     Task detail(Long userId, String taskId);
+
+    /** Hide an owned, completed recommendation without removing its quota record. */
+    void hideRecommendation(Long userId, String taskId);
 }

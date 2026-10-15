@@ -14,5 +14,6 @@ public class AgentResponse {
     private String status;
     private Object result;
     private List<Object> references;
+    private String releaseId;
     private String errorMessage;
 }

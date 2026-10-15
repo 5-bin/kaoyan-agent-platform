@@ -1,147 +1,114 @@
 <template>
   <div class="page schools-page">
     <div class="hero">
-      <h1 class="hero-title">院校库</h1>
-      <p class="hero-sub">查找目标院校，了解层次与地区分布</p>
+      <h1>院校与专业</h1><p>按明确条件比较候选，逐条核对官方依据</p>
       <div class="search-bar">
-        <el-input v-model="q.province" placeholder="省份" clearable size="large" />
-        <el-select v-model="q.level" placeholder="层次" clearable size="large" style="width:140px">
-          <el-option label="985" value="985" />
-          <el-option label="211" value="211" />
-          <el-option label="双一流" value="双一流" />
-        </el-select>
-        <el-input v-model="q.majorName" placeholder="专业名" clearable size="large" style="width:220px" />
-        <el-button type="primary" size="large" @click="load">搜索</el-button>
-        <el-button size="large" class="ai-btn" @click="dialog = true">
-          <el-icon><MagicStick /></el-icon>&nbsp;AI 择校
-        </el-button>
+        <el-input v-model="q.province" placeholder="省份" clearable />
+        <el-select v-model="q.level" placeholder="层次" clearable><el-option v-for="level in ['985','211','双一流']" :key="level" :label="level" :value="level" /></el-select>
+        <el-input v-model="q.majorName" placeholder="专业名" clearable />
+        <el-button @click="load">搜索院校库</el-button>
+        <el-button type="primary" @click="openRecommendation">条件推荐</el-button>
       </div>
     </div>
-
-    <div class="result" v-loading="loading">
-      <div v-for="s in list" :key="s.id" class="row" @click="router.push(`/schools/${s.id}`)">
-        <div class="row-icon">{{ s.name?.[0] }}</div>
-        <div class="row-main">
-          <div class="row-name">{{ s.name }}</div>
-          <div class="row-meta">{{ s.province }}</div>
-        </div>
-        <div class="row-tags">
-          <el-tag v-if="s.level" effect="dark" size="small">{{ s.level }}</el-tag>
-        </div>
-        <el-icon class="row-arrow"><ArrowRight /></el-icon>
-      </div>
-      <el-empty v-if="!loading && !list.length" description="没有匹配的院校" style="margin:40px 0" />
+    <el-alert title="旧院校库包含演示资料与2025年估计值，请勿作为报考依据。条件推荐独立使用带官方来源的2027年核验资料。" type="warning" :closable="false" />
+    <div class="rows" v-loading="loading">
+      <router-link v-for="school in list" :key="school.id" :to="`/schools/${school.id}`" class="school-row">
+        <strong>{{ school.name }}</strong><span>{{ school.province }} · {{ school.level }}</span>
+      </router-link>
+      <el-empty v-if="!loading && !list.length" description="没有匹配的院校" />
     </div>
-
-    <el-dialog v-model="dialog" title="AI 择校推荐" width="680px">
-      <el-input
-        v-model="query" type="textarea" :rows="3"
-        placeholder="描述你的情况，比如：本科双非计算机，想考福建的学硕，数学一般，求推荐"
-      />
-      <div v-if="result" class="result-block">
-        <h4>{{ result.summary }}</h4>
-        <template v-for="(group, key) in ['rush','stable','safe']" :key="key">
-          <div v-if="result[group]?.length" class="group">
-            <div class="group-title">{{ groupLabel[key] }}</div>
-            <div v-for="r in result[group]" :key="r.school" class="school">
-              <b>{{ r.school }}</b> · {{ r.major }}
-              <span class="muted">（分数线 {{ r.score_line || '—' }}）</span>
-              <p>{{ r.reason }}</p>
-              <p v-if="r.risk" class="muted">风险：{{ r.risk }}</p>
-            </div>
-          </div>
-        </template>
-        <p v-if="result.tips" class="tips">{{ result.tips }}</p>
+    <section class="card history">
+      <h2>我的推荐历史（最近100条） <el-button size="small" @click="loadHistory">刷新</el-button></h2>
+      <el-empty v-if="!history.length" description="还没有推荐记录" :image-size="60" />
+      <div v-for="task in history" :key="task.id" class="history-row">
+        <span>{{ task.createdAt }} · {{ task.status }}</span>
+        <el-button size="small" @click="showHistory(task)">查看</el-button>
       </div>
-      <el-empty v-else-if="done" description="AI 暂无返回" :image-size="60" />
-      <template #footer>
-        <el-button @click="dialog = false">关闭</el-button>
-        <el-button type="primary" :loading="loading" @click="ask">问 AI</el-button>
-      </template>
+    </section>
+    <el-dialog v-model="dialog" title="2027年院校专业推荐" width="min(760px, 94vw)" top="5vh" class="recommendation-dialog" destroy-on-close>
+      <p>档案报考年份：<strong>{{ profile?.examYear || '未填写' }}</strong> · <router-link to="/profile">编辑档案</router-link></p>
+      <p class="muted">首批覆盖3所院校的081200、085404普通全日制项目；临时偏好不会修改档案。</p>
+      <el-form label-position="top" :disabled="submitting">
+        <div class="form-grid">
+          <el-form-item label="目标专业"><el-select v-model="form.majorCode"><el-option label="081200 计算机科学与技术" value="081200" /><el-option label="085404 计算机技术" value="085404" /></el-select></el-form-item>
+          <el-form-item label="学位类型"><el-select v-model="form.degreeType"><el-option label="学硕" value="academic" /><el-option label="专硕" value="professional" /></el-select></el-form-item>
+          <el-form-item label="地区"><el-select v-model="form.regions" multiple filterable allow-create placeholder="不限制地区"><el-option label="北京" value="北京" /><el-option label="江苏" value="江苏" /></el-select></el-form-item>
+          <el-form-item label="地区约束"><el-select v-model="form.regionConstraint"><el-option label="优先考虑" value="preferred" /><el-option label="必须满足" value="required" /></el-select></el-form-item>
+          <el-form-item label="学习方式"><el-select v-model="form.studyMode"><el-option label="全日制" value="full_time" /><el-option label="非全日制" value="part_time" /></el-select></el-form-item>
+        </div>
+        <el-form-item label="希望比较的问题"><el-input v-model="query" type="textarea" :rows="2" maxlength="8000" /></el-form-item>
+        <el-checkbox v-model="form.explainWithAi">请求AI解释（未启用模型时使用规则说明）</el-checkbox>
+      </el-form>
+      <TaskResultView v-if="result" :task="result" />
+      <template #footer><el-button @click="dialog = false">关闭</el-button><el-button type="primary" :loading="submitting" :disabled="!query.trim()" @click="ask">生成推荐</el-button></template>
+    </el-dialog>
+    <el-dialog :model-value="!!historyTask" title="历史推荐与依据" width="min(760px, 94vw)" top="5vh" class="recommendation-dialog" @close="historyTask = null">
+      <TaskResultView v-if="historyTask" :task="historyTask" />
     </el-dialog>
   </div>
 </template>
-
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { searchSchools } from '@/api/school'
-import { submitTask } from '@/api/task'
-import type { School } from '@/types/api'
-import { ArrowRight, MagicStick } from '@element-plus/icons-vue'
-
-const router = useRouter()
+import { generateRecommend, getRecommendList } from '@/api/recommend'
+import { getCurrentUser } from '@/api/user'
+import { useUserStore } from '@/stores/user'
+import TaskResultView from '@/components/TaskResultView.vue'
+import type { School, Task, User } from '@/types/api'
+const user = useUserStore()
 const q = reactive({ province: '', level: '', majorName: '' })
-const list = ref<School[]>([])
-const loading = ref(false)
-const load = async () => {
+const list = ref<School[]>([]), history = ref<Task[]>([])
+const loading = ref(false), submitting = ref(false), dialog = ref(false)
+const profile = ref<User | null>(null), result = ref<Task | null>(null)
+const historyTask = ref<Task | null>(null)
+const query = ref('请比较符合条件的专业，并说明考试科目及需要核对的事项。')
+const form = reactive({ majorCode: '081200', degreeType: 'academic', regions: [] as string[], regionConstraint: 'preferred', studyMode: 'full_time', explainWithAi: true })
+let searchVersion = 0, historyVersion = 0
+async function load() {
+  const version = ++searchVersion
   loading.value = true
-  try { list.value = await searchSchools(q) } finally { loading.value = false }
+  try { const data = await searchSchools(q); if (version === searchVersion) list.value = data } finally { if (version === searchVersion) loading.value = false }
 }
-onMounted(load)
-
-const dialog = ref(false)
-const query = ref('')
-const result = ref<any>(null)
-const done = ref(false)
-const groupLabel: Record<string, string> = { rush: '冲刺', stable: '稳妥', safe: '保底' }
-
-const ask = async () => {
-  if (!query.value.trim()) return
-  loading.value = true
-  done.value = false
+async function loadHistory() {
+  const version = ++historyVersion
+  const data = await getRecommendList()
+  if (version === historyVersion) history.value = data
+}
+async function openRecommendation() {
   result.value = null
+  profile.value = await getCurrentUser()
+  if (profile.value.targetMajor === '085404' || profile.value.targetMajor === '计算机技术') { form.majorCode = '085404'; form.degreeType = 'professional' }
+  dialog.value = true
+}
+function showHistory(task: Task) { historyTask.value = task }
+async function ask() {
+  if (submitting.value || !query.value.trim()) return
+  const token = user.token
+  submitting.value = true
   try {
-    const t: any = await submitTask({ taskType: 'SCHOOL_RECOMMEND', input: { query: query.value } })
-    if (t.status === 'SUCCESS') result.value = t.resultPayload
-    done.value = true
-  } finally { loading.value = false }
+    const task = await generateRecommend({ query: query.value, preferences: { majorCodes: [form.majorCode], degreeType: form.degreeType,
+      regions: form.regions, regionConstraint: form.regionConstraint, studyMode: form.studyMode, explainWithAi: form.explainWithAi } })
+    if (token !== user.token) return
+    result.value = task
+    await loadHistory()
+  } catch { /* The request wrapper displays errors and discards stale account responses. */ }
+  finally { submitting.value = false }
 }
+onMounted(() => { void load(); void loadHistory() })
 </script>
-
 <style scoped>
-.schools-page { max-width: 900px; }
-.hero {
-  background: linear-gradient(135deg, #3b6cff 0%, #6d5cff 100%);
-  border-radius: var(--r-lg);
-  padding: 36px; color: #fff; margin-bottom: 20px;
-}
-.hero-title { font-size: 26px; font-weight: 700; margin: 0 0 6px; }
-.hero-sub { opacity: .85; margin: 0 0 22px; font-size: 14px; }
-.search-bar { display: flex; gap: 10px; flex-wrap: wrap; }
-.search-bar :deep(.el-input__wrapper),
-.search-bar :deep(.el-select__wrapper) {
-  box-shadow: 0 0 0 1px rgba(255,255,255,.3) inset;
-  background: rgba(255,255,255,.95);
-}
-.ai-btn { background: rgba(255,255,255,.2); color: #fff; border-color: rgba(255,255,255,.4); }
-.ai-btn:hover { background: rgba(255,255,255,.3); color: #fff; }
-
-.result { display: flex; flex-direction: column; gap: 10px; }
-.row {
-  background: var(--c-surface); border: 1px solid var(--c-line);
-  border-radius: var(--r-md); padding: 16px 20px;
-  display: flex; align-items: center; gap: 16px;
-  cursor: pointer; transition: all .15s;
-}
-.row:hover { border-color: var(--c-primary); box-shadow: var(--shadow-md); }
-.row-icon {
-  width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
-  background: var(--c-primary-light); color: var(--c-primary);
-  display: grid; place-items: center; font-weight: 700; font-size: 19px;
-}
-.row-main { flex: 1; min-width: 0; }
-.row-name { font-weight: 600; font-size: 16px; }
-.row-meta { color: var(--c-ink-2); font-size: 12px; margin-top: 4px; }
-.row-tags { display: flex; gap: 6px; }
-.row-arrow { color: var(--c-ink-3); }
-.row:hover .row-arrow { color: var(--c-primary); }
-
-.result-block { margin-top: 16px; }
-.group { margin-top: 12px; }
-.group-title { font-weight: 600; margin-bottom: 6px; }
-.school { padding: 8px 0; border-bottom: 1px dashed var(--c-line); }
-.school p { margin: 4px 0 0; color: var(--c-ink-2); font-size: 13px; }
-.muted { color: var(--c-ink-3); font-size: 12px; }
-.tips { margin-top: 12px; color: var(--c-ink-2); font-size: 13px; }
+.schools-page { max-width: 1000px; }
+.hero { background: linear-gradient(135deg,#3b6cff,#6d5cff); border-radius: 16px; padding: 28px; color: white; margin-bottom: 18px; }
+.hero h1 { margin: 0; }
+.search-bar, .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.search-bar .el-input, .search-bar .el-select { width: 100%; }
+.rows { margin: 20px 0; }
+.school-row { display: flex; justify-content: space-between; padding: 18px; margin: 10px 0; background: var(--c-surface); border: 1px solid var(--c-line); border-radius: 12px; color: var(--c-ink); text-decoration: none; }
+.history { padding: 20px; }
+.history h2 { font-size: 18px; }
+.history-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--c-line); }
+.muted { color: var(--c-ink-2); font-size: 13px; }
+.recommendation-dialog { max-height: 90vh; display: flex; flex-direction: column; }
+.recommendation-dialog :deep(.el-dialog__body) { min-height: 0; overflow-y: auto; }
+@media(max-width:600px) { .form-grid,.search-bar { grid-template-columns: 1fr; } .school-row { flex-direction: column; gap: 8px; } }
 </style>

@@ -25,16 +25,21 @@ class TaskServiceImplTest {
     PracticeRecordMapper records = mock(PracticeRecordMapper.class);
     TaskMapper tasks = mock(TaskMapper.class);
     TaskServiceImpl service;
+    TaskStore store;
 
     @BeforeEach void setup() {
         var assistant = new MapperBuilderAssistant(new MybatisConfiguration(), "test");
         assistant.setCurrentNamespace("test");
         TableInfoHelper.initTableInfo(assistant, Task.class);
         TableInfoHelper.initTableInfo(assistant, PracticeRecord.class);
-        service = spy(new TaskServiceImpl(agent, new AgentProperties(), mock(UserMapper.class), records));
+        var users = mock(UserMapper.class);
+        var user = new com.kaoyan.entity.User(); user.setId(1L);
+        when(users.selectById(1L)).thenReturn(user);
+        store = new TaskStore(tasks, new AgentProperties());
+        service = spy(new TaskServiceImpl(agent, new AgentProperties(), users, records, mock(QuestionMapper.class), store));
         ReflectionTestUtils.setField(service, "baseMapper", tasks);
-        doAnswer(call -> { ((Task) call.getArgument(0)).setId("task-1"); return true; }).when(service).save(any(Task.class));
-        doReturn(true).when(service).updateById(any(Task.class));
+        when(tasks.insert(any(Task.class))).thenReturn(1);
+        when(tasks.updateById(any(Task.class))).thenReturn(1);
     }
 
     @Test void malformedInputDoesNotCreateTaskOrCallAgent() {
@@ -43,14 +48,14 @@ class TaskServiceImplTest {
             assertEquals(400, assertThrows(ApiException.class, () -> service.submit(1L, "KNOWLEDGE_QA", input)).getHttpStatus());
         }
         assertThrows(ApiException.class, () -> service.submit(1L, "invented", Map.of("query", "q")));
-        verify(service, never()).save(any(Task.class)); verifyNoInteractions(agent);
+        verify(tasks, never()).insert(any(Task.class)); verifyNoInteractions(agent);
     }
 
     @Test void foreignOrMissingSessionRejectedBeforeTaskCreation() {
         when(records.selectList(any())).thenReturn(List.of());
         assertEquals(404, assertThrows(ApiException.class,
             () -> service.submit(1L, "PRACTICE_SUMMARY", Map.of("sessionId", "foreign"))).getHttpStatus());
-        verify(service, never()).save(any(Task.class)); verifyNoInteractions(agent);
+        verify(tasks, never()).insert(any(Task.class)); verifyNoInteractions(agent);
     }
 
     @Test void incompleteSessionRejected() {
@@ -62,24 +67,25 @@ class TaskServiceImplTest {
     }
 
     @Test void successfulResultSavedAndResponseIdentityChecked() {
-        var response = response("task-1", Map.of("answer", "mock answer"));
-        when(agent.chat(anyString(), any())).thenReturn(response);
+        when(agent.chat(anyString(), any())).thenAnswer(call -> response(
+            ((com.kaoyan.dto.agent.AgentRequest) call.getArgument(1)).getTaskId(), Map.of("answer", "mock answer")));
         var saved = service.submit(1L, "KNOWLEDGE_QA", Map.of("query", "进程是什么"));
         assertEquals("SUCCESS", saved.getStatus());
         assertEquals("mock answer", saved.getResultPayload().get("answer"));
-        verify(service).updateById(saved);
-        response.setTaskId("someone-else");
+        verify(tasks).updateById(saved);
+        doReturn(response("someone-else", Map.of("answer", "mock"))).when(agent).chat(anyString(), any());
         assertEquals("FAILED", service.submit(1L, "KNOWLEDGE_QA", Map.of("query", "q")).getStatus());
     }
 
     @Test void invalidResultAndExceptionsBecomeSanitizedSavedFailures() {
-        when(agent.chat(anyString(), any())).thenReturn(response("task-1", "not-an-object"));
+        when(agent.chat(anyString(), any())).thenAnswer(call -> response(
+            ((com.kaoyan.dto.agent.AgentRequest) call.getArgument(1)).getTaskId(), "not-an-object"));
         assertEquals("FAILED", service.submit(1L, "KNOWLEDGE_QA", Map.of("query", "q")).getStatus());
-        when(agent.chat(anyString(), any())).thenThrow(new RuntimeException("private-upstream-detail"));
+        doThrow(new RuntimeException("private-upstream-detail")).when(agent).chat(anyString(), any());
         var saved = service.submit(1L, "KNOWLEDGE_QA", Map.of("query", "q"));
         assertEquals("FAILED", saved.getStatus());
         assertFalse(saved.getErrorMessage().contains("private-upstream-detail"));
-        verify(service, times(2)).updateById(any(Task.class));
+        verify(tasks, times(2)).updateById(any(Task.class));
     }
 
     @Test void foreignTaskLooksLikeMissingTask() {
@@ -95,13 +101,13 @@ class TaskServiceImplTest {
         when(tasks.countForUserSince(eq(1L), any())).thenReturn(0L, 6L);
         assertEquals(429, assertThrows(ApiException.class,
                 () -> service.submit(1L, "KNOWLEDGE_QA", Map.of("query", "q"))).getHttpStatus());
-        verify(service, never()).save(any(Task.class));
+        verify(tasks, never()).insert(any(Task.class));
         verifyNoInteractions(agent);
     }
 
     @Test void utcDayCutoffIsConvertedToTheStoredLocalDateTimeZone() {
         var clock = java.time.Clock.fixed(java.time.Instant.parse("2026-10-14T00:30:00Z"), java.time.ZoneId.of("Asia/Shanghai"));
-        ReflectionTestUtils.setField(service, "clock", clock);
+        ReflectionTestUtils.setField(store, "clock", clock);
         when(agent.chat(anyString(), any())).thenReturn(response("task-1", Map.of("answer", "mock")));
         service.submit(1L, "KNOWLEDGE_QA", Map.of("query", "q"));
         verify(tasks).countForUserSince(1L, java.time.LocalDateTime.parse("2026-10-14T08:00:00"));
@@ -109,6 +115,15 @@ class TaskServiceImplTest {
     }
 
     private AgentResponse response(String id, Object result) {
-        var r = new AgentResponse(); r.setTaskId(id); r.setStatus("SUCCESS"); r.setResult(result); return r;
+        var r = new AgentResponse(); r.setTaskId(id); r.setStatus("SUCCESS");
+        r.setReleaseId("rag-v1-1234567890abcdef"); r.setReferences(List.of());
+        if (result instanceof Map<?, ?> map) {
+            var body = new java.util.HashMap<String,Object>();
+            map.forEach((key, value) -> body.put(key.toString(), value));
+            body.put("outcome", "UNSUPPORTED"); body.put("resolvedTaskType", "KNOWLEDGE_QA");
+            body.put("releaseId", r.getReleaseId()); body.put("explanationMode", "rules");
+            r.setResult(body);
+        } else r.setResult(result);
+        return r;
     }
 }

@@ -16,8 +16,9 @@ public class AgentRequest {
     private String taskType;
     private String userInput;
     private String sessionId;
-    private List<Long> correctQuestionIds;
-    private List<Long> wrongQuestionIds;
+    /** Server-authorized and already graded snapshots, never client supplied IDs. */
+    private List<Map<String, Object>> questions;
+    private Map<String, Object> preferences;
     private List<Object> messages;
     private Map<String, Object> profile;
 }
