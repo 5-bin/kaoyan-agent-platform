@@ -206,6 +206,8 @@ const doAiSummary = async () => {
     } else {
       aiResult.value = 'AI 总结失败：' + (t.errorMessage || '未知错误')
     }
+  } catch {
+    // The shared request wrapper displays the server's error, including missing snapshots.
   } finally { aiLoading.value = false }
 }
 

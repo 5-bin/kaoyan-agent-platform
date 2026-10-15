@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 CREATE TABLE IF NOT EXISTS task (
  id VARCHAR(64) PRIMARY KEY, user_id BIGINT, task_type VARCHAR(40), status VARCHAR(20),
  input_payload VARCHAR(20000), result_payload VARCHAR(20000), release_id VARCHAR(64),
- error_message VARCHAR(1000), created_at TIMESTAMP, updated_at TIMESTAMP
+ error_message VARCHAR(1000), created_at TIMESTAMP, updated_at TIMESTAMP, deleted_at TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS practice_record (
  id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT, session_id VARCHAR(64),

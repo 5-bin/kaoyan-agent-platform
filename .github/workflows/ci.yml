@@ -59,6 +59,7 @@ jobs:
         if: failure()
         with:
           name: test-diagnostics
+          include-hidden-files: true
           path: |
             kaoyan-B/target/surefire-reports/
             kaoyan-B/target/agent-chain.log

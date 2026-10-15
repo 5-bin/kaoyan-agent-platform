@@ -140,10 +140,12 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             if (records.stream().noneMatch(r -> "valid".equals(r.getGradingStatus()))
                     || records.stream().anyMatch(r -> "valid".equals(r.getGradingStatus()) && r.getIsCorrect() == null))
                 throw new ApiException(409, "批次尚未完成或无有效作答，不能生成总结");
+            if (records.stream().filter(r -> "valid".equals(r.getGradingStatus()))
+                    .anyMatch(r -> r.getQuestionSnapshot() == null || r.getQuestionSnapshot().isEmpty()))
+                throw new ApiException(409, "该批次包含缺少题目版本快照的历史作答，暂不支持生成总结");
             List<Map<String, Object>> snapshots = new ArrayList<>();
             for (PracticeRecord record : records) {
                 if (record.getIsCorrect() == null || !"valid".equals(record.getGradingStatus())) continue;
-                if (record.getQuestionSnapshot() == null) continue;
                 Map<String, Object> q = new LinkedHashMap<>(record.getQuestionSnapshot());
                 q.put("correct", record.getIsCorrect() == 1);
                 snapshots.add(q);
@@ -210,6 +212,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         Page<Task> p = Page.of(Math.max(page, 1), Math.min(Math.max(size, 1), 100));
         Page<Task> result = baseMapper.selectPage(p, new LambdaQueryWrapper<Task>()
             .eq(Task::getUserId, userId).eq(taskType != null, Task::getTaskType, taskType)
+            .isNull(Task::getDeletedAt)
             .orderByDesc(Task::getCreatedAt).orderByDesc(Task::getId));
         return PageResult.of(result.getTotal(), p.getCurrent(), p.getSize(), result.getRecords());
     }
@@ -217,8 +220,19 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     @Override
     public Task detail(Long userId, String taskId) {
         Task task = getById(taskId);
-        if (task == null || !task.getUserId().equals(userId)) throw new ApiException(404, "任务不存在或无权访问");
+        if (task == null || !task.getUserId().equals(userId) || task.getDeletedAt() != null)
+            throw new ApiException(404, "任务不存在或无权访问");
         return task;
+    }
+
+    @Override
+    public void hideRecommendation(Long userId, String taskId) {
+        Task task = detail(userId, taskId);
+        if (!"SCHOOL_RECOMMEND".equals(task.getTaskType())) throw new ApiException(404, "推荐记录不存在");
+        if (!"SUCCESS".equals(task.getStatus()) && !"FAILED".equals(task.getStatus()))
+            throw new ApiException(409, "任务尚未结束，不能删除");
+        if (baseMapper.hideRecommendation(userId, taskId, java.time.LocalDateTime.now()) != 1)
+            throw new ApiException(404, "推荐记录不存在或已删除");
     }
 
     @Override

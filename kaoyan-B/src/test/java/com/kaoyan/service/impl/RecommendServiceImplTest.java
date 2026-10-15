@@ -20,13 +20,14 @@ class RecommendServiceImplTest {
         verifyNoMoreInteractions(tasks);
     }
 
-    @Test void cannotDeleteRunningOrNonRecommendationTasks() {
+    @Test void deletionUsesGuardedTaskOperationAndPreservesItsErrors() {
         var tasks = mock(TaskService.class);
         var service = new RecommendServiceImpl(tasks);
-        var task = new Task(); task.setTaskType("SCHOOL_RECOMMEND"); task.setStatus("RUNNING");
-        when(tasks.detail(1L, "owned")).thenReturn(task);
+        service.delete("ended", 1L);
+        verify(tasks).hideRecommendation(1L, "ended");
+        doThrow(new ApiException(409, "任务尚未结束")).when(tasks).hideRecommendation(1L, "owned");
         assertEquals(409, assertThrows(ApiException.class, () -> service.delete("owned", 1L)).getHttpStatus());
-        task.setTaskType("KNOWLEDGE_QA");
+        doThrow(new ApiException(404, "推荐记录不存在")).when(tasks).hideRecommendation(1L, "owned");
         assertEquals(404, assertThrows(ApiException.class, () -> service.delete("owned", 1L)).getHttpStatus());
         verify(tasks, never()).removeById(anyString());
     }

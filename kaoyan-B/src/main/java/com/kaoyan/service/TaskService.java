@@ -40,4 +40,7 @@ public interface TaskService extends IService<Task> {
      * @return 任务
      */
     Task detail(Long userId, String taskId);
+
+    /** Hide an owned, completed recommendation without removing its quota record. */
+    void hideRecommendation(Long userId, String taskId);
 }

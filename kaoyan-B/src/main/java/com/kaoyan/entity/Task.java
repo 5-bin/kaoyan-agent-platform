@@ -45,6 +45,10 @@ public class Task {
     /** 失败原因 */
     private String errorMessage;
 
+    /** Display deletion only; quota queries intentionally retain these rows. */
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private LocalDateTime deletedAt;
+
     /** 创建时间 */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;

@@ -77,6 +77,8 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error('报告已存在，使用新的文件名')
+    if args.browser_check and not (ROOT / 'kaoyan-frontend/dist/index.html').is_file():
+        parser.error('浏览器检查需要构建产物；先在kaoyan-frontend执行 npm ci 和 npm run build')
     classpath_file = ROOT / 'kaoyan-B/target/test-classpath.txt'
     if not classpath_file.is_file():
         parser.error('先在kaoyan-B执行 ./mvnw test-compile dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt')
@@ -103,6 +105,7 @@ def main():
                'NODE_PATH': str(ROOT / 'kaoyan-frontend/node_modules'),
                'DAILY_TASK_LIMIT': '100', 'MINUTE_TASK_LIMIT': '100'}
         log_handles = [(temporary / name).open('w') for name in ['python.log', 'java.log', 'frontend.log']]
+        browser_diagnostics = temporary / 'browser'
         try:
             python = subprocess.Popen([sys.executable, '-m', 'uvicorn', 'tests.wire_app:app', '--host', '127.0.0.1',
                                        '--port', str(python_port)], cwd=ROOT / 'kaoyan-agent', env=env,
@@ -140,11 +143,11 @@ def main():
             check('第二页及总数正确', status == 200 and history['data']['total'] == 25 and len(history['data']['list']) == 5)
             if args.browser_check:
                 frontend_env = {**env, 'API_PROXY_TARGET': java_base}
-                frontend = subprocess.Popen([args.node, 'node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
+                frontend = subprocess.Popen([args.node, 'node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1',
                     '--port', str(frontend_port), '--strictPort'], cwd=ROOT / 'kaoyan-frontend', env=frontend_env,
                     stdout=log_handles[2], stderr=subprocess.STDOUT)
                 wait_ready(frontend, frontend_base, '/')
-                subprocess.run([args.node, str(ROOT / 'scripts/browser-current.cjs'), frontend_base],
+                subprocess.run([args.node, str(ROOT / 'scripts/browser-current.cjs'), frontend_base, str(browser_diagnostics)],
                                cwd=ROOT, env=env, check=True, timeout=120)
                 check('实际后端任务页面与账号隔离检查', True)
             def interrupted_call():
@@ -194,6 +197,8 @@ def main():
             debug.mkdir(parents=True)
             for name in ('python.log', 'java.log', 'frontend.log'):
                 shutil.copyfile(temporary / name, debug / name)
+            if browser_diagnostics.is_dir():
+                shutil.copytree(browser_diagnostics, debug / 'browser')
             print('测试失败，隔离服务日志保存在:', debug, file=sys.stderr)
             raise
         finally:

@@ -12,6 +12,7 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 - [框架适配历史记录](docs/当前框架适配.md)：同学在合并前的验证与限制。
 - [合并审查记录](docs/merge-review-2026-10-14.md)：本次冲突处理和重新验证范围。
 - [RAG详细契约](docs/rag.md)：资料、筛选、快照、引用与版本。
+- [PR #8修复验证](docs/pr8-fix-verification-2026-10-15.md)：删除后的配额、历史快照及页面联调修复。
 
 ## 当前能力
 
@@ -40,9 +41,9 @@ py -3.13 -m venv .venv
 
 ### 数据库
 
-仅在**全新空库**建立 `kaoyan` 并执行 `kaoyan-B/src/main/resources/db/V1__init.sql`，然后执行新增的 `V7__practice_snapshot.sql`。V1含DROP语句，不能用于已有业务库。
+仅在**全新空库**建立 `kaoyan` 并执行 `kaoyan-B/src/main/resources/db/V1__init.sql`，然后依次执行 `V7__practice_snapshot.sql` 和 `V8__task_soft_delete.sql`。V1含DROP语句，不能用于已有业务库。
 
-已有数据库只执行一次V7，为作答增加 `question_snapshot`。不需要修改或清空旧数据。旧作答没有快照时不纳入新总结，以免用最新题目冒充历史版本。V2—V6属于旧演示种子，不是新推荐的数据源，V6的估计分数线不应导入正式库。迁移当前由开发者显式执行；尚未启用全仓库自动迁移。
+已有数据库先核对已执行的迁移：V7为作答增加 `question_snapshot`，V8为任务增加 `deleted_at`；尚未执行的脚本各执行一次，已执行的不要重跑。**V8必须在启动本版Java前完成**，它保留现有任务、结果及额度依据，不清空数据。推荐删除后在历史中隐藏，仍计入每日及分钟额度。批次中任一有效作答缺少快照时，总结返回409，不创建任务或消耗任务额度；不使用最新题目补造历史。V2—V6属于旧演示种子，不是新推荐的数据源，V6的估计分数线不应导入正式库。迁移当前由开发者显式执行；尚未启用全仓库自动迁移。
 
 ### 启动服务
 
@@ -115,7 +116,7 @@ Java测试在独立H2库启动真实Python子进程，不读日常MySQL，也不
 
 ## 隔离HTTP与真实后端浏览器检查
 
-保留并更新上游的链路脚本，使用随机端口、临时H2、Redis／模型替身，不读取日常业务数据。先在kaoyan-B生成测试类路径：
+保留并更新上游的链路脚本，使用随机端口、临时H2、Redis／模型替身，不读取日常业务数据。浏览器检查使用生产构建产物及Vite preview，避免开发依赖首次优化刷新打断登录；`/api`代理仍指向本次临时Java端口。先在kaoyan-frontend执行 `npm ci`、`npm run build`，再在kaoyan-B生成测试类路径：
 
 ```powershell
 .\mvnw.cmd -B -ntp test-compile dependency:build-classpath '-Dmdep.includeScope=test' '-Dmdep.outputFile=target/test-classpath.txt'
@@ -128,4 +129,4 @@ $env:PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = '本机Chrome或Edge可执行文件�
 .\.venv\Scripts\python.exe -X utf8 scripts/smoke-current.py --output .cache/new-http-report.json --browser-check --node node
 ```
 
-无本机浏览器时先安装前端Playwright Chromium；省略浏览器环境变量即可使用其默认浏览器。Linux/macOS使用 `.venv/bin/python`。脚本验证实际HTTP调用、分页、注销、跨账号、超时前落库、真实进程重启和来源结果展示；不代表真实Redis／模型供应商验收。任务配额按UTC日重置，单Java实例通过短事务保存，不在调用Python时持有数据库事务。
+无本机浏览器时先安装前端Playwright Chromium；省略浏览器环境变量即可使用其默认浏览器。Linux/macOS使用 `.venv/bin/python`。脚本验证实际HTTP调用、分页、注销、跨账号、超时前落库、真实进程重启和来源结果展示；不代表真实Redis／模型供应商验收。缺少构建产物时会在启动临时服务前报错。失败诊断保存在独立的 `.cache/smoke-debug-*`，包含服务日志及可用的浏览器截图、异常类别和接口路径／状态，不记录请求头、正文或令牌。任务配额按UTC日重置，单Java实例通过短事务保存，不在调用Python时持有数据库事务。

@@ -215,7 +215,7 @@ kaoyan-agent-platform/
 
 ### 5.3 职责与数据流
 
-Java读取当前账号、本人的档案与批次作答，执行判分和权限检查。总结要求valid项目全部已答，仅将判分时已保存的题目快照传给Python；缺少快照的旧记录不查询现行题表补造。推荐由Python对独立版本资料按硬条件筛选与稳定排序，Java保存当次授权输入、候选结果、引用和releaseId。Python不连接业务数据库，不接受客户端或模型提供的owner、SQL及业务写入。
+Java读取当前账号、本人的档案与批次作答，执行判分和权限检查。总结要求valid项目全部已答且快照完整，仅将判分时已保存的题目快照传给Python；缺少快照的批次在创建任务前409拒绝，不查询现行题表补造。推荐由Python对独立版本资料按硬条件筛选与稳定排序，Java保存当次授权输入、候选结果、引用和releaseId。Python不连接业务数据库，不接受客户端或模型提供的owner、SQL及业务写入。
 
 ### 5.4 任务、限额与失败
 
@@ -305,7 +305,7 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 ### 6.7 错题辅导与批次总结
 
-当前PRACTICE_SUMMARY要求本人批次valid项目全部已答，读取判分时保存的question_snapshot，代码计算正确题数与正确率，模型仅可解释。无快照时明确NEEDS_INPUT，不能用新题目冒充旧依据。判分时快照不等于抽题时固定整个批次，正式错题辅导、提示与重练仍待建设。
+当前PRACTICE_SUMMARY要求本人批次valid项目全部已答，且每条question_snapshot非NULL、非空对象。快照缺失时Java返回409及历史依据缺失说明，不创建任务、不调用Agent、不消耗任务额度。快照完整时读取全部有效作答，代码计算正确题数与正确率，模型仅可解释；不能用新题目冒充旧依据。判分时快照不等于抽题时固定整个批次，正式错题辅导、提示与重练仍待建设。
 
 目标错题流程：Java验证本人attemptId → 读取题目版本与判分快照 → Python关联知识点并检索 → 解释选择错误的条件和正确解法 → 推荐已审核题目 → 检查与标准答案一致 → Java保存任务。答案与资料冲突时待管理员核查，保留既有判分，不静默改答案。
 
@@ -337,7 +337,7 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 | 当前表 | 主要字段／关系 | 不能据此声称的能力 |
 | --- | --- | --- |
 | user | 数字id、账号、密码哈希、role／status及目标院校／专业／年份／背景 | 完整专业资格、学位与成绩档案 |
-| task | 字符串id、userId、taskType、status、inputPayload、resultPayload、releaseId、错误与时间 | releaseId已实际激活、结构化领域终态已接入 |
+| task | 字符串id、userId、taskType、status、inputPayload、resultPayload、releaseId、错误与时间、内部deletedAt | 独立用量账本、用户可见的删除时间或自动数据清理 |
 | document | 标题、科目、正文、sourceUrl、status及创建／审核人 | 来源定位、许可、不可变知识版本和检索索引 |
 | school、school_detail | 院校及专业代码／名称／年份／人数／分数线 | 学院、完整条件、来源核验及跨口径可比性 |
 | recommend_record | 旧占位推荐表，保留兼容 | 新推荐统一保存task，不读写占位推荐历史 |
@@ -357,10 +357,10 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 | POST `/api/auth/register`、`/api/auth/login`、`/api/auth/logout` | 注册／登录账号密码；退出Authorization | 注册仅STUDENT，登录accessToken，退出Redis撤销 |
 | POST `/api/auth/refresh` | refreshToken | 当前登录不下发refreshToken，保留兼容入口 |
 | GET `/api/users/me`、PUT `/api/users/profile`、PUT `/api/users/avatar` | 本人展示资料、允许档案、头像 | 归属从认证取，不能设置role |
-| GET／POST `/api/tasks`、GET `/api/tasks/{taskId}` | 分页历史、类型化输入、本人任务 | 同步调用并保存状态，跨账号详情404 |
+| GET／POST `/api/tasks`、GET `/api/tasks/{taskId}` | 分页历史、类型化输入、本人任务 | 同步调用并保存状态；历史及total排除已删除项，跨账号或已删除详情404 |
 | GET `/api/documents` | subject，可返回已发布资料列表 | 尚非Agent知识检索接口 |
 | GET `/api/schools`、POST `/api/schools/search`、GET `/api/schools/{schoolId}` | province／level／majorName，院校及专业详情 | 列表不是核验推荐，未提供完整当年专业条件筛选 |
-| POST `/api/recommends/generate`、GET `/api/recommends`、DELETE `/api/recommends/{taskId}` | `{query,preferences}`、本人近期Task历史／字符串taskId删除 | 与任务同一流程，不写旧占位记录；仅删除本人的已结束推荐 |
+| POST `/api/recommends/generate`、GET `/api/recommends`、DELETE `/api/recommends/{taskId}` | `{query,preferences}`、本人近期Task历史／字符串taskId删除 | 与任务同一流程；仅隐藏本人SUCCESS／FAILED推荐并保留额度，重复删除404，未结束409 |
 | GET `/api/questions/practice`、GET `/api/questions/{id}` | subject／difficulty／knowledgePoint／limit，题目实体 | 抽题限审核启用；仍含答案，详情不能作为合格学生DTO |
 | POST `/api/practice/sessions` | subject、difficulty、count；返回sessionId | 固定stable_order及记录，上限100在Service截取；无正式状态与版本 |
 | POST `/api/practice/sessions/{sessionId}/answer` | questionId、answer；返回data:null | Java判分，但未返回权威判分视图，需改造页面与DTO |
@@ -597,7 +597,7 @@ python3.13 -m venv .venv
 
 数据库负责人仅在明确可丢弃的空开发／测试库准备表；`V1__init.sql`逐表DROP，严禁对已有业务库重跑。其余V2—V6种子含演示用户、题目和院校，不自动导入为正式资料，也不公开其中账号作为真实访问方式。没有自动安全迁移入口时不能写成启动自动完成建库。
 
-本版本需要`V7__practice_snapshot.sql`为practice_record增加question_snapshot列；已有库仅执行一次V7，新空库建表后再执行V7。旧记录保留NULL，不从当前题目倒填历史快照。
+本版本需要`V7__practice_snapshot.sql`为practice_record增加question_snapshot列，以及`V8__task_soft_delete.sql`为task增加deleted_at列。新空库按V1→V7→V8执行；已有库核对已应用记录，仅执行尚未应用的增量脚本，每份一次，V8必须先于本版Java启动。迁移由负责人显式执行，不清空记录或重跑V1。旧作答快照保留NULL，不从当前题目倒填；任一valid作答快照缺失或为空对象时，总结409拒绝，不创建任务、不调用Agent或消耗任务额度。
 
 ### 10.2 本地三端启动
 
@@ -657,7 +657,7 @@ Windows按README使用Python3.13与mvnw.cmd；Java由`scripts/start-backend.ps1`
 
 每次使用未存在的报告名，脚本拒绝覆盖。它使用临时端口、独立H2、Redis和模型替身；确认具备所需运行环境并在授权范围内执行，不指向现有业务库。测试完只关闭本次子进程。
 
-增加浏览器检查需已安装Playwright及其Chromium或本机Chrome／Edge，脚本自动使用前端node_modules，CHROME_PATH或PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH指定Chrome／Edge文件（不设置则使用Playwright默认浏览器）；先安装前端依赖。以下同样不是本轮已执行命令：
+增加浏览器检查需已安装Playwright及其Chromium或本机Chrome／Edge，脚本自动使用前端node_modules，CHROME_PATH或PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH指定Chrome／Edge文件（不设置则使用Playwright默认浏览器）；先在kaoyan-frontend执行npm ci与npm run build。完整链路使用Vite preview及临时Java代理，缺少dist/index.html时在启动测试服务前报错。以下为复现入口，实际结果见[PR #8修复验证](docs/pr8-fix-verification-2026-10-15.md)：
 
 ```bash
 ./.venv/bin/python scripts/smoke-current.py --output .cache/browser-check-new.json --browser-check --node node
@@ -673,7 +673,7 @@ Windows按README使用Python3.13与mvnw.cmd；Java由`scripts/start-backend.ps1`
 | MySQL连接／表不存在 | 独立开发库、账号权限、表结构及安全准备状态 | 不自动执行DROP或种子修复 |
 | 登录后401／退出失败 | 令牌过期、issuer、账号状态、Redis连接与撤销 | 前端缓存不能决定真实登录／角色 |
 | Agent FAILED | Python可达、401／422、模型配置、HTTPS、预算与结果字段 | 日志只用任务ID和错误类别，不公开供应商原异常 |
-| 总结404／409／NEEDS_INPUT | 本人批次、valid项目是否全答、已保存快照及V7迁移 | 旧记录无快照不查现行题表补造 |
+| 总结404／409／NEEDS_INPUT | 本人批次、valid项目是否全答、全部有效作答快照及V7迁移 | 快照缺失／空对象409且不创建任务，不查现行题表补造 |
 | 推荐NEEDS_INPUT／UNSUPPORTED | 档案年份、专业／学位条件及副本覆盖 | 不自动改年份、放宽硬条件或使用旧演示分数 |
 | 上传503 | OSS是否配置及授权范围 | 未配置不应阻止核心服务启动 |
 | 页面超时／旧账号结果 | 先查任务历史；核对请求时令牌与当前会话 | 不自动重试新增付费任务 |

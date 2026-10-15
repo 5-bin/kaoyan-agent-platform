@@ -156,9 +156,18 @@ class AgentChainTest {
         record.setQuestionSnapshot(Map.of("id", 123456, "version", 2, "subject", "操作系统",
             "knowledgePoint", "线程", "content", "已判分的历史版本题干", "answer", "A"));
         attempts.insert(record);
+        var correctRecord = new com.kaoyan.entity.PracticeRecord();
+        correctRecord.setUserId(me.path("id").asLong()); correctRecord.setSessionId("snapshot-session");
+        correctRecord.setQuestionId(123457L); correctRecord.setOrderIndex(1); correctRecord.setIsCorrect(1);
+        correctRecord.setGradingStatus("valid");
+        correctRecord.setQuestionSnapshot(Map.of("id", 123457, "version", 1, "subject", "操作系统",
+            "content", "另一道已判分历史题", "answer", "B"));
+        attempts.insert(correctRecord);
         JsonNode task = submit(owner, "PRACTICE_SUMMARY", Map.of("sessionId", "snapshot-session"));
         assertEquals("SUCCESS", task.path("status").asText());
-        assertEquals(0, task.path("resultPayload").path("correct").asInt());
+        assertEquals(1, task.path("resultPayload").path("correct").asInt());
+        assertEquals(2, task.path("resultPayload").path("total").asInt());
+        assertEquals(50.0, task.path("resultPayload").path("accuracy").asDouble());
         assertEquals(2, task.path("inputPayload").path("questions").get(0).path("version").asInt());
         mvc.perform(post("/api/tasks").header("Authorization", "Bearer " + other).contentType("application/json")
             .content("{\"taskType\":\"PRACTICE_SUMMARY\",\"input\":{\"sessionId\":\"snapshot-session\"}}"))
