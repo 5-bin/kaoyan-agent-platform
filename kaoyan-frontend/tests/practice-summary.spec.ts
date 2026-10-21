@@ -15,8 +15,9 @@ test('missing historical snapshots show the server error and release the summary
       return
     }
     const data = path.endsWith('/questions/1')
-      ? { id: 1, content: '测试题干', optionA: '测试选项A', optionB: '测试选项B', answer: 'A' }
-      : path.endsWith('/answer') ? null : [{ questionId: 1, orderIndex: 0, isCorrect: null }]
+      ? { id: 1, content: '测试题干', optionA: '测试选项A', optionB: '测试选项B' }
+      : path.endsWith('/answer') ? { questionId: 1, userAnswer: 'A', isCorrect: 1, answer: 'A', analysis: '已提交解析' }
+      : [{ questionId: 1, orderIndex: 0, isCorrect: null }]
     await route.fulfill({ json: { code: 0, message: 'ok', data } })
   })
   await page.goto('/practice/session/legacy-session')

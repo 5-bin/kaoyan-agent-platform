@@ -19,19 +19,8 @@ public interface UserQuestionMarkMapper extends BaseMapper<UserQuestionMark> {
                m.wrong_count AS wrongCount,
                m.last_wrong_at AS lastWrongAt,
                m.updated_at AS updatedAt,
-               m.is_favorite AS isFavorite,
-               q.subject AS subject,
-               q.knowledge_point AS knowledgePoint,
-               q.content AS content,
-               q.option_a AS optionA,
-               q.option_b AS optionB,
-               q.option_c AS optionC,
-               q.option_d AS optionD,
-               q.answer AS answer,
-               q.analysis AS analysis,
-               q.difficulty AS difficulty
+               m.is_favorite AS isFavorite
         FROM user_question_mark m
-        LEFT JOIN question q ON q.id = m.question_id
         WHERE m.user_id = #{userId}
           AND m.is_wrong = 1
         ORDER BY m.last_wrong_at DESC, m.question_id DESC
@@ -43,19 +32,8 @@ public interface UserQuestionMarkMapper extends BaseMapper<UserQuestionMark> {
                m.wrong_count AS wrongCount,
                m.last_wrong_at AS lastWrongAt,
                m.updated_at AS updatedAt,
-               m.is_favorite AS isFavorite,
-               q.subject AS subject,
-               q.knowledge_point AS knowledgePoint,
-               q.content AS content,
-               q.option_a AS optionA,
-               q.option_b AS optionB,
-               q.option_c AS optionC,
-               q.option_d AS optionD,
-               q.answer AS answer,
-               q.analysis AS analysis,
-               q.difficulty AS difficulty
+               m.is_favorite AS isFavorite
         FROM user_question_mark m
-        LEFT JOIN question q ON q.id = m.question_id
         WHERE m.user_id = #{userId}
           AND m.is_favorite = 1
         ORDER BY m.updated_at DESC, m.question_id DESC

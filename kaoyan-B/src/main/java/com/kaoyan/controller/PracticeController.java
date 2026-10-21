@@ -5,8 +5,9 @@ import com.kaoyan.common.Result;
 import com.kaoyan.dto.request.AnswerRequest;
 import com.kaoyan.dto.request.StartSessionRequest;
 import com.kaoyan.dto.response.ReviewRecordVO;
+import com.kaoyan.dto.response.AnswerVO;
+import com.kaoyan.dto.response.PracticeRecordVO;
 import com.kaoyan.dto.response.SessionSummaryVO;
-import com.kaoyan.entity.PracticeRecord;
 import com.kaoyan.entity.Task;
 import com.kaoyan.security.UserContext;
 import com.kaoyan.service.PracticeService;
@@ -48,10 +49,9 @@ public class PracticeController {
      */
     @Operation(summary = "作答一题")
     @PostMapping("/sessions/{sessionId}/answer")
-    public Result<Void> answer(@PathVariable String sessionId,
+    public Result<AnswerVO> answer(@PathVariable String sessionId,
                                @Valid @RequestBody AnswerRequest req) {
-        practiceService.answer(UserContext.currentUserId(), sessionId, req.questionId(), req.answer());
-        return Result.ok();
+        return Result.ok(practiceService.answer(UserContext.currentUserId(), sessionId, req.questionId(), req.answer()));
     }
 
     /**
@@ -94,8 +94,8 @@ public class PracticeController {
      */
     @Operation(summary = "批次详情")
     @GetMapping("/sessions/{sessionId}")
-    public Result<List<PracticeRecord>> detail(@PathVariable String sessionId) {
-        return Result.ok(practiceService.sessionDetail(UserContext.currentUserId(), sessionId));
+    public Result<List<PracticeRecordVO>> detail(@PathVariable String sessionId) {
+        return Result.ok(practiceService.sessionDetail(UserContext.currentUserId(), sessionId).stream().map(PracticeRecordVO::from).toList());
     }
 
     @Operation(summary = "批次回顾分页（含题目详情）")

@@ -3,6 +3,7 @@ package com.kaoyan.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kaoyan.common.PageResult;
 import com.kaoyan.dto.response.ReviewRecordVO;
+import com.kaoyan.dto.response.AnswerVO;
 import com.kaoyan.dto.response.SessionSummaryVO;
 import com.kaoyan.entity.PracticeRecord;
 
@@ -33,7 +34,7 @@ public interface PracticeService extends IService<PracticeRecord> {
      * @param questionId 题目 ID
      * @param userAnswer 用户答案
      */
-    void answer(Long userId, String sessionId, Long questionId, String userAnswer);
+    AnswerVO answer(Long userId, String sessionId, Long questionId, String userAnswer);
 
     /**
      * 批次总结

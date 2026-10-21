@@ -155,6 +155,11 @@ class AgentChainTest {
         record.setOrderIndex(0); record.setIsCorrect(0); record.setGradingStatus("valid");
         record.setQuestionSnapshot(Map.of("id", 123456, "version", 2, "subject", "操作系统",
             "knowledgePoint", "线程", "content", "已判分的历史版本题干", "answer", "A"));
+        var expandedSnapshot = new LinkedHashMap<String, Object>(record.getQuestionSnapshot());
+        expandedSnapshot.put("optionA", "历史选项A"); expandedSnapshot.put("optionB", "历史选项B");
+        expandedSnapshot.put("optionC", null); expandedSnapshot.put("optionD", null);
+        expandedSnapshot.put("difficulty", "EASY");
+        record.setQuestionSnapshot(expandedSnapshot);
         attempts.insert(record);
         var correctRecord = new com.kaoyan.entity.PracticeRecord();
         correctRecord.setUserId(me.path("id").asLong()); correctRecord.setSessionId("snapshot-session");

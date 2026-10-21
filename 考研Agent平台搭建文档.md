@@ -4,7 +4,7 @@
 
 本文参考同级 [原项目搭建文档](../考研agent平台搭建/考研Agent平台搭建文档.md) 的需求、领域规则和验收方法，按本项目实际 Vue + Spring Boot/MyBatis-Plus + FastAPI 工程重新组织。原项目使用的原生页面、JPA 多模块、H2/PostgreSQL 部署路线和旧任务协议不能直接套用。参考链接用于本地追溯，不是本项目运行依赖；只分发当前仓库时该同级文档不会随包携带。
 
-**当前定位：框架适配与RAG基础版本已整合，完整领域业务仍待验收。** 当前具备账号、Redis注销撤销、任务持久化，以及基于小范围带来源资料的知识检索、结构化院校筛选、可选模型解释和本人作答快照总结。初始资料仅4段408概念和3校6条2027专业，尚需小组内容审核与独立效果评估，不代表全国覆盖。刷题批次版本、草稿、结束状态、答案展示DTO等仍待建设。
+**当前定位：框架适配与RAG基础版本已整合，完整领域业务仍待验收。** 当前具备账号、Redis注销撤销、任务持久化，以及基于小范围带来源资料的知识检索、结构化院校筛选、可选模型解释和本人作答快照总结。初始资料仅4段408概念和3校6条2027专业，尚需小组内容审核与独立效果评估，不代表全国覆盖。学生答案隐藏、服务端判分视图和历史回顾已在Issue #9本地实现；刷题批次固定版本、草稿和结束状态仍待建设。
 
 文档职责：本文维护业务设计、当前契约与建设阶段；[README](README.md)维护可执行入口；[AGENTS.md](AGENTS.md)维护协作约定；[RAG契约](docs/rag.md)补充检索及快照字段；[框架适配历史](docs/当前框架适配.md)、[RAG历史验证](docs/validation-rag.md)及[本次合并审查](docs/merge-review-2026-10-14.md)分别记录实际范围。本次整合不重置日常业务库、不调用付费模型或发布公网。
 
@@ -124,7 +124,7 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 | 账号与档案 | STUDENT注册、JWT登录、Redis撤销；档案字段和接口存在；权限／会话有隔离测试记录 | P0：可持久、隔离的完整备考条件；管理员受控授权 |
 | 知识问答 | KNOWLEDGE_QA检索与任务页；默认离线摘要，可选模型解释，资料不足明确说明 | P0：四科目录、审核资料、引用、缺信息与缺资料区分 |
 | 院校与推荐 | 院校查询与详情、条件推荐和来源历史；3校6专业静态副本，代码筛选，模型可选解释 | P0：当年核验候选、确定性筛选排序和推荐快照 |
-| 刷题 | 稳定顺序抽题、批次记录、Java判分及回顾；答案隐藏和完整批次规则不合格 | P0：四模式、固定版本、答题卡、草稿、审核提示、幂等提交和结果页 |
+| 刷题 | 稳定顺序抽题、Java判分视图、学生答案隐藏及历史快照回顾；完整批次规则仍待建设 | P0：四模式、固定版本、答题卡、草稿、审核提示、幂等提交和结果页 |
 | 错题与收藏 | 本人标记、列表和错答归集存在；连续正确掌握规则未实现 | P0：可重练、保存历史、自动掌握状态和错题辅导 |
 | 统计与任务 | 作答累加、任务分页、失败保存和重启中断处理存在；统计口径待统一 | P0：有效／未答／撤回、辅助／独立口径；P1：覆盖率和90天练习日历 |
 | 管理与资料 | 资料和题目管理审核入口存在；不可变发布包和完整来源元数据未接入 | P0：录入、审核、版本发布与失败恢复 |
@@ -139,7 +139,7 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 | `/profile` | 保存当前档案 | 必填与可选条件、学位类型、地区软硬偏好、自评成绩口径 |
 | `/tasks` | 提交任务、分页查看结果及失败 | 扩大科目覆盖、改进多轮交互；引用、追问和版本结果已具备基础实现 |
 | `/schools`、`/schools/:id` | 院校筛选与详情 | 扩充院校资料与内容审核；当前已有专业／年份条件、来源及任务历史 |
-| `/practice`、`/practice/session/:sessionId` | 抽题、逐题作答、回顾和AI总结 | 四模式、答题卡、续做、提示、服务器判分结果及结束入口 |
+| `/practice`、`/practice/session/:sessionId` | 抽题、逐题作答、回顾和AI总结 | 四模式、答题卡、持久草稿、提示及正式结束入口 |
 | `/wrong`、`/favorite` | 本人错题和收藏 | 重练批次、撤回提示、掌握状态与辅导入口 |
 | `/stat` | 学习统计 | 统一口径、样本量、独立正确率和覆盖范围 |
 | `/admin/documents`、`/admin/questions` | 管理列表与审核 | 来源／许可校验、草稿新版本和发布状态；招生管理待建设 |
@@ -166,7 +166,9 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 - **结果**：区分实际题数、有效已答、未答、撤回、正确、错误、辅助题数和独立正确率。正确率按有效已答计算，独立正确率仅含hintLevelUsed=0的有效作答，分母为0展示暂无数据。
 - **错题与增强统计**：错答进入reviewing；连续独立答对2次进入mastered，辅助答对不推进，之后答错恢复reviewing。少于3次知识点作答只显示样本不足。覆盖率基于明确资料版本的去重有效题数；90天日历按Asia/Shanghai自然日统计有效作答，不把批次起止间隔或草稿操作当成学习时长。
 
-当前缺口：抽题实际上按stable_order返回且上限100；没有上述mode、1—50约束、抽题时固定版本快照、草稿／revision、提示和批次状态（仅判分时保存题目快照供总结）；答案详情、回顾和收藏列表提前可读，页面已使用服务器判分结果判断正误，完整答案展示DTO仍待实现。顺序重复作答返回409，但缺少完整重放／并发保证。当前DELETE批次会删除记录；总结按总题数计算正确率，而分页批次列表按已答计算，必须统一。以上都是待修复事实，不是本轮完成项。
+当前缺口：抽题按stable_order返回且上限100；没有上述mode、1—50约束、抽题时固定版本快照、草稿／revision、提示和批次状态。Issue #9已实现学生白名单DTO、服务端判分结果展示，以及回顾／收藏／错题按本人有效提交和历史快照展示；未答不算错，缺失快照不回退现行题表。重复或同一记录并发提交返回409且不重复计数，但完整请求重放、不同记录并发统计仍待建设。当前DELETE批次会删除记录，summary接口与批次列表统计分母仍需统一；回顾页面已按全部记录计算已答正确率，不随加载页数改变。本次范围和验证见[Issue #9验证记录](docs/practice-answer-safety-verification.md)。
+
+PR #10审查修复（2026-10-21，基线`1bf60bc`）：首次加载、下一题和回顾后继续共用按原顺序选取未答题的流程。服务端标记不可用或题目详情404时提示并跳过；网络失败保留重试，提交404／409先刷新本人记录并核对题目，已答则显示服务器历史，配置冲突不自动跳过或重放提交。跳过只保存在当前页面内存中，不写判分、错题或统计，重新加载时核验；仍有有效未答项目时不声称完成或开放总结。回顾独立展示历史快照中的标准答案和本人选择，缺少选项不影响答案字母展示；未答／缺失／不可用快照继续隐藏答案。以上不等同于正式撤回、版本锁定、草稿或结束状态已实现，接口与数据库契约保持现状。
 
 <a id="architecture"></a>
 
@@ -350,6 +352,12 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 ### 7.2 当前公共接口
 
+Issue #9（本地适配契约，2026-10-21）：学生抽题及详情改用白名单DTO，不含answer、analysis及审核字段；详情仅开放启用且已审核题目。作答请求沿用questionId、answer，成功data新增questionId、userAnswer、isCorrect（0/1）、answer、analysis，页面只使用服务器判分。非法选项400、非本人404、重复作答409，更新成功后才累计统计。
+
+回顾及标记列表新增snapshotStatus：NOT_ANSWERED表示没有本人有效提交，AVAILABLE表示完整历史快照，PARTIAL表示旧快照缺少部分展示字段，MISSING表示已答但历史依据缺失，UNAVAILABLE表示题目或判分不可用。answer／analysis缺失时不输出这些键；已答内容只来自快照，不用当前题目补齐旧内容。新判分快照补存选项和难度，已有JSON列即可保存，无数据库迁移；Java发给Python时仍只发送原契约字段。批次详情返回白名单作答记录，不公开原始questionSnapshot。标记列表取本人该题最新有效提交，手动标记不授予答案查看权。
+
+本次验收：所有学生入口隐藏未答答案；真实服务端结果展示；非法、重复、跨账号提交不写数据；历史改题不改变回顾；未答不显示为错误；Java verify、前端构建与页面测试。依赖V7快照列及当前认证，完整批次版本／草稿／发布／迁移仍属后续任务。
+
 注册／登录不要求已有令牌；业务请求使用Bearer令牌，后端取当前账号。当前 `/api/auth/refresh` 有入口，但登录仅签发accessToken，不能宣称自动刷新闭环已接通。Java未提供参考项目的 `/api/health`；Python有 `/health`，仅表示进程存活。
 
 | 方法与路径 | 当前输入／输出 | 行为与边界 |
@@ -361,11 +369,11 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 | GET `/api/documents` | subject，可返回已发布资料列表 | 尚非Agent知识检索接口 |
 | GET `/api/schools`、POST `/api/schools/search`、GET `/api/schools/{schoolId}` | province／level／majorName，院校及专业详情 | 列表不是核验推荐，未提供完整当年专业条件筛选 |
 | POST `/api/recommends/generate`、GET `/api/recommends`、DELETE `/api/recommends/{taskId}` | `{query,preferences}`、本人近期Task历史／字符串taskId删除 | 与任务同一流程；仅隐藏本人SUCCESS／FAILED推荐并保留额度，重复删除404，未结束409 |
-| GET `/api/questions/practice`、GET `/api/questions/{id}` | subject／difficulty／knowledgePoint／limit，题目实体 | 抽题限审核启用；仍含答案，详情不能作为合格学生DTO |
+| GET `/api/questions/practice`、GET `/api/questions/{id}` | subject／difficulty／knowledgePoint／limit，StudentQuestionVO | 抽题及详情仅审核启用题，不返回答案、解析或审核字段 |
 | POST `/api/practice/sessions` | subject、difficulty、count；返回sessionId | 固定stable_order及记录，上限100在Service截取；无正式状态与版本 |
-| POST `/api/practice/sessions/{sessionId}/answer` | questionId、answer；返回data:null | Java判分，但未返回权威判分视图，需改造页面与DTO |
+| POST `/api/practice/sessions/{sessionId}/answer` | questionId、answer；返回AnswerVO | Java返回归一化答案、正误、标准答案与解析；非法400、非本人404、重复409 |
 | GET `/api/practice/sessions`、`/api/practice/sessions/page`、`/api/practice/sessions/{sessionId}` | 本人ID列表／分页汇总／记录列表 | 分页汇总目前只列有作答时间的批次，不等于完整续做目录 |
-| GET `/api/practice/sessions/{sessionId}/summary`、`/api/practice/sessions/{sessionId}/review` | 汇总、分页题目回顾 | 总结与列表分母不一致；回顾可泄露未答答案 |
+| GET `/api/practice/sessions/{sessionId}/summary`、`/api/practice/sessions/{sessionId}/review` | 汇总、分页题目回顾 | 汇总口径仍待统一；回顾按本人作答状态隐藏答案，已答仅用历史快照 |
 | POST `/api/practice/sessions/{sessionId}/ai-summary` | 无正文，返回PRACTICE_SUMMARY任务 | 必须为本人、有有效记录且有效题全部已答 |
 | DELETE `/api/practice/sessions/{sessionId}` | 无正文 | 当前删除记录，不是保留历史的结束操作 |
 | GET `/api/marks/wrong`、`/api/marks/favorite` | pageNum／pageSize；本人分页题目 | 当前标记列表不是完整掌握状态模型 |
@@ -377,7 +385,7 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 统一响应：`code=0`表示请求业务包装成功，任务是否成功还须检查data.status。分页为 `{total,page,size,list}`，页码从1起；任务、题目审核和管理资料列表接收pageNum／pageSize并兼容page／size，默认1／10。批次和标记分页按各自Controller参数，不能把兼容范围扩大到所有接口。
 
-当前User实体passwordHash已设置@JsonIgnore，注册不返回哈希；完整账号白名单DTO仍需后续建设，持续通过HTTP检查敏感字段。收藏／错题列表同样含answer和analysis，不能作为绕过提交前答案隐藏的入口；只对有本人有效已提交作答的记录开放相应历史解析。
+当前User实体passwordHash已设置@JsonIgnore，注册不返回哈希；完整账号白名单DTO仍需后续建设，持续通过HTTP检查敏感字段。收藏／错题列表只对本人最新有效已提交作答开放对应历史答案和解析；未答或历史依据缺失不输出answer／analysis，手动标记不授予答案访问权。
 
 ### 7.3 当前任务入参与示例
 
@@ -430,7 +438,7 @@ Java不在远程调用时持有数据库事务。task表先保存RUNNING，再�
 | 错题／收藏 | 收藏唯一标记、有效错答来源、连续独立正确次数、reviewing／mastered | 手动标记单独记录，不计入错答量或模型效果样本 |
 | 任务／推荐 | 授权contextSnapshot、releaseId、resultSchemaVersion及正式推荐快照 | 旧任务按版本1解析，不改写历史结果 |
 
-刷题目标在 `/api/practice/sessions` 路径上扩展mode、知识点和实际数量；增加 `PUT /{sessionId}/progress`、`POST /{sessionId}/items/{itemId}/hints`、`POST /{sessionId}/finish`、`GET /{sessionId}/result`。现有answer入口补充版本、itemId、clientRequestId并返回服务端判分视图；详情／回顾改为按本人提交状态隐藏答案的DTO。收藏可保留现有路径，保证添加／取消幂等及资源可访问；DELETE批次需停止破坏历史，旧页面同步切换结束动作，不能悄悄把删除当作现有完成行为。
+刷题目标在 `/api/practice/sessions` 路径上扩展mode、知识点和实际数量；增加 `PUT /{sessionId}/progress`、`POST /{sessionId}/items/{itemId}/hints`、`POST /{sessionId}/finish`、`GET /{sessionId}/result`。现有answer入口补充版本、itemId、clientRequestId并返回服务端判分视图；详情／回顾已使用隐藏未答答案的DTO，后续继续保持这一边界。收藏可保留现有路径，保证添加／取消幂等及资源可访问；DELETE批次需停止破坏历史，旧页面同步切换结束动作，不能悄悄把删除当作现有完成行为。
 
 领域任务保留现有四类型，正式问答和择校分别增强KNOWLEDGE_QA／SCHOOL_RECOMMEND，新增WRONG_QUESTION_TUTOR与attemptId输入；PRACTICE_SUMMARY继续存在。CHAT只是可选交互，不替代正式领域任务类型。未来subject等新字段按类型加入；preferences已按白名单支持，不允许客户端上传完整授权context。
 
@@ -679,7 +687,7 @@ Windows按README使用Python3.13与mvnw.cmd；Java由`scripts/start-backend.ps1`
 | 页面超时／旧账号结果 | 先查任务历史；核对请求时令牌与当前会话 | 不自动重试新增付费任务 |
 | 统计／回顾不一致 | 当前不同分母、未答、分页已加载数量、删除记录等 | 统一服务端完整聚合，不在前端拼凑已加载页总计 |
 
-当前练习回顾在重新进入批次时可能按已加载分页计算正确数，也应随权威结果页改造验证；这是代码静态核对的待修复项，未进行本轮页面复现。
+Issue #9已将练习回顾计数改为读取完整批次记录，不按已加载回顾页计算正确数；已用12题、10条分页的浏览器案例验证。统一服务端权威结果页及撤回后的有效统计仍需后续建设。
 
 ### 10.5 部署目标与运行边界
 

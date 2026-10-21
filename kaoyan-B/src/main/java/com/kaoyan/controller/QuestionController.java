@@ -6,6 +6,9 @@ import com.kaoyan.dto.query.PageQuery;
 import com.kaoyan.dto.query.QuestionPracticeQuery;
 import com.kaoyan.dto.request.ReviewRequest;
 import com.kaoyan.entity.Question;
+import com.kaoyan.dto.response.StudentQuestionVO;
+import com.kaoyan.common.ApiException;
+import com.kaoyan.service.QuestionHistoryView;
 import com.kaoyan.security.UserContext;
 import com.kaoyan.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,9 +35,10 @@ public class QuestionController {
      */
     @Operation(summary = "刷题抽题", description = "按科目/难度/知识点抽题")
     @GetMapping("/practice")
-    public Result<List<Question>> practice(QuestionPracticeQuery query) {
+    public Result<List<StudentQuestionVO>> practice(QuestionPracticeQuery query) {
         return Result.ok(questionService.listForPractice(
-                query.subject(), query.difficulty(), query.knowledgePoint(), query.effectiveLimit()));
+                query.subject(), query.difficulty(), query.knowledgePoint(), query.effectiveLimit())
+                .stream().map(StudentQuestionVO::from).toList());
     }
 
     /**
@@ -42,8 +46,10 @@ public class QuestionController {
      */
     @Operation(summary = "题目详情")
     @GetMapping("/{id}")
-    public Result<Question> detail(@PathVariable Long id) {
-        return Result.ok(questionService.detail(id));
+    public Result<StudentQuestionVO> detail(@PathVariable Long id) {
+        Question q = questionService.detail(id);
+        if (!QuestionHistoryView.playable(q)) throw new ApiException(404, 404, "题目不存在或不可练习");
+        return Result.ok(StudentQuestionVO.from(q));
     }
 
     /**

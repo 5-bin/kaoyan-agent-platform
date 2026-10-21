@@ -1,9 +1,13 @@
 ﻿import request from './request'
 
-export interface SessionDetail {
-  sessionId: string
-  questions: any[]
-  [k: string]: unknown
+import type { PracticeRecord } from '@/types/api'
+
+export interface AnswerResult {
+  questionId: number
+  userAnswer: string
+  isCorrect: 0 | 1
+  answer: string
+  analysis?: string
 }
 
 export const startSession = (data: { subject: string; difficulty?: string; count: number }) =>
@@ -12,10 +16,10 @@ export const startSession = (data: { subject: string; difficulty?: string; count
 export const answerQuestion = (
   sessionId: string,
   data: { questionId: number; answer: string }
-) => request.post(`/practice/sessions/${sessionId}/answer`, data)
+) => request.post<unknown, AnswerResult>(`/practice/sessions/${sessionId}/answer`, data)
 
 export const getSessionDetail = (sessionId: string) =>
-  request.get<unknown, SessionDetail>(`/practice/sessions/${sessionId}`)
+  request.get<unknown, PracticeRecord[]>(`/practice/sessions/${sessionId}`)
 
 export const getSessionSummary = (sessionId: string) =>
   request.get(`/practice/sessions/${sessionId}/summary`)
@@ -36,7 +40,9 @@ export interface ReviewRecord {
   questionId: number
   orderIndex: number
   userAnswer?: string
-  isCorrect?: number
+  isCorrect?: number | null
+  snapshotStatus?: string
+  version?: number
   subject?: string
   knowledgePoint?: string
   content?: string

@@ -18,6 +18,7 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
+          cache-path: .cache/maven/repository
           cache-dependency-path: kaoyan-B/pom.xml
       - uses: actions/setup-python@v7
         with:

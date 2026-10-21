@@ -10,10 +10,11 @@
         <div class="item-head">
           <el-tag size="large" type="danger" effect="dark">错</el-tag>
           <el-tag v-if="it.isFavorite === 1" size="large" type="warning" effect="plain">已收藏</el-tag>
-          <span class="q">{{ it.content || `[题目 #${it.questionId} 已删除]` }}</span>
+          <span class="q">{{ it.content || `[题目 #${it.questionId} 内容不可用]` }}</span>
         </div>
         <div class="body">
-          <p><b>正确答案：</b><span class="right-ans">{{ it.answer }}</span></p>
+          <p v-if="it.answer"><b>正确答案：</b><span class="right-ans">{{ it.answer }}</span></p>
+          <p v-if="historyNotice(it.snapshotStatus)">{{ historyNotice(it.snapshotStatus) }}</p>
           <p v-if="it.analysis"><b>解析：</b>{{ it.analysis }}</p>
         </div>
         <div class="foot">
@@ -30,6 +31,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { historyNotice } from '@/utils/question-history'
 import { getWrongPage, removeWrong, addFavorite, type MarkItem } from '@/api/mark'
 
 const loading = ref(false)

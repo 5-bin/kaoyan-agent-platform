@@ -104,14 +104,17 @@ export interface Question {
   reviewStatus: string
 }
 
+export type StudentQuestion = Pick<Question, 'id' | 'subject' | 'knowledgePoint' | 'content' |
+  'optionA' | 'optionB' | 'optionC' | 'optionD' | 'difficulty' | 'questionType'> & { version?: number }
+
 export interface PracticeRecord {
   id: number
-  userId: number
   sessionId: string
   questionId: number
   orderIndex: number
   userAnswer?: string
-  isCorrect?: number
+  isCorrect?: number | null
+  gradingStatus?: string
   answeredAt?: string
 }
 

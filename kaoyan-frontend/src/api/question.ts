@@ -1,14 +1,14 @@
 ﻿import request from './request'
-import type { Question } from '@/types/api'
+import type { Question, StudentQuestion } from '@/types/api'
 
 export const getPracticeQuestions = (params: {
   subject?: string
   difficulty?: string
   limit?: number
-}) => request.get<unknown, Question[]>('/questions/practice', { params })
+}) => request.get<unknown, StudentQuestion[]>('/questions/practice', { params })
 
 export const getQuestionDetail = (id: number) =>
-  request.get<unknown, Question>(`/questions/${id}`)
+  request.get<unknown, StudentQuestion>(`/questions/${id}`)
 
 export const getAdminPending = (params: { pageNum: number; pageSize: number }) =>
   request.get<unknown, { list: Question[] }>('/questions/admin/pending', { params })
