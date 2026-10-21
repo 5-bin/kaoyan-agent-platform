@@ -20,7 +20,7 @@
 
 依赖现行JWT、题目审核启用状态及V7的question_snapshot列。本次不新增数据库脚本，不执行迁移，未改公共认证或Python协议。
 
-## 自动检查
+## 原PR实现时的自动检查
 
 环境：Windows PowerShell，JDK17，Maven Wrapper，仓库根目录独立Python虚拟环境，Node/npm及本机Chrome。
 
@@ -46,6 +46,29 @@
 4. 提交部分题目后查看已保存作答，未答显示“未作答”，不显示“答错”。12题批次加载10条后再加载剩余2条，计数保持不变，序号继续到12。
 5. 在隔离测试库修改已答题的现行题干、选项、答案；原批次回顾、本人收藏和错题仍显示当时快照内容。
 6. 对隔离测试记录模拟旧快照为NULL或空对象，回顾提示历史快照缺失且不返回答案；旧快照仅缺选项则提示不完整，不拼接新题选项。
+
+## PR #10审查修复与重新验证（2026-10-21）
+
+在独立本地检出目录以`1bf60bc`为基线修复三个页面问题，未改Java／Python业务实现、接口或数据库。修复用于补充[PR #10](https://github.com/5-bin/kaoyan-agent-platform/pull/10)，合并与部署另行执行。页面规则见[搭建文档第4.4节](../考研Agent平台搭建文档.md#features)。
+
+- 不可用题目提示后自动跳过；首次加载、下一题和继续作答共用顺序导航。网络／超时／500错误保留重试，不把请求失败当作撤回。
+- 提交404／409先查询本人记录；已提交则同步服务器历史，确认题目失效才跳过，配置冲突不跳过，不自动重放作答。
+- 旧快照没有选项时，独立显示已保存的标准答案和本人选择；回顾可继续作答，加载失败保留原视图。
+- 跳过只改变页面导航，不更新判分或统计。有效未答记录仍存在时展示“暂无可继续作答的题目”，禁用AI总结；不将其视为正式结束批次。
+
+本次环境：macOS、JDK25.0.4.1（编译目标17）、Python3.13.15、Node22.23.3、Chrome隔离上下文。Java复用本机已有Maven缓存和Python运行时，不复制日常环境或业务数据。
+
+| 检查 | 本次实际结果 | 边界与证据 |
+| --- | --- | --- |
+| Java | `bash mvnw -B -ntp -o -Dmaven.repo.local=<已有缓存路径> verify dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt`：51项通过，0失败、0错误、0跳过，打包成功 | 设置`PYTHON_EXECUTABLE`为已有虚拟环境Python；H2／Redis替身，包含Java→Python真实子进程及答案安全、快照与并发测试 |
+| 前端构建 | `npm run build`通过 | TypeScript与生产构建；已有大包提示仍存在 |
+| 浏览器回归 | 设置`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`后`npm run test:e2e`：42项通过 | 21案例×桌面1280／手机宽度390；API替身。新增`practice-recovery.spec.ts`的13案例覆盖三项修复、首题／中间／全部不可用、恢复后重查、网络／超时／500、提交404／409、重复提交同步、配置冲突及失败视图保留 |
+| 实际Java页面 | 本地独立检查6项通过：两个宽度分别检查旧快照、不可用题目及回顾后提交 | Vite生产预览→真实Java→临时H2，Redis替身，无API拦截；验证实际404、答案隐藏、Java判分及记录保存，未调用模型。报告`.cache/pr10-real-practice.json`及两个宽度截图，仅本地保留 |
+| 文档与差异 | `scripts/check-project.py`、`scripts/check-framework.py`和`git diff --check`均通过 | 静态文档、契约入口和差异检查，不替代业务或真实环境验收 |
+
+实际后端检查使用本地诊断入口`.cache/pr10-repair-check.py`及`.cache/pr10-repair-browser.cjs`，执行后关闭本次Java、Vite和Chrome；临时库自动清理。诊断入口和报告不随源码提交。已检查390宽度截图与页面溢出，属于模拟手机宽度，不是实机验证。
+
+新增回归用例可通过`npx playwright test tests/practice-recovery.spec.ts`单独复现；完整测试同时覆盖原有未答隐藏、服务器判分、跨页计数、收藏／错题和推荐页检查。复现旧快照时不请求现行题目；自动跳过和失败检查确认未提交题目的`isCorrect`保持NULL。
 
 ## 尚未覆盖
 
