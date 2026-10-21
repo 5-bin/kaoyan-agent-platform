@@ -70,6 +70,12 @@
 
 新增回归用例可通过`npx playwright test tests/practice-recovery.spec.ts`单独复现；完整测试同时覆盖原有未答隐藏、服务器判分、跨页计数、收藏／错题和推荐页检查。复现旧快照时不请求现行题目；自动跳过和失败检查确认未提交题目的`isCorrect`保持NULL。
 
+## CI缓存路径修复（2026-10-21）
+
+提交`3c3752b`的[远端CI](https://github.com/5-bin/kaoyan-agent-platform/actions/runs/39610115442)已通过，包含Python68项、Java51项、浏览器42项和15项HTTP链路检查；收尾时因缓存目录不匹配产生警告。`kaoyan-B/.mvn/maven.config`将依赖库放在项目根目录的`.cache/maven/repository`，而`setup-java`默认缓存`~/.m2/repository`。现为`actions/setup-java@v6`显式设置`cache-path: .cache/maven/repository`，对齐已有目录，不改变Maven命令、测试或权限。Ubuntu运行环境迁移提示保留。
+
+本次执行YAML解析、缓存路径一致性检查、现有文档／框架检查及`git diff --check`；配置检查通过。未在本地重跑业务测试；缓存实际保存结果以修复后GitHub Actions运行为准。
+
 ## 尚未覆盖
 
 抽题时固定完整题目版本、持久草稿、正式批次结束与重放语义、不同题目并发统计、删除批次后的聚合一致性，以及完整题目审核发布/迁移仍需后续任务。当前判分保存的是提交时题目快照，不能声称已实现抽题时锁定版本。
