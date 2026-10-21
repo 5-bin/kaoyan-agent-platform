@@ -14,6 +14,8 @@ export interface MarkItem {
   analysis?: string
   difficulty?: string
   isFavorite?: number
+  snapshotStatus?: string
+  version?: number
 }
 
 export const addWrong = (questionId: number) =>

@@ -7,16 +7,18 @@
       <div class="card summary">
         <div class="sum-item"><div class="sum-num">{{ reviewTotal }}</div><div class="sum-lbl">总题数</div></div>
         <div class="sum-item"><div class="sum-num" style="color:var(--c-success)">{{ correctCount }}</div><div class="sum-lbl">答对</div></div>
-        <div class="sum-item"><div class="sum-num" style="color:var(--c-danger)">{{ reviewTotal - correctCount }}</div><div class="sum-lbl">答错</div></div>
+        <div class="sum-item"><div class="sum-num" style="color:var(--c-danger)">{{ wrongCount }}</div><div class="sum-lbl">答错</div></div>
+        <div class="sum-item"><div class="sum-num">{{ unansweredCount }}</div><div class="sum-lbl">未作答</div></div>
         <div class="sum-item"><div class="sum-num" style="color:var(--c-primary)">{{ accuracy }}%</div><div class="sum-lbl">正确率</div></div>
       </div>
 
       <div v-for="(rec, i) in reviewItems" :key="rec.questionId" class="card q-card">
         <div class="q-head">
-          <span class="q-no">{{ (reviewPage - 1) * reviewSize + i + 1 }}</span>
-          <span class="q-content">{{ rec.content }}</span>
+          <span class="q-no">{{ i + 1 }}</span>
+          <span class="q-content">{{ rec.content || '历史题目内容不可用' }}</span>
           <el-tag v-if="rec.isCorrect === 1" type="success" effect="dark" size="small">答对</el-tag>
-          <el-tag v-else type="danger" effect="dark" size="small">答错</el-tag>
+          <el-tag v-else-if="rec.isCorrect === 0" type="danger" effect="dark" size="small">答错</el-tag>
+          <el-tag v-else type="info" size="small">未作答</el-tag>
         </div>
         <div class="opts">
           <div
@@ -34,6 +36,7 @@
         <div v-if="rec.analysis" class="analysis">
           <b>解析：</b>{{ rec.analysis }}
         </div>
+        <p v-if="historyNotice(rec.snapshotStatus)" class="analysis">{{ historyNotice(rec.snapshotStatus) }}</p>
       </div>
       <div v-if="reviewItems.length < reviewTotal" class="more">
         <el-button size="large" :loading="reviewLoading" @click="loadReviewMore">加载更多</el-button>
@@ -54,20 +57,21 @@
             :key="opt.key"
             class="opt"
             :class="{ picked: answer === opt.key }"
-            @click="answer = opt.key"
+            @click="!revealed && !answering && (answer = opt.key)"
           >
             <span class="opt-key">{{ opt.key }}</span>
             <span class="opt-text">{{ opt.text }}</span>
           </div>
         </div>
         <div v-if="revealed" class="feedback" :class="lastCorrect ? 'ok' : 'bad'">
-          {{ lastCorrect ? '回答正确' : `回答错误，正确答案：${cur?.answer}` }}
-          <p v-if="cur?.analysis">解析：{{ cur.analysis }}</p>
+          {{ lastCorrect ? '回答正确' : `回答错误，正确答案：${feedback?.answer}` }}
+          <p v-if="feedback?.analysis">解析：{{ feedback.analysis }}</p>
         </div>
         <div class="actions">
-          <el-button type="primary" size="large" :disabled="!answer" :loading="answering" @click="submit">
+          <el-button type="primary" size="large" :disabled="!answer || loading || !cur" :loading="answering" @click="submit">
             {{ !revealed ? '提交答案' : (idx === records.length - 1 ? '完成，查看结果' : '下一题') }}
           </el-button>
+          <el-button :disabled="answering || loading" @click="enterReview">查看已保存作答</el-button>
         </div>
       </div>
 
@@ -88,9 +92,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getSessionDetail, answerQuestion, getReviewPage, triggerAiSummary, type ReviewRecord } from '@/api/practice'
+import { getSessionDetail, answerQuestion, getReviewPage, triggerAiSummary, type ReviewRecord, type AnswerResult } from '@/api/practice'
 import { getQuestionDetail } from '@/api/question'
-import type { Question } from '@/types/api'
+import type { StudentQuestion, PracticeRecord } from '@/types/api'
+import { historyNotice } from '@/utils/question-history'
 import { ArrowLeft } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -99,8 +104,9 @@ const sessionId = route.params.sessionId as string
 
 const loading = ref(false)
 const answering = ref(false)
-const records = ref<any[]>([])
-const qMap = ref<Record<number, Question>>({})
+const records = ref<PracticeRecord[]>([])
+const qMap = ref<Record<number, StudentQuestion>>({})
+const feedback = ref<AnswerResult | null>(null)
 
 const idx = ref(0)
 const answer = ref('')
@@ -118,43 +124,42 @@ const reviewLoading = ref(false)
 const aiLoading = ref(false)
 const aiResult = ref('')
 
-const cur = computed<Question | undefined>(() => {
+const cur = computed<StudentQuestion | undefined>(() => {
   const rec = records.value[idx.value]
   return rec ? qMap.value[rec.questionId] : undefined
 })
-const optionsFor = (q?: Question | ReviewRecord) => [
+const optionsFor = (q?: StudentQuestion | ReviewRecord) => [
   { key: 'A', text: q?.optionA },
   { key: 'B', text: q?.optionB },
   { key: 'C', text: q?.optionC },
   { key: 'D', text: q?.optionD }
-]
+].filter(opt => opt.text != null)
 const percent = computed(() => Math.round((idx.value / (records.value.length || 1)) * 100))
-const correctCount = computed(() => {
-  if (reviewItems.value.length && !records.value.length) {
-    return reviewItems.value.filter((r) => r.isCorrect === 1).length
-  }
-  return records.value.filter((r) => r.isCorrect === 1).length
-})
+const correctCount = computed(() => records.value.filter(r => r.isCorrect === 1).length)
+const wrongCount = computed(() => records.value.filter(r => r.isCorrect === 0).length)
+const unansweredCount = computed(() => records.value.filter(r => r.isCorrect == null).length)
 const accuracy = computed(() =>
-  reviewTotal.value ? Math.round((correctCount.value / reviewTotal.value) * 100) : 0)
+  correctCount.value + wrongCount.value ? Math.round(correctCount.value / (correctCount.value + wrongCount.value) * 100) : 0)
 
-function optClass(rec: any, key: string) {
+function optClass(rec: ReviewRecord, key: string) {
   const correct = rec.answer
   return {
     'opt-correct': key === correct,
-    'opt-wrong': key === rec.userAnswer && key !== correct
+    'opt-wrong': Boolean(correct) && key === rec.userAnswer && key !== correct
   }
 }
 
 const submit = async () => {
+  if (answering.value || loading.value || !cur.value) return
   if (!revealed.value) {
     const rec = records.value[idx.value]
     answering.value = true
     try {
-      await answerQuestion(sessionId, { questionId: rec.questionId, answer: answer.value })
-      rec.isCorrect = answer.value === cur.value?.answer ? 1 : 0
-      rec.userAnswer = answer.value
-      lastCorrect.value = answer.value === cur.value?.answer
+      const result = await answerQuestion(sessionId, { questionId: rec.questionId, answer: answer.value })
+      feedback.value = result
+      rec.isCorrect = result.isCorrect
+      rec.userAnswer = result.userAnswer
+      lastCorrect.value = result.isCorrect === 1
       revealed.value = true
     } finally {
       answering.value = false
@@ -162,11 +167,14 @@ const submit = async () => {
   } else {
     answer.value = ''
     revealed.value = false
-    if (idx.value + 1 >= records.value.length) {
+    feedback.value = null
+    const next = records.value.findIndex(r => r.isCorrect == null)
+    if (next < 0) {
       finished.value = true
     } else {
-      idx.value++
-      prefetch(idx.value)
+      idx.value = next
+      loading.value = true
+      try { await prefetch(idx.value) } finally { loading.value = false }
     }
   }
 }
@@ -179,9 +187,10 @@ const prefetch = async (i: number) => {
 }
 
 const enterReview = async () => {
+  records.value = await getSessionDetail(sessionId)
+  const r = await getReviewPage(sessionId, { pageNum: 1, pageSize: reviewSize })
   reviewMode.value = true
   reviewPage.value = 1
-  const r = await getReviewPage(sessionId, { pageNum: 1, pageSize: reviewSize })
   reviewTotal.value = r.total
   reviewItems.value = r.list
 }
@@ -189,8 +198,8 @@ const enterReview = async () => {
 const loadReviewMore = async () => {
   reviewLoading.value = true
   try {
+    const r = await getReviewPage(sessionId, { pageNum: reviewPage.value + 1, pageSize: reviewSize })
     reviewPage.value++
-    const r = await getReviewPage(sessionId, { pageNum: reviewPage.value, pageSize: reviewSize })
     reviewItems.value = [...reviewItems.value, ...r.list]
   } finally { reviewLoading.value = false }
 }
@@ -214,16 +223,17 @@ const doAiSummary = async () => {
 onMounted(async () => {
   loading.value = true
   try {
-    const list: any = await getSessionDetail(sessionId)
-    records.value = (list || []).sort((a: any, b: any) => (a.orderIndex || 0) - (b.orderIndex || 0))
+    const list = await getSessionDetail(sessionId)
+    records.value = (list || []).sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0))
     // 已答过的批次直接进回顾模式
-    if (records.value.length && records.value.every((r: any) => r.isCorrect != null)) {
+    if (records.value.length && records.value.every(r => r.isCorrect != null)) {
       reviewMode.value = true
       const r = await getReviewPage(sessionId, { pageNum: 1, pageSize: reviewSize })
       reviewTotal.value = r.total
       reviewItems.value = r.list
     } else {
-      await prefetch(0)
+      idx.value = Math.max(0, records.value.findIndex(r => r.isCorrect == null))
+      await prefetch(idx.value)
     }
   } finally {
     loading.value = false
@@ -233,7 +243,7 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .summary {
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   padding: 20px; margin-bottom: 20px;
 }
 .sum-item { text-align: center; }
@@ -245,12 +255,13 @@ onMounted(async () => {
 .p-text { color: var(--c-ink-2); font-size: 13px; white-space: nowrap; }
 .q-title { font-size: 17px; margin: 0 0 20px; line-height: 1.6; }
 .q-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px; }
+.q-head .el-tag { flex-shrink: 0; }
 .q-no {
   width: 24px; height: 24px; border-radius: 6px; background: var(--c-primary-light);
   color: var(--c-primary); display: grid; place-items: center; font-size: 13px;
   font-weight: 600; flex-shrink: 0;
 }
-.q-content { flex: 1; font-weight: 600; line-height: 1.6; }
+.q-content { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 600; line-height: 1.6; }
 
 .opts { display: flex; flex-direction: column; gap: 10px; }
 .opt {
@@ -278,7 +289,8 @@ onMounted(async () => {
 .feedback.ok { background: var(--c-success-light); color: var(--c-success); }
 .feedback.bad { background: var(--c-danger-light); color: var(--c-danger); }
 .feedback p { margin: 8px 0 0; font-weight: 400; }
-.actions { margin-top: 20px; text-align: right; }
+.actions { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }
+.actions .el-button + .el-button { margin-left: 0; }
 .analysis {
   margin-top: 14px; padding: 12px; background: var(--c-bg);
   border-radius: var(--r-sm); color: var(--c-ink-2); font-size: 13px; line-height: 1.6;

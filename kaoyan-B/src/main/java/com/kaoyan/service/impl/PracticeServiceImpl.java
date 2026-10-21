@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kaoyan.common.ApiException;
 import com.kaoyan.common.PageResult;
 import com.kaoyan.dto.response.ReviewRecordVO;
+import com.kaoyan.dto.response.AnswerVO;
+import com.kaoyan.service.QuestionHistoryView;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kaoyan.dto.response.SessionSummaryVO;
 import com.kaoyan.entity.PracticeRecord;
 import com.kaoyan.entity.Question;
@@ -58,7 +61,9 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
 
     @Override
     @Transactional
-    public void answer(Long userId, String sessionId, Long questionId, String userAnswer) {
+    public AnswerVO answer(Long userId, String sessionId, Long questionId, String userAnswer) {
+        String selected = userAnswer == null ? "" : userAnswer.trim().toUpperCase(java.util.Locale.ROOT);
+        if (!selected.matches("[A-D]")) throw new ApiException(400, 400, "请选择有效的单选选项A至D");
         PracticeRecord r = lambdaQuery()
                 .eq(PracticeRecord::getUserId, userId)
                 .eq(PracticeRecord::getSessionId, sessionId)
@@ -71,22 +76,42 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
             throw new ApiException(409, 409, "该题已作答");
         }
         Question q = questionService.detail(questionId);
-        boolean correct = q.getAnswer() != null && q.getAnswer().equalsIgnoreCase(userAnswer == null ? "" : userAnswer.trim());
-        r.setUserAnswer(userAnswer);
+        if (!"valid".equals(r.getGradingStatus())) throw new ApiException(409, 409, "该项目已不可作答");
+        if (!QuestionHistoryView.playable(q)) throw new ApiException(409, 409, "题目已不可练习");
+        String expected = q.getAnswer() == null ? "" : q.getAnswer().trim().toUpperCase(java.util.Locale.ROOT);
+        if (!"SINGLE_CHOICE".equals(q.getQuestionType()) || !expected.matches("[A-D]")
+                || option(q, expected) == null || option(q, expected).isBlank())
+            throw new ApiException(409, 409, "题目答案配置不完整，请联系管理员");
+        if (option(q, selected) == null || option(q, selected).isBlank())
+            throw new ApiException(400, 400, "选项不属于该题目");
+        boolean correct = expected.equals(selected);
+        r.setUserAnswer(selected);
         r.setIsCorrect(correct ? 1 : 0);
         r.setAnsweredAt(LocalDateTime.now());
         Map<String, Object> snapshot = new java.util.LinkedHashMap<>();
         snapshot.put("id", q.getId()); snapshot.put("subject", q.getSubject());
         snapshot.put("knowledgePoint", q.getKnowledgePoint()); snapshot.put("content", q.getContent());
-        snapshot.put("answer", q.getAnswer()); snapshot.put("analysis", q.getAnalysis());
+        snapshot.put("answer", expected); snapshot.put("analysis", q.getAnalysis());
         snapshot.put("version", q.getVersion());
+        snapshot.put("optionA", q.getOptionA()); snapshot.put("optionB", q.getOptionB());
+        snapshot.put("optionC", q.getOptionC()); snapshot.put("optionD", q.getOptionD());
+        snapshot.put("difficulty", q.getDifficulty());
         r.setQuestionSnapshot(snapshot);
-        updateById(r);
+        // An overlapping submission must not overwrite the winner or accumulate twice.
+        if (!update(r, new LambdaQueryWrapper<PracticeRecord>().eq(PracticeRecord::getId, r.getId())
+                .isNull(PracticeRecord::getIsCorrect).eq(PracticeRecord::getGradingStatus, "valid")))
+            throw new ApiException(409, 409, "该题已作答或已不可作答");
 
         if (!correct) {
             userQuestionMarkService.markWrong(userId, questionId);
         }
         studyStatService.accumulate(userId, 1, correct ? 1 : 0, 0);
+        return new AnswerVO(questionId, selected, correct ? 1 : 0, expected, q.getAnalysis());
+    }
+
+    private static String option(Question q, String key) {
+        return switch (key) { case "A" -> q.getOptionA(); case "B" -> q.getOptionB();
+            case "C" -> q.getOptionC(); case "D" -> q.getOptionD(); default -> null; };
     }
 
     @Override
@@ -155,11 +180,19 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
 
     @Override
     public PageResult<ReviewRecordVO> pageReview(Long userId, String sessionId, int page, int size) {
-        Page<ReviewRecordVO> p = Page.of(Math.max(page, 1), Math.min(Math.max(size, 1), 50));
-        Page<ReviewRecordVO> result = baseMapper.pageReview(p, userId, sessionId);
+        Page<PracticeRecord> result = lambdaQuery().eq(PracticeRecord::getUserId, userId)
+                .eq(PracticeRecord::getSessionId, sessionId).orderByAsc(PracticeRecord::getOrderIndex)
+                .page(Page.of(Math.max(page, 1), Math.min(Math.max(size, 1), 50)));
         if (result.getTotal() == 0) {
             throw new ApiException(404, 404, "批次不存在");
         }
-        return PageResult.of(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+        List<ReviewRecordVO> views = result.getRecords().stream().map(r -> {
+            ReviewRecordVO view = new ReviewRecordVO();
+            view.setSessionId(r.getSessionId()); view.setQuestionId(r.getQuestionId()); view.setOrderIndex(r.getOrderIndex());
+            view.setUserAnswer(r.getUserAnswer()); view.setIsCorrect(r.getIsCorrect());
+            QuestionHistoryView.populate(view, r, r.getIsCorrect() == null ? questionService.getById(r.getQuestionId()) : null);
+            return view;
+        }).toList();
+        return PageResult.of(result.getTotal(), result.getCurrent(), result.getSize(), views);
     }
 }

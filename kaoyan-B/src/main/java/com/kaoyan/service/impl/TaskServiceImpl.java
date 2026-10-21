@@ -146,7 +146,11 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             List<Map<String, Object>> snapshots = new ArrayList<>();
             for (PracticeRecord record : records) {
                 if (record.getIsCorrect() == null || !"valid".equals(record.getGradingStatus())) continue;
-                Map<String, Object> q = new LinkedHashMap<>(record.getQuestionSnapshot());
+                // Local display snapshots can grow; the Python contract remains unchanged.
+                Map<String, Object> q = new LinkedHashMap<>();
+                for (String key : List.of("id", "version", "subject", "knowledgePoint", "content", "answer", "analysis")) {
+                    if (record.getQuestionSnapshot().containsKey(key)) q.put(key, record.getQuestionSnapshot().get(key));
+                }
                 q.put("correct", record.getIsCorrect() == 1);
                 snapshots.add(q);
             }

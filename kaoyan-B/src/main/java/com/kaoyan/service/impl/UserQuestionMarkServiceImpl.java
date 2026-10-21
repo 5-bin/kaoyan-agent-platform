@@ -5,6 +5,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kaoyan.common.PageResult;
 import com.kaoyan.dto.response.MarkQuestionVO;
 import com.kaoyan.entity.UserQuestionMark;
+import com.kaoyan.entity.PracticeRecord;
+import com.kaoyan.mapper.PracticeRecordMapper;
+import com.kaoyan.mapper.QuestionMapper;
+import com.kaoyan.service.QuestionHistoryView;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import lombok.RequiredArgsConstructor;
 import com.kaoyan.mapper.UserQuestionMarkMapper;
 import com.kaoyan.service.UserQuestionMarkService;
 import org.springframework.stereotype.Service;
@@ -17,8 +23,12 @@ import java.util.List;
  * 错题与收藏 Service 实现
  */
 @Service
+@RequiredArgsConstructor
 public class UserQuestionMarkServiceImpl extends ServiceImpl<UserQuestionMarkMapper, UserQuestionMark>
         implements UserQuestionMarkService {
+
+    private final PracticeRecordMapper attempts;
+    private final QuestionMapper questions;
 
     private UserQuestionMark find(Long userId, Long questionId) {
         return lambdaQuery()
@@ -105,6 +115,7 @@ public class UserQuestionMarkServiceImpl extends ServiceImpl<UserQuestionMarkMap
     public PageResult<MarkQuestionVO> pageWrong(Long userId, int page, int size) {
         Page<MarkQuestionVO> p = Page.of(Math.max(page, 1), Math.min(Math.max(size, 1), 50));
         Page<MarkQuestionVO> result = baseMapper.pageWrong(p, userId);
+        result.getRecords().forEach(view -> history(userId, view));
         return PageResult.of(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
     }
 
@@ -112,6 +123,14 @@ public class UserQuestionMarkServiceImpl extends ServiceImpl<UserQuestionMarkMap
     public PageResult<MarkQuestionVO> pageFavorite(Long userId, int page, int size) {
         Page<MarkQuestionVO> p = Page.of(Math.max(page, 1), Math.min(Math.max(size, 1), 50));
         Page<MarkQuestionVO> result = baseMapper.pageFavorite(p, userId);
+        result.getRecords().forEach(view -> history(userId, view));
         return PageResult.of(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+    }
+    private void history(Long userId, MarkQuestionVO view) {
+        PracticeRecord latest = attempts.selectOne(new LambdaQueryWrapper<PracticeRecord>()
+            .eq(PracticeRecord::getUserId, userId).eq(PracticeRecord::getQuestionId, view.getQuestionId())
+            .isNotNull(PracticeRecord::getIsCorrect).eq(PracticeRecord::getGradingStatus, "valid")
+            .orderByDesc(PracticeRecord::getAnsweredAt).orderByDesc(PracticeRecord::getId).last("LIMIT 1"));
+        QuestionHistoryView.populate(view, latest, latest == null ? questions.selectById(view.getQuestionId()) : null);
     }
 }
