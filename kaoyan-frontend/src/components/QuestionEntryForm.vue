@@ -37,13 +37,14 @@
     <p v-if="error" class="error" role="alert">{{ error }}</p>
     <div class="actions">
       <el-button :disabled="saving" @click="emit('cancel')">取消录入</el-button>
-      <el-button type="primary" native-type="submit" :loading="saving">保存并送审</el-button>
+      <el-button type="primary" native-type="submit" :loading="saving" :disabled="stale">保存并送审</el-button>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import axios from 'axios'
 import { createQuestion, updateQuestion } from '@/api/question'
 import type { AdminQuestion, QuestionEntry } from '@/types/question-entry'
 
@@ -64,8 +65,10 @@ if (props.initial) {
 }
 const saving = ref(false)
 const error = ref('')
+const stale = ref(false)
+const initialVersion = props.initial?.version
 async function save() {
-  if (saving.value) return
+  if (saving.value || stale.value) return
   const required: (keyof QuestionEntry)[] = ['knowledgePoint', 'content', 'optionA', 'optionB', 'optionC', 'optionD',
     'analysis', 'sourceName', 'sourceLocator', 'permissionNote']
   if (required.some(k => !String(form[k] ?? '').trim())) { error.value = '请填写题目、全部选项、解析和来源／使用权限信息。'; return }
@@ -75,9 +78,14 @@ async function save() {
   saving.value = true; error.value = ''
   try {
     if (props.initial) {
-      emit('saved', await updateQuestion(props.initial.id, { ...form }))
+      emit('saved', await updateQuestion(props.initial.id, { ...form, version: initialVersion! }))
     } else emit('saved', await createQuestion({ ...form }))
-  } catch { error.value = '保存未成功，内容已保留，请核对错误信息后重试。' }
+  } catch (failure) {
+    if (axios.isAxiosError(failure) && failure.response?.status === 409 && props.initial) {
+      stale.value = true
+      error.value = '题目已被修改或审核，内容已保留。请先复制需要保留的输入，取消编辑并刷新详情，核对最新内容后重新编辑。'
+    } else error.value = '保存未成功，内容已保留，请核对错误信息后重试。'
+  }
   finally { saving.value = false }
 }
 </script>

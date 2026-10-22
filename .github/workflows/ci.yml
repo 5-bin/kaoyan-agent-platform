@@ -56,6 +56,8 @@ jobs:
           npm run test:e2e
       - name: Real HTTP and browser regression with isolated H2 and Redis/model doubles
         run: python scripts/smoke-current.py --output .cache/ci-merge-http.json --browser-check --node node
+      - name: Question admin with real Java and isolated H2
+        run: python scripts/smoke-question-admin.py --output .cache/ci-question-admin-browser.json
       - uses: actions/upload-artifact@v6
         if: failure()
         with:

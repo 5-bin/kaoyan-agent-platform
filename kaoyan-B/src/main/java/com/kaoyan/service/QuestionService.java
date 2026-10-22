@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.kaoyan.common.PageResult;
 import com.kaoyan.entity.Question;
 import com.kaoyan.dto.request.QuestionEntryRequest;
+import com.kaoyan.dto.request.QuestionUpdateRequest;
 
 import java.util.List;
 
@@ -47,7 +48,10 @@ public interface QuestionService extends IService<Question> {
      * @param request 完整的可编辑题目与来源信息
      * @return 已保存的新待审核版本
      */
-    Question update(Long questionId, QuestionEntryRequest request);
+    Question update(Long questionId, QuestionUpdateRequest request);
+
+    /** Toggle an approved question without changing content, provenance, audit or practice records. */
+    Question changeActive(Long questionId, Integer active, Integer version);
 
     /**
      * 删除题目

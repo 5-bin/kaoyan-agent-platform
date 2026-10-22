@@ -5,6 +5,8 @@ import com.kaoyan.common.Result;
 import com.kaoyan.dto.query.PageQuery;
 import com.kaoyan.dto.query.QuestionPracticeQuery;
 import com.kaoyan.dto.request.QuestionEntryRequest;
+import com.kaoyan.dto.request.QuestionUpdateRequest;
+import com.kaoyan.dto.request.QuestionActiveRequest;
 import com.kaoyan.dto.request.QuestionReviewRequest;
 import com.kaoyan.entity.Question;
 import com.kaoyan.dto.response.StudentQuestionVO;
@@ -82,8 +84,14 @@ public class QuestionController {
      */
     @Operation(summary = "更新题目")
     @PutMapping("/admin/{id}")
-    public Result<Question> update(@PathVariable Long id, @Valid @RequestBody QuestionEntryRequest request) {
+    public Result<Question> update(@PathVariable Long id, @Valid @RequestBody QuestionUpdateRequest request) {
         return Result.ok(questionService.update(id, request));
+    }
+
+    @Operation(summary = "停用或重新启用已审核题目")
+    @PutMapping("/admin/{id}/active")
+    public Result<Question> active(@PathVariable Long id, @Valid @RequestBody QuestionActiveRequest request) {
+        return Result.ok(questionService.changeActive(id, request.active(), request.version()));
     }
 
     /**

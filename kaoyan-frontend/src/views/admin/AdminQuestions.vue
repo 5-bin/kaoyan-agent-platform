@@ -18,6 +18,7 @@
     <section v-if="selected && !editingOpen" class="card detail" aria-label="题目详情">
       <div class="heading"><h3>题目 #{{ selected.id }} · 版本 {{ selected.version }}</h3>
         <el-tag :type="selected.reviewStatus === 'APPROVED' ? 'success' : selected.reviewStatus === 'REJECTED' ? 'danger' : 'warning'">{{ statusName(selected.reviewStatus) }}</el-tag></div>
+      <p>启用状态：{{ selected.active === 1 ? '已启用' : '已停用' }}</p>
       <p>{{ selected.subject }} · {{ selected.knowledgePoint }} · {{ selected.difficulty }}</p>
       <h4 class="question-content">{{ selected.content }}</h4>
       <p v-for="key in optionKeys" :key="key" class="option-text">{{ key }}. {{ selected[optionField(key)] || '未填写' }}</p>
@@ -44,7 +45,13 @@
         </div>
       </div>
       <el-button v-else-if="selected.reviewStatus === 'REJECTED'" @click="startEntry(selected)">修改后重新送审</el-button>
-      <p v-else class="hint">已发布题目暂不支持原地修改；修订需后续版本发布流程。</p>
+      <div v-else>
+        <p class="hint">已发布题目暂不支持原地修改；修订需后续版本发布流程。</p>
+        <p v-if="legacySource(selected)" class="hint">旧题来源待补充：六项来源字段均为空，允许依据原审核结果恢复；这不代表来源或使用权限已经核验。</p>
+        <el-button :type="selected.active === 1 ? 'danger' : 'success'" :disabled="reviewing || detailLoading" @click="toggleActive">
+          {{ selected.active === 1 ? '停用题目' : '重新启用' }}
+        </el-button>
+      </div>
       <p v-if="reviewError" class="error" role="alert">{{ reviewError }}</p>
       <el-button :disabled="reviewing || detailLoading" @click="showDetail(selected.id)">刷新详情</el-button>
     </section>
@@ -71,7 +78,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { getAdminPending, getAdminQuestion, reviewQuestion } from '@/api/question'
+import { ElMessageBox } from 'element-plus'
+import { getAdminPending, getAdminQuestion, reviewQuestion, changeQuestionActive } from '@/api/question'
 import type { AdminQuestion } from '@/types/question-entry'
 import QuestionEntryForm from '@/components/QuestionEntryForm.vue'
 
@@ -91,6 +99,8 @@ const savedNotice = ref('')
 const comment = ref('')
 const reviewing = ref(false)
 const reviewError = ref('')
+const legacySource = (q: AdminQuestion) => [q.sourceType, q.sourceName, q.sourceLocator,
+  q.sourceYear, q.sourceQuestionNo, q.permissionNote].every(value => value == null)
 const optionKeys = ['A', 'B', 'C', 'D'] as const
 const optionField = (key: typeof optionKeys[number]) => `option${key}` as 'optionA' | 'optionB' | 'optionC' | 'optionD'
 const statusName = (status: string) => ({ PENDING_REVIEW: '待审核', APPROVED: '审核通过', REJECTED: '已驳回' }[status] || status)
@@ -145,6 +155,27 @@ async function review(status: 'APPROVED' | 'REJECTED') {
     try { selected.value = await getAdminQuestion(id) }
     catch { detailError.value = '审核已保存，详情读取失败；可按题目ID重新查看。' }
   } catch { reviewError.value = '审核未成功，请查看错误信息并刷新详情后重试。' }
+  finally { reviewing.value = false }
+}
+async function toggleActive() {
+  if (!selected.value || reviewing.value || detailLoading.value || editingOpen.value) return
+  const { id, version } = selected.value
+  const active = selected.value.active === 1 ? 0 : 1
+  const action = active === 0 ? '停用' : '重新启用'
+  // Guard before opening the confirmation so detail selection cannot change underneath it.
+  reviewing.value = true; reviewError.value = ''
+  try {
+    await ElMessageBox.confirm(active === 0
+      ? '停用后学生不能抽取或继续作答，题目和历史记录保留。确认停用？'
+      : '将按当前审核状态及题目信息重新启用。确认恢复学生练习？', `确认${action}`, { type: 'warning' })
+  } catch { reviewing.value = false; return }
+  try {
+    const saved = await changeQuestionActive(id, { active, version })
+    selected.value = saved
+    savedNotice.value = `题目 #${id} 已${action}。`
+    try { selected.value = await getAdminQuestion(id) }
+    catch { detailError.value = '状态已保存，详情刷新失败；请刷新详情核对。' }
+  } catch { reviewError.value = '状态切换未成功，请核对错误信息并刷新详情后重试。' }
   finally { reviewing.value = false }
 }
 onMounted(load)

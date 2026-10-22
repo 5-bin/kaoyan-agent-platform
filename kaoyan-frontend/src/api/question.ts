@@ -1,6 +1,6 @@
 ﻿import request from './request'
 import type { StudentQuestion, PageResult } from '@/types/api'
-import type { QuestionEntry, AdminQuestion } from '@/types/question-entry'
+import type { QuestionEntry, QuestionUpdate, AdminQuestion } from '@/types/question-entry'
 
 export const getPracticeQuestions = (params: {
   subject?: string
@@ -20,8 +20,11 @@ export const getAdminQuestion = (id: number) =>
 export const createQuestion = (data: QuestionEntry) =>
   request.post<unknown, AdminQuestion>('/questions/admin', data)
 
-export const updateQuestion = (id: number, data: QuestionEntry) =>
+export const updateQuestion = (id: number, data: QuestionUpdate) =>
   request.put<unknown, AdminQuestion>(`/questions/admin/${id}`, data)
 
 export const reviewQuestion = (id: number, data: { status: 'APPROVED' | 'REJECTED'; comment?: string; version: number }) =>
   request.post(`/questions/admin/${id}/review`, data)
+
+export const changeQuestionActive = (id: number, data: { active: 0 | 1; version: number }) =>
+  request.put<unknown, AdminQuestion>(`/questions/admin/${id}/active`, data)

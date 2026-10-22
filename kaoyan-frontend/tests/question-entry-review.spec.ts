@@ -37,7 +37,7 @@ test('enter, recover from a failed save, approve and read the persisted result',
       saved = { ...question }; data = saved
     } else if (path.endsWith('/review')) {
       expect(route.request().postDataJSON()).toEqual({ status: 'APPROVED', comment: '已核对自编说明', version: 1 })
-      saved = { ...question, reviewStatus: 'APPROVED' }; data = null
+      saved = { ...question, version: 2, reviewStatus: 'APPROVED' }; data = null
     } else if (path.endsWith('/pending')) data = { total: saved?.reviewStatus === 'PENDING_REVIEW' ? 1 : 0, page: 1, size: 10, list: saved?.reviewStatus === 'PENDING_REVIEW' ? [saved] : [] }
     else data = saved
     await route.fulfill({ json: { code: 0, message: 'ok', data } })
@@ -88,10 +88,10 @@ test('reject requires a reason, stale review refreshes, and a corrected question
         return route.fulfill({ status: 409, json: { code: 409, message: '题目已被修改，请刷新', data: null } })
       }
       expect(route.request().postDataJSON()).toEqual({ status: 'REJECTED', comment: '请补充解析', version: 2 })
-      current = { ...current, reviewStatus: 'REJECTED' }; data = null
+      current = { ...current, version: 3, reviewStatus: 'REJECTED' }; data = null
     } else if (route.request().method() === 'PUT') {
-      expect(route.request().postDataJSON()).toEqual({ ...entry, analysis: '补充后的完整解析' })
-      current = { ...current, analysis: '补充后的完整解析', version: 3, reviewStatus: 'PENDING_REVIEW' }; data = current
+      expect(route.request().postDataJSON()).toEqual({ ...entry, analysis: '补充后的完整解析', version: 3 })
+      current = { ...current, analysis: '补充后的完整解析', version: 4, reviewStatus: 'PENDING_REVIEW' }; data = current
     } else if (path.endsWith('/pending')) data = { total: current.reviewStatus === 'PENDING_REVIEW' ? 1 : 0, page: 1, size: 10,
       list: current.reviewStatus === 'PENDING_REVIEW' ? [current] : [] }
     await route.fulfill({ json: { code: 0, message: 'ok', data } })
@@ -111,7 +111,7 @@ test('reject requires a reason, stale review refreshes, and a corrected question
   await page.getByRole('button', { name: '修改后重新送审' }).click()
   await page.getByLabel('解析', { exact: true }).fill('补充后的完整解析')
   await page.getByRole('button', { name: '保存并送审' }).click()
-  await expect(page.getByRole('heading', { name: '题目 #101 · 版本 3' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '题目 #101 · 版本 4' })).toBeVisible()
   await expect(page.getByRole('region', { name: '题目详情' })).toContainText('待审核')
 })
 
@@ -173,4 +173,92 @@ test('student route guard hides question management', async ({ page }) => {
   await expect(page).toHaveURL('http://127.0.0.1:4173/')
   await expect(page.getByRole('button', { name: '录入题目' })).toHaveCount(0)
   expect(managementRequests).toBe(0)
+})
+
+test('stale edits keep input, prevent blind retries, and reload the latest version explicitly', async ({ page }) => {
+  await login(page)
+  let current = { ...question }
+  let writes = 0
+  await page.route('http://127.0.0.1:4173/api/**', async route => {
+    const path = new URL(route.request().url()).pathname
+    if (route.request().method() === 'PUT') {
+      const request = route.request().postDataJSON(); writes++
+      if (writes === 1) {
+        expect(request.version).toBe(1)
+        current = { ...current, answer: 'B', version: 2 }
+        return route.fulfill({ status: 409, json: { code: 409, message: '题目已被其他管理员修改', data: null } })
+      }
+      expect(request.version).toBe(2); expect(request.answer).toBe('B')
+      current = { ...current, ...request, version: 3 }
+    }
+    await route.fulfill({ json: { code: 0, message: 'ok', data: path.endsWith('/pending')
+      ? { total: 1, list: [current], page: 1, size: 10 } : current } })
+  })
+  await page.goto('/admin/questions')
+  await page.getByRole('button', { name: '查看并审核' }).click()
+  await page.getByRole('button', { name: '补充／修改' }).click()
+  await page.getByLabel('解析', { exact: true }).fill('我在旧页面输入的解析')
+  await page.getByRole('button', { name: '保存并送审' }).click()
+  await expect(page.getByRole('alert').filter({ hasText: '请先复制需要保留的输入' })).toBeVisible()
+  await expect(page.getByLabel('解析', { exact: true })).toHaveValue('我在旧页面输入的解析')
+  await expect(page.getByRole('button', { name: '保存并送审' })).toBeDisabled()
+  expect(writes).toBe(1)
+  await page.getByRole('button', { name: '取消录入' }).click()
+  await page.getByRole('button', { name: '刷新详情' }).click()
+  await expect(page.getByRole('heading', { name: '题目 #101 · 版本 2' })).toBeVisible()
+  await page.getByRole('button', { name: '补充／修改' }).click()
+  await expect(page.getByLabel('标准答案', { exact: true })).toHaveValue('B')
+  await page.getByLabel('解析', { exact: true }).fill('核对最新答案后补充的解析')
+  await page.getByRole('button', { name: '保存并送审' }).click()
+  await expect(page.getByRole('heading', { name: '题目 #101 · 版本 3' })).toBeVisible()
+  expect(writes).toBe(2)
+})
+
+test('activation requires confirmation, stale states refresh, and legacy sources remain undocumented', async ({ page }) => {
+  await login(page)
+  let current = { ...question, version: 2, reviewStatus: 'APPROVED', sourceType: null,
+    sourceName: null, sourceLocator: null, sourceYear: null, sourceQuestionNo: null, permissionNote: null }
+  let writes = 0
+  await page.route('http://127.0.0.1:4173/api/**', async route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/active')) {
+      writes++
+      const request = route.request().postDataJSON()
+      expect(Object.keys(request).sort()).toEqual(['active', 'version'])
+      if (writes === 1) {
+        expect(request).toEqual({ active: 0, version: 2 })
+        current = { ...current, version: 3 }
+        return route.fulfill({ status: 409, json: { code: 409, message: '状态已变化，请刷新', data: null } })
+      }
+      expect(request).toEqual(writes === 2 ? { active: 0, version: 3 } : { active: 1, version: 4 })
+      // Keep the request pending briefly to verify duplicate actions remain disabled.
+      await new Promise(resolve => setTimeout(resolve, 150))
+      current = { ...current, active: request.active, version: request.version + 1 }
+    }
+    await route.fulfill({ json: { code: 0, message: 'ok', data: path.endsWith('/pending')
+      ? { total: 0, list: [], page: 1, size: 10 } : current } })
+  })
+  await page.goto('/admin/questions')
+  await page.getByLabel('按题目ID查看').fill('101')
+  await page.getByRole('button', { name: '查看题目', exact: true }).click()
+  await expect(page.getByText('旧题来源待补充：', { exact: false })).toBeVisible()
+  await page.getByRole('button', { name: '停用题目', exact: true }).click()
+  await expect(page.getByRole('button', { name: '停用题目', exact: true })).toBeDisabled()
+  await page.getByRole('button', { name: '取消', exact: true }).click()
+  expect(writes).toBe(0)
+  await page.getByRole('button', { name: '停用题目', exact: true }).click()
+  await page.getByRole('button', { name: '确定', exact: true }).click()
+  await expect(page.getByText('状态切换未成功，', { exact: false })).toBeVisible()
+  await page.getByRole('button', { name: '刷新详情' }).click()
+  await expect(page.getByRole('heading', { name: '题目 #101 · 版本 3' })).toBeVisible()
+  await page.getByRole('button', { name: '停用题目', exact: true }).click()
+  await page.getByRole('button', { name: '确定', exact: true }).click()
+  await expect(page.getByRole('region', { name: '题目详情' })).toContainText('启用状态：已停用')
+  await page.getByRole('button', { name: '重新启用', exact: true }).click()
+  await page.getByRole('button', { name: '确定', exact: true }).click()
+  await expect(page.getByRole('heading', { name: '题目 #101 · 版本 5' })).toBeVisible()
+  await expect(page.getByRole('region', { name: '题目详情' })).toContainText('启用状态：已启用')
+  await expect(page.getByText('来源类别：待补充')).toBeVisible()
+  await noOverflow(page)
+  expect(writes).toBe(3)
 })

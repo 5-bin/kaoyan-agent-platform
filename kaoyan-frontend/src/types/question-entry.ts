@@ -7,6 +7,8 @@ export interface QuestionEntry {
   answer: string; analysis: string; sourceType: SourceType; sourceName: string
   sourceLocator: string; sourceYear?: number; sourceQuestionNo: string; permissionNote: string
 }
+export interface QuestionUpdate extends QuestionEntry { version: number }
+
 export interface AdminQuestion extends Question {
   version: number
   sourceType?: SourceType | null
