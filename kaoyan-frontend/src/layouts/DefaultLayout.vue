@@ -30,6 +30,7 @@
         <div v-if="userStore.isAdmin" class="menu-group">
           <div class="group-label">管理</div>
           <el-menu-item index="/admin/documents"><el-icon><Setting /></el-icon><span>管理后台</span></el-menu-item>
+          <el-menu-item index="/admin/questions"><el-icon><EditPen /></el-icon><span>题目录入与审核</span></el-menu-item>
         </div>
       </el-menu>
     </aside>
@@ -76,13 +77,16 @@ const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
 
-const activeMenu = computed(() => '/' + (route.path.split('/')[1] || ''))
+const activeMenu = computed(() => route.path.startsWith('/admin/')
+  ? '/' + route.path.split('/').slice(1, 3).join('/')
+  : '/' + (route.path.split('/')[1] || ''))
 const crumbMap: Record<string, string> = {
   '': '首页', practice: '刷题', wrong: '错题本', favorite: '收藏',
   stat: '学习统计', schools: '院校库', documents: '备考资料',
-  profile: '个人中心', tasks: 'Agent 任务'
+  profile: '个人中心', tasks: 'Agent 任务',
+  'admin/questions': '题目录入与审核', 'admin/documents': '资料管理'
 }
-const crumbName = computed(() => crumbMap[route.path.split('/')[1]] || '首页')
+const crumbName = computed(() => crumbMap[activeMenu.value.slice(1)] || '首页')
 
 const onLogout = async () => {
   try {

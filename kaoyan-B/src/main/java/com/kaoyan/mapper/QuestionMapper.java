@@ -14,6 +14,9 @@ import java.util.List;
 @Mapper
 public interface QuestionMapper extends BaseMapper<Question> {
 
+    @Select("SELECT * FROM question WHERE id = #{id} FOR UPDATE")
+    Question selectForUpdate(@Param("id") Long id);
+
     /**
      * 按条件抽题用于刷题：active=1 且已审核
      *

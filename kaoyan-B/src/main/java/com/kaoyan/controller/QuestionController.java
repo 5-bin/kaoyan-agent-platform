@@ -4,7 +4,10 @@ import com.kaoyan.common.PageResult;
 import com.kaoyan.common.Result;
 import com.kaoyan.dto.query.PageQuery;
 import com.kaoyan.dto.query.QuestionPracticeQuery;
-import com.kaoyan.dto.request.ReviewRequest;
+import com.kaoyan.dto.request.QuestionEntryRequest;
+import com.kaoyan.dto.request.QuestionUpdateRequest;
+import com.kaoyan.dto.request.QuestionActiveRequest;
+import com.kaoyan.dto.request.QuestionReviewRequest;
 import com.kaoyan.entity.Question;
 import com.kaoyan.dto.response.StudentQuestionVO;
 import com.kaoyan.common.ApiException;
@@ -66,9 +69,14 @@ public class QuestionController {
      */
     @Operation(summary = "新建题目")
     @PostMapping("/admin")
-    public Result<Question> create(@RequestBody Question question) {
-        questionService.create(question);
-        return Result.ok(question);
+    public Result<Question> create(@Valid @RequestBody QuestionEntryRequest request) {
+        return Result.ok(questionService.create(request));
+    }
+
+    @Operation(summary = "管理端题目完整详情")
+    @GetMapping("/admin/{id}")
+    public Result<Question> adminDetail(@PathVariable Long id) {
+        return Result.ok(questionService.detail(id));
     }
 
     /**
@@ -76,10 +84,14 @@ public class QuestionController {
      */
     @Operation(summary = "更新题目")
     @PutMapping("/admin/{id}")
-    public Result<Void> update(@PathVariable Long id, @RequestBody Question question) {
-        question.setId(id);
-        questionService.update(question);
-        return Result.ok();
+    public Result<Question> update(@PathVariable Long id, @Valid @RequestBody QuestionUpdateRequest request) {
+        return Result.ok(questionService.update(id, request));
+    }
+
+    @Operation(summary = "停用或重新启用已审核题目")
+    @PutMapping("/admin/{id}/active")
+    public Result<Question> active(@PathVariable Long id, @Valid @RequestBody QuestionActiveRequest request) {
+        return Result.ok(questionService.changeActive(id, request.active(), request.version()));
     }
 
     /**
@@ -97,8 +109,8 @@ public class QuestionController {
      */
     @Operation(summary = "审核题目")
     @PostMapping("/admin/{id}/review")
-    public Result<Void> review(@PathVariable Long id, @Valid @RequestBody ReviewRequest req) {
-        questionService.submitReview(id, UserContext.currentUserId(), req.status(), req.comment());
+    public Result<Void> review(@PathVariable Long id, @Valid @RequestBody QuestionReviewRequest req) {
+        questionService.submitReview(id, UserContext.currentUserId(), req.status(), req.comment(), req.version());
         return Result.ok();
     }
 }
