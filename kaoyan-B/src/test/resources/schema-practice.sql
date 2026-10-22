@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS question (
  option_a TEXT, option_b TEXT, option_c TEXT, option_d TEXT, answer VARCHAR(10), analysis TEXT,
  difficulty VARCHAR(20), question_type VARCHAR(30), version INT, active INT, stable_order INT,
  review_status VARCHAR(30), reviewer_user_id BIGINT, reviewed_at TIMESTAMP, review_comment TEXT,
+ source_type VARCHAR(20), source_name VARCHAR(255), source_locator VARCHAR(1000), source_year INT,
+ source_question_no VARCHAR(64), permission_note VARCHAR(2000),
  created_at TIMESTAMP, updated_at TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS user_question_mark (

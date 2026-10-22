@@ -142,7 +142,7 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 | `/practice`、`/practice/session/:sessionId` | 抽题、逐题作答、回顾和AI总结 | 四模式、答题卡、持久草稿、提示及正式结束入口 |
 | `/wrong`、`/favorite` | 本人错题和收藏 | 重练批次、撤回提示、掌握状态与辅导入口 |
 | `/stat` | 学习统计 | 统一口径、样本量、独立正确率和覆盖范围 |
-| `/admin/documents`、`/admin/questions` | 管理列表与审核 | 来源／许可校验、草稿新版本和发布状态；招生管理待建设 |
+| `/admin/documents`、`/admin/questions` | 资料管理、单选题录入／来源登记／审核及待审分页 | 批量导入、不可变题目新版本发布；招生管理待建设 |
 
 前端守卫与菜单不授予权限。localStorage 当前缓存令牌与用户展示信息，正式档案、任务和作答在后端保存；未来草稿也必须通过后端恢复。
 
@@ -381,11 +381,23 @@ Issue #9（本地适配契约，2026-10-21）：学生抽题及详情改用白�
 | GET `/api/stats/today`、`/api/stats/range`、`/api/stats/overview` | 日期范围与累加统计 | 当前按服务器本地日期，需统一目标时区与有效口径 |
 | POST `/api/files/upload`、DELETE `/api/files` | 上传／删除文件 | OSS可选，未配置上传503，生产用途需核对授权与文件边界 |
 
-管理路径在 `/api/documents/admin`（列表为 `/admin/list`）和 `/api/questions/admin`（待审核为 `/admin/pending`）下，支持创建、修改、删除及 `/{id}/review`。后端要求ADMIN，审核身份取当前账号。当前部分管理接口接收实体，完整建设应改为白名单DTO，防止客户端操纵不应开放的版本／审核字段；不能因为有审核按钮就认定资料许可校验已实现。
+管理路径在 `/api/documents/admin`（列表为 `/admin/list`）和 `/api/questions/admin`（待审核为 `/admin/pending`）下，支持创建、修改、删除及 `/{id}/review`。后端要求ADMIN，审核身份取当前账号。题目录入／修改及审核已使用专用白名单DTO，来源和未发布编辑规则见7.2.1；资料管理的实体入参仍待改造。使用权限说明必须人工核对，不能因为有审核按钮就认定实际许可已核验。
 
 统一响应：`code=0`表示请求业务包装成功，任务是否成功还须检查data.status。分页为 `{total,page,size,list}`，页码从1起；任务、题目审核和管理资料列表接收pageNum／pageSize并兼容page／size，默认1／10。批次和标记分页按各自Controller参数，不能把兼容范围扩大到所有接口。
 
 当前User实体passwordHash已设置@JsonIgnore，注册不返回哈希；完整账号白名单DTO仍需后续建设，持续通过HTTP检查敏感字段。收藏／错题列表只对本人最新有效已提交作答开放对应历史答案和解析；未答或历史依据缺失不输出answer／analysis，手动标记不授予答案访问权。
+
+### 7.2.1 Issue #11：题目录入与来源审核契约
+
+开发基线`28f7aec`，功能分支`feat/question-entry-review`。以下为本次实现契约，测试及部署状态另记验证报告。
+
+- ADMIN沿用`POST /api/questions/admin`录入、`PUT /api/questions/admin/{id}`完整修改未发布题、`GET /api/questions/admin/pending`分页及`POST /api/questions/admin/{id}/review`审核；新增`GET /api/questions/admin/{id}`完整详情。学生仍使用答案隐藏DTO，包装及数字ID不变。
+- 录题白名单字段：subject（408四科中文名称）、knowledgePoint、difficulty（EASY/MEDIUM/HARD）、content、optionA/B/C/D、answer（A—D，兼容小写归一）、analysis、sourceType（REAL_EXAM/MOCK/ORIGINAL）、sourceName、sourceLocator、sourceYear、sourceQuestionNo、permissionNote。题干／解析各限10000字符，选项各限2000，知识点／来源名称各255，来源定位1000，原题号64，权限说明2000。除年份及原题号外均非空；真题必须有1900—2100年份及原题号，其他题年份可空。
+- ID、active、version、questionType、stableOrder、审核身份／状态／时间由服务端控制，不接受额外字段。新题version=1、active=1、SINGLE_CHOICE、PENDING_REVIEW；待审核不进入学生题池。修改仅允许PENDING_REVIEW或REJECTED，完整校验后重新待审核、清除旧审核信息并增加version；APPROVED返回409，正式新版本发布另做。POST／PUT成功均返回已保存的完整管理题目，页面不自行合成版本或审核记录。
+- 审核请求为`{status,comment,version}`，status仅APPROVED或REJECTED，version必填正整数；驳回原因非空、最多2000字。仅待审核题可审；行锁串行化修改及审核，版本过期或重复审核409。审核人来自认证，不接受客户端伪造。通过前重新校验题目与来源完整性；不完整旧题需先补充。历史已发布题不批量改状态。
+- V9增量脚本在question增加6个可空列：source_type VARCHAR(20)、source_name VARCHAR(255)、source_locator VARCHAR(1000)、source_year INT、source_question_no VARCHAR(64)、permission_note VARCHAR(2000)。先核对已有V7/V8，在受控流程执行一次V9再启动新Java；不改V1、不补造旧题来源、不执行V4删题种子。迁移与#5协调，MySQL验收及执行由后续步骤完成。
+- 前端`/admin/questions`提供录题、详情、修改未发布题、通过／驳回、待审核分页和按ID查看已审核结果；真实失败保留表单与重试，不把错误当作空列表。来源信息只向管理员展示，Python及学生题目DTO保持原契约。
+- 验收覆盖录入→持久化→待审核不可抽→审核通过可练与Java判分、驳回不可抽、学生403、伪造字段400、已发布修改409、过期审核409、旧题／快照保留，以及桌面／390px页面。批量导入、真题采集、重复题检测、整卷／年份筛选和完整不可变版本不属本期。
 
 ### 7.3 当前任务入参与示例
 

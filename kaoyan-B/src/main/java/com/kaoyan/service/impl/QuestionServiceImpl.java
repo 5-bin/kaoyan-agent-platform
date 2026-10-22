@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kaoyan.common.ApiException;
 import com.kaoyan.common.PageResult;
 import com.kaoyan.entity.Question;
+import com.kaoyan.dto.request.QuestionEntryRequest;
 import com.kaoyan.mapper.QuestionMapper;
 import com.kaoyan.service.QuestionService;
+import jakarta.validation.Validator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +20,10 @@ import java.util.List;
  * 题库 Service 实现
  */
 @Service
+@RequiredArgsConstructor
 public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> implements QuestionService {
+
+    private final Validator validator;
 
     @Override
     public List<Question> listForPractice(String subject, String difficulty,
@@ -37,27 +43,42 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
 
     @Override
     @Transactional
-    public void create(Question question) {
-        question.setId(null);
-        if (question.getActive() == null) {
-            question.setActive(1);
-        }
-        if (question.getVersion() == null) {
-            question.setVersion(1);
-        }
-        if (question.getReviewStatus() == null) {
-            question.setReviewStatus("PENDING_REVIEW");
-        }
+    public Question create(QuestionEntryRequest request) {
+        Question question = entry(request);
+        question.setActive(1);
+        question.setVersion(1);
+        question.setStableOrder(0);
+        question.setQuestionType("SINGLE_CHOICE");
+        question.setReviewStatus("PENDING_REVIEW");
         save(question);
+        return question;
     }
 
     @Override
     @Transactional
-    public void update(Question question) {
-        if (question.getId() == null || getById(question.getId()) == null) {
-            throw new ApiException(404, 404, "题目不存在");
-        }
-        updateById(question);
+    public Question update(Long questionId, QuestionEntryRequest request) {
+        Question existing = locked(questionId);
+        if (!"PENDING_REVIEW".equals(existing.getReviewStatus()) && !"REJECTED".equals(existing.getReviewStatus()))
+            throw new ApiException(409, 409, "已发布题目不能原地修改，请通过后续版本发布流程修订");
+        Question replacement = entry(request);
+        replacement.setId(questionId);
+        replacement.setVersion(existing.getVersion() == null ? 1 : Math.addExact(existing.getVersion(), 1));
+        replacement.setReviewStatus("PENDING_REVIEW");
+        // Explicit assignments also clear optional fields and audit data when resubmitting.
+        lambdaUpdate().eq(Question::getId, questionId)
+            .set(Question::getSubject, replacement.getSubject()).set(Question::getKnowledgePoint, replacement.getKnowledgePoint())
+            .set(Question::getDifficulty, replacement.getDifficulty()).set(Question::getContent, replacement.getContent())
+            .set(Question::getOptionA, replacement.getOptionA()).set(Question::getOptionB, replacement.getOptionB())
+            .set(Question::getOptionC, replacement.getOptionC()).set(Question::getOptionD, replacement.getOptionD())
+            .set(Question::getAnswer, replacement.getAnswer()).set(Question::getAnalysis, replacement.getAnalysis())
+            .set(Question::getSourceType, replacement.getSourceType()).set(Question::getSourceName, replacement.getSourceName())
+            .set(Question::getSourceLocator, replacement.getSourceLocator()).set(Question::getPermissionNote, replacement.getPermissionNote())
+            .set(Question::getVersion, replacement.getVersion()).set(Question::getReviewStatus, "PENDING_REVIEW")
+            .set(Question::getReviewerUserId, null).set(Question::getReviewedAt, null)
+            .set(Question::getReviewComment, null).set(Question::getSourceYear, replacement.getSourceYear())
+            .set(Question::getSourceQuestionNo, replacement.getSourceQuestionNo())
+            .set(Question::getUpdatedAt, LocalDateTime.now()).update();
+        return detail(questionId);
     }
 
     @Override
@@ -70,16 +91,45 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
 
     @Override
     @Transactional
-    public void submitReview(Long questionId, Long reviewerUserId, String status, String comment) {
-        Question q = getById(questionId);
-        if (q == null) {
-            throw new ApiException(404, 404, "题目不存在");
-        }
+    public void submitReview(Long questionId, Long reviewerUserId, String status, String comment, Integer version) {
+        if (!"APPROVED".equals(status) && !"REJECTED".equals(status))
+            throw new ApiException(400, 400, "审核结果只能为通过或驳回");
+        if ((comment != null && comment.length() > 2000) || ("REJECTED".equals(status) && (comment == null || comment.isBlank())))
+            throw new ApiException(400, 400, "驳回需填写原因，审核意见最多2000字");
+        Question q = locked(questionId);
+        if (!"PENDING_REVIEW".equals(q.getReviewStatus()) || version == null || !version.equals(q.getVersion()))
+            throw new ApiException(409, 409, "题目已被修改或审核，请重新读取最新详情");
+        if ("APPROVED".equals(status)) entry(new QuestionEntryRequest(q.getSubject(), q.getKnowledgePoint(),
+            q.getDifficulty(), q.getContent(), q.getOptionA(), q.getOptionB(), q.getOptionC(), q.getOptionD(),
+            q.getAnswer(), q.getAnalysis(), q.getSourceType(), q.getSourceName(), q.getSourceLocator(),
+            q.getSourceYear(), q.getSourceQuestionNo(), q.getPermissionNote()));
         q.setReviewStatus(status);
         q.setReviewerUserId(reviewerUserId);
         q.setReviewComment(comment);
         q.setReviewedAt(LocalDateTime.now());
         updateById(q);
+    }
+
+    private Question locked(Long id) {
+        Question question = baseMapper.selectForUpdate(id);
+        if (question == null) throw new ApiException(404, 404, "题目不存在");
+        return question;
+    }
+
+    private Question entry(QuestionEntryRequest r) {
+        if (r == null || !validator.validate(r).isEmpty())
+            throw new ApiException(400, 400, "题目或来源信息不完整，请补充后再提交");
+        if ("REAL_EXAM".equals(r.sourceType()) && (r.sourceYear() == null || r.sourceQuestionNo() == null || r.sourceQuestionNo().isBlank()))
+            throw new ApiException(400, 400, "真题必须填写年份和原题号");
+        Question q = new Question();
+        q.setSubject(r.subject()); q.setKnowledgePoint(r.knowledgePoint().strip()); q.setDifficulty(r.difficulty());
+        q.setContent(r.content().strip()); q.setOptionA(r.optionA().strip()); q.setOptionB(r.optionB().strip());
+        q.setOptionC(r.optionC().strip()); q.setOptionD(r.optionD().strip());
+        q.setAnswer(r.answer().toUpperCase(java.util.Locale.ROOT)); q.setAnalysis(r.analysis().strip());
+        q.setSourceType(r.sourceType()); q.setSourceName(r.sourceName().strip()); q.setSourceLocator(r.sourceLocator().strip());
+        q.setSourceYear(r.sourceYear()); q.setSourceQuestionNo(r.sourceQuestionNo() == null || r.sourceQuestionNo().isBlank() ? null : r.sourceQuestionNo().strip());
+        q.setPermissionNote(r.permissionNote().strip());
+        return q;
     }
 
     @Override
@@ -88,6 +138,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         Page<Question> result = lambdaQuery()
                 .eq(Question::getReviewStatus, "PENDING_REVIEW")
                 .orderByAsc(Question::getStableOrder)
+                .orderByAsc(Question::getId)
                 .page(p);
         return PageResult.of(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
     }

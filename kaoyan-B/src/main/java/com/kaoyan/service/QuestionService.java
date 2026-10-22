@@ -3,6 +3,7 @@ package com.kaoyan.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kaoyan.common.PageResult;
 import com.kaoyan.entity.Question;
+import com.kaoyan.dto.request.QuestionEntryRequest;
 
 import java.util.List;
 
@@ -34,16 +35,19 @@ public interface QuestionService extends IService<Question> {
     /**
      * 新建题目
      *
-     * @param question 题目
+     * @param request 可编辑题目与来源信息
+     * @return 已保存的待审核题目
      */
-    void create(Question question);
+    Question create(QuestionEntryRequest request);
 
     /**
      * 更新题目
      *
-     * @param question 题目
+     * @param questionId 题目 ID
+     * @param request 完整的可编辑题目与来源信息
+     * @return 已保存的新待审核版本
      */
-    void update(Question question);
+    Question update(Long questionId, QuestionEntryRequest request);
 
     /**
      * 删除题目
@@ -59,8 +63,9 @@ public interface QuestionService extends IService<Question> {
      * @param reviewerUserId 审核人 ID
      * @param status         审核结果
      * @param comment        审核意见
+     * @param version        管理员读取的题目版本
      */
-    void submitReview(Long questionId, Long reviewerUserId, String status, String comment);
+    void submitReview(Long questionId, Long reviewerUserId, String status, String comment, Integer version);
 
     /**
      * 待审核题目分页

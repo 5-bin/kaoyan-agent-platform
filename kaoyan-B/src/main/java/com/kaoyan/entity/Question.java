@@ -53,6 +53,14 @@ public class Question {
     /** 题型 */
     private String questionType;
 
+    /** V9 source metadata; null on legacy questions with undocumented provenance. */
+    private String sourceType;
+    private String sourceName;
+    private String sourceLocator;
+    private Integer sourceYear;
+    private String sourceQuestionNo;
+    private String permissionNote;
+
     /** 版本号 */
     private Integer version;
 
