@@ -17,7 +17,7 @@ class JwtAuthenticationFilterTest {
     @Test void roleIsReadFromCurrentAccountInsteadOfOldTokenClaim() throws Exception {
         var jwt = mock(JwtService.class);
         var users = mock(UserMapper.class);
-        when(jwt.parse("test-token")).thenReturn(Jwts.claims().subject("1").id("jti")
+        when(jwt.parse("test-token")).thenReturn(Jwts.claims().subject("1").id("jti").expiration(new java.util.Date(System.currentTimeMillis()+60000))
                 .add("type", "access").add("role", "STUDENT").build());
         var user = new User(); user.setId(1L); user.setUsername("test"); user.setStatus(1); user.setRole("ADMIN");
         when(users.selectById(1L)).thenReturn(user);
@@ -34,7 +34,7 @@ class JwtAuthenticationFilterTest {
     @Test void disabledAccountCannotAuthenticateWithStillValidToken() throws Exception {
         var jwt = mock(JwtService.class);
         var users = mock(UserMapper.class);
-        when(jwt.parse("test-token")).thenReturn(Jwts.claims().subject("1").id("jti").add("type", "access").build());
+        when(jwt.parse("test-token")).thenReturn(Jwts.claims().subject("1").id("jti").expiration(new java.util.Date(System.currentTimeMillis()+60000)).add("type", "access").build());
         var user = new User(); user.setId(1L); user.setStatus(0);
         when(users.selectById(1L)).thenReturn(user);
         var request = new MockHttpServletRequest("GET", "/api/tasks");

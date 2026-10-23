@@ -9,6 +9,7 @@ import com.kaoyan.dto.response.AnswerVO;
 import com.kaoyan.dto.response.PracticeRecordVO;
 import com.kaoyan.dto.response.SessionSummaryVO;
 import com.kaoyan.entity.Task;
+import com.kaoyan.dto.response.TaskView;
 import com.kaoyan.security.UserContext;
 import com.kaoyan.service.PracticeService;
 import com.kaoyan.service.TaskService;
@@ -40,7 +41,7 @@ public class PracticeController {
     @PostMapping("/sessions")
     public Result<Map<String, String>> start(@Valid @RequestBody StartSessionRequest req) {
         String sessionId = practiceService.startSession(
-                UserContext.currentUserId(), req.subject(), req.difficulty(), req.count());
+                UserContext.currentUserId(), req.subject(), req.difficulty(), req.count(), req.source(), req.questionIds());
         return Result.ok(Map.of("sessionId", sessionId));
     }
 
@@ -65,11 +66,11 @@ public class PracticeController {
 
     @Operation(summary = "触发 AI 总结", description = "做完一批题后调用，结果落 task 表")
     @PostMapping("/sessions/{sessionId}/ai-summary")
-    public Result<Task> aiSummary(@PathVariable String sessionId) {
-        return Result.ok(taskService.submit(
+    public Result<TaskView> aiSummary(@PathVariable String sessionId) {
+        return Result.ok(TaskView.of(taskService.submit(
                 UserContext.currentUserId(),
                 "PRACTICE_SUMMARY",
-                Map.of("sessionId", sessionId)));
+                Map.of("sessionId", sessionId))));
     }
 
     /**

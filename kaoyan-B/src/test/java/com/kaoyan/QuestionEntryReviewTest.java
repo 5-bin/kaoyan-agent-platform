@@ -97,7 +97,7 @@ class QuestionEntryReviewTest {
         assertFalse(visible.get(0).has("answer")); assertFalse(visible.get(0).has("permissionNote"));
         var publicDetail = call(get("/api/questions/" + id), student, null, 200);
         assertFalse(publicDetail.has("analysis")); assertFalse(publicDetail.has("sourceLocator"));
-        String session = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 100), 200).path("sessionId").asText();
+        String session = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 50), 200).path("sessionId").asText();
         var result = call(post("/api/practice/sessions/" + session + "/answer"), student, Map.of("questionId", id, "answer", "A"), 200);
         assertEquals(1, result.path("isCorrect").asInt());
         edit(admin, id, body, 2, 409);
@@ -258,9 +258,9 @@ class QuestionEntryReviewTest {
     @Test void disablingAndRestoringPreservesAuditSourcesSnapshotsAndStatistics() throws Exception {
         String admin = account(true), student = account(false); var body = entry(); long id = create(admin, body);
         review(admin, id, "APPROVED", "保留审核依据", 1, 200);
-        String first = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 100), 200).path("sessionId").asText();
+        String first = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 50), 200).path("sessionId").asText();
         call(post("/api/practice/sessions/" + first + "/answer"), student, Map.of("questionId", id, "answer", "B"), 200);
-        String second = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 100), 200).path("sessionId").asText();
+        String second = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 50), 200).path("sessionId").asText();
         var records = jdbc.queryForList("SELECT * FROM practice_record WHERE question_id=? ORDER BY id", id);
         var stats = jdbc.queryForList("SELECT * FROM study_stat");
         var marks = jdbc.queryForList("SELECT * FROM user_question_mark");

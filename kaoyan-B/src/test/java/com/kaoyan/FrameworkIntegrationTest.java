@@ -41,6 +41,38 @@ class FrameworkIntegrationTest {
     @MockitoBean AgentFeignClient agent;
     @MockitoBean StringRedisTemplate redis;
 
+    @Test void clearingAllDuringSynchronousRequestCannotRestoreItsPrivatePayload() throws Exception {
+        String token=login();long owner=Long.parseLong(jwt.parse(token).getSubject());
+        var entered=new java.util.concurrent.CountDownLatch(1);var release=new java.util.concurrent.CountDownLatch(1);
+        when(agent.chat(anyString(),any())).thenAnswer(call -> {
+            AgentRequest request=call.getArgument(1);entered.countDown();assertTrue(release.await(10,java.util.concurrent.TimeUnit.SECONDS));
+            var response=new AgentResponse();response.setTaskId(request.getTaskId());response.setStatus("SUCCESS");
+            response.setReleaseId("rag-v1-1234567890abcdef");response.setReferences(java.util.List.of());
+            response.setResult(Map.of("answer","SYNTHETIC_PRIVATE_ANSWER","outcome","COMPLETED","resolvedTaskType","KNOWLEDGE_QA","releaseId",response.getReleaseId(),"explanationMode","rules"));return response;
+        });
+        var pool=java.util.concurrent.Executors.newSingleThreadExecutor();
+        try {
+            var future=pool.submit(() -> mvc.perform(post("/api/tasks").header("Authorization","Bearer "+token).contentType("application/json")
+                .content("{\"taskType\":\"KNOWLEDGE_QA\",\"input\":{\"query\":\"SYNTHETIC_PRIVATE_QUERY\"}}"))
+                .andReturn().getResponse().getContentAsString());
+            assertTrue(entered.await(10,java.util.concurrent.TimeUnit.SECONDS));
+            mvc.perform(delete("/api/conversations").header("Authorization","Bearer "+token)).andExpect(status().isOk());
+            release.countDown();String body=future.get(10,java.util.concurrent.TimeUnit.SECONDS);
+            assertFalse(body.contains("SYNTHETIC_PRIVATE"));
+            var rows=jdbc.queryForList("SELECT input_payload,result_payload,status FROM task WHERE user_id=?",owner);
+            assertEquals(1,rows.size());assertNull(rows.get(0).get("input_payload"));assertNull(rows.get(0).get("result_payload"));
+            assertEquals("CANCELLED",rows.get(0).get("status"));
+        } finally {release.countDown();pool.shutdownNow();}
+    }
+
+    @Test void expiredHiddenRecommendationsAreErasedRatherThanOnlyHidden() throws Exception {
+        String token=login();long owner=Long.parseLong(jwt.parse(token).getSubject());String id=UUID.randomUUID().toString();
+        jdbc.update("INSERT INTO task(id,user_id,task_type,status,input_payload,result_payload,created_at,deleted_at) VALUES(?,?,'SCHOOL_RECOMMEND','SUCCESS','{\"query\":\"SYNTHETIC_HIDDEN\"}','{\"answer\":\"SYNTHETIC_HIDDEN\"}',?,CURRENT_TIMESTAMP)",id,owner,java.time.LocalDateTime.now().minusDays(31));
+        mvc.perform(get("/api/tasks").header("Authorization","Bearer "+token)).andExpect(status().isOk());
+        assertNull(jdbc.queryForObject("SELECT input_payload FROM task WHERE id=?",String.class,id));
+        assertNull(jdbc.queryForObject("SELECT result_payload FROM task WHERE id=?",String.class,id));
+    }
+
     String login() throws Exception {
         String username = "t" + UUID.randomUUID().toString().substring(0, 8);
         String body = mapper.writeValueAsString(Map.of("username", username, "password", "test-password"));

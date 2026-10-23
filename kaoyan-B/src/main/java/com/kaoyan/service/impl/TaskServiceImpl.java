@@ -31,6 +31,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     private final PracticeRecordMapper practiceRecordMapper;
     private final QuestionMapper questionMapper;
     private final TaskStore store;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private com.kaoyan.service.AssistantPrivacyService privacy;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private org.springframework.beans.factory.ObjectProvider<com.kaoyan.service.ConversationService> conversations;
 
     @Override
     public Task submit(Long userId, String taskType, Map<String, Object> input) {
@@ -48,6 +52,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         task.setTaskType(taskType);
         task.setStatus("RUNNING");
         AgentRequest request = buildRequest(userId, taskType, task.getId(), fields);
+        request.setQuotaExempt(store.isQuotaExempt(userId));
+        Map<String,Object> consent=privacy==null?Map.of("modelAllowed",false,"scopes",List.of(),"version",0):privacy.settings(userId);
+        request.setPrivacy(privacy==null?consent:privacy.wire(consent));
+        Map<String,Object> grant=com.kaoyan.security.UserContext.sessionGrant();
         // Save the exact authorized context, not a client-supplied profile or owner.
         Map<String, Object> snapshot = new LinkedHashMap<>(fields);
         snapshot.put("profileSnapshot", request.getProfile());
@@ -55,8 +63,14 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         task.setInputPayload(snapshot);
         synchronized (store) { store.begin(task); }
         try {
+            if(privacy!=null) privacy.check(userId,grant,((Number)consent.get("version")).intValue());
+            if(privacy!=null && Boolean.TRUE.equals(consent.get("modelAllowed")) && !privacy.provider().equals(consent.get("provider")))
+                throw new ApiException(409,"模型接收端点已变化，请重新授权");
             AgentResponse response = agentClient.chat(agentProps.getInternalKey(), request);
             validateResponse(task, response);
+            if(privacy!=null) privacy.check(userId,grant,((Number)consent.get("version")).intValue());
+            if(privacy!=null && Boolean.TRUE.equals(consent.get("modelAllowed")) && !privacy.provider().equals(consent.get("provider")))
+                throw new ApiException(409,"模型接收端点已变化，请重新授权");
             task.setStatus(response.getStatus());
             task.setReleaseId(response.getReleaseId());
             if ("SUCCESS".equals(response.getStatus())) {
@@ -69,7 +83,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             task.setStatus("FAILED");
             task.setErrorMessage("Agent暂时不可用或响应不符合契约，请按任务编号检查日志");
         }
-        store.finish(task);
+        if(privacy!=null) privacy.finishTask(task,grant,((Number)consent.get("version")).intValue());
+        else store.finish(task);
         return task;
     }
 
@@ -84,7 +99,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         profile.put("targetSchool", user.getTargetSchool());
         profile.put("targetMajor", user.getTargetMajor());
         profile.put("examYear", user.getExamYear());
-        profile.put("background", user.getBackground());
+        // Free-form background is unrelated to rule-based screening and never forwarded by default.
         request.setProfile(profile);
         if (!"PRACTICE_SUMMARY".equals(type)) {
             Object query = input.get("query");
@@ -168,7 +183,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         return (Map<String, Object>) map;
     }
 
-    static void validateResponse(Task task, AgentResponse response) {
+    public static void validateResponse(Task task, AgentResponse response) {
         if (response == null || !task.getId().equals(response.getTaskId())
                 || response.getStatus() == null || !Set.of("SUCCESS", "FAILED").contains(response.getStatus())
                 || response.getReleaseId() == null || !response.getReleaseId().matches("rag-v1-[a-f0-9]{16}"))
@@ -213,6 +228,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
     @Override
     public PageResult<Task> historyPage(Long userId, int page, int size, String taskType) {
+        if(conversations!=null) conversations.getObject().cleanupOwner(userId);
         Page<Task> p = Page.of(Math.max(page, 1), Math.min(Math.max(size, 1), 100));
         Page<Task> result = baseMapper.selectPage(p, new LambdaQueryWrapper<Task>()
             .eq(Task::getUserId, userId).eq(taskType != null, Task::getTaskType, taskType)
@@ -223,6 +239,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
     @Override
     public Task detail(Long userId, String taskId) {
+        if(conversations!=null) conversations.getObject().cleanupOwner(userId);
         Task task = getById(taskId);
         if (task == null || !task.getUserId().equals(userId) || task.getDeletedAt() != null)
             throw new ApiException(404, "任务不存在或无权访问");

@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 /**
  * 考研 Agent 平台启动类
  */
-@SpringBootApplication
+@SpringBootApplication(exclude=org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class)
 @MapperScan("com.kaoyan.mapper")
 @EnableFeignClients(basePackages = "com.kaoyan.feign")
 public class KaoyanApplication {

@@ -35,13 +35,37 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
         implements PracticeService {
 
     private final QuestionService questionService;
+    private final com.kaoyan.mapper.QuestionMapper questionMapper;
     private final UserQuestionMarkService userQuestionMarkService;
     private final StudyStatService studyStatService;
 
     @Override
     @Transactional
     public String startSession(Long userId, String subject, String difficulty, int count) {
-        List<Question> questions = questionService.listForPractice(subject, difficulty, null, count);
+        return startSession(userId, subject, difficulty, count, "NORMAL", null);
+    }
+
+    @Override
+    @Transactional
+    public String startSession(Long userId, String subject, String difficulty, int count, String source, List<Long> questionIds) {
+        if (count < 1 || count > 50) throw new ApiException(400, 400, "题目数量须为1至50");
+        String mode = source == null ? "NORMAL" : source;
+        if (!List.of("NORMAL", "WRONG", "FAVORITE").contains(mode)) throw new ApiException(400, 400, "练习来源无效");
+        if (questionIds != null && (questionIds.size() > 50 || questionIds.stream().anyMatch(id -> id == null || id <= 0)))
+            throw new ApiException(400, 400, "题目集合无效");
+        List<Long> allowed = "WRONG".equals(mode) ? userQuestionMarkService.listWrong(userId).stream().map(com.kaoyan.entity.UserQuestionMark::getQuestionId).toList()
+                : "FAVORITE".equals(mode) ? userQuestionMarkService.listFavorite(userId).stream().map(com.kaoyan.entity.UserQuestionMark::getQuestionId).toList() : null;
+        List<Question> questions;
+        if (questionIds != null && !questionIds.isEmpty()) {
+            if (allowed != null && !allowed.containsAll(questionIds)) throw new ApiException(404, 404, "题目不存在");
+            questions = questionIds.stream().distinct().map(questionService::getById)
+                    .filter(QuestionHistoryView::playable).filter(q -> subject == null || subject.isBlank() || subject.equals(q.getSubject()))
+                    .filter(q -> difficulty == null || difficulty.isBlank() || difficulty.equals(q.getDifficulty())).limit(count).toList();
+        } else if (allowed != null) {
+            questions = allowed.stream().distinct().map(questionService::getById).filter(QuestionHistoryView::playable)
+                    .filter(q -> subject == null || subject.isBlank() || subject.equals(q.getSubject()))
+                    .filter(q -> difficulty == null || difficulty.isBlank() || difficulty.equals(q.getDifficulty())).limit(count).toList();
+        } else questions = questionService.listForPractice(subject, difficulty, null, count);
         if (questions.isEmpty()) {
             throw new ApiException(404, 404, "没有符合条件的题目");
         }
@@ -54,6 +78,9 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
             r.setQuestionId(q.getId());
             r.setOrderIndex(order++);
             r.setGradingStatus("valid");
+            Map<String, Object> fixed = snapshot(q);
+            fixed.put("snapshotAtCreation", true);
+            r.setQuestionSnapshot(fixed);
             save(r);
         }
         return sessionId;
@@ -75,28 +102,24 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
         if (r.getIsCorrect() != null) {
             throw new ApiException(409, 409, "该题已作答");
         }
-        Question q = questionService.detail(questionId);
+        Question q = questionMapper.selectForUpdate(questionId);
+        if(q==null) throw new ApiException(404,404,"题目不存在");
         if (!"valid".equals(r.getGradingStatus())) throw new ApiException(409, 409, "该项目已不可作答");
         if (!QuestionHistoryView.playable(q)) throw new ApiException(409, 409, "题目已不可练习");
-        String expected = q.getAnswer() == null ? "" : q.getAnswer().trim().toUpperCase(java.util.Locale.ROOT);
-        if (!"SINGLE_CHOICE".equals(q.getQuestionType()) || !expected.matches("[A-D]")
-                || option(q, expected) == null || option(q, expected).isBlank())
+        // New batches grade their immutable creation snapshot. Legacy unanswered batches retain their old behavior.
+        boolean fixed = r.getQuestionSnapshot() != null && Boolean.TRUE.equals(r.getQuestionSnapshot().get("snapshotAtCreation"));
+        Question grading = fixed ? questionFromSnapshot(r.getQuestionSnapshot(), questionId) : q;
+        String expected = grading.getAnswer() == null ? "" : grading.getAnswer().trim().toUpperCase(java.util.Locale.ROOT);
+        if (!"SINGLE_CHOICE".equals(grading.getQuestionType()) || !expected.matches("[A-D]")
+                || option(grading, expected) == null || option(grading, expected).isBlank())
             throw new ApiException(409, 409, "题目答案配置不完整，请联系管理员");
-        if (option(q, selected) == null || option(q, selected).isBlank())
+        if (option(grading, selected) == null || option(grading, selected).isBlank())
             throw new ApiException(400, 400, "选项不属于该题目");
         boolean correct = expected.equals(selected);
         r.setUserAnswer(selected);
         r.setIsCorrect(correct ? 1 : 0);
-        r.setAnsweredAt(LocalDateTime.now());
-        Map<String, Object> snapshot = new java.util.LinkedHashMap<>();
-        snapshot.put("id", q.getId()); snapshot.put("subject", q.getSubject());
-        snapshot.put("knowledgePoint", q.getKnowledgePoint()); snapshot.put("content", q.getContent());
-        snapshot.put("answer", expected); snapshot.put("analysis", q.getAnalysis());
-        snapshot.put("version", q.getVersion());
-        snapshot.put("optionA", q.getOptionA()); snapshot.put("optionB", q.getOptionB());
-        snapshot.put("optionC", q.getOptionC()); snapshot.put("optionD", q.getOptionD());
-        snapshot.put("difficulty", q.getDifficulty());
-        r.setQuestionSnapshot(snapshot);
+        r.setAnsweredAt(LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai")));
+        if (!fixed) r.setQuestionSnapshot(snapshot(grading));
         // An overlapping submission must not overwrite the winner or accumulate twice.
         if (!update(r, new LambdaQueryWrapper<PracticeRecord>().eq(PracticeRecord::getId, r.getId())
                 .isNull(PracticeRecord::getIsCorrect).eq(PracticeRecord::getGradingStatus, "valid")))
@@ -106,7 +129,24 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
             userQuestionMarkService.markWrong(userId, questionId);
         }
         studyStatService.accumulate(userId, 1, correct ? 1 : 0, 0);
-        return new AnswerVO(questionId, selected, correct ? 1 : 0, expected, q.getAnalysis());
+        return new AnswerVO(questionId, selected, correct ? 1 : 0, expected, grading.getAnalysis());
+    }
+
+    private static Map<String, Object> snapshot(Question q) {
+        Map<String, Object> s = new java.util.LinkedHashMap<>();
+        s.put("id", q.getId()); s.put("subject", q.getSubject()); s.put("knowledgePoint", q.getKnowledgePoint());
+        s.put("content", q.getContent()); s.put("answer", q.getAnswer()); s.put("analysis", q.getAnalysis());
+        s.put("version", q.getVersion()); s.put("optionA", q.getOptionA()); s.put("optionB", q.getOptionB());
+        s.put("optionC", q.getOptionC()); s.put("optionD", q.getOptionD()); s.put("difficulty", q.getDifficulty());
+        s.put("questionType", q.getQuestionType()); return s;
+    }
+    private static Question questionFromSnapshot(Map<String, Object> s, Long id) {
+        if (!(s.get("id") instanceof Number n) || n.longValue() != id || !(s.get("content") instanceof String))
+            throw new ApiException(409, 409, "批次题目快照缺失");
+        Question q = new Question(); q.setId(id); q.setContent((String)s.get("content"));
+        q.setQuestionType((String)s.get("questionType")); q.setAnswer((String)s.get("answer")); q.setAnalysis((String)s.get("analysis"));
+        q.setOptionA((String)s.get("optionA")); q.setOptionB((String)s.get("optionB"));
+        q.setOptionC((String)s.get("optionC")); q.setOptionD((String)s.get("optionD")); return q;
     }
 
     private static String option(Question q, String key) {
@@ -118,14 +158,14 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
     public Map<String, Object> sessionSummary(Long userId, String sessionId) {
         List<PracticeRecord> records = sessionDetail(userId, sessionId);
         long total = records.size();
-        long answered = records.stream().filter(r -> r.getIsCorrect() != null).count();
-        long correct = records.stream().filter(r -> r.getIsCorrect() != null && r.getIsCorrect() == 1).count();
+        long answered = records.stream().filter(r -> "valid".equals(r.getGradingStatus()) && r.getIsCorrect() != null).count();
+        long correct = records.stream().filter(r -> "valid".equals(r.getGradingStatus()) && r.getIsCorrect() != null && r.getIsCorrect() == 1).count();
         Map<String, Object> map = new HashMap<>();
         map.put("sessionId", sessionId);
         map.put("total", total);
         map.put("answered", answered);
         map.put("correct", correct);
-        map.put("accuracy", total == 0 ? 0.0 : (double) correct / total);
+        map.put("accuracy", answered == 0 ? 0.0 : (double) correct / answered);
         return map;
     }
 

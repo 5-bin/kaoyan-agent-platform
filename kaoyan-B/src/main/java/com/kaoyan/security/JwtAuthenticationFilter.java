@@ -42,6 +42,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 chain.doFilter(request, response);
                 return;
             }
+            if(claims.getExpiration()==null || claims.getId()==null) {
+                SecurityContextHolder.clearContext();chain.doFilter(request,response);return;
+            }
             // 黑名单校验
             if (jwtService.isRevoked(claims.getId())) {
                 chain.doFilter(request, response);
@@ -60,6 +63,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     principal, null,
                     List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+            auth.setDetails(java.util.Map.of("jti",claims.getId(),"expiresAt",claims.getExpiration().getTime()));
+            response.setHeader("Cache-Control","no-store");
+            response.setHeader("Referrer-Policy","no-referrer");
             SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (ApiException | IllegalArgumentException e) {
             SecurityContextHolder.clearContext();

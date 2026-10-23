@@ -39,6 +39,16 @@ public final class UserContext {
         return current().role();
     }
 
+    public static java.util.Map<String,Object> sessionGrant() {
+        Authentication auth=SecurityContextHolder.getContext().getAuthentication();
+        if(auth!=null && auth.getDetails() instanceof java.util.Map<?,?> details) {
+            java.util.Map<String,Object> grant=new java.util.LinkedHashMap<>();
+            for(String key:java.util.List.of("jti","expiresAt")) if(details.containsKey(key)) grant.put(key,details.get(key));
+            return grant;
+        }
+        return java.util.Map.of();
+    }
+
     private static AuthUser current() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof AuthUser au)) {
