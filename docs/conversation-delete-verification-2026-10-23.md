@@ -20,3 +20,9 @@
 Playwright自带Chromium未安装；本机Chrome在沙箱内启动即退出。经自动审批允许后，使用`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`在隔离浏览器上下文运行。测试使用临时Vite服务和模拟API，不读取日常浏览器资料。早期测试修正了模拟路径误拦截源码、弹窗退出动画及分页滚动定位，最终结果单独记录。
 
 未运行浏览器连接真实Java／MySQL的整站验收、真实手机、真实外部模型和公网部署；页面测试通过不等于这些验收完成。未删除用户实际会话。测试日志和浏览器输出位于`/tmp/kaoyan-delete-*20261023*`。
+
+## PR #13 CI 弹窗时序修复
+
+[失败任务](https://github.com/5-bin/kaoyan-agent-platform/actions/runs/39935016354/job/120352318636?pr=13)在100项浏览器测试中有1项失败：桌面连续删除当前会话和最后一条会话时，列表已更新而前一个确认框仍在退出动画中，定位“删除”按钮匹配到两个元素。
+
+`askDelete`现先等待旧确认框从页面移除，再打开新确认框，并检查唯一性与可见性；不修改业务代码、不增加固定延时或重试次数。本机使用独立Chrome上下文和模拟API验证删除测试，桌面及390×844模拟手机宽度共14项通过（22.1秒）。首次运行缺少Playwright自带Chromium，改用本机Chrome时沙箱阻止启动，经自动审批后运行通过。日志为本机忽略目录`.cache/ci-fix-delete-verified.log`。本次未重跑全量浏览器测试、Java或Python测试，远端结果以修复提交的新CI记录为准。

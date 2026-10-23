@@ -39,9 +39,15 @@ async function list(page: Page) {
   return page.locator('.conversation-list')
 }
 async function askDelete(page: Page, id: string) {
+  const dialog = page.getByRole('dialog', { name: '删除对话', exact: true })
+  // A completed DELETE can update the list before the previous dialog's leave
+  // transition removes it. Wait for teardown before opening another dialog.
+  await expect(dialog).toHaveCount(0)
   const button = (await list(page)).getByRole('button', { name: `删除对话：对话 ${id}`, exact: true })
   await button.scrollIntoViewIfNeeded(); await expect(button).toBeInViewport(); await button.focus(); await page.keyboard.press('Enter')
-  return page.getByRole('dialog', { name: '删除对话', exact: true })
+  await expect(dialog).toHaveCount(1)
+  await expect(dialog).toBeVisible()
+  return dialog
 }
 const input = (page: Page) => page.getByRole('textbox', { name: '聊天输入', exact: true })
 
