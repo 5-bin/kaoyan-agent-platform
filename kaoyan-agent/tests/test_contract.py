@@ -119,6 +119,39 @@ def test_summary_requires_distinct_snapshots_and_session():
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize('thinking_mode', ['default', 'enabled', 'disabled'])
+@pytest.mark.parametrize('router', [False, True])
+async def test_thinking_mode_reaches_vendor_without_changing_json_contract(thinking_mode, router):
+    import json
+    import httpx
+    from openai import AsyncOpenAI
+    requests = []
+    def respond(request):
+        requests.append(json.loads(request.content))
+        return httpx.Response(200, json={
+            'id': 'test-completion', 'object': 'chat.completion', 'created': 0,
+            'model': 'test-only', 'choices': [{'index': 0, 'finish_reason': 'stop',
+                'message': {'role': 'assistant', 'content': '{"answer":"测试回答","sourceIds":["test-source#0"]}'}}]})
+    config = Settings(_env_file=None, AGENT_INTERNAL_KEY=KEY, LLM_ENABLED=True,
+        LLM_API_KEY='test-only', LLM_THINKING_MODE=thinking_mode)
+    model = ModelClient(config)
+    model.client = AsyncOpenAI(api_key='test-only', max_retries=0,
+        http_client=httpx.AsyncClient(transport=httpx.MockTransport(respond)))
+    try:
+        answer = await model.generate('请输出JSON', {}, Answer, router=router)
+        assert answer.answer == '测试回答'
+        assert len(requests) == 1
+        assert requests[0]['response_format'] == {'type': 'json_object'}
+        assert requests[0]['model'] == (config.LLM_MODEL_ROUTER if router else config.LLM_MODEL_MAIN)
+        if thinking_mode == 'default':
+            assert 'thinking' not in requests[0]
+        else:
+            assert requests[0]['thinking'] == {'type': thinking_mode}
+    finally:
+        await model.close()
+
+
+@pytest.mark.asyncio
 async def test_model_daily_budget_blocks_before_opening_vendor_client(monkeypatch):
     import llm_client
     from unittest.mock import Mock

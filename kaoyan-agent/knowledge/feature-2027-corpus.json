@@ -1,0 +1,589 @@
+[
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "ds-deque",
+    "domain": "knowledge",
+    "subject": "数据结构",
+    "title": "栈、队列与双端队列",
+    "url": "https://docs.python.org/3/library/collections.html#collections.deque",
+    "locator": "collections.deque；两端插入与删除操作",
+    "version": "knowledge-408-v1",
+    "content": "栈通常使用后进先出（LIFO）次序，队列通常使用先进先出（FIFO）次序。双端队列允许在两端插入和删除。Python deque 的 append/pop 可实现栈，append/popleft 可实现队列。应区分抽象访问规则与具体底层实现。",
+    "keywords": [
+      "栈",
+      "队列",
+      "双端队列",
+      "LIFO",
+      "FIFO",
+      "deque"
+    ]
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "os-threads",
+    "domain": "knowledge",
+    "subject": "操作系统",
+    "title": "进程与线程",
+    "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-intro.pdf",
+    "locator": "Concurrency: An Introduction，第1—2页",
+    "version": "knowledge-408-v1",
+    "content": "进程与线程都与程序执行有关。同一进程的多个线程共享地址空间，但每个线程保留自己的程序计数器、寄存器状态和栈。共享可变数据带来并发同步问题，不能把共享地址空间理解成线程拥有完全相同的执行状态。",
+    "keywords": [
+      "进程",
+      "线程",
+      "地址空间"
+    ]
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "co-memory",
+    "domain": "knowledge",
+    "subject": "计算机组成原理",
+    "title": "存储层次与主存容量",
+    "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/vm-beyondphys.pdf",
+    "locator": "Beyond Physical Memory: Mechanisms，第1—2页",
+    "version": "knowledge-408-v1",
+    "content": "存储层次使用速度、容量和成本不同的介质组织数据。主存容量有限，虚拟内存机制可以把部分页置于较慢的后备存储；访问不在主存中的页可能触发缺页处理。应区分主存命中与访问后备存储的开销，不能把虚拟地址空间大小当作物理内存容量。",
+    "keywords": [
+      "存储层次",
+      "主存",
+      "虚拟内存",
+      "缺页"
+    ]
+  },
+  {
+    "reviewStatus": "verified",
+    "retrievedAt": "2026-10-14",
+    "license": "自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+    "id": "cn-tcp",
+    "domain": "knowledge",
+    "subject": "计算机网络",
+    "title": "TCP可靠传输",
+    "url": "https://www.rfc-editor.org/rfc/rfc9293.html",
+    "locator": "RFC 9293，3.3 Sequence Numbers、3.8 Data Communication",
+    "version": "knowledge-408-v1",
+    "content": "TCP向应用提供可靠、有序的字节流。序号、确认和重传等机制用于发现与恢复传输中的丢失，接收方按序向应用交付数据。TCP不保留应用消息边界；可靠传输不表示网络不会丢包，也不保证任意时刻都能完成传输。",
+    "keywords": [
+      "TCP",
+      "可靠传输",
+      "重传",
+      "字节流"
+    ]
+  },
+  {
+    "id": "nau-2027-081200-full-time",
+    "domain": "school",
+    "title": "南京审计大学2027年计算机科学与技术核验摘要",
+    "url": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+    "locator": "2027专业目录：学术学位／专业学位计算机学院全日制条目；081200",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "南京审计大学计算机学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。拟招生人数包含推免，不录入人数；不混入智能审计或其他专业。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "nau-2027-081200-full-time",
+      "school": "南京审计大学",
+      "college": "计算机学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "江苏",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "南京审计大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "nau-2027-085404-full-time",
+    "domain": "school",
+    "title": "南京审计大学2027年计算机技术核验摘要",
+    "url": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+    "locator": "2027专业目录：学术学位／专业学位计算机学院全日制条目；085404",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "南京审计大学计算机学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。拟招生人数包含推免，不录入人数；不混入智能审计或其他专业。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "nau-2027-085404-full-time",
+      "school": "南京审计大学",
+      "college": "计算机学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "江苏",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "南京审计大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "ucas-2027-081200-full-time",
+    "domain": "school",
+    "title": "中国科学院大学2027年计算机科学与技术核验摘要",
+    "url": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+    "locator": "培养单位80086；2027硕士目录；普通全日制方向；081200",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "中国科学院大学计算机科学与技术学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。不包含代国际学院招生条目；学位授予单位为中国科学院大学，不将学院冒充独立大学。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "ucas-2027-081200-full-time",
+      "school": "中国科学院大学",
+      "college": "计算机科学与技术学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "中国科学院大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "ucas-2027-085404-full-time",
+    "domain": "school",
+    "title": "中国科学院大学2027年计算机技术核验摘要",
+    "url": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+    "locator": "培养单位80086；2027硕士目录；普通全日制方向；085404",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "中国科学院大学计算机科学与技术学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。不包含代国际学院招生条目；学位授予单位为中国科学院大学，不将学院冒充独立大学。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "ucas-2027-085404-full-time",
+      "school": "中国科学院大学",
+      "college": "计算机科学与技术学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "中国科学院大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "cuc-2027-081200-full-time",
+    "domain": "school",
+    "title": "中国传媒大学2027年计算机科学与技术核验摘要",
+    "url": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+    "locator": "2027专业目录：全日制学术学位／全日制专业学位表；081200",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "中国传媒大学计算机与网络空间安全学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。仅普通项目；不混入中外合作或其他学院专业。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "cuc-2027-081200-full-time",
+      "school": "中国传媒大学",
+      "college": "计算机与网络空间安全学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "中国传媒大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "cuc-2027-085404-full-time",
+    "domain": "school",
+    "title": "中国传媒大学2027年计算机技术核验摘要",
+    "url": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+    "locator": "2027专业目录：全日制学术学位／全日制专业学位表；085404",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "中国传媒大学计算机与网络空间安全学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。仅普通项目；不混入中外合作或其他学院专业。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "cuc-2027-085404-full-time",
+      "school": "中国传媒大学",
+      "college": "计算机与网络空间安全学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "中国传媒大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "buaa-2027-081200-full-time",
+    "domain": "school",
+    "title": "北京航空航天大学2027年计算机科学与技术核验摘要",
+    "url": "https://yzb.buaa.edu.cn/xlss/zymlcx.htm",
+    "locator": "公开目录查询：学院006；专业081200；方向01先进计算系统与环境；081200",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "北京航空航天大学计算机学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。公开查询POST回传结果注明全日制，学制3年；不将其他学院科目套用。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "buaa-2027-081200-full-time",
+      "school": "北京航空航天大学",
+      "college": "计算机学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "北京航空航天大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "scu-2027-081200-full-time",
+    "domain": "school",
+    "title": "四川大学2027年计算机科学与技术核验摘要",
+    "url": "https://yz.scu.edu.cn/sszyml",
+    "locator": "年份2027；院系304；专业081200；01全日制计算机系统结构；081200",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "四川大学计算机学院（软件学院）2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。仅本学院普通全日制学术项目，不混入其他学院和专项。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "scu-2027-081200-full-time",
+      "school": "四川大学",
+      "college": "计算机学院（软件学院）",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "四川",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "四川大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "scnu-2027-085404-full-time",
+    "domain": "school",
+    "title": "华南师范大学2027年计算机技术核验摘要",
+    "url": "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx",
+    "locator": "年度2027；院系019；专业085404；全日制；085404",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "华南师范大学计算机学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。官方2027目录选择019计算机学院、专业型、全日制。计划数含士兵专项，不录入人数。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "scnu-2027-085404-full-time",
+      "school": "华南师范大学",
+      "college": "计算机学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "广东",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "华南师范大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "ysu-2027-081200-full-time",
+    "domain": "school",
+    "title": "燕山大学2027年计算机科学与技术核验摘要",
+    "url": "https://yz.chsi.com.cn/zsml/yjfxdetail?id=496dc291f5c9567f22e7fd845324df20",
+    "locator": "2027年硕士目录；招生单位10216燕山大学；院系021人工智能学院；081200；全日制；学术学位；统考",
+    "version": "admissions-2027-feature-v2",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "燕山大学人工智能学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。同年度研招网专业详情直接确认学术学位、全日制、统考；初试与学院目录交叉核对，人数不录入。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "ysu-2027-081200-full-time",
+      "school": "燕山大学",
+      "college": "人工智能学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "河北",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "燕山大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "zua-2027-085404-full-time",
+    "domain": "school",
+    "title": "郑州航空工业管理学院2027年计算机技术核验摘要",
+    "url": "https://yjsc.zua.edu.cn/ssyjszszy/a008jsjxy/a085404jsjjs.htm",
+    "locator": "2027硕士专业目录；008计算机学院；085404行；085404",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "郑州航空工业管理学院计算机学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。招生计划为暂定，不录入人数；同等学力加试离散数学、数据库原理。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "zua-2027-085404-full-time",
+      "school": "郑州航空工业管理学院",
+      "college": "计算机学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "河南",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "郑州航空工业管理学院",
+      "085404"
+    ]
+  },
+  {
+    "id": "zust-2027-085404-full-time",
+    "domain": "school",
+    "title": "浙江科技大学2027年计算机技术核验摘要",
+    "url": "https://itee.zust.edu.cn/zsgz/yjszs/zsxx/zsml.htm",
+    "locator": "页面标题2027目录；嵌入图片第1行085404；085404",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "浙江科技大学计算机科学与技术学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。图片注明全日制小和山校区，学制3年；不混入085409和085410。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "zust-2027-085404-full-time",
+      "school": "浙江科技大学",
+      "college": "计算机科学与技术学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "浙江",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "浙江科技大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "ahnu-2027-081200-full-time",
+    "domain": "school",
+    "title": "安徽师范大学2027年计算机科学与技术核验摘要",
+    "url": "https://yz.ahnu.edu.cn/info/1006/10276.htm",
+    "locator": "020计算机与信息学院；全日制081200／085404条目；081200",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "安徽师范大学计算机与信息学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。两个专业均为101、201、301、408；不招收同等学力考生。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "ahnu-2027-081200-full-time",
+      "school": "安徽师范大学",
+      "college": "计算机与信息学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "安徽",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "安徽师范大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "ahnu-2027-085404-full-time",
+    "domain": "school",
+    "title": "安徽师范大学2027年计算机技术核验摘要",
+    "url": "https://yz.ahnu.edu.cn/info/1006/10276.htm",
+    "locator": "020计算机与信息学院；全日制081200／085404条目；085404",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "安徽师范大学计算机与信息学院2027年全日制计算机技术（085404），专业学位，初试代码为101、201、301、408。两个专业均为101、201、301、408；不招收同等学力考生。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "ahnu-2027-085404-full-time",
+      "school": "安徽师范大学",
+      "college": "计算机与信息学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "安徽",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "安徽师范大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "scnu-2027-081200-full-time",
+    "domain": "school",
+    "title": "华南师范大学2027年计算机科学与技术核验摘要",
+    "url": "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx",
+    "locator": "年度2027；院系019；专业081200；学术型；全日制",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "华南师范大学计算机学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。官方2027目录显示普通全日制学术型，人数含推免不录入。未收录招生人数、分数线或录取概率。",
+    "metadata": {
+      "programId": "scnu-2027-081200-full-time",
+      "school": "华南师范大学",
+      "college": "计算机学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "广东",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "华南师范大学",
+      "081200"
+    ]
+  }
+]
