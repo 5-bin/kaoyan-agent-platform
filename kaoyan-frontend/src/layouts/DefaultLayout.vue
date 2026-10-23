@@ -14,10 +14,11 @@
           <div class="group-label">学习</div>
           <el-menu-item index="/"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
           <el-menu-item index="/practice"><el-icon><EditPen /></el-icon><span>刷题</span></el-menu-item>
-          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>Agent 任务</span></el-menu-item>
+          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>Agent 助手</span></el-menu-item>
         </div>
         <div class="menu-group">
           <div class="group-label">复习</div>
+          <el-menu-item index="/notes"><el-icon><Document /></el-icon><span>个人笔记</span></el-menu-item>
           <el-menu-item index="/wrong"><el-icon><Notebook /></el-icon><span>错题本</span></el-menu-item>
           <el-menu-item index="/favorite"><el-icon><Star /></el-icon><span>我的收藏</span></el-menu-item>
           <el-menu-item index="/stat"><el-icon><TrendCharts /></el-icon><span>学习统计</span></el-menu-item>
@@ -57,37 +58,46 @@
         </el-dropdown>
       </header>
       <main class="content">
-        <router-view />
+        <router-view v-if="route.path !== '/tasks'" />
+        <ChatAssistant v-if="assistantMounted" v-show="route.path === '/tasks' || assistant.open" :compact="route.path !== '/tasks'" />
+        <el-button v-if="assistantEligible && !assistant.open && route.path !== '/tasks'" class="assistant-launch" type="primary" @click="assistant.open = true">考研助手</el-button>
       </main>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
+import ChatAssistant from '@/views/ChatAssistant.vue'
+import { useAssistantStore } from '@/stores/assistant'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import {
   HomeFilled, EditPen, Notebook, Star, TrendCharts,
-  School, Folder, Setting
+  School, Folder, Setting, Document
 } from '@element-plus/icons-vue'
 
+const assistant = useAssistantStore()
+const assistantEligible = computed(() => ['/wrong', '/favorite', '/stat', '/documents', '/practice', '/notes'].some(path => route.path === path || route.path.startsWith(path + '/')))
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
+const assistantMounted = ref(false)
+watch([() => route.path, () => assistant.open], ([path, open]) => { if (path === '/tasks' || open) assistantMounted.value = true }, { immediate: true })
 
 const activeMenu = computed(() => route.path.startsWith('/admin/')
   ? '/' + route.path.split('/').slice(1, 3).join('/')
   : '/' + (route.path.split('/')[1] || ''))
 const crumbMap: Record<string, string> = {
   '': '首页', practice: '刷题', wrong: '错题本', favorite: '收藏',
-  stat: '学习统计', schools: '院校库', documents: '备考资料',
-  profile: '个人中心', tasks: 'Agent 任务',
+  stat: '学习统计', schools: '院校库', documents: '备考资料', notes: '个人笔记',
+  profile: '个人中心', tasks: 'Agent 助手',
   'admin/questions': '题目录入与审核', 'admin/documents': '资料管理'
 }
 const crumbName = computed(() => crumbMap[activeMenu.value.slice(1)] || '首页')
 
+watch(() => userStore.token, (token, previous) => { if (token !== previous) { assistant.reset(); assistantMounted.value = route.path === '/tasks' } })
 const onLogout = async () => {
   try {
     await userStore.logout()
@@ -99,6 +109,7 @@ const onLogout = async () => {
 </script>
 
 <style scoped lang="scss">
+.assistant-launch { position:fixed; right:20px; bottom:24px; z-index:20 }
 .layout { display: flex; height: 100vh; overflow: hidden; }
 
 .sidebar {

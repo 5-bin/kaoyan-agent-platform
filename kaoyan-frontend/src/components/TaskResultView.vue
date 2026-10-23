@@ -1,16 +1,15 @@
 <template>
   <section class="task-result" aria-live="polite">
     <el-alert v-if="task.status === 'FAILED'" type="error" :closable="false" :title="task.errorMessage || '任务失败，请稍后重试'" />
+    <el-alert v-else-if="task.status === 'CANCELLED'" type="info" :closable="false" title="已停止生成" />
     <template v-else-if="result">
-      <div class="meta">
+      <div v-if="result.outcome !== 'COMPLETED'" class="meta">
         <el-tag>{{ outcomeLabels[result.outcome] }}</el-tag>
-        <el-tag type="info">{{ modeLabels[result.explanationMode] }}</el-tag>
-        <small>版本 {{ task.releaseId || result.releaseId }}</small>
       </div>
-      <p class="answer">{{ result.answer }}</p>
-      <el-alert v-if="result.notice" type="warning" :closable="false" :title="result.notice" />
+      <SafeMarkdown :content="result.answer" :allowed-urls="result.references?.map(source => source.url).filter(url => !!safeUrl(url))" />
+      <div v-if="result.evidence?.length" class="source"><strong>学习依据</strong><p v-for="item in result.evidence" :key="item.ref"><router-link v-if="resourceRoute(item.resource)" :to="resourceRoute(item.resource)!">{{ item.ref }} · {{ item.title }}</router-link><span v-else>{{ item.ref }} · {{ item.title }}</span> · {{ item.locator || '原文位置未记录' }} · {{ item.version || '版本未记录' }}</p></div>
+      <el-alert v-if="result.notice || result.explanationMode === 'fallback'" type="warning" :closable="false" :title="result.notice || 'AI解释暂不可用，已保留资料与规则结果。'" />
       <ul v-if="result.followUp?.length"><li v-for="item in result.followUp" :key="item">{{ item }}</li></ul>
-      <p v-if="result.followUp?.length"><router-link to="/profile">补充个人档案</router-link></p>
       <article v-for="(candidate, index) in result.candidates" :key="candidate.programId" class="candidate">
         <h3>{{ index + 1 }}. {{ candidate.school }} · {{ candidate.major }}</h3>
         <p>{{ candidate.college }} · {{ candidate.year }}年 · {{ candidate.degreeType === 'academic' ? '学硕' : '专硕' }} · {{ candidate.region }}</p>
@@ -37,22 +36,20 @@
       <pre class="answer">{{ JSON.stringify(task.resultPayload, null, 2) }}</pre>
     </template>
     <el-empty v-else description="处理中，请稍后刷新任务历史" />
-    <small class="muted">任务编号：{{ task.id }}</small>
   </section>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Task } from '@/types/api'
+import SafeMarkdown from '@/components/SafeMarkdown.vue'
+import { resourceRoute, safeSourceUrl } from '@/utils/assistant-resource'
 const props = defineProps<{ task: Task }>()
 const result = computed(() => {
   const value = props.task.resultPayload
   return value?.outcome && value.explanationMode ? value : null
 })
 const outcomeLabels = { COMPLETED: '已完成', NEEDS_INPUT: '需补充条件', UNSUPPORTED: '资料未覆盖' }
-const modeLabels = { rules: '规则 / 来源摘要', ai: 'AI解释', fallback: 'AI降级，保留规则结果' }
-function safeUrl(value: string) {
-  try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : undefined } catch { return undefined }
-}
+function safeUrl(value: string) { return safeSourceUrl(value) }
 </script>
 <style scoped>
 .task-result { overflow-wrap: anywhere; }

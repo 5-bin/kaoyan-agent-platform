@@ -10,10 +10,10 @@
         <el-button type="primary" @click="openRecommendation">条件推荐</el-button>
       </div>
     </div>
-    <el-alert title="旧院校库包含演示资料与2025年估计值，请勿作为报考依据。条件推荐独立使用带官方来源的2027年核验资料。" type="warning" :closable="false" />
+    <el-alert title="请核对专业详情中的招生年份、来源与适用条件。历史演示或估计数据不能作为报考依据；条件推荐使用独立核验资料。" type="warning" :closable="false" />
     <div class="rows" v-loading="loading">
       <router-link v-for="school in list" :key="school.id" :to="`/schools/${school.id}`" class="school-row">
-        <strong>{{ school.name }}</strong><span>{{ school.province }} · {{ school.level }}</span>
+        <strong>{{ school.name }}</strong><span>{{ school.province }} · {{ school.level || '层次未登记' }}</span>
       </router-link>
       <el-empty v-if="!loading && !list.length" description="没有匹配的院校" />
     </div>
@@ -27,7 +27,7 @@
     </section>
     <el-dialog v-model="dialog" title="2027年院校专业推荐" width="min(760px, 94vw)" top="5vh" class="recommendation-dialog" destroy-on-close>
       <p>档案报考年份：<strong>{{ profile?.examYear || '未填写' }}</strong> · <router-link to="/profile">编辑档案</router-link></p>
-      <p class="muted">首批覆盖3所院校的081200、085404普通全日制项目；临时偏好不会修改档案。</p>
+      <p class="muted">按当前已核验资料筛选081200、085404项目；实际覆盖范围见推荐结果，临时偏好不会修改档案。</p>
       <el-form label-position="top" :disabled="submitting">
         <div class="form-grid">
           <el-form-item label="目标专业"><el-select v-model="form.majorCode"><el-option label="081200 计算机科学与技术" value="081200" /><el-option label="085404 计算机技术" value="085404" /></el-select></el-form-item>

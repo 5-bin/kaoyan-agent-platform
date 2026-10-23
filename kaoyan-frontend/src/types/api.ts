@@ -27,7 +27,7 @@ export interface Task {
   id: string
   userId: number
   taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND' | 'PRACTICE_SUMMARY' | 'CHAT'
-  status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED'
+  status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'CANCELLED'
   inputPayload?: Record<string, unknown>
   resultPayload?: TaskResult
   releaseId?: string
@@ -43,11 +43,23 @@ export interface SchoolCandidate {
   degreeType: 'academic' | 'professional'; region: string; studyMode: string; examSubjects: string[]
   matchedConditions: string[]; pendingChecks: string[]; sourceIds: string[]; explanation: string
 }
+export interface AssistantAction {
+  id: string; type: string; status: 'PENDING' | 'SUCCESS' | 'DISMISSED' | 'FAILED'; title: string
+  count: number; requiresConfirmation: boolean; result?: { sessionId?: string; actualCount?: number }
+  requestedCount?: number; targets?: { title: string; resource: AssistantEvidence['resource'] }[]
+}
+export interface AssistantEvidence {
+  ref: string; kind: string; title: string; locator?: string; version?: string
+  resource?: { type: 'question' | 'document' | 'practice' | 'stats'; id?: string | number }
+}
 export interface TaskResult {
   outcome: 'COMPLETED' | 'NEEDS_INPUT' | 'UNSUPPORTED'; answer: string
   resolvedTaskType: Task['taskType']; explanationMode: 'rules' | 'ai' | 'fallback'
   releaseId: string; references: SourceReference[]; followUp?: string[]; notice?: string
   candidates?: SchoolCandidate[]; coverage?: string; weakPoints?: string[]; accuracy?: number
+  evidence?: AssistantEvidence[]; actions?: AssistantAction[]
+  conditions?: Record<string, unknown>
+  documentProposal?: { operation: 'create' | 'update'; documentId?: string; baseVersion?: number; title: string; content: string }
 }
 
 export interface Document {

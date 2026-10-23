@@ -5,7 +5,9 @@
       <p class="page-sub">选择题型、难度和题量，开始一次新的练习</p>
     </div>
 
+    <el-dialog v-model="questionPreview" title="题目（未作答不展示答案）" width="min(800px,94vw)"><p>此处展示当前可练习版本；历史作答以助手列出的版本及原练习回顾为准。</p><p>{{ linkedQuestion?.content }}</p><p v-for="key in ['A','B','C','D'] as const" :key="key">{{ key }}. {{ linkedQuestion?.[('option' + key) as 'optionA'] }}</p></el-dialog>
     <div class="card config">
+      <div class="cfg-row"><div class="cfg-label">范围</div><el-select v-model="cfg.source"><el-option label="普通练习" value="NORMAL" /><el-option label="我的错题" value="WRONG" /><el-option label="我的收藏" value="FAVORITE" /></el-select></div>
       <div class="cfg-row">
         <div class="cfg-label">科目</div>
         <div class="opts">
@@ -26,7 +28,7 @@
         <div class="cfg-label">题量</div>
         <div class="opts">
           <div
-            v-for="n in [5, 10, 20, 50, 100]" :key="n"
+            v-for="n in [5, 10, 20, 50]" :key="n"
             class="pill"
             :class="{ on: !customActive && cfg.count === n }"
             @click="onPill(n)"
@@ -81,26 +83,33 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
+import { useAssistantPage } from '@/composables/assistant-page'
+import { getQuestionDetail } from '@/api/question'
+import type { StudentQuestion } from '@/types/api'
+import { ElMessage } from 'element-plus'
 import type { InputInstance } from 'element-plus'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { startSession, getSessionPage, type SessionSummary } from '@/api/practice'
 
-const router = useRouter()
+const router = useRouter(), route = useRoute()
+const linkedQuestion = ref<StudentQuestion>(), questionPreview = ref(false)
+let questionLoad = 0
+async function openLinkedQuestion() { const stamp = ++questionLoad, id = String(route.query.questionId || ''); linkedQuestion.value = undefined; questionPreview.value = false; if (!/^\d+$/.test(id)) return; const data = await getQuestionDetail(Number(id)); if (stamp === questionLoad && String(route.query.questionId) === id) { linkedQuestion.value = data; questionPreview.value = true } }
 const subjects = ['数据结构', '操作系统', '计算机网络', '计算机组成原理']
 const difficulties = [
   { v: 'EASY', label: '简单' },
   { v: 'MEDIUM', label: '中等' },
   { v: 'HARD', label: '困难' }
 ]
-const cfg = reactive({ subject: '数据结构', difficulty: 'MEDIUM', count: 5 })
+const cfg = reactive({ subject: '数据结构', difficulty: 'MEDIUM', count: 5, source: 'NORMAL' as 'NORMAL' | 'WRONG' | 'FAVORITE' })
 const customCount = ref<number | undefined>(undefined)
 const customActive = ref(false)
 const customRef = ref<InputInstance>()
 const onPill = (n: number) => { customActive.value = false; customCount.value = undefined; cfg.count = n }
 const onCustom = () => {
   const v = Number(customCount.value)
-  if (Number.isFinite(v) && v >= 1 && v <= 500) cfg.count = Math.floor(v)
+  if (Number.isFinite(v) && v >= 1 && v <= 50) cfg.count = Math.floor(v)
 }
 const loading = ref(false)
 const historyLoading = ref(false)
@@ -110,6 +119,7 @@ const page = ref(1)
 const size = 10
 
 const start = async () => {
+  if (customActive.value && (!Number.isInteger(customCount.value) || Number(customCount.value) < 1 || Number(customCount.value) > 50)) { ElMessage.warning('题量须为1至50的整数'); return }
   loading.value = true
   try {
     const r: any = await startSession({ ...cfg })
@@ -135,7 +145,9 @@ const loadHistory = async (append = false) => {
 }
 const loadMore = () => { page.value++; loadHistory(true) }
 
-onMounted(loadHistory)
+useAssistantPage(() => ({ page: 'practice', subject: questionPreview.value ? linkedQuestion.value?.subject : cfg.subject, selectedQuestionIds: questionPreview.value && linkedQuestion.value ? [linkedQuestion.value.id] : [], visibleQuestionIds: questionPreview.value && linkedQuestion.value ? [linkedQuestion.value.id] : [] }), loadHistory)
+watch(() => route.query.questionId, openLinkedQuestion)
+onMounted(() => { void loadHistory(); void openLinkedQuestion() })
 </script>
 
 <style scoped lang="scss">

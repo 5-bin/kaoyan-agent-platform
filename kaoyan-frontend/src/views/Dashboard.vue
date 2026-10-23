@@ -23,7 +23,7 @@
       <div class="card stat">
         <div class="stat-icon orange">⏱</div>
         <div>
-          <div class="num">{{ today.studyMinutes || 0 }}<span class="unit">分钟</span></div>
+          <div class="num">{{ today.studyMinutes ?? '未记录' }}<span v-if="today.studyMinutes != null" class="unit">分钟</span></div>
           <div class="lbl">今日学习</div>
         </div>
       </div>
@@ -50,7 +50,7 @@ import { getTodayStat } from '@/api/stat'
 
 const router = useRouter()
 const userStore = useUserStore()
-const today = reactive({ questionCount: 0, correctCount: 0, studyMinutes: 0 })
+const today = reactive({ questionCount: 0, correctCount: 0, studyMinutes: null as number | null })
 
 const quick = [
   { title: '开始刷题', desc: '智能组卷练习', icon: '✍️', path: '/practice', bg: '#eef3ff' },
