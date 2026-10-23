@@ -162,8 +162,10 @@ def main():
             deadline = time.monotonic() + 10
             while time.monotonic() < deadline:
                 _, recent = call(java_base, '/api/tasks', token=token)
+                # This isolated fixture has one pending request; public task
+                # views intentionally omit private inputPayload.
                 interrupted = next((item for item in recent['data']['list']
-                    if item['inputPayload'].get('query') == 'simulate-interruption' and item['status'] == 'RUNNING'), None)
+                    if item['taskType'] == 'KNOWLEDGE_QA' and item['status'] == 'RUNNING'), None)
                 if interrupted:
                     break
                 time.sleep(0.1)

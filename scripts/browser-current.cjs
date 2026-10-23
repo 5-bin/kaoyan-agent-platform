@@ -57,11 +57,11 @@ const diagnosticsDir = process.argv[3];
     await page.locator('.el-pagination .btn-next').click();
     await page.waitForFunction(() => document.querySelectorAll('.el-table__body tbody tr').length === 5);
     checks.push('真实后端第二页5条');
-    await page.goto(base + '/tasks');
-    await page.getByRole('textbox', { name: '聊天输入' }).fill('页面HTTP联调测试');
-    await page.getByRole('button', { name: '发送', exact: true }).click();
+    await page.locator('.el-table__body tbody tr').first().getByRole('button', { name: '查看', exact: true }).click();
     await page.getByText('HTTP链路测试的模拟答案', { exact: false }).first().waitFor();
-    checks.push('连续聊天创建任务并显示Java→Python规则结果');
+    checks.push('任务历史显示已保存的Java→Python结果；连续聊天由独立聊天脚本验证');
+    await page.keyboard.press('Escape');
+    await page.getByRole('dialog', { name: '历史结果', exact: true }).waitFor({ state: 'hidden' });
 
     for (const status of [200, 401]) {
       let held;
