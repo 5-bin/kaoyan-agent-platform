@@ -1,0 +1,542 @@
+{
+  "batch": "feature-test-2027-v1",
+  "year": 2027,
+  "schools": [
+    {
+      "code": "nau",
+      "name": "南京审计大学",
+      "province": "江苏",
+      "level": null,
+      "sourceUrl": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm"
+    },
+    {
+      "code": "ucas",
+      "name": "中国科学院大学",
+      "province": "北京",
+      "level": "双一流",
+      "sourceUrl": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027"
+    },
+    {
+      "code": "cuc",
+      "name": "中国传媒大学",
+      "province": "北京",
+      "level": "211",
+      "sourceUrl": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm"
+    },
+    {
+      "code": "buaa",
+      "name": "北京航空航天大学",
+      "province": "北京",
+      "level": "985",
+      "sourceUrl": "https://yzb.buaa.edu.cn/xlss/zymlcx.htm"
+    },
+    {
+      "code": "scu",
+      "name": "四川大学",
+      "province": "四川",
+      "level": "985",
+      "sourceUrl": "https://yz.scu.edu.cn/sszyml"
+    },
+    {
+      "code": "scnu",
+      "name": "华南师范大学",
+      "province": "广东",
+      "level": "211",
+      "sourceUrl": "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx"
+    },
+    {
+      "code": "ysu",
+      "name": "燕山大学",
+      "province": "河北",
+      "level": null,
+      "sourceUrl": "https://zsc.ysu.edu.cn/info/1255/7088.htm"
+    },
+    {
+      "code": "zua",
+      "name": "郑州航空工业管理学院",
+      "province": "河南",
+      "level": null,
+      "sourceUrl": "https://yjsc.zua.edu.cn/ssyjszszy/a008jsjxy/a085404jsjjs.htm"
+    },
+    {
+      "code": "zust",
+      "name": "浙江科技大学",
+      "province": "浙江",
+      "level": null,
+      "sourceUrl": "https://itee.zust.edu.cn/zsgz/yjszs/zsxx/zsml.htm"
+    },
+    {
+      "code": "ahnu",
+      "name": "安徽师范大学",
+      "province": "安徽",
+      "level": null,
+      "sourceUrl": "https://yz.ahnu.edu.cn/info/1006/10276.htm"
+    }
+  ],
+  "programs": [
+    {
+      "programId": "nau-2027-081200-full-time",
+      "schoolCode": "nau",
+      "school": "南京审计大学",
+      "college": "计算机学院",
+      "majorCode": "081200",
+      "major": "计算机科学与技术",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "江苏",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+      "locator": "2027专业目录：学术学位／专业学位计算机学院全日制条目；081200",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "拟招生人数包含推免，不录入人数；不混入智能审计或其他专业。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "nau-2027-085404-full-time",
+      "schoolCode": "nau",
+      "school": "南京审计大学",
+      "college": "计算机学院",
+      "majorCode": "085404",
+      "major": "计算机技术",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "江苏",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "sourceUrl": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+      "locator": "2027专业目录：学术学位／专业学位计算机学院全日制条目；085404",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "拟招生人数包含推免，不录入人数；不混入智能审计或其他专业。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "ucas-2027-081200-full-time",
+      "schoolCode": "ucas",
+      "school": "中国科学院大学",
+      "college": "计算机科学与技术学院",
+      "majorCode": "081200",
+      "major": "计算机科学与技术",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+      "locator": "培养单位80086；2027硕士目录；普通全日制方向；081200",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "不包含代国际学院招生条目；学位授予单位为中国科学院大学，不将学院冒充独立大学。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "ucas-2027-085404-full-time",
+      "schoolCode": "ucas",
+      "school": "中国科学院大学",
+      "college": "计算机科学与技术学院",
+      "majorCode": "085404",
+      "major": "计算机技术",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "sourceUrl": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+      "locator": "培养单位80086；2027硕士目录；普通全日制方向；085404",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "不包含代国际学院招生条目；学位授予单位为中国科学院大学，不将学院冒充独立大学。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "cuc-2027-081200-full-time",
+      "schoolCode": "cuc",
+      "school": "中国传媒大学",
+      "college": "计算机与网络空间安全学院",
+      "majorCode": "081200",
+      "major": "计算机科学与技术",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+      "locator": "2027专业目录：全日制学术学位／全日制专业学位表；081200",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "仅普通项目；不混入中外合作或其他学院专业。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "cuc-2027-085404-full-time",
+      "schoolCode": "cuc",
+      "school": "中国传媒大学",
+      "college": "计算机与网络空间安全学院",
+      "majorCode": "085404",
+      "major": "计算机技术",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "sourceUrl": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+      "locator": "2027专业目录：全日制学术学位／全日制专业学位表；085404",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "仅普通项目；不混入中外合作或其他学院专业。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "buaa-2027-081200-full-time",
+      "schoolCode": "buaa",
+      "school": "北京航空航天大学",
+      "college": "计算机学院",
+      "majorCode": "081200",
+      "major": "计算机科学与技术",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://yzb.buaa.edu.cn/xlss/zymlcx.htm",
+      "locator": "公开目录查询：学院006；专业081200；方向01先进计算系统与环境；081200",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "公开查询POST回传结果注明全日制，学制3年；不将其他学院科目套用。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": [
+        {
+          "url": "https://yzb.buaa.edu.cn/ssmlcxjg.jsp?wbtreeid=1018",
+          "method": "POST",
+          "form": {
+            "xydm": "006",
+            "zydm": "081200",
+            "yjfxdm": "01"
+          }
+        }
+      ]
+    },
+    {
+      "programId": "scu-2027-081200-full-time",
+      "schoolCode": "scu",
+      "school": "四川大学",
+      "college": "计算机学院（软件学院）",
+      "majorCode": "081200",
+      "major": "计算机科学与技术",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "四川",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://yz.scu.edu.cn/sszyml",
+      "locator": "年份2027；院系304；专业081200；01全日制计算机系统结构；081200",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "仅本学院普通全日制学术项目，不混入其他学院和专项。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": [
+        {
+          "url": "https://yz.scu.edu.cn/sszyml/simpleiq/304;081200;0;2027;;;",
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "programId": "scnu-2027-085404-full-time",
+      "schoolCode": "scnu",
+      "school": "华南师范大学",
+      "college": "计算机学院",
+      "majorCode": "085404",
+      "major": "计算机技术",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "广东",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "sourceUrl": "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx",
+      "locator": "年度2027；院系019；专业085404；全日制；085404",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "官方2027目录选择019计算机学院、专业型、全日制。计划数含士兵专项，不录入人数。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": [
+        {
+          "url": "https://yanzhao.scnu.edu.cn/Master/ZyView.aspx?EID=TnhSqrGjBktNA-GYGuy!ZFdv1pIsqDuheBmS68pnPTnS1SYG4B4l1Q==",
+          "method": "GET",
+          "locator": "专业085404；专业型；全日制；初试科目"
+        }
+      ]
+    },
+    {
+      "programId": "ysu-2027-081200-full-time",
+      "schoolCode": "ysu",
+      "school": "燕山大学",
+      "college": "人工智能学院",
+      "majorCode": "081200",
+      "major": "计算机科学与技术",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "河北",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://yz.chsi.com.cn/zsml/yjfxdetail?id=496dc291f5c9567f22e7fd845324df20",
+      "locator": "2027年硕士目录；招生单位10216燕山大学；院系021人工智能学院；081200；全日制；学术学位；统考",
+      "version": "admissions-2027-feature-v2",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "同年度研招网专业详情直接确认学术学位、全日制、统考；初试与学院目录交叉核对，人数不录入。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": [
+        {
+          "url": "https://zsc.ysu.edu.cn/info/1255/7088.htm",
+          "method": "GET",
+          "locator": "021学院2027目录；081200及初试科目"
+        },
+        {
+          "url": "https://yz.chsi.com.cn/zsml/yjfxdetail?id=496dc291f5c9567f22e7fd845324df20",
+          "method": "GET",
+          "locator": "2027、10216、021、081200；学位、学习方式、考试方式"
+        }
+      ]
+    },
+    {
+      "programId": "zua-2027-085404-full-time",
+      "schoolCode": "zua",
+      "school": "郑州航空工业管理学院",
+      "college": "计算机学院",
+      "majorCode": "085404",
+      "major": "计算机技术",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "河南",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "sourceUrl": "https://yjsc.zua.edu.cn/ssyjszszy/a008jsjxy/a085404jsjjs.htm",
+      "locator": "2027硕士专业目录；008计算机学院；085404行；085404",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "招生计划为暂定，不录入人数；同等学力加试离散数学、数据库原理。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "zust-2027-085404-full-time",
+      "schoolCode": "zust",
+      "school": "浙江科技大学",
+      "college": "计算机科学与技术学院",
+      "majorCode": "085404",
+      "major": "计算机技术",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "浙江",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "sourceUrl": "https://itee.zust.edu.cn/zsgz/yjszs/zsxx/zsml.htm",
+      "locator": "页面标题2027目录；嵌入图片第1行085404；085404",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "图片注明全日制小和山校区，学制3年；不混入085409和085410。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": [
+        {
+          "url": "https://itee.zust.edu.cn/__local/F/05/94/719E27751A3174C3828164D557A_376EBADB_E164.jpg",
+          "method": "GET",
+          "locator": "首行085404及跨行共用初试科目单元格"
+        }
+      ]
+    },
+    {
+      "programId": "ahnu-2027-081200-full-time",
+      "schoolCode": "ahnu",
+      "school": "安徽师范大学",
+      "college": "计算机与信息学院",
+      "majorCode": "081200",
+      "major": "计算机科学与技术",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "安徽",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://yz.ahnu.edu.cn/info/1006/10276.htm",
+      "locator": "020计算机与信息学院；全日制081200／085404条目；081200",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "两个专业均为101、201、301、408；不招收同等学力考生。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "ahnu-2027-085404-full-time",
+      "schoolCode": "ahnu",
+      "school": "安徽师范大学",
+      "college": "计算机与信息学院",
+      "majorCode": "085404",
+      "major": "计算机技术",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "安徽",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://yz.ahnu.edu.cn/info/1006/10276.htm",
+      "locator": "020计算机与信息学院；全日制081200／085404条目；085404",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "两个专业均为101、201、301、408；不招收同等学力考生。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": []
+    },
+    {
+      "programId": "scnu-2027-081200-full-time",
+      "schoolCode": "scnu",
+      "school": "华南师范大学",
+      "college": "计算机学院",
+      "majorCode": "081200",
+      "major": "计算机科学与技术",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "广东",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "sourceUrl": "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx",
+      "locator": "年度2027；院系019；专业081200；学术型；全日制",
+      "version": "admissions-2027-feature-v1",
+      "retrievedAt": "2026-10-23",
+      "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+      "reviewStatus": "verified",
+      "note": "官方2027目录显示普通全日制学术型，人数含推免不录入。",
+      "enrollmentCount": null,
+      "scoreLine": null,
+      "evidence": [
+        {
+          "url": "https://yanzhao.scnu.edu.cn/Master/ZyView.aspx?EID=TnhSqrGjBkutNZDhdjwfkyGHbV5bWEcdKbc3FxqFBlr5b57kYhiO8w==",
+          "method": "GET",
+          "locator": "专业081200；学术型；全日制；初试科目"
+        }
+      ]
+    }
+  ]
+}
