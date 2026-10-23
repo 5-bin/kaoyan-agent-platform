@@ -19,14 +19,20 @@ public class TaskStore {
     private final AgentProperties props;
     private Clock clock = Clock.systemDefaultZone();
 
+    public boolean isQuotaExempt(Long owner) {
+        String exempt = props.getQuotaExemptUsername();
+        return exempt != null && !exempt.isBlank() && exempt.equals(mapper.quotaUsername(owner));
+    }
+
     @Transactional
     public synchronized void begin(Task task) {
+        mapper.lockQuotaAccount(task.getUserId());
         var instant = clock.instant();
         LocalDateTime now = LocalDateTime.ofInstant(instant, clock.getZone());
         var dayStart = instant.atOffset(ZoneOffset.UTC).toLocalDate().atStartOfDay().toInstant(ZoneOffset.UTC);
         long daily = mapper.countForUserSince(task.getUserId(), LocalDateTime.ofInstant(dayStart, clock.getZone()));
         long minute = mapper.countForUserSince(task.getUserId(), now.minusMinutes(1));
-        if (daily >= props.getDailyTaskLimit() || minute >= props.getMinuteTaskLimit())
+        if (!isQuotaExempt(task.getUserId()) && (daily >= props.getDailyTaskLimit() || minute >= props.getMinuteTaskLimit()))
             throw new ApiException(429, "任务次数达到上限；每日限额于UTC次日重置，分钟限额稍后恢复");
         task.setCreatedAt(now);
         task.setUpdatedAt(now);

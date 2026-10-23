@@ -12,6 +12,19 @@ const request: AxiosInstance = axios.create({
   timeout: 55000
 })
 
+// Shared by Axios requests and Bearer-authenticated fetch streams.
+export function handleAuthFailure(status: number | undefined, token: string) {
+  if (token !== useUserStore().token) throw new axios.CanceledError('账号已切换，忽略旧请求')
+  if (status === 401) {
+    useUserStore().clearSession()
+    void router.push('/login')
+    ElMessage.error('登录已过期，请重新登录')
+    return true
+  }
+  if (status === 403) { ElMessage.error('无权访问'); return true }
+  return false
+}
+
 request.interceptors.request.use((config) => {
   const userStore = useUserStore()
   config.sessionToken = userStore.token
@@ -38,13 +51,8 @@ request.interceptors.response.use(
       return Promise.reject(new axios.CanceledError('账号已切换，忽略旧请求'))
     }
     const status = error.response?.status
-    if (status === 401) {
-      const userStore = useUserStore()
-      userStore.clearSession()
-      router.push('/login')
-      ElMessage.error('登录已过期，请重新登录')
-    } else if (status === 403) {
-      ElMessage.error('无权访问')
+    if (handleAuthFailure(status, error.config?.sessionToken ?? useUserStore().token)) {
+      return Promise.reject(error)
     } else if (error.code === 'ECONNABORTED') {
       ElMessage.error('等待超时，任务可能仍在处理，请先查看任务记录，避免重复提交')
     } else {

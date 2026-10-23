@@ -1,0 +1,326 @@
+{
+  "batch": "local-test-data-v1-20261022",
+  "notice": "仅用于本机功能测试。题目与资料待审核；院校和招生记录完全虚构。不创建账号、作答、统计、推荐或聊天记录。",
+  "questions": [
+    {
+      "code": "DS01",
+      "subject": "数据结构",
+      "knowledge_point": "栈",
+      "difficulty": "EASY",
+      "content": "【测试自编题 DS01】一个空栈依次压入 A、B、C 后，第一次弹出的元素是？",
+      "options": [
+        "C",
+        "A",
+        "B",
+        "无法确定"
+      ],
+      "answer": "A",
+      "analysis": "栈遵循后进先出，最后压入的 C 先弹出。"
+    },
+    {
+      "code": "DS02",
+      "subject": "数据结构",
+      "knowledge_point": "队列",
+      "difficulty": "EASY",
+      "content": "【测试自编题 DS02】一个空队列依次入队 A、B、C 后，第一次出队的元素是？",
+      "options": [
+        "C",
+        "A",
+        "B",
+        "A、B、C同时出队"
+      ],
+      "answer": "B",
+      "analysis": "普通队列遵循先进先出，最先入队的 A 先出队。"
+    },
+    {
+      "code": "DS03",
+      "subject": "数据结构",
+      "knowledge_point": "双端队列",
+      "difficulty": "EASY",
+      "content": "【测试自编题 DS03】双端队列允许在哪些位置插入和删除元素？",
+      "options": [
+        "只能在队头",
+        "只能在队尾",
+        "队头和队尾均可",
+        "只能在中间位置"
+      ],
+      "answer": "C",
+      "analysis": "双端队列允许在两端插入和删除元素。"
+    },
+    {
+      "code": "DS04",
+      "subject": "数据结构",
+      "knowledge_point": "数组下标",
+      "difficulty": "EASY",
+      "content": "【测试自编题 DS04】长度为8、采用从0开始编号的数组，其最后一个合法下标是？",
+      "options": [
+        "8",
+        "9",
+        "6",
+        "7"
+      ],
+      "answer": "D",
+      "analysis": "从0开始的连续下标为0至7，最后一个下标为长度减1。"
+    },
+    {
+      "code": "OS01",
+      "subject": "操作系统",
+      "knowledge_point": "进程与线程",
+      "difficulty": "EASY",
+      "content": "【测试自编题 OS01】同一进程中的多个线程通常共享下列哪项？",
+      "options": [
+        "进程地址空间",
+        "各自的程序计数器",
+        "各自的寄存器状态",
+        "各自的栈"
+      ],
+      "answer": "A",
+      "analysis": "同一进程中的线程共享地址空间，但分别保留执行状态。"
+    },
+    {
+      "code": "OS02",
+      "subject": "操作系统",
+      "knowledge_point": "线程执行状态",
+      "difficulty": "EASY",
+      "content": "【测试自编题 OS02】同一进程的两个线程，通常各自独立保留哪项？",
+      "options": [
+        "整个进程的地址空间",
+        "线程栈",
+        "进程中全部全局变量",
+        "进程中全部堆对象"
+      ],
+      "answer": "B",
+      "analysis": "各线程有自己的栈；不能把共享地址空间理解为全部执行状态也共享。"
+    },
+    {
+      "code": "OS03",
+      "subject": "操作系统",
+      "knowledge_point": "并发同步",
+      "difficulty": "MEDIUM",
+      "content": "【测试自编题 OS03】多个线程并发修改共享可变数据时，应重点考虑什么问题？",
+      "options": [
+        "所有线程是否具有同一程序计数器",
+        "线程栈是否必须合并",
+        "并发同步与数据一致性",
+        "是否应禁用所有函数调用"
+      ],
+      "answer": "C",
+      "analysis": "共享可变数据会产生并发同步问题，需要按访问方式保证一致性。"
+    },
+    {
+      "code": "OS04",
+      "subject": "操作系统",
+      "knowledge_point": "线程资源边界",
+      "difficulty": "MEDIUM",
+      "content": "【测试自编题 OS04】关于同一进程的多个线程，下列哪项表述正确？",
+      "options": [
+        "线程共享同一个栈",
+        "线程必须有完全相同的寄存器状态",
+        "线程共享同一程序计数器",
+        "共享地址空间不等于共享全部执行状态"
+      ],
+      "answer": "D",
+      "analysis": "线程共享地址空间，但程序计数器、寄存器状态和栈分别保留。"
+    },
+    {
+      "code": "NET01",
+      "subject": "计算机网络",
+      "knowledge_point": "TCP字节流",
+      "difficulty": "EASY",
+      "content": "【测试自编题 NET01】TCP向应用提供的传输抽象是？",
+      "options": [
+        "可靠、有序的字节流",
+        "保留应用消息边界的数据报",
+        "绝不丢包的物理链路",
+        "固定长度的文件块"
+      ],
+      "answer": "A",
+      "analysis": "TCP向应用提供可靠、有序的字节流。"
+    },
+    {
+      "code": "NET02",
+      "subject": "计算机网络",
+      "knowledge_point": "TCP消息边界",
+      "difficulty": "MEDIUM",
+      "content": "【测试自编题 NET02】应用连续两次向TCP连接写入数据，接收应用能否仅凭TCP确定这两次写入的消息边界？",
+      "options": [
+        "总能，TCP保留每次写入的边界",
+        "不能，应用需要自行设计消息边界",
+        "总能，每次读取恰好对应一次写入",
+        "只有数据长度相等时才能"
+      ],
+      "answer": "B",
+      "analysis": "TCP不保留应用消息边界，应用通常需要长度字段或分隔符等协议设计。"
+    },
+    {
+      "code": "NET03",
+      "subject": "计算机网络",
+      "knowledge_point": "TCP可靠传输",
+      "difficulty": "MEDIUM",
+      "content": "【测试自编题 NET03】下列哪组机制用于TCP发现与恢复传输中的丢失？",
+      "options": [
+        "只依靠应用程序等待",
+        "只依靠传输介质不出错",
+        "序号、确认和重传",
+        "只依靠固定消息长度"
+      ],
+      "answer": "C",
+      "analysis": "TCP使用序号、确认与重传等机制实现可靠传输。"
+    },
+    {
+      "code": "NET04",
+      "subject": "计算机网络",
+      "knowledge_point": "可靠性的含义",
+      "difficulty": "MEDIUM",
+      "content": "【测试自编题 NET04】关于TCP可靠传输，下列哪项理解正确？",
+      "options": [
+        "网络中绝不会丢包",
+        "任何时刻都保证传输成功",
+        "TCP天然保留应用消息边界",
+        "可靠传输不等于网络绝不丢包"
+      ],
+      "answer": "D",
+      "analysis": "可靠传输通过协议机制处理问题，不承诺底层网络永不丢包或任意时刻均能完成传输。"
+    },
+    {
+      "code": "CO01",
+      "subject": "计算机组成原理",
+      "knowledge_point": "按字节编址",
+      "difficulty": "EASY",
+      "content": "【测试自编题 CO01】一个按字节编址、地址宽度为8位且全部地址可用的存储空间，其容量是？",
+      "options": [
+        "256字节",
+        "8字节",
+        "64字节",
+        "2048字节"
+      ],
+      "answer": "A",
+      "analysis": "8位二进制地址可区分2^8=256个字节地址。"
+    },
+    {
+      "code": "CO02",
+      "subject": "计算机组成原理",
+      "knowledge_point": "容量单位",
+      "difficulty": "EASY",
+      "content": "【测试自编题 CO02】1 KiB等于多少字节？",
+      "options": [
+        "1000",
+        "1024",
+        "512",
+        "2048"
+      ],
+      "answer": "B",
+      "analysis": "KiB是二进制容量单位，1 KiB=2^10=1024字节。"
+    },
+    {
+      "code": "CO03",
+      "subject": "计算机组成原理",
+      "knowledge_point": "二进制表示",
+      "difficulty": "EASY",
+      "content": "【测试自编题 CO03】无符号二进制数101101对应的十进制值是？",
+      "options": [
+        "41",
+        "44",
+        "45",
+        "46"
+      ],
+      "answer": "C",
+      "analysis": "按位权展开为32+8+4+1=45。"
+    },
+    {
+      "code": "CO04",
+      "subject": "计算机组成原理",
+      "knowledge_point": "虚拟内存",
+      "difficulty": "MEDIUM",
+      "content": "【测试自编题 CO04】关于虚拟内存，下列哪项表述正确？",
+      "options": [
+        "虚拟地址空间大小等于物理内存容量",
+        "缺页时绝不访问较慢介质",
+        "虚拟内存使主存容量不再有限",
+        "部分页可置于较慢后备存储，访问时可能触发缺页处理"
+      ],
+      "answer": "D",
+      "analysis": "虚拟内存允许把部分页置于后备存储，但不能把虚拟地址空间大小当成物理内存容量。"
+    }
+  ],
+  "documents": [
+    {
+      "code": "ds-deque",
+      "title": "【测试资料】栈、队列与双端队列",
+      "subject": "数据结构",
+      "content": "本地界面测试资料；摘要来源与版本见下。待审核，非完整教材。\n\n栈通常使用后进先出（LIFO）次序，队列通常使用先进先出（FIFO）次序。双端队列允许在两端插入和删除。Python deque 的 append/pop 可实现栈，append/popleft 可实现队列。应区分抽象访问规则与具体底层实现。\n\n原文定位：collections.deque；两端插入与删除操作\n资料版本：knowledge-408-v1\n本项目核验日期：2026-10-14\n使用说明：自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+      "source_url": "https://docs.python.org/3/library/collections.html#collections.deque"
+    },
+    {
+      "code": "os-threads",
+      "title": "【测试资料】进程与线程",
+      "subject": "操作系统",
+      "content": "本地界面测试资料；摘要来源与版本见下。待审核，非完整教材。\n\n进程与线程都与程序执行有关。同一进程的多个线程共享地址空间，但每个线程保留自己的程序计数器、寄存器状态和栈。共享可变数据带来并发同步问题，不能把共享地址空间理解成线程拥有完全相同的执行状态。\n\n原文定位：Concurrency: An Introduction，第1—2页\n资料版本：knowledge-408-v1\n本项目核验日期：2026-10-14\n使用说明：自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+      "source_url": "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-intro.pdf"
+    },
+    {
+      "code": "co-memory",
+      "title": "【测试资料】存储层次与主存容量",
+      "subject": "计算机组成原理",
+      "content": "本地界面测试资料；摘要来源与版本见下。待审核，非完整教材。\n\n存储层次使用速度、容量和成本不同的介质组织数据。主存容量有限，虚拟内存机制可以把部分页置于较慢的后备存储；访问不在主存中的页可能触发缺页处理。应区分主存命中与访问后备存储的开销，不能把虚拟地址空间大小当作物理内存容量。\n\n原文定位：Beyond Physical Memory: Mechanisms，第1—2页\n资料版本：knowledge-408-v1\n本项目核验日期：2026-10-14\n使用说明：自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+      "source_url": "https://pages.cs.wisc.edu/~remzi/OSTEP/vm-beyondphys.pdf"
+    },
+    {
+      "code": "cn-tcp",
+      "title": "【测试资料】TCP可靠传输",
+      "subject": "计算机网络",
+      "content": "本地界面测试资料；摘要来源与版本见下。待审核，非完整教材。\n\nTCP向应用提供可靠、有序的字节流。序号、确认和重传等机制用于发现与恢复传输中的丢失，接收方按序向应用交付数据。TCP不保留应用消息边界；可靠传输不表示网络不会丢包，也不保证任意时刻都能完成传输。\n\n原文定位：RFC 9293，3.3 Sequence Numbers、3.8 Data Communication\n资料版本：knowledge-408-v1\n本项目核验日期：2026-10-14\n使用说明：自编事实摘要，原文版权归来源方；仅保留核验所需短摘要与原文链接。",
+      "source_url": "https://www.rfc-editor.org/rfc/rfc9293.html"
+    }
+  ],
+  "schools": [
+    {
+      "code": "S01",
+      "name": "【测试虚构】示例甲大学",
+      "province": "北京",
+      "level": "985"
+    },
+    {
+      "code": "S02",
+      "name": "【测试虚构】示例乙大学",
+      "province": "上海",
+      "level": "211"
+    },
+    {
+      "code": "S03",
+      "name": "【测试虚构】示例丙大学",
+      "province": "江苏",
+      "level": "双一流"
+    },
+    {
+      "code": "S04",
+      "name": "【测试虚构】示例丁大学",
+      "province": "浙江",
+      "level": "211"
+    },
+    {
+      "code": "S05",
+      "name": "【测试虚构】示例戊大学",
+      "province": "广东",
+      "level": "985"
+    },
+    {
+      "code": "S06",
+      "name": "【测试虚构】示例己大学",
+      "province": "四川",
+      "level": "双一流"
+    }
+  ],
+  "majors": [
+    {
+      "major_name": "计算机科学与技术",
+      "major_code": "081200",
+      "year": 2027
+    },
+    {
+      "major_name": "计算机技术",
+      "major_code": "085404",
+      "year": 2027
+    }
+  ]
+}

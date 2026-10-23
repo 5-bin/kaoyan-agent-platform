@@ -12,6 +12,7 @@ import java.util.Map;
 public class AgentRequest {
     private String taskId;
     private Long userId;
+    private boolean quotaExempt;
     /** KNOWLEDGE_QA / SCHOOL_RECOMMEND / PRACTICE_SUMMARY / CHAT */
     private String taskType;
     private String userInput;
@@ -21,4 +22,5 @@ public class AgentRequest {
     private Map<String, Object> preferences;
     private List<Object> messages;
     private Map<String, Object> profile;
+    private Map<String, Object> privacy;
 }

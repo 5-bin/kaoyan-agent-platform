@@ -2,6 +2,7 @@ package com.kaoyan.controller;
 
 import com.kaoyan.common.Result;
 import com.kaoyan.entity.Task;
+import com.kaoyan.dto.response.TaskView;
 import com.kaoyan.security.UserContext;
 import com.kaoyan.service.RecommendService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,8 +29,8 @@ public class RecommendController {
      */
     @Operation(summary = "生成推荐")
     @PostMapping("/generate")
-    public Result<Task> generate(@RequestBody(required = false) Map<String, Object> input) {
-        return Result.ok(recommendService.generate(UserContext.currentUserId(), input));
+    public Result<TaskView> generate(@RequestBody(required = false) Map<String, Object> input) {
+        return Result.ok(TaskView.of(recommendService.generate(UserContext.currentUserId(), input)));
     }
 
     /**
@@ -37,8 +38,8 @@ public class RecommendController {
      */
     @Operation(summary = "推荐历史")
     @GetMapping
-    public Result<List<Task>> list() {
-        return Result.ok(recommendService.listByUser(UserContext.currentUserId()));
+    public Result<List<TaskView>> list() {
+        return Result.ok(recommendService.listByUser(UserContext.currentUserId()).stream().map(TaskView::of).toList());
     }
 
     /**

@@ -47,4 +47,6 @@ public interface StudyStatService extends IService<StudyStat> {
      * @return 总览
      */
     Map<String, Object> overview(Long userId);
+
+    Map<String, Object> learning(Long userId, LocalDate from, LocalDate to, String subject);
 }

@@ -13,6 +13,17 @@ public final class QuestionHistoryView {
             if ((record != null && !"valid".equals(record.getGradingStatus())) || !playable(current)) {
                 view.setSnapshotStatus("UNAVAILABLE"); return;
             }
+            Map<String,Object> fixed = record == null ? null : record.getQuestionSnapshot();
+            if (fixed != null && Boolean.TRUE.equals(fixed.get("snapshotAtCreation"))) {
+                if (!(fixed.get("id") instanceof Number id) || id.longValue() != record.getQuestionId() || text(fixed, "content") == null) {
+                    view.setSnapshotStatus("MISSING"); return;
+                }
+                view.setSubject(text(fixed,"subject")); view.setKnowledgePoint(text(fixed,"knowledgePoint"));
+                view.setContent(text(fixed,"content")); view.setOptionA(text(fixed,"optionA")); view.setOptionB(text(fixed,"optionB"));
+                view.setOptionC(text(fixed,"optionC")); view.setOptionD(text(fixed,"optionD")); view.setDifficulty(text(fixed,"difficulty"));
+                if (fixed.get("version") instanceof Number version) view.setVersion(version.intValue());
+                view.setSnapshotStatus("NOT_ANSWERED"); return;
+            }
             view.setSubject(current.getSubject()); view.setKnowledgePoint(current.getKnowledgePoint());
             view.setContent(current.getContent()); view.setOptionA(current.getOptionA()); view.setOptionB(current.getOptionB());
             view.setOptionC(current.getOptionC()); view.setOptionD(current.getOptionD()); view.setDifficulty(current.getDifficulty());

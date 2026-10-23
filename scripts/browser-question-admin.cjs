@@ -67,10 +67,10 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
         await page.getByRole('button', { name: '审核通过', exact: true }).click();
         await page.getByRole('heading', { name: `题目 #${id} · 版本 4` }).waitFor();
         const approved = await api('/questions/admin/' + id, admin);
-        const first = (await api('/practice/sessions', student, 'POST', { subject: '数据结构', count: 100 })).sessionId;
+        const first = (await api('/practice/sessions', student, 'POST', { subject: '数据结构', count: 1, questionIds: [id] })).sessionId;
         await api(`/practice/sessions/${first}/answer`, student, 'POST', { questionId: id, answer: 'A' });
         const historical = (await api(`/practice/sessions/${first}/review`, student)).list.find(q => q.questionId === id);
-        const second = (await api('/practice/sessions', student, 'POST', { subject: '数据结构', count: 100 })).sessionId;
+        const second = (await api('/practice/sessions', student, 'POST', { subject: '数据结构', count: 1, questionIds: [id] })).sessionId;
         await api('/questions/admin/' + id + '/active', student, 'PUT', { active: 0, version: 4 }, 403);
         checks.push(`${width}: 页面审核后可判分，学生不能调用启停接口`);
         async function toggle(name, version) {

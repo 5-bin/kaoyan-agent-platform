@@ -50,6 +50,8 @@ class AgentChainTest {
         builder.directory(agent.toFile());
         builder.environment().put("AGENT_INTERNAL_KEY", "test-only-internal-key-123456");
         builder.environment().put("LLM_ENABLED", "false"); builder.environment().put("RAG_BACKEND", "lexical");
+        // The chain contract uses its three-school baseline, independent of local RAG_DATA.
+        builder.environment().put("RAG_DATA", agent.resolve("knowledge/corpus.json").toString());
         builder.redirectErrorStream(true).redirectOutput(Path.of("target", "agent-chain.log").toFile());
         python = builder.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> { if (python != null) python.destroy(); }));
@@ -173,7 +175,7 @@ class AgentChainTest {
         assertEquals(1, task.path("resultPayload").path("correct").asInt());
         assertEquals(2, task.path("resultPayload").path("total").asInt());
         assertEquals(50.0, task.path("resultPayload").path("accuracy").asDouble());
-        assertEquals(2, task.path("inputPayload").path("questions").get(0).path("version").asInt());
+        assertFalse(task.has("inputPayload"),"公开任务不得返回模型上下文");
         mvc.perform(post("/api/tasks").header("Authorization", "Bearer " + other).contentType("application/json")
             .content("{\"taskType\":\"PRACTICE_SUMMARY\",\"input\":{\"sessionId\":\"snapshot-session\"}}"))
             .andExpect(status().isNotFound());

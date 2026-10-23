@@ -40,6 +40,8 @@ public class UserQuestionMarkServiceImpl extends ServiceImpl<UserQuestionMarkMap
     @Override
     @Transactional
     public void markWrong(Long userId, Long questionId) {
+        questions.selectForUpdate(questionId);
+        requireAccessible(userId, questionId);
         UserQuestionMark m = find(userId, questionId);
         LocalDateTime now = LocalDateTime.now();
         if (m == null) {
@@ -62,6 +64,9 @@ public class UserQuestionMarkServiceImpl extends ServiceImpl<UserQuestionMarkMap
     @Override
     @Transactional
     public void toggleFavorite(Long userId, Long questionId, boolean favorite) {
+        // Serialize first mark creation as well as repeated idempotent set operations.
+        questions.selectForUpdate(questionId);
+        requireAccessible(userId, questionId);
         UserQuestionMark m = find(userId, questionId);
         if (m == null) {
             m = new UserQuestionMark();
@@ -80,6 +85,7 @@ public class UserQuestionMarkServiceImpl extends ServiceImpl<UserQuestionMarkMap
     @Override
     @Transactional
     public void removeWrong(Long userId, Long questionId) {
+        questions.selectForUpdate(questionId);
         UserQuestionMark m = find(userId, questionId);
         if (m != null) {
             m.setIsWrong(0);
@@ -125,6 +131,13 @@ public class UserQuestionMarkServiceImpl extends ServiceImpl<UserQuestionMarkMap
         Page<MarkQuestionVO> result = baseMapper.pageFavorite(p, userId);
         result.getRecords().forEach(view -> history(userId, view));
         return PageResult.of(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+    }
+    private void requireAccessible(Long userId, Long questionId) {
+        if (QuestionHistoryView.playable(questions.selectById(questionId))) return;
+        if (attempts.selectCount(new LambdaQueryWrapper<PracticeRecord>().eq(PracticeRecord::getUserId,userId)
+                .eq(PracticeRecord::getQuestionId,questionId).eq(PracticeRecord::getGradingStatus,"valid")
+                .isNotNull(PracticeRecord::getIsCorrect)) == 0)
+            throw new com.kaoyan.common.ApiException(404,404,"题目不存在");
     }
     private void history(Long userId, MarkQuestionVO view) {
         PracticeRecord latest = attempts.selectOne(new LambdaQueryWrapper<PracticeRecord>()

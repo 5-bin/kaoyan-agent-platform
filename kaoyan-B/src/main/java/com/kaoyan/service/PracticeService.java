@@ -25,6 +25,7 @@ public interface PracticeService extends IService<PracticeRecord> {
      * @return sessionId
      */
     String startSession(Long userId, String subject, String difficulty, int count);
+    String startSession(Long userId, String subject, String difficulty, int count, String source, List<Long> questionIds);
 
     /**
      * 作答一题

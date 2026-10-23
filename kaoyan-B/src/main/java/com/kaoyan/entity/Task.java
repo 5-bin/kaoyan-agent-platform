@@ -28,7 +28,7 @@ public class Task {
     /** 任务类型：KNOWLEDGE_QA / SCHOOL_RECOMMEND */
     private String taskType;
 
-    /** 状态：PENDING / RUNNING / SUCCESS / FAILED */
+    /** 状态：RUNNING / SUCCESS / FAILED / CANCELLED；兼容旧PENDING记录。 */
     private String status;
 
     /** 请求参数 */
