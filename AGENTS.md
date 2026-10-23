@@ -13,14 +13,14 @@
 
 - `kaoyan-frontend/` 使用 Vue、TypeScript、Vite、Pinia 和 Element Plus。页面通过 `src/api/` 及统一 `request.ts` 请求 Java；路由和隐藏按钮只改善交互，实际权限由后端判断。
 - `kaoyan-B/` 是当前单模块 Spring Boot 工程，使用 MyBatis-Plus、MySQL、JWT、Redis 和 OpenFeign。Controller 接收校验后的 DTO，Service 管业务与事务，Mapper 管持久化，security 管认证授权，feign 管内部调用。不向参考工程的 `backend/` 或三个旧模块添加代码。
-- `kaoyan-agent/` 使用 FastAPI、Pydantic 和 OpenAI 兼容客户端。`main.py` 管入口，`schemas.py` 管契约，`workflows.py` 管固定工作流，`retrieval.py` 管版本化静态资料与独立Qdrant，`prompts/` 管提示模板，`llm_client.py` 管模型请求与预算。
+- `kaoyan-agent/` 使用FastAPI、Pydantic、LangChain与OpenAI兼容客户端。`main.py`管入口，`schemas.py`管契约，`conversation.py`管会话解析与受控文档工具，`workflows.py`管领域工作流，`retrieval.py`管版本化资料与独立Qdrant，`prompts/`管提示模板，`llm_client.py`管真实模型流与预算。会话及文档契约见`docs/conversations.md`。
 - Java 负责账号、档案、确定性判分、个人记录、任务、限流及审核发布；Python 仅处理必要上下文、资料检索、受约束规则工具和结果校验，不修改账号或个人业务记录。
 - Python 不连接业务数据库；Java只传本人档案与已判分题目快照，Python只读版本化资料副本及独立Qdrant。不得恢复按题目ID读取现行题表来冒充历史版本。
 - 前端不持有模型密钥，不直接请求内部 Agent，不以 localStorage 承担正式记录或权限判断。当前令牌缓存方案如有调整，同步会话、退出和账号切换处理。
 
 ## 接口与业务安全
 
-- 当前对外包装为 `{code,message,data}`，分页从 1 起；任务使用 `KNOWLEDGE_QA/SCHOOL_RECOMMEND/PRACTICE_SUMMARY/CHAT`，业务任务状态为 `RUNNING/SUCCESS/FAILED`，内部入口为 `/internal/rag/chat`。
+- 普通对外接口包装为`{code,message,data}`，分页从1起；任务类型仍为`KNOWLEDGE_QA/SCHOOL_RECOMMEND/PRACTICE_SUMMARY/CHAT`，状态为`RUNNING/SUCCESS/FAILED/CANCELLED`。保留`/internal/rag/chat`同步入口，聊天使用`/internal/rag/conversation/stream`。订阅不创建任务；文档建议由用户确认后才通过Java保存。
 - 接口修改先更新搭建文档契约，同时检查前端请求和类型、Java DTO／序列化、Python 模型、结果保存和测试。新增字段或终态必须说明兼容方式，不能只改某一端，也不能把目标设计写成当前支持。
 - 私有资源归属取自 Java 认证上下文，不信任客户端传入的 userId 或 ownerId。公开注册只能创建 STUDENT；管理员由服务端受控方式授权。跨账号资源查询返回404，非管理员管理请求返回403。
 - 对外使用白名单展示DTO，不序列化账号密码哈希、内部凭证或未提交题目答案；注册和本人资料响应也需核对敏感字段，不能直接以实体完整返回作为安全依据。
