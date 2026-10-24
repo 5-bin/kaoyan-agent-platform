@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 def create_app(settings=None, model=None, retriever=None):
     settings = settings or Settings()
-    corpus = Corpus(settings.RAG_DATA)
+    corpus = Corpus(settings.RAG_DATA, settings.RAG_SOURCE_POLICY_FILE)
     model = model or ModelClient(settings)
     retriever = retriever or Retriever(settings, corpus)
     engine = Workflows(settings, corpus, retriever, model)

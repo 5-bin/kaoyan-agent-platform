@@ -51,6 +51,51 @@ model.client = AsyncOpenAI(api_key="test-only", base_url="https://provider.inval
     http_client=httpx.AsyncClient(transport=httpx.MockTransport(provider)))
 app = create_app(settings, model=model)
 
+# Deliberately malformed upstream envelopes exercise Java's trust boundary.
+# These routes exist only in this isolated fixture, never in main.create_app.
+from fastapi.responses import StreamingResponse
+from schemas import ConversationResolution
+
+
+@app.middleware("http")
+async def source_policy_fixture(request, call_next):
+    paths = {"/internal/rag/conversation/plan", "/internal/rag/conversation/stream", "/internal/rag/chat"}
+    if request.url.path not in paths or request.headers.get("X-Internal-Key") != settings.AGENT_INTERNAL_KEY:
+        return await call_next(request)
+    body = await request.json()
+    text = body.get("userInput", "")
+    if not text.startswith("source-policy-fixture:"):
+        return await call_next(request)
+    mode = text.split(":", 1)[1]
+    if request.url.path.endswith("/plan"):
+        if mode == "plan":
+            return JSONResponse({"action": "INVALID"})
+        return JSONResponse(ConversationResolution(action="KNOWLEDGE_QA", standaloneQuery=text).model_dump(by_alias=True))
+    host = {"github": "github.com", "mit": "ocw.mit.edu", "school": "yzb.buaa.edu.cn"}.get(mode, "github.com")
+    if mode == "denied":
+        host = "github.com.attacker.invalid"
+    reference = {"id": "fixture-source#0", "url": f"https://{host}/PRIVATE_URL_MARKER",
+                 "version": "fixture-v1", "title": "合成来源", "locator": "合成位置",
+                 "retrievedAt": "2026-10-24", "excerpt": "合成摘录"}
+    release = app.state.engine.corpus.release_id
+    result = {"answer": "合成引用校验回答", "outcome": "COMPLETED", "explanationMode": "rules",
+              "resolvedTaskType": body["taskType"], "releaseId": release, "conditions": {}}
+    if mode == "result":
+        result["releaseId"] = "rag-v1-0000000000000000"
+    if mode == "conditions":
+        result["conditions"] = {"examYear": "PRIVATE_CONDITION_MARKER"}
+    if mode == "document":
+        result["documentProposal"] = {"title": "", "content": "PRIVATE_DOCUMENT_MARKER"}
+    response = {"taskId": body["taskId"], "status": "SUCCESS", "releaseId": release,
+                "references": [reference], "result": result}
+    if request.url.path.endswith("/chat"):
+        return JSONResponse(response)
+    if mode == "upstream":
+        return JSONResponse({"error": "PRIVATE_UPSTREAM_MARKER"}, status_code=503)
+    async def event():
+        yield "data: " + json.dumps({"type": "result", "response": response}) + "\n\n"
+    return StreamingResponse(event(), media_type="text/event-stream")
+
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 

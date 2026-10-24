@@ -31,6 +31,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     private final PracticeRecordMapper practiceRecordMapper;
     private final QuestionMapper questionMapper;
     private final TaskStore store;
+    private final com.kaoyan.service.ReferenceSourcePolicy sourcePolicy;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private com.kaoyan.service.AssistantPrivacyService privacy;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
@@ -68,6 +69,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
                 throw new ApiException(409,"模型接收端点已变化，请重新授权");
             AgentResponse response = agentClient.chat(agentProps.getInternalKey(), request);
             validateResponse(task, response);
+            sourcePolicy.validateResponse(response);
             if(privacy!=null) privacy.check(userId,grant,((Number)consent.get("version")).intValue());
             if(privacy!=null && Boolean.TRUE.equals(consent.get("modelAllowed")) && !privacy.provider().equals(consent.get("provider")))
                 throw new ApiException(409,"模型接收端点已变化，请重新授权");

@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 from uuid import NAMESPACE_URL, uuid5
 from pydantic import Field, model_validator
 from schemas import Reference, StrictModel
+from source_policy import ReferenceSourcePolicy
 
 
 class Document(StrictModel):
@@ -50,7 +51,8 @@ def terms(text):
 
 
 class Corpus:
-    def __init__(self, path):
+    def __init__(self, path, policy_path=None):
+        policy = ReferenceSourcePolicy(policy_path)
         raw = Path(path).read_bytes()
         records = json.loads(raw)
         self.records = records
@@ -58,6 +60,8 @@ class Corpus:
         self.checksum = hashlib.sha256(canonical).hexdigest()
         self.release_id = "rag-v1-" + self.checksum[:16]
         self.documents = [Document.model_validate(d) for d in records]
+        for document in self.documents:
+            policy.validate_url(document.url)
         if not self.documents or len({d.id for d in self.documents}) != len(self.documents):
             raise ValueError("资料为空或编号重复")
         self.by_id = {d.id: d for d in self.documents}

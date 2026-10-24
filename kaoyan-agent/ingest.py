@@ -4,7 +4,7 @@ from retrieval import Corpus, VectorIndex
 
 if __name__ == "__main__":
     settings = Settings()
-    corpus = Corpus(settings.RAG_DATA)
+    corpus = Corpus(settings.RAG_DATA, settings.RAG_SOURCE_POLICY_FILE)
     index = VectorIndex(settings, corpus)
     try:
         index.build()

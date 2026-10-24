@@ -2,6 +2,8 @@ package com.kaoyan.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaoyan.common.ApiException;
+import com.kaoyan.common.AgentValidationException;
+import com.kaoyan.common.AgentValidationException.Code;
 import com.kaoyan.config.AgentProperties;
 import com.kaoyan.dto.agent.AgentResponse;
 import com.kaoyan.entity.Task;
@@ -38,6 +40,7 @@ public class ConversationService {
     private final AssistantPrivacyService privacy;
     private final AssistantLearningService learning;
     private final ObjectMapper json;
+    private final ReferenceSourcePolicy sourcePolicy;
     private final ExecutorService workers = new ThreadPoolExecutor(4,4,0,TimeUnit.SECONDS,
         new ArrayBlockingQueue<>(16), new ThreadPoolExecutor.AbortPolicy());
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
@@ -279,6 +282,7 @@ public class ConversationService {
     }
 
     private void generate(Live live) {
+        Code failureCode = Code.UNEXPECTED_ERROR;
         try {
             synchronized(live) { if(live.done) return; live.worker=Thread.currentThread(); }
             var saved=db.one("SELECT user_id,conversation_id,context_json FROM chat_generation WHERE task_id=?",live.taskId);
@@ -290,12 +294,15 @@ public class ConversationService {
             Map<String,Object> publicPage=new LinkedHashMap<>();
             for(String key:List.of("page","subject","from","to")) if(page.get(key)!=null) publicPage.put(key,page.get(key));
             if(!publicPage.isEmpty()) planRequest.put("pageContext",publicPage);
+            failureCode = Code.UPSTREAM_FAILED;
             var planned=http.send(HttpRequest.newBuilder(URI.create(properties.getBaseUrl()+"/internal/rag/conversation/plan"))
                 .timeout(Duration.ofSeconds(22)).header("Content-Type","application/json").header("X-Internal-Key",properties.getInternalKey())
                 .POST(HttpRequest.BodyPublishers.ofString(db.encode(planRequest))).build(),HttpResponse.BodyHandlers.ofString());
             if(planned.statusCode()!=200 || planned.body().length()>40000) throw new IOException("plan_failed");
+            failureCode = Code.PLAN_VALIDATION_FAILED;
             var plan=db.object(planned.body());
             validatePlan(plan,Objects.toString(context.get("userInput")));
+            failureCode = Code.UNEXPECTED_ERROR;
             page=resolveTargets(owner,saved.get("conversationId").toString(),plan,page,Objects.toString(context.get("_referenceTaskId"),null),context);
             context.put("_pageContext",page);
             if(plan.get("clarification")!=null) {
@@ -316,6 +323,7 @@ public class ConversationService {
             checkAuthorization(owner,context,true);
             var streamContext=wireContext(context);
             streamContext.put("preparedPlan",plan); // Expanded historical query exists only for this live request.
+            failureCode = Code.UPSTREAM_FAILED;
             var request=HttpRequest.newBuilder(URI.create(properties.getBaseUrl()+"/internal/rag/conversation/stream"))
                 .timeout(Duration.ofSeconds(47)).header("Content-Type","application/json")
                 .header("X-Internal-Key",properties.getInternalKey()).POST(HttpRequest.BodyPublishers.ofString(db.encode(streamContext))).build();
@@ -332,18 +340,21 @@ public class ConversationService {
                     if(!line.startsWith("data: ")) continue;
                     var event=db.object(line.substring(6));
                     if("result".equals(event.get("type"))) {
+                        failureCode = Code.RESULT_VALIDATION_FAILED;
                         AgentResponse result=json.convertValue(event.get("response"),AgentResponse.class);
                         Task task=new Task(); task.setId(live.taskId); task.setTaskType("CHAT");
                         TaskServiceImpl.validateResponse(task,result);
-                        if(!"SUCCESS".equals(result.getStatus())) throw new IOException("upstream_failed");
-                        var output=db.object(result.getResult()); output.put("references",result.getReferences());
-                        for(Object reference:result.getReferences()) {
-                            String host=URI.create(Objects.toString(db.object(reference).get("url"))).getHost();
-                            if(!Set.of("docs.python.org","pages.cs.wisc.edu","www.rfc-editor.org","gs.nau.edu.cn","admission.ucas.edu.cn","yz.cuc.edu.cn").contains(host))
-                                throw new IllegalStateException("source_host_not_allowed");
+                        if(!"SUCCESS".equals(result.getStatus())) {
+                            failureCode = Code.UPSTREAM_FAILED;
+                            throw new IOException("upstream_failed");
                         }
+                        sourcePolicy.validateResponse(result);
+                        var output=db.object(result.getResult()); output.put("references",result.getReferences());
+                        failureCode = Code.CONDITIONS_VALIDATION_FAILED;
                         validateConditions(db.object(output.get("conditions")));
+                        failureCode = Code.DOCUMENT_VALIDATION_FAILED;
                         validateProposal(output,context);
+                        failureCode = Code.UNEXPECTED_ERROR;
                         output.put("evidence",data.getOrDefault("evidence",List.of()));
                         output.put("dataScopes",dataScopes(context,data));
                         output.put("readScope",data.getOrDefault("scope",List.of()));
@@ -357,7 +368,8 @@ public class ConversationService {
             }
             throw new IOException("upstream_incomplete");
         } catch(Exception error) {
-            log.warn("task={} chatFailure={}",live.taskId,error.getClass().getSimpleName());
+            Code code = error instanceof AgentValidationException validation ? validation.getCode() : failureCode;
+            log.warn("task={} chatFailure={} errorCode={}",live.taskId,error.getClass().getSimpleName(),code.name());
             terminate(live,"FAILED","生成失败或输出未通过校验，请重试",null);
         }
     }

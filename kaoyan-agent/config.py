@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from urllib.parse import urlsplit, urlunsplit
+from source_policy import DEFAULT_SOURCE_POLICY
 
 ROOT = Path(__file__).resolve().parent
 
@@ -35,6 +36,7 @@ class Settings(BaseSettings):
     MAX_MODEL_CALLS_PER_DAY: int = Field(default=100, ge=1)
     RAG_BACKEND: Literal["lexical", "qdrant"] = "lexical"
     RAG_DATA: Path = ROOT / "knowledge" / "corpus.json"
+    RAG_SOURCE_POLICY_FILE: Path = DEFAULT_SOURCE_POLICY
     RAG_INDEX: Path = ROOT / ".cache" / "rag"
     QDRANT_URL: str = ""
     QDRANT_API_KEY: str = ""
@@ -44,6 +46,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_settings(self):
+        if not self.RAG_SOURCE_POLICY_FILE.is_absolute():
+            raise ValueError("SOURCE_POLICY_INVALID")
         if len(self.AGENT_INTERNAL_KEY) < 16 or any(not 33 <= ord(c) <= 126 for c in self.AGENT_INTERNAL_KEY):
             raise ValueError("AGENT_INTERNAL_KEY 必须显式设置为至少16位ASCII字符")
         try:
