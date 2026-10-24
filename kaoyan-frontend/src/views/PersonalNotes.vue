@@ -4,9 +4,12 @@
     <div class="note-grid">
       <aside class="card note-list" aria-label="笔记列表">
         <el-button type="primary" @click="newNote">新建笔记</el-button>
-        <el-empty v-if="!notes.length && !loading" description="暂无个人笔记" :image-size="60" />
-        <button v-for="note in notes" :key="note.id" class="note-item" :class="{ active: original?.id === note.id }" :title="note.title" @click="openNote(note.id)"><strong>{{ note.title }}</strong><small>版本 {{ note.version }}</small></button>
-        <el-button v-if="notes.length < total" :loading="loading" @click="loadMore">更多笔记</el-button>
+        <div class="note-items" tabindex="0" role="region" aria-label="可滚动的笔记列表" :aria-busy="listLoading">
+          <el-empty v-if="!notes.length && !listLoading && !listError" description="暂无个人笔记" :image-size="60" />
+          <button v-for="note in notes" :key="note.id" class="note-item" :class="{ active: original?.id === note.id }" :aria-label="note.title" :aria-current="original?.id === note.id ? 'true' : undefined" :title="note.title" @click="openNote(note.id)"><strong>{{ note.title }}</strong><small>版本 {{ note.version }}</small></button>
+        </div>
+        <small v-if="listError" role="status">笔记列表加载失败，请重试。</small>
+        <el-button v-if="notes.length < total || listError || (listLoading && !notes.length)" :loading="listLoading" :disabled="listLoading" @click="notes.length ? loadMore() : loadList(true)">{{ listError ? '重试加载' : '展开更多' }}</el-button>
       </aside>
       <section v-if="editing" class="card note-content" aria-label="笔记编辑器">
         <div class="note-toolbar"><strong>{{ original ? '编辑笔记 · v' + original.version : '新建笔记' }}</strong><el-button v-if="original" @click="askAssistant">让助手修改</el-button><el-button v-if="original" @click="loadHistory(true)">历史版本</el-button><el-button type="primary" :loading="saving" :disabled="loading || !title.trim()" @click="save">{{ original ? '保存新版本' : '创建笔记' }}</el-button></div>
@@ -42,17 +45,44 @@ import { useAssistantPage } from '@/composables/assistant-page'
 
 const user = useUserStore(), assistant = useAssistantStore(), route = useRoute(), router = useRouter()
 const notes = ref<PersonalDocument[]>([]), total = ref(0), page = ref(1), loading = ref(false)
+const notePageSize = 5, listLoading = ref(false), listError = ref(false)
 const editing = ref(false), original = ref<PersonalDocument>(), title = ref(''), content = ref(''), saving = ref(false), conflict = ref(false)
 const versions = ref<DocumentVersion[]>([]), versionPage = ref(1), versionTotal = ref(0), historyOpen = ref(false), versionOpen = ref(false), historical = ref<PersonalDocument>()
 let epoch = 0
+let listRequest = 0
 const guard = (stamp: number) => stamp === epoch && !!user.token
 const dirty = computed(() => editing.value && (title.value !== (original.value?.title || '') || content.value !== (original.value?.content || '')))
 const differences = computed(() => diffLines(original.value?.content || '', content.value))
 async function canLeave() { if (!dirty.value || !user.token) return true; try { await ElMessageBox.confirm('有尚未保存的笔记内容，离开后将丢弃本次编辑。', '未保存的修改', { confirmButtonText: '离开', cancelButtonText: '继续编辑', type: 'warning' }); return true } catch { return false } }
 onBeforeRouteLeave(canLeave)
 onBeforeRouteUpdate(async (to, from) => to.query.noteId === from.query.noteId || await canLeave())
-async function loadList() { const stamp = epoch, data = await api.listPersonalDocuments(); if (guard(stamp)) { notes.value = data.list; total.value = data.total; page.value = 1 } }
-async function loadMore() { const stamp = epoch; loading.value = true; try { const data = await api.listPersonalDocuments(page.value + 1); if (guard(stamp)) { notes.value.push(...data.list); total.value = data.total; page.value++ } } finally { if (guard(stamp)) loading.value = false } }
+async function loadList(reset = false) {
+  const token = user.token, request = ++listRequest, pages = reset ? 1 : page.value
+  if (!token) return
+  const current = () => request === listRequest && token === user.token
+  listLoading.value = true; listError.value = false
+  try {
+    const results = await Promise.all(Array.from({ length: pages }, (_, index) => api.listPersonalDocuments(index + 1, notePageSize)))
+    if (!current()) return
+    notes.value = [...new Map(results.flatMap(result => result.list).map(note => [note.id, note])).values()]
+    total.value = results[0]!.total; page.value = pages
+  } catch { if (current()) listError.value = true }
+  finally { if (current()) listLoading.value = false }
+}
+async function loadMore() {
+  if (listLoading.value) return
+  if (notes.value.length >= total.value) { await loadList(); return }
+  const token = user.token, request = ++listRequest, next = page.value + 1
+  const current = () => request === listRequest && token === user.token
+  listLoading.value = true; listError.value = false
+  try {
+    const data = await api.listPersonalDocuments(next, notePageSize)
+    if (!current()) return
+    notes.value = [...new Map([...notes.value, ...data.list].map(note => [note.id, note])).values()]
+    total.value = data.total; page.value = next
+  } catch { if (current()) listError.value = true }
+  finally { if (current()) listLoading.value = false }
+}
 async function openNote(id: string) { if (id !== original.value?.id) await router.push({ path: '/notes', query: { noteId: id } }) }
 async function newNote() {
   if (!await canLeave()) return
@@ -86,7 +116,7 @@ async function loadHistory(first: boolean) {
   if (guard(stamp)) { versions.value = first ? data.list : [...versions.value, ...data.list]; versionPage.value = next; versionTotal.value = data.total; historyOpen.value = true }
 }
 async function previewVersion(version: number) { if (!original.value) return; const stamp = epoch, data = await api.getDocumentVersion(original.value.id, version); if (guard(stamp)) { historical.value = data; versionOpen.value = true } }
-useAssistantPage(() => ({ page: 'notes' }), loadList)
+useAssistantPage(() => ({ page: 'notes' }), () => loadList())
 watch(() => assistant.noteRevision, async () => {
   if (!user.token) return
   const stamp = epoch, id = original.value?.id
@@ -97,22 +127,28 @@ watch(() => assistant.noteRevision, async () => {
   if (dirty.value) { if (data.version !== original.value?.version) conflict.value = true; return }
   original.value = data; title.value = data.title; content.value = data.content
 })
+watch(() => user.token, token => {
+  listRequest++; notes.value = []; total.value = 0; page.value = 1; listLoading.value = false; listError.value = false
+  if (token) void loadList(true)
+}, { immediate: true })
 watch([() => user.token, () => route.query.noteId], async ([token, id]) => {
   const stamp = ++epoch; original.value = undefined; title.value = ''; content.value = ''; editing.value = false; conflict.value = false; saving.value = false
-  historyOpen.value = false; versionOpen.value = false; versions.value = []; historical.value = undefined; notes.value = []; total.value = 0
+  historyOpen.value = false; versionOpen.value = false; versions.value = []; historical.value = undefined
   if (!token) return
   loading.value = true
   try {
-    await loadList()
     if (typeof id === 'string' && id) { const data = await api.getPersonalDocument(id); if (guard(stamp)) { original.value = data; title.value = data.title; content.value = data.content; editing.value = true } }
   } finally { if (guard(stamp)) loading.value = false }
 }, { immediate: true })
-onBeforeUnmount(() => { epoch++ })
+onBeforeUnmount(() => { epoch++; listRequest++ })
 </script>
 
 <style scoped>
 .note-grid { display:grid; grid-template-columns:240px minmax(0,1fr); gap:20px; align-items:start }
 .note-list,.note-content { padding:20px; min-width:0 }
+.note-list { display:flex; flex-direction:column; gap:12px; max-height:calc(100dvh - 210px) }
+.note-list > .el-button { margin:0; flex-shrink:0; align-self:flex-start }
+.note-items { min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable }
 .note-item { display:flex; flex-direction:column; text-align:left; gap:6px; width:100%; border:0; border-bottom:1px solid var(--c-line); padding:14px 8px; background:transparent; color:inherit; cursor:pointer }
 .note-item strong { width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 .note-item.active { background:var(--c-primary-light,#eef4ff) }
@@ -120,5 +156,5 @@ onBeforeUnmount(() => { epoch++ })
 .note-editor { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; margin-top:16px }
 .note-preview { max-height:65vh; overflow:auto; padding:12px; border:1px solid var(--c-line); border-radius:8px; overflow-wrap:anywhere }
 .diff { white-space:pre-wrap; overflow-wrap:anywhere; padding:12px }.added { background:#ddf5e3 }.removed { background:#ffe1e1; text-decoration:line-through }.muted,small { color:var(--c-ink-2) }
-@media(max-width:1000px) { .note-grid,.note-editor { grid-template-columns:minmax(0,1fr) }.note-list { max-height:260px; overflow:auto } }
+@media(max-width:1000px) { .note-grid,.note-editor { grid-template-columns:minmax(0,1fr) }.note-list { max-height:320px } }
 </style>

@@ -20,14 +20,14 @@ export interface ChatMessage { id: string; sequenceNo: number; content: string; 
 export interface PersonalDocument { id: string; title: string; content: string; version: number }
 export interface DocumentVersion extends PersonalDocument { documentId: string; sourceTaskId?: string; createdAt: string }
 export const createConversation = () => request.post<unknown, Conversation>('/conversations')
-export const listConversations = (pageNum = 1) => request.get<unknown, PageResult<Conversation>>('/conversations', { params: { pageNum, pageSize: 20 } })
+export const listConversations = (pageNum = 1) => request.get<unknown, PageResult<Conversation>>('/conversations', { params: { pageNum, pageSize: 5 } })
 export const listMessages = (id: string, pageNum = 1) => request.get<unknown, PageResult<ChatMessage> & { conversation: Conversation }>(`/conversations/${id}/messages`, { params: { pageNum, pageSize: 20 } })
 export const sendMessage = (id: string, data: { query: string; clientRequestId: string; documentId?: string; documentVersion?: number; pageContext?: AssistantPageContext; referenceTaskId?: string }) =>
   request.post<unknown, { taskId: string; messageId: string }>(`/conversations/${id}/messages`, data)
 export const retryMessage = (id: string, messageId: string, clientRequestId: string) =>
   request.post<unknown, { taskId: string; messageId: string }>(`/conversations/${id}/messages/${messageId}/retry`, { clientRequestId })
 export const cancelGeneration = (id: string, taskId: string) => request.post(`/conversations/${id}/generations/${taskId}/cancel`)
-export const listPersonalDocuments = (pageNum = 1) => request.get<unknown, PageResult<PersonalDocument>>('/personal-documents', { params: { pageNum, pageSize: 20 } })
+export const listPersonalDocuments = (pageNum = 1, pageSize = 20) => request.get<unknown, PageResult<PersonalDocument>>('/personal-documents', { params: { pageNum, pageSize } })
 export const getPersonalDocument = (id: string) => request.get<unknown, PersonalDocument>(`/personal-documents/${id}`)
 export const getDocumentVersion = (id: string, version: number) => request.get<unknown, PersonalDocument>(`/personal-documents/${id}/versions/${version}`)
 export const documentVersions = (id: string, pageNum = 1) => request.get<unknown, PageResult<DocumentVersion>>(`/personal-documents/${id}/versions`, { params: { pageNum, pageSize: 20 } })

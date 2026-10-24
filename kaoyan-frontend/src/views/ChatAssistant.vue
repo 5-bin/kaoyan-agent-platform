@@ -3,7 +3,7 @@
     <aside class="conversation-list">
       <el-button type="primary" @click="newConversation">新建会话</el-button>
       <ConversationListItem v-for="item in conversations" :key="item.id" :item="item" :active="item.id === conversationId" :busy="!!deletingConversation" @open="openConversation" @delete="removeConversation" />
-      <el-button v-if="conversations.length < conversationTotal" @click="moreConversations">更多会话</el-button>
+      <el-button v-if="conversations.length < conversationTotal" :loading="loadingConversations" :disabled="loadingConversations || !!deletingConversation" @click="moreConversations">展开更多</el-button>
       <router-link to="/tasks/history">任务历史</router-link>
     </aside>
     <section class="chat-main">
@@ -65,7 +65,7 @@
     <el-drawer v-model="drawer" title="会话" direction="ltr" size="min(300px,90vw)">
       <el-button type="primary" @click="newConversation">新建会话</el-button>
       <ConversationListItem v-for="item in conversations" :key="item.id" :item="item" :active="item.id === conversationId" :busy="!!deletingConversation" @open="openConversation" @delete="removeConversation" />
-      <el-button v-if="conversations.length < conversationTotal" @click="moreConversations">更多会话</el-button>
+      <el-button v-if="conversations.length < conversationTotal" :loading="loadingConversations" :disabled="loadingConversations || !!deletingConversation" @click="moreConversations">展开更多</el-button>
       <router-link to="/tasks/history">任务历史</router-link>
     </el-drawer>
     <el-dialog v-model="privacyDialog" title="考研助手隐私设置" width="min(640px,94vw)">
@@ -126,7 +126,7 @@ async function clearChat(all: boolean) {
   if (!guard(stamp)) return
   if (all) await api.clearConversations(); else await api.deleteConversation(id)
   if (!guard(stamp)) return
-  stream?.abort(); messages.value = []; current.value = undefined; input.value = ''; editContent.value = ''; editTitle.value = ''; baseDocument.value = undefined; selectedDocument.value = undefined; selectedDocumentId.value = undefined; pending = undefined; retryPending = undefined; assistant.conversationId = ''; privacyDialog.value = false; await refreshConversations();
+  stream?.abort(); messages.value = []; current.value = undefined; input.value = ''; editContent.value = ''; editTitle.value = ''; baseDocument.value = undefined; selectedDocument.value = undefined; selectedDocumentId.value = undefined; pending = undefined; retryPending = undefined; assistant.conversationId = ''; privacyDialog.value = false; await refreshConversations(true);
   if (route.path === '/tasks') await router.replace('/tasks')
 }
 async function handleAction(action: AssistantAction, confirm: boolean) {
@@ -138,6 +138,7 @@ const deletingConversation = ref('')
 const deletedConversations = new Set<string>()
 let listRevision = 0, listRequest = 0, sessionRevision = 0, unmounted = false
 const conversations = ref<Conversation[]>([]), current = ref<Conversation>(), messages = ref<ChatMessage[]>([])
+const loadingConversations = ref(false)
 const conversationPage = ref(1), conversationTotal = ref(0), messagePage = ref(1), messageTotal = ref(0)
 const documentPage = ref(1), documentTotal = ref(0), personalDocuments = ref<PersonalDocument[]>([])
 const input = ref(''), sending = ref(false), composing = ref(false), drawer = ref(false)
@@ -167,21 +168,48 @@ function draftText(attempt: Generation) { return Object.values(attempt.draft || 
 function asTask(attempt: Generation): Task { return { id: attempt.taskId, userId: 0, taskType: 'CHAT', status: attempt.status, resultPayload: attempt.result, errorMessage: attempt.errorMessage, createdAt: '' } }
 function canRetry(message: ChatMessage, attempt: Generation) { return !activeGeneration.value && message.id === messages.value.at(-1)?.id && attempt.taskId === message.attempts.at(-1)?.taskId && ['FAILED','CANCELLED'].includes(attempt.status) }
 function referenceQuestion(attempt: Generation, ref: string) { referenceTaskId.value = attempt.taskId; input.value = '收藏 ' + ref }
-async function refreshConversations(stamp = epoch) {
-  const revision = listRevision, serial = ++listRequest
-  const data = await api.listConversations()
-  if (guard(stamp) && revision === listRevision && serial === listRequest) {
-    conversations.value = (Array.isArray(data?.list) ? data.list : []).filter(item => !deletedConversations.has(item.id))
-    conversationTotal.value = Number(data?.total) || 0; conversationPage.value = 1
+// List requests belong to the account, not to the currently selected chat.
+function listGuard() {
+  const token = user.token, session = sessionRevision, revision = listRevision, serial = ++listRequest
+  return () => !unmounted && !!token && token === user.token && session === sessionRevision && revision === listRevision && serial === listRequest
+}
+async function refreshConversations(reset = false) {
+  if (reset) listRevision++
+  const valid = listGuard(), pages = reset ? 1 : conversationPage.value
+  loadingConversations.value = true
+  try {
+    const items = new Map<string, Conversation>()
+    let total = 0, loaded = 0
+    // Replace atomically so refreshing titles/order never briefly collapses the list.
+    for (let page = 1; page <= pages; page++) {
+      const data = await api.listConversations(page)
+      if (!valid()) return
+      for (const item of Array.isArray(data?.list) ? data.list : []) {
+        if (!deletedConversations.has(item.id)) items.set(item.id, item)
+      }
+      total = Number(data?.total) || 0; loaded = page
+      if (page * 5 >= total) break
+    }
+    conversations.value = [...items.values()]
+    conversationTotal.value = total; conversationPage.value = loaded
+  } finally {
+    if (valid()) loadingConversations.value = false
   }
 }
 async function refreshDocuments(stamp = epoch) { const data = await api.listPersonalDocuments(); if (guard(stamp)) { personalDocuments.value = Array.isArray(data?.list) ? data.list : []; documentTotal.value = Number(data?.total) || 0; documentPage.value = 1 } }
 async function moreConversations() {
-  const stamp = epoch, revision = listRevision, serial = ++listRequest, page = conversationPage.value + 1
-  const data = await api.listConversations(page)
-  if (guard(stamp) && revision === listRevision && serial === listRequest) {
-    conversations.value.push(...data.list.filter(item => !deletedConversations.has(item.id) && !conversations.value.some(existing => existing.id === item.id)))
-    conversationPage.value = page; conversationTotal.value = data.total
+  if (loadingConversations.value || deletingConversation.value || conversations.value.length >= conversationTotal.value) return
+  const valid = listGuard(), page = conversationPage.value + 1
+  loadingConversations.value = true
+  try {
+    const data = await api.listConversations(page)
+    if (valid()) {
+      conversations.value.push(...data.list.filter(item => !deletedConversations.has(item.id) && !conversations.value.some(existing => existing.id === item.id)))
+      conversationPage.value = page; conversationTotal.value = data.total
+    }
+  } catch { /* The shared request layer reports errors; keep the page for retry. */ }
+  finally {
+    if (valid()) loadingConversations.value = false
   }
 }
 async function moreDocuments() { const stamp = epoch, data = await api.listPersonalDocuments(documentPage.value + 1); if (guard(stamp)) { personalDocuments.value.push(...data.list); documentPage.value++; documentTotal.value = data.total } }
@@ -216,12 +244,19 @@ async function removeConversation(id: string) {
     }
     ElMessage.success('对话已删除')
     // Refresh from page one after removing a row: offset pagination otherwise skips a row.
-    try { await refreshConversations() } catch { /* Keep the successful local removal; the request layer reports refresh errors. */ }
+    try { await refreshConversations(true) } catch { /* Keep the successful local removal; the request layer reports refresh errors. */ }
     if (valid() && !conversationId.value && conversations.value[0]) await openConversation(conversations.value[0].id)
   } catch { /* The shared request layer reports deletion errors; keep the original conversation. */ }
   finally { if (valid()) deletingConversation.value = '' }
 }
-async function newConversation() { const stamp = epoch; const created = await api.createConversation(); if (guard(stamp)) await openConversation(created.id) }
+async function openNewConversation(id: string) {
+  const token = user.token, session = sessionRevision
+  await openConversation(id)
+  if (token === user.token && session === sessionRevision && !unmounted) {
+    try { await refreshConversations(true) } catch { /* Keep the new chat usable when the list refresh fails. */ }
+  }
+}
+async function newConversation() { const stamp = epoch; const created = await api.createConversation(); if (guard(stamp)) await openNewConversation(created.id) }
 async function loadMessages(stamp = epoch) {
   const serial = ++messageLoad
   const id = conversationId.value
@@ -256,7 +291,7 @@ async function connect(attempt: Generation) {
         else if (['completed','failed','cancelled'].includes(event)) {
           Object.assign(attempt, value); attempt.draft = {}
           if (attempt.result?.conditions && current.value) current.value.conditions = attempt.result.conditions
-          connectionNotice.value = ''; controller.abort(); refreshSuccessfulActions(); void refreshConversations(stamp)
+          connectionNotice.value = ''; controller.abort(); refreshSuccessfulActions(); void refreshConversations().catch(() => { /* Keep the expanded list on refresh failure. */ })
         } else {
           if (version !== attempt.version + 1) throw new Error('消息版本不连续，重新获取快照')
           attempt.version = version
@@ -283,7 +318,7 @@ async function send() {
   if (!conversationId.value) {
     creatingForSend = true
     const token = user.token
-    try { const created = await api.createConversation(); if (token !== user.token) return; await openConversation(created.id); await nextTick() }
+    try { const created = await api.createConversation(); if (token !== user.token) return; await openNewConversation(created.id); await nextTick(); if (token !== user.token) return }
     finally { creatingForSend = false }
   }
   const stamp = epoch, id = conversationId.value
@@ -332,17 +367,19 @@ async function saveDocument() {
 watch(() => route.path, async path => { drawer.value = false; editor.value = false; privacyDialog.value = false; if (path === '/tasks' && conversationId.value && !route.query.conversationId) await router.replace({ path, query: { conversationId: conversationId.value } }) })
 watch(() => route.query.conversationId, value => { if (route.path === '/tasks' && typeof value === 'string' && !deletedConversations.has(value)) assistant.conversationId = value }, { immediate: true })
 watch([() => assistant.conversationId, () => user.token], async (values, previous) => {
-  const stamp = ++epoch; listRequest++; stream?.abort(); messages.value = []; current.value = undefined; messageTotal.value = 0
+  const initializeList = !previous.length || values[1] !== previous[1]
+  const stamp = ++epoch; stream?.abort(); messages.value = []; current.value = undefined; messageTotal.value = 0
   selectedDocument.value = undefined; loadingDocument.value = false; selectionEpoch++; referenceTaskId.value = undefined
-  personalDocuments.value = []; conversations.value = []; sending.value = false; saving.value = false
+  personalDocuments.value = []; sending.value = false; saving.value = false
   editor.value = false; busyAction.value = ''; privacyDialog.value = false; pending = undefined; retryPending = undefined; atBottom.value = true
   if (previous.length && values[1] !== previous[1]) { sessionRevision++; deletingConversation.value = ''; deletedConversations.clear(); listRevision++; selectedDocumentId.value = undefined; observedActions.clear(); privacy.value = undefined; privacyDraft.value = { modelAllowed: false, scopes: [] }; input.value = ''; editContent.value = ''; editTitle.value = ''; baseDocument.value = undefined; }
+  if (initializeList) { listRequest++; conversations.value = []; conversationPage.value = 1; conversationTotal.value = 0; loadingConversations.value = false }
   if (!user.token) { input.value = ''; return }
   try {
-    await Promise.all([refreshConversations(stamp), refreshDocuments(stamp), refreshPrivacy(stamp).catch(() => { if (guard(stamp)) privacy.value = undefined })])
+    await Promise.all([...(initializeList ? [refreshConversations(true)] : []), refreshDocuments(stamp), refreshPrivacy(stamp).catch(() => { if (guard(stamp)) privacy.value = undefined })])
     if (!guard(stamp)) return
     if (selectedDocumentId.value) await selectDocument()
-    if (!conversationId.value && conversations.value[0]) await openConversation(conversations.value[0].id)
+    if (!conversationId.value && !loadingConversations.value && conversations.value[0]) await openConversation(conversations.value[0].id)
     else await loadMessages(stamp)
   } catch { /* Unified request layer shows authentication and network errors. */ }
 }, { immediate: true })
