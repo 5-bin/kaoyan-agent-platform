@@ -2,6 +2,7 @@ package com.kaoyan.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kaoyan.common.ApiException;
+import com.kaoyan.dto.response.SchoolOptionsVO;
 import com.kaoyan.entity.School;
 import com.kaoyan.entity.SchoolDetail;
 import com.kaoyan.mapper.SchoolMapper;
@@ -22,6 +23,11 @@ import java.util.Map;
 public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> implements SchoolService {
 
     private final SchoolDetailService schoolDetailService;
+
+    @Override
+    public SchoolOptionsVO options() {
+        return new SchoolOptionsVO(baseMapper.listProvinces(), baseMapper.listMajorNames());
+    }
 
     @Override
     public List<School> search(String province, String level, String majorName) {

@@ -3,11 +3,18 @@
     <div class="hero">
       <h1>院校与专业</h1><p>按明确条件比较候选，逐条核对官方依据</p>
       <div class="search-bar">
-        <el-input v-model="q.province" placeholder="省份" clearable />
+        <el-select v-model="q.province" placeholder="省份" aria-label="省份" filterable clearable :loading="optionsLoading" no-data-text="暂无选项">
+          <el-option v-for="province in options.provinces" :key="province" :label="province" :value="province" />
+        </el-select>
         <el-select v-model="q.level" placeholder="层次" clearable><el-option v-for="level in ['985','211','双一流']" :key="level" :label="level" :value="level" /></el-select>
-        <el-input v-model="q.majorName" placeholder="专业名" clearable />
+        <el-select v-model="q.majorName" placeholder="专业名" aria-label="专业名" filterable clearable :loading="optionsLoading" no-data-text="暂无选项">
+          <el-option v-for="major in options.majorNames" :key="major" :label="major" :value="major" />
+        </el-select>
         <el-button @click="load">搜索院校库</el-button>
         <el-button type="primary" @click="openRecommendation">条件推荐</el-button>
+      </div>
+      <div v-if="optionsError" class="options-error" role="alert">
+        筛选选项加载失败 <el-button size="small" :loading="optionsLoading" @click="loadOptions">重试</el-button>
       </div>
     </div>
     <el-alert title="请核对专业详情中的招生年份、来源与适用条件。历史演示或估计数据不能作为报考依据；条件推荐使用独立核验资料。" type="warning" :closable="false" />
@@ -49,7 +56,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import { searchSchools } from '@/api/school'
+import { getSchoolOptions, searchSchools, type SchoolOptions } from '@/api/school'
 import { generateRecommend, getRecommendList } from '@/api/recommend'
 import { getCurrentUser } from '@/api/user'
 import { useUserStore } from '@/stores/user'
@@ -57,6 +64,8 @@ import TaskResultView from '@/components/TaskResultView.vue'
 import type { School, Task, User } from '@/types/api'
 const user = useUserStore()
 const q = reactive({ province: '', level: '', majorName: '' })
+const options = ref<SchoolOptions>({ provinces: [], majorNames: [] })
+const optionsLoading = ref(false), optionsError = ref(false)
 const list = ref<School[]>([]), history = ref<Task[]>([])
 const loading = ref(false), submitting = ref(false), dialog = ref(false)
 const profile = ref<User | null>(null), result = ref<Task | null>(null)
@@ -64,6 +73,19 @@ const historyTask = ref<Task | null>(null)
 const query = ref('请比较符合条件的专业，并说明考试科目及需要核对的事项。')
 const form = reactive({ majorCode: '081200', degreeType: 'academic', regions: [] as string[], regionConstraint: 'preferred', studyMode: 'full_time', explainWithAi: true })
 let searchVersion = 0, historyVersion = 0
+async function loadOptions() {
+  if (optionsLoading.value) return
+  const token = user.token
+  optionsLoading.value = true
+  try {
+    const data = await getSchoolOptions()
+    if (token !== user.token) return
+    options.value = data
+    optionsError.value = false
+  } catch {
+    if (token === user.token) optionsError.value = true
+  } finally { optionsLoading.value = false }
+}
 async function load() {
   const version = ++searchVersion
   loading.value = true
@@ -94,7 +116,7 @@ async function ask() {
   } catch { /* The request wrapper displays errors and discards stale account responses. */ }
   finally { submitting.value = false }
 }
-onMounted(() => { void load(); void loadHistory() })
+onMounted(() => { void loadOptions(); void load(); void loadHistory() })
 </script>
 <style scoped>
 .schools-page { max-width: 1000px; }
@@ -102,6 +124,7 @@ onMounted(() => { void load(); void loadHistory() })
 .hero h1 { margin: 0; }
 .search-bar, .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
 .search-bar .el-input, .search-bar .el-select { width: 100%; }
+.options-error { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
 .rows { margin: 20px 0; }
 .school-row { display: flex; justify-content: space-between; padding: 18px; margin: 10px 0; background: var(--c-surface); border: 1px solid var(--c-line); border-radius: 12px; color: var(--c-ink); text-decoration: none; }
 .history { padding: 20px; }

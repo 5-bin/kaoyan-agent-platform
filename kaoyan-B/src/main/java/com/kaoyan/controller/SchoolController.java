@@ -2,6 +2,7 @@ package com.kaoyan.controller;
 
 import com.kaoyan.common.Result;
 import com.kaoyan.dto.query.SchoolQuery;
+import com.kaoyan.dto.response.SchoolOptionsVO;
 import com.kaoyan.entity.School;
 import com.kaoyan.service.SchoolService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,12 @@ import java.util.Map;
 public class SchoolController {
 
     private final SchoolService schoolService;
+
+    @Operation(summary = "院校筛选选项", description = "返回库内已有的省份与专业名，去除空值及重复值并排序")
+    @GetMapping("/options")
+    public Result<SchoolOptionsVO> options() {
+        return Result.ok(schoolService.options());
+    }
 
     /**
      * 搜索院校（GET，普通 query 参数）
