@@ -67,3 +67,11 @@ Playwright服务入口改为`vite preview`，复用CI前序步骤已经生成的
 | 题目管理浏览器链路 | 10项通过；`.cache/ci-fix-question-admin-20261024-1846.json` |
 
 同时通过`node --check scripts/browser-chat.cjs`和`git diff --check`。临时服务结束后由脚本关闭；没有启动日常数据库或Redis，没有调用付费模型。最新完整Linux结果仍以修复PR的Checks为准。
+
+## 手动笔记场景的异步完成边界
+
+[第三轮CI](https://github.com/5-bin/kaoyan-agent-platform/actions/runs/40087360433)再次通过Java、146项浏览器检查及15项HTTP链路；聊天脚本在手动笔记的v2标题等待处超时。原日志没有区分保存后与重新打开后的两个相同等待点。
+
+检查脚本发现：创建成功响应会先显示v1标题，而`save()`还要等待笔记列表并更新带`noteId`的路由；此时记录`page.url()`可能仍得到不含笔记ID的`/notes`。脚本现明确等待带ID的路由再记录重开地址，并在编辑后核对实际PUT返回200。另增阶段标记和失败截图，使保存、重开和历史版本错误可以区分；CI失败产物补充聊天日志及聊天／学情截图目录。
+
+本机再次运行完整聊天链路11项通过，报告为`.cache/ci-fix-chat-route-20261024-1857.json`；脚本语法、文档与差异检查通过。该轮改动没有修改业务保存逻辑；Linux效果继续由最新PR检查核对。
