@@ -1,6 +1,6 @@
-# CI题目索引冷启动重试修复
+# CI索引等待与浏览器检查修复
 
-日期：2026-10-24。基线：`7efc315`。范围仅为隔离聊天集成测试及其Python夹具，无生产接口、限额、数据库或模型配置变更。
+日期：2026-10-24。基线：`7efc315`。范围为隔离聊天集成测试、Python夹具、浏览器测试服务及聊天断言和验证文档，无生产接口、限额、数据库或模型配置变更。
 
 ## 失败与原因
 
@@ -51,3 +51,19 @@ git diff --check
 Playwright服务入口改为`vite preview`，复用CI前序步骤已经生成的生产构建，不加载Vite开发客户端。README同步明确先构建再运行浏览器检查。保留原有迟到响应与账号隔离断言，不通过放宽等待时间或跳过用例来规避失败。
 
 本轮本机重新执行`npm run build`通过，保留既有大chunk提示；随后使用全新Chrome上下文运行完整桌面／移动端浏览器回归，146项全部通过（2.1分钟），包含原退出登录失败用例。日志为`/private/tmp/kaoyan-ci-preview-build-20261024.log`和`/private/tmp/kaoyan-ci-preview-e2e-20261024.log`。未改动应用业务代码或放宽测试断言。
+
+## 后续聊天链路断言修复
+
+[第二轮CI](https://github.com/5-bin/kaoyan-agent-platform/actions/runs/40086739859)已通过Java129项、浏览器146项和15项真实HTTP／浏览器链路检查。连续聊天步骤随后失败：新增逐条引用支持度列表后，“线程共享地址空间，保留各自的栈。”同时出现在正文段落和核验列表中，旧的全页文本定位触发Playwright严格模式，匹配到2个元素。
+
+`scripts/browser-chat.cjs`将回答断言限定在`.task-result .markdown`正文区域，仍核对首轮、追问和刷新后的第二条正文，不使用任意元素来代替目标正文。
+
+本机后续实跑剩余链路，全部使用随机端口、隔离H2、Redis与模型替身、独立Chrome上下文：
+
+| 检查 | 结果与本地报告 |
+| --- | --- |
+| 连续聊天、文档及重启恢复 | 11项通过；`.cache/ci-fix-chat-20261024-1846.json` |
+| 学情助手、隐私与受控操作 | 17项通过；`.cache/ci-fix-learning-20261024-1846.json` |
+| 题目管理浏览器链路 | 10项通过；`.cache/ci-fix-question-admin-20261024-1846.json` |
+
+同时通过`node --check scripts/browser-chat.cjs`和`git diff --check`。临时服务结束后由脚本关闭；没有启动日常数据库或Redis，没有调用付费模型。最新完整Linux结果仍以修复PR的Checks为准。
