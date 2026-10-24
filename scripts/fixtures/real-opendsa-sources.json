@@ -1,0 +1,635 @@
+{
+  "retrievedAt": "2026-10-24",
+  "repository": "OpenDSA/OpenDSA",
+  "files": [
+    {
+      "path": "Exercises/Sorting/InssortMCQcostb.html",
+      "dir": "Sorting",
+      "name": "InssortMCQcostb",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA Insertion Sort Exercise: Multiple Choice Question 3</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"InssortMCQcostbp\">\n          <p class=\"question\">What is the best-case time for\n            Insertionsort to sort an array of n records?</p>\n          <div class=\"solution\"><code>\\Theta(n)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n^2)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n \\log n)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>The best-case cost occurs when the records are already in sorted\n              order from lowest to highest.</p>\n            <p>In this case, every test on the inner for loop will\n              fail immediately, and no records will be moved.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "bb1d2d17236b04e611ec944cd4cf120c0d36f4e8",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/InssortMCQcostb.html",
+      "display_title": "InssortMCQcostb.html"
+    },
+    {
+      "path": "Exercises/Sorting/InssortMCQcosta.html",
+      "dir": "Sorting",
+      "name": "InssortMCQcosta",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math spin\" lang=\"en\">\n  <head>\n    <title>OpenDSA Insertion Sort Exercise: Multiple Choice Question 2</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"InssortMCQcostap\">\n          <div class=\"spin\">\n            <p class=\"question\">What is the {average|worst}-case time for\n              Insertion Sort to sort an array of n records?</p>\n          </div>\n          <div class=\"solution\"><code>\\Theta(n^2)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n \\log n)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>In the worst case, each record must make its way to the\n              start of the array. This would occur if the record values are\n              initially arranged from highest to lowest, in the reverse\n              of sorted order.</p>\n            <p>In this case, the number of comparisons will be one the\n              first time through the for loop, two the second time, and\n              so on.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "bef1e0f24ce11bce6d5b9ec6fd36651ec8a0d387",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/InssortMCQcosta.html",
+      "display_title": "InssortMCQcosta.html"
+    },
+    {
+      "path": "Exercises/Sorting/InssortMCQcomplex.html",
+      "dir": "Sorting",
+      "name": "InssortMCQcomplex",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Insertion Sort Question: Complexity</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n  <body>\n\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"InssortMCQcomplexp\">\n          <p class=\"question\">In which cases are the growth rates\n            the same for Insertion Sort?</p>\n          <div class=\"solution\">Worst and Average only</div>\n          <ul class=\"choices\">\n            <li>Worst and Best only</li>\n            <li>Best and Average only</li>\n            <li>Worst, Average, and Best</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Insertion Sort is really cheap in the best case.</p>\n            <p>Its average and worst case times differ by a constant factor.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "0630d8d3f7f12c1961a3fa34a7d8bdf9527e1fb8",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/InssortMCQcomplex.html",
+      "display_title": "InssortMCQcomplex.html"
+    },
+    {
+      "path": "Exercises/Sorting/InssortMCQsorted.html",
+      "dir": "Sorting",
+      "name": "InssortMCQsorted",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Insertion Sort Question: Sorted Input</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"InssortMCQsortedp\">\n          <p class=\"question\"> What is the running time of Insertion Sort\n            when the input is an array that has already been sorted? </p>\n          <div class=\"solution\"><code>\\Theta(n)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n^2)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n \\log n)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>Each test in the inner for loop will fail because the\n              value at position <code>i</code> is never less than the\n              value at position <code>i-1</code>.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "6bcfed783f22de381f9cb5fc58c963ac72591854",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/InssortMCQsorted.html",
+      "display_title": "InssortMCQsorted.html"
+    },
+    {
+      "path": "Exercises/Sorting/SelsortMCQcost.html",
+      "dir": "Sorting",
+      "name": "SelsortMCQcost",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math spin\" lang=\"en\">\n  <head>\n    <title>Selection Sort: Cost</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"SelsortMCQcostp\">\n          <div class=\"spin\">\n            <p class=\"question\">What is the {best|average|worst}-case time for\n              Selection Sort to sort an array of n records?</p>\n          </div>\n          <div class=\"solution\"><code>\\Theta(n^2)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n \\log n)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>Does Selection Sort's order and number of comparisons\n              depend on the particular order of the input array?</p>\n            <p>No, it does not.</p>\n            <p>Recall that our implementation for Selection Sort will\n              try to swap even if the current record is in its correct\n              location.\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "5afbe8c68168b748cade349fa444b156b7fc4d22",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/SelsortMCQcost.html",
+      "display_title": "SelsortMCQcost.html"
+    },
+    {
+      "path": "Exercises/Sorting/SelsortMCQswaps.html",
+      "dir": "Sorting",
+      "name": "SelsortMCQswaps",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math spin\" lang=\"en\">\n  <head>\n    <title>Selection Sort: Swaps</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n  <body>\n\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"SelsortMCQswapsp\">\n          <div class=\"spin\">\n            <p class=\"question\"> In the {best|average|worst} case, the\n              total number of swaps done by Selection Sort is closest to: </p>\n          </div>\n          <div class=\"solution\"><code>n</code></div>\n          <ul class=\"choices\">\n            <li><code>n^2/2</code></li>\n            <li><code>n^2</code></li>\n            <li><code>n \\log n</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>Does Selection Sort's number of swaps\n              depend on the particular order of the input array?</p>\n            <p>No, it does not.</p>\n            <p>Recall that our implementation for Selection Sort will\n              try to swap even if the current record is in its correct\n              location.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "5a84f7dbebb826ff0955a315043ad6860d8e94bf",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/SelsortMCQswaps.html",
+      "display_title": "SelsortMCQswaps.html"
+    },
+    {
+      "path": "Exercises/Sorting/HeapsortMCQcost.html",
+      "dir": "Sorting",
+      "name": "HeapsortMCQcost",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math spin\" lang=\"en\">\n  <head>\n    <title>Heapsort Question: Cost</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HeapsortMCQcostp\">\n          <div class=\"spin\">\n            <p class=\"question\">What is the {best|average|worst}-case time for\n              Heapsort to sort an array of n records that each have unique\n              key values?</p>\n          </div>\n          <div class=\"solution\"><code>\\Theta(n \\log n)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n^2)</code></li>\n            <li><code>\\Theta(n^n)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>Does Heapsort's number of comparisons depend on the\n              particular order of the input array?</p>\n            <p>Only a little bit, Heapsort still does basically the\n              same work regardless of input data order.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "1c4d4211f69993196cf0ef7f73245fde93914a74",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/HeapsortMCQcost.html",
+      "display_title": "HeapsortMCQcost.html"
+    },
+    {
+      "path": "Exercises/Sorting/HeapsortMCQspace.html",
+      "dir": "Sorting",
+      "name": "HeapsortMCQspace",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Heapsort Question: Space Requirements</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HeapsortMCQspacep\">\n          <p class=\"question\">How much auxilliary space or overhead\n            (beyond the array holding the records) is needed by Heapsort?</p>\n          <div class=\"solution\"><code>\\Theta(1)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n)</code></li>\n            <li><code>\\Theta(n^2)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>Heapsort does not require any auxilliary arrays.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "5a9eb15473644560049950c76b4eb5e6e8bae352",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/HeapsortMCQspace.html",
+      "display_title": "HeapsortMCQspace.html"
+    },
+    {
+      "path": "Exercises/Sorting/MergesortMCQcost.html",
+      "dir": "Sorting",
+      "name": "MergesortMCQcost",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math spin\" lang=\"en\">\n  <head>\n    <title>Mergesort Cost Question</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"MergesortMCQcostp\">\n          <div class=\"spin\">\n            <p class=\"question\">What is the {best|average|worst}-case time for\n              Mergesort to sort an array of <code>n</code> records?</p>\n          </div>\n          <div class=\"solution\"><code>\\Theta(n \\log n)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n^2)</code></li>\n            <li><code>\\Theta(n^n)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>Does Mergesort's number of comparisons depend on the\n              particular order of the input array?</p>\n            <p>No, it does not.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "8dc9fa47e2cf8743ae78ba6e60e07442509ce54a",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/MergesortMCQcost.html",
+      "display_title": "MergesortMCQcost.html"
+    },
+    {
+      "path": "Exercises/Sorting/MergesortMCQcomplex.html",
+      "dir": "Sorting",
+      "name": "MergesortMCQcomplex",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Mergesort Question: Complexity</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"MergesortMCQcomplexp\">\n          <p class=\"question\">In which cases are the time complexities the\n            same for Mergesort?</p>\n          <div class=\"solution\">Worst, Average and Best</div>\n          <ul class=\"choices\">\n            <li>Worst and Best</li>\n            <li>Best and Average</li>\n            <li>Worst and Average</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Does Mergesort's cost vary according to the order of the\n              array input values?</p>\n            <p>No, it does not matter what order the input values have.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "1c6619523cf82ad12c54422d1f20bacb97e6befe",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/MergesortMCQcomplex.html",
+      "display_title": "MergesortMCQcomplex.html"
+    },
+    {
+      "path": "Exercises/Sorting/QuicksortMCQcosta.html",
+      "dir": "Sorting",
+      "name": "QuicksortMCQcosta",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Quicksort Multiple Choice Question: Cost</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"QuicksortMCQcostap\">\n          <p class=\"question\">What is the worst-case cost for Quicksort\n            to sort an array of n elements?</p>\n          <div class=\"solution\"><code>\\Theta(n^2)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n \\log n)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>There are a few really bad inputs.</p>\n            <p>The bad cases have pivots that repeatedly reduce the\n              partition size by one.</p>\n            <p>That leads to a series of partition sizes of\n              <code>n-1</code>, <code>n-2></code>, and so on.\n            <p>Since the time to process a partition is linear on its\n              size, this in turn leads to a cost for the whole algorithm\n              that is the sum of <code>i</code> from 2 to\n              <code>n-1</code>, that you should be very familiar with.\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "774eefb01c45dacd2a21ae6c9c6fd8a6120a9ef6",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/QuicksortMCQcosta.html",
+      "display_title": "QuicksortMCQcosta.html"
+    },
+    {
+      "path": "Exercises/Sorting/QuicksortMCQcostb.html",
+      "dir": "Sorting",
+      "name": "QuicksortMCQcostb",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math spin\" lang=\"en\">\n  <head>\n    <title>Quicksort Multiple Choice Question: Cost</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"QuicksortMCQcostbp\">\n          <div class=\"spin\">\n            <p class=\"question\">What is the {best|average}-case cost for Quicksort\n              to sort an array of n elements?</p>\n          </div>\n          <div class=\"solution\"><code>\\Theta(n \\log n)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n^2)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>While there are a few bad inputs, they are so few as to not\n              affect the average or best cases.</p>\n            <p>The best thing that can happen is that every pivot split\n              its partition in half. Something close to this happens in the\n              average case.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "0fe8897e79d2dbdb4999f26e966f914321feec50",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/QuicksortMCQcostb.html",
+      "display_title": "QuicksortMCQcostb.html"
+    },
+    {
+      "path": "Exercises/Sorting/BubsortMCQcost.html",
+      "dir": "Sorting",
+      "name": "BubsortMCQcost",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math spin\" lang=\"en\">\n  <head>\n    <title>Bubble Sort Question</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"BubsortMCQcostp\">\n          <div class=\"spin\">\n            <p class=\"question\">What is the {best|average|worst}-case time for\n              Bubble Sort (as the algorithm is presented in this module)\n              to sort an array of <code>n</code> records?</p>\n          </div>\n          <div class=\"solution\"><code>\\Theta(n^2)</code></div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(n)</code></li>\n            <li><code>\\Theta(\\log n)</code></li>\n            <li><code>\\Theta(n \\log n)</code></li>\n            <li><code>\\Theta(n^n)</code></li>\n          </ul>\n          <div class=\"hints\">\n            <p>Does Bubble Sort's number of comparisons depend on the\n              particular order of the input array?</p>\n            <p>No, it does not.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "4f48a5f01b9d22f26c4458c77f3c5eb6e29d350b",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/BubsortMCQcost.html",
+      "display_title": "BubsortMCQcost.html"
+    },
+    {
+      "path": "Exercises/Sorting/ShellsortMCQ2.html",
+      "dir": "Sorting",
+      "name": "ShellsortMCQ2",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title> Shellsort Multiple Choice Question 2</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ShellsortMCQ2p\">\n          <p class=\"question\">What is the best case input for Shellsort?</p>\n          <div class=\"solution\">A sorted array because each sublist is\n            sorted in linear time</div>\n          <ul class=\"choices\">\n            <li>A reverse sorted array because because all the sublists\n              are sorted in linear time</li>\n            <li>A random array, without too much order or dis-order, which\n              will keep things balanced</li>\n            <li>It doesn't matter, all inputs of a given size will cost the same</li>\n          </ul>\n          <div class=\"hints\">\n            <p>The order of the input does affect the cost.</p>\n            <p>Remember what sort is used for sorting the sublists.</p>\n            <p>Insertion sort is used to sort the sublists.</p>\n            <p>Insertion sort's best case is when the input is ordered</p>\n            <p>If the input to Shellsort is ordered, than the input to\n              each call to Insertion sort on the sublists will also be\n              ordered.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n",
+      "encoding": "utf-8",
+      "sha": "43cff01bebad86be2bdb62a8cb9af2ab662dd94f",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/ShellsortMCQ2.html",
+      "display_title": "ShellsortMCQ2.html"
+    },
+    {
+      "path": "Exercises/Sorting/SortBoundMCQ1.html",
+      "dir": "Sorting",
+      "name": "SortBoundMCQ1",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Sorting Lower Bounds Question 1</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"SortBoundMCQ1p\">\n          <p class=\"question\">The upper bound for a problem is defined to be:</p>\n          <div class=\"solution\">The cost of the best algorithm that we know for the problem</div>\n          <ul class=\"choices\">\n            <li>The cost of the worst algorithm that we know for the problem</li>\n            <li>The same as the lower bound for the problem</li>\n            <li>The cost of the worst case input for the problem</li>\n          </ul>\n          <div class=\"hints\">\n            <p>For a given problem, it is possible to write an algorithm\n              that is as bad as we want. So defining a bound in terms of bad\n              algorithms is not useful.</p>\n            <p>We look at the worst-case input to determine the worst-case\n              upper bound for an algorithm, not a problem.</p>\n            <p>To get the upper bound for a problems, we\n              compare the cost for each algorithm that we know.</p>\n            <p>The upper bound of the problem is the upper bound of the\n              best known algorithm.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n</div>\n</body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "7e7b0a828ab119b599eaf3d8fcd911f6cad32417",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/SortBoundMCQ1.html",
+      "display_title": "SortBoundMCQ1.html"
+    },
+    {
+      "path": "Exercises/Sorting/SortBoundMCQ2.html",
+      "dir": "Sorting",
+      "name": "SortBoundMCQ2",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Sorting Lower Bounds Question 2</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"SortBoundMCQ2p\">\n          <p class=\"question\">The lower bound for a problem is defined to be:</p>\n          <div class=\"solution\">The best possible cost for any algorithm that solves the problem</div>\n          <ul class=\"choices\">\n            <li>The cost of the best algorithm that we know for the problem</li>\n            <li>The same as the upper bound for the problem</li>\n            <li>The cost of the best case input for the problem</li>\n            <li>The maximum cost that any algorithm to solve the problem could have</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Upper and lower bounds are used to describe to what we\n              know, and we do not always know that these are the same for\n              a given algorithm.</p>\n            <p>Lower bound refers to the class of inputs that we are\n              considering (best, average, or worst-case). So it does NOT\n              necessarily have anything to do with the best-case\n              input.</p>\n            <p>The cost of the best algorithm that we know sets a limit\n              on the upper bound of the problem, not the lower bound.</p>\n            <p>The lower bound refers to the best possible cost (for the\n              class of inputs, such as worst-case) for ANY algorithm that\n              solves the problem.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n</div>\n</body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "edbee6910792e191e2a10b797dbca2de30758343",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Sorting/SortBoundMCQ2.html",
+      "display_title": "SortBoundMCQ2.html"
+    },
+    {
+      "path": "Exercises/List/ListdsMCQfifo.html",
+      "dir": "List",
+      "name": "ListdsMCQfifo",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>General List Questions: FIFO Data Structure</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ListdsMCQfifop\">\n          <p class=\"question\">The term \"FIFO\" is associated with which\n            data structure?</p>\n          <div class=\"solution\">Queue</div>\n          <ul class=\"choices\">\n            <li>List</li>\n            <li>Stack</li>\n            <li>Freelist</li>\n            <li>All of these</li>\n            <li>None of these</li>\n          </ul>\n          <div class=\"hints\">\n            <p>FIFO means \"first-in, first-out\"</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "f790d3502ba1b8686f3b8b06fd63f1cf31bf50c3",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/ListdsMCQfifo.html",
+      "display_title": "ListdsMCQfifo.html"
+    },
+    {
+      "path": "Exercises/List/ListdsMCQlifo.html",
+      "dir": "List",
+      "name": "ListdsMCQlifo",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>General List Questions: LIFO Data Structure</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ListdsMCQlifop\">\n          <p class=\"question\">The term \"LIFO\" is associated with which\n            data structure?</p>\n          <div class=\"solution\">Stack</div>\n          <ul class=\"choices\">\n            <li>List</li>\n            <li>Queue</li>\n            <li>All of these</li>\n            <li>None of these</li>\n          </ul>\n          <div class=\"hints\">\n            <p>LIFO means \"Last-in, First-out\".</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "4d5cdfee2fa026b8a04c8758ecb1dc2b78f2f3b4",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/ListdsMCQlifo.html",
+      "display_title": "ListdsMCQlifo.html"
+    },
+    {
+      "path": "Exercises/List/ListdsMCQpshpp.html",
+      "dir": "List",
+      "name": "ListdsMCQpshpp",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>General List Questions: Push and Pop Data Structure</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ListdsMCQpshppp\">\n          <p class=\"question\">The terms \"push\" and \"pop\" are associated\n            with which data structure?</p>\n          <div class=\"solution\">Stack</div>\n          <ul class=\"choices\">\n            <li>Queue</li>\n            <li>Array</li>\n            <li>List</li>\n            <li>All of these</li>\n            <li>None of these</li>\n          </ul>\n          <div class=\"hints\">\n            <p>\"Push\" and \"pop\" are special terminology associated with\n              one of these data structures.</p>\n            <p>You push items onto a stack, and pull them off.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "598ced470ec5ff6549c05964b9cf4c83d4e5f215",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/ListdsMCQpshpp.html",
+      "display_title": "ListdsMCQpshpp.html"
+    },
+    {
+      "path": "Exercises/List/ListdsMCQenqdq.html",
+      "dir": "List",
+      "name": "ListdsMCQenqdq",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n<head>\n  <title>General List Questions: Enqueue and Dequeue Data Structure</title>\n  <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n  <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  <script src=\"../../lib/splice-iframe.js\"></script> \n\n</head>\n\n<body>\n<div class=\"exercise\">\n  <div class=\"problems\">\n    <div id=\"ListdsMCQenqdqp\">\n      <p class=\"question\">The terms \"enqueue\" and \"dequeue\" are\n      associated with which data structure?</p>\n      <div class=\"solution\">Queue</div>\n      <ul class=\"choices\">\n\t<li>Stack</li>\n        <li>Array</li>\n\t<li>List</li>\n        <li>All of these</li>\n        <li>None of these</li>\t\t  \t \n      </ul>\n      <div class=\"hints\">\n        <p>What does \"enqueue\" and \"dequeue\" mean?</p>\n      </div>\n    </div> \n  </div>\n</div>\n</body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "8fe98740e9365508115dffe0405d9cb45127df53",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/ListdsMCQenqdq.html",
+      "display_title": "ListdsMCQenqdq.html"
+    },
+    {
+      "path": "Exercises/List/ListdsMCQrcrsn.html",
+      "dir": "List",
+      "name": "ListdsMCQrcrsn",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>General List Questions: Data Structure for Recursion</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ListdsMCQrcrsnp\">\n          <p class=\"question\">Which data structure would be used to\n            implement recursion?</p>\n          <div class=\"solution\">Stack</div>\n          <ul class=\"choices\">\n            <li>Queue</li>\n            <li>Array-based list</li>\n            <li>Linked list</li>\n            <li>Tree</li>\n          </ul>\n          <div class=\"hints\">\n            <p>When unwinding from recursion, we say that you \"pop\" the recursive \"stack\".</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "0651daaf6cd64f6803be81326b5157454faf7ca3",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/ListdsMCQrcrsn.html",
+      "display_title": "ListdsMCQrcrsn.html"
+    },
+    {
+      "path": "Exercises/List/StackQMCQqchrct.html",
+      "dir": "List",
+      "name": "StackQMCQqchrct",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA Stack/Queue Exercise: Queue Characteristic</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"StackQMCQqchrctp\">\n          <p class=\"question\">Queue behavior is typically referred to as:</p>\n          <div class=\"solution\">First-In, First-Out</div>\n          <ul class=\"choices\">\n            <li>Last-In, First-Out</li>\n            <li>First Come, First Served</li>\n            <li>Just-in-Time</li>\n          </ul>\n          <div class=\"hints\">\n            <p>In a queue, we remove the one that came in first.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "709129ed7f32e2504ba06e90ef8ce816fdbc3424",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/StackQMCQqchrct.html",
+      "display_title": "StackQMCQqchrct.html"
+    },
+    {
+      "path": "Exercises/List/StackQMCQschrct.html",
+      "dir": "List",
+      "name": "StackQMCQschrct",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA Stack/Queue Exercise: Stack Characteristic</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"StackQMCQschrctp\">\n          <p class=\"question\">The Stack is best characterized as:</p>\n          <div class=\"solution\">Last-In, First-Out</div>\n          <ul class=\"choices\">\n            <li>First-In, First-Out</li>\n            <li>First come, First Served</li>\n            <li>Just-in-Time</li>\n          </ul>\n          <div class=\"hints\">\n            <p>The queue is called \"First-in, First-out\"</p>\n            <p>The stack is called \"Last-in, First-out\"</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "fb0df164483902facc77d98af9133934d8d603b6",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/StackQMCQschrct.html",
+      "display_title": "StackQMCQschrct.html"
+    },
+    {
+      "path": "Exercises/List/ListdsMCQntlnr.html",
+      "dir": "List",
+      "name": "ListdsMCQntlnr",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>General List Questions: Non-Linear Data Structure</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ListdsMCQntlnrp\">\n          <p class=\"question\">Which of the following is not a linear data\n            structure?</p>\n          <div class=\"solution\">Tree</div>\n          <ul class=\"choices\">\n            <li>Queue</li>\n            <li>Array-based list</li>\n            <li>Linked list</li>\n            <li>Stack</li>\n            <li>These are all linear data structures</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Which is the one data structure not covered in this chapter?</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "2a5a5bb7864f99166d75a00319cd807d492987ff",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/ListdsMCQntlnr.html",
+      "display_title": "ListdsMCQntlnr.html"
+    },
+    {
+      "path": "Exercises/Graph/GAdjacentMCQ.html",
+      "dir": "Graph",
+      "name": "GAdjacentMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Graph Term: Adjacent</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"GAdjacentMCQp\">\n          <p class=\"question\">When a vertex  Q is connected by an edge to\n            a vertex K, what is the term for their relationship?</p>\n          <div class=\"solution\">Q and K are adjacent</div>\n          <ul class=\"choices\" data-none=\"true\">\n            <li>Q and K are incident</li>\n            <li>Q and K are insecure</li>\n            <li>Q and K are isolated</li>\n          </ul>\n          <div class=\"hints\">\n            <p>An edge connecting two vertices is incident\n              on these vertices.</p>\n            <p>Two vertices connected by an edge are adjacent.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "ac911787bb0c5a6740bf5cff15e158e6b7f03a66",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Graph/GAdjacentMCQ.html",
+      "display_title": "GAdjacentMCQ.html"
+    },
+    {
+      "path": "Exercises/Graph/GcliqueMCQ.html",
+      "dir": "Graph",
+      "name": "GcliqueMCQ",
+      "content": "!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title> Graph Clique 1 </title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body data-height=\"650\" data-width=\"950\">\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"GcliqueMCQp\">\n          <p class=\"question\">Given a subset S of the vertices in a\n            graph, when all vertices in S connect to all other\n            vertices in S, this is called a:</p>\n          <div class=\"solution\">clique</div>\n          <ul class=\"choices\" data-show=\"4\" data-none=\"true\">\n            <li>connected component</li>\n            <li>directed graph</li>\n            <li>DAG</li>\n            <li>sparse graph</li>\n            <li>sparse matrix</li>\n          </ul>\n          <div class=\"hints\">\n            <p>A clique is a subset of the graph where all the vertices in\n              the subgraph connect to the other vertices.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "e2a6385cdc1e21bcd2b862822a587ecf5fc71bcc",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Graph/GcliqueMCQ.html",
+      "display_title": "GcliqueMCQ.html"
+    },
+    {
+      "path": "Exercises/Graph/GcompleteMCQ.html",
+      "dir": "Graph",
+      "name": "GcompleteMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title> Graph Complete 1 </title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"GcompleteMCQp\">\n          <p class=\"question\">A complete graph is a clique of size:</p>\n          <div class=\"solution\">|V|</div>\n          <ul class=\"choices\" data-none=\"true\">\n            <li>|E|</li>\n            <li>|n|</li>\n            <li>n</li>\n          </ul>\n          <div class=\"hints\">\n            <p>A graph containing all possible edges\n              is said to be a complete graph</p>\n            <p>Any subset of V where all vertices in the\n              subset connect to all other vertices in the\n              subset is called a clique</p>\n            <p>A complete graph is a clique of size |V|.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "01e74da0d4483ef00a9661e70cbb5bec2590ddd5",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Graph/GcompleteMCQ.html",
+      "display_title": "GcompleteMCQ.html"
+    },
+    {
+      "path": "Exercises/Graph/GcycleMCQ.html",
+      "dir": "Graph",
+      "name": "GcycleMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n<head>\n  <title>Graph Terms: Cycles</title>\n  <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n  <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n</head>\n\n<body>\n<div class=\"exercise\">\n  <div class=\"problems\">\n    <div id=\"GcycleMCQp\">\n      <p class=\"question\">A graph without cycles is called a/an:</p>\n      <div class=\"solution\">acyclic graph</div>\n      <ul class=\"choices\" data-show=\"5\" data-none=\"true\">\n        <li>undirected graph</li>\n        <li>directed graph</li>\n        <li>simple graph</li>\n        <li>connected graph</li>\n        <li>complete graph</li>\n      </ul>\n      <div class=\"hints\">\n        <p>An acyclilc graph has no cycles.</p>\n      </div>\n    </div>\n  </div>\n</div>\n</body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "e38ec2e116729b7d4797f9c4de30a8a37670ff12",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Graph/GcycleMCQ.html",
+      "display_title": "GcycleMCQ.html"
+    },
+    {
+      "path": "Exercises/Graph/GdegreeMCQ.html",
+      "dir": "Graph",
+      "name": "GdegreeMCQ",
+      "content": "!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title> Graph Terms: Degree </title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"GdegreeMCQp\">\n          <p class=\"question\">The number of edges incident to that\n            vertex called its:</p>\n          <div class=\"solution\">degree</div>\n          <ul class=\"choices\" data-none=\"true\">\n            <li>count</li>\n            <li>number</li>\n            <li>size</li>\n            <li>depth</li>\n          </ul>\n          <div class=\"hints\">\n            <p>An edge connecting vertices is said to be\n              incident.</p>\n            <p>The degree of a vertex is the number\n              of graph edges it touches.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "b0363fece47e71ad1f593f9098636cd9b6fe1c02",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Graph/GdegreeMCQ.html",
+      "display_title": "GdegreeMCQ.html"
+    },
+    {
+      "path": "Exercises/Graph/GdigraphMCQ.html",
+      "dir": "Graph",
+      "name": "GdigraphMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title> Graph Digraph TF 1</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"GdigraphMCQp\">\n          <p class=\"question\">A digraph is a:</p>\n          <div class=\"solution\">directed graph</div>\n          <ul class=\"choices\" data-none=\"true\">\n            <li>undirected graph</li>\n            <li>connected component</li>\n            <li>DAG</li>\n          </ul>\n          <div class=\"hints\">\n            <p>A directed graph is also called a digraph.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "5b5a314be3c9f08ffc98c4124c2963d8daca180a",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Graph/GdigraphMCQ.html",
+      "display_title": "GdigraphMCQ.html"
+    },
+    {
+      "path": "Exercises/Graph/GsimppathMCQ.html",
+      "dir": "Graph",
+      "name": "GsimppathMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Graph Simple Path</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"GsimppathMCQp\">\n          <p class=\"question\">A simple path:</p>\n          <div class=\"solution\">must have all vertices be unique</div>\n          <ul class=\"choices\" data-none=\"true\">\n            <li>allows repetition of vertices so long as the\n              length of the path is less than 5</li>\n            <li>allows repetition of vertices so long as no edge\n              is repeated</li>\n            <li>must have all vertices unique except that the\n              first and last vertices are the same</li>\n          </ul>\n          <div class=\"hints\">\n            <p>A path is simple if all vertices on the path are distinct.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "34cd8e761bd370ecbf7b0d5af68db28f1058eebd",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Graph/GsimppathMCQ.html",
+      "display_title": "GsimppathMCQ.html"
+    },
+    {
+      "path": "Exercises/Graph/GsimpcycleMCQ.html",
+      "dir": "Graph",
+      "name": "GsimpcycleMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Graph Simple Cycle</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"GsimpcycleMCQp\">\n          <p class=\"question\">A simple cycle:</p>\n          <div class=\"solution\">must have all vertices unique except\n            that the first and last vertices are the same</div>\n          <ul class=\"choices\" data-none=\"true\">\n            <li>allows repetition of vertices so long as the length of the path is less than 5</li>\n            <li>allows repetition of vertices so long as no edge is repeated</li>\n            <li>must have all vertices be unique</li>\n          </ul>\n          <div class=\"hints\">\n            <p>A cyle is simple if all vertices on the cycle are distinct,\n              with the first and last vertices being the same.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "4a53ad7e51fb93f3d2b29630b071f517aa97367e",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Graph/GsimpcycleMCQ.html",
+      "display_title": "GsimpcycleMCQ.html"
+    },
+    {
+      "path": "Exercises/Hashing/HashMCQcollision.html",
+      "dir": "Hashing",
+      "name": "HashMCQcollision",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Hashing Question: Collisions</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HashMCQcollisionp\">\n          <p class=\"question\"> Which is the best definition for\n            collision in a hash table?</p>\n          <div class=\"solution\">Two records with different keys have the same hash value</div>\n          <ul class=\"choices\" data-show=\"4\">\n            <li>Two records are identical except for their keys</li>\n            <li>Two records have the same key</li>\n            <li>Two records have the same key and the same hash value</li>\n            <li>Two records with the same key have different hash values</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Collision occurs when two keys try to go to the same slot.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "601fb63ccd27b34b65e1ffbca4b03aa9586ffd1b",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Hashing/HashMCQcollision.html",
+      "display_title": "HashMCQcollision.html"
+    },
+    {
+      "path": "Exercises/Hashing/HashMCQhashdef.html",
+      "dir": "Hashing",
+      "name": "HashMCQhashdef",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Hashing Question: Hash Function Definition</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HashMCQhashdefp\">\n          <p class=\"problem\">(Recall that <code>M</code> refers to the size of a hash table.)</p>\n          <p class=\"question\">A hash function must:</p>\n          <div class=\"solution\">Return a value between 0 and <code>M-1</code></div>\n          <ul class=\"choices\" data-show=\"4\">\n            <li>Return a value between 1 and <code>M</code></li>\n            <li>Return the position of a free slot in the table</li>\n            <li>Return the hash value for the key</li>\n            <li>Return values in equal distribution throughout the table</li>\n          </ul>\n          <div class=\"hints\">\n            <p>A hash function should always give you a legal index into\n              the hash table array.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "f635992db61047e6ac85008bca94574e90818d7b",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Hashing/HashMCQhashdef.html",
+      "display_title": "HashMCQhashdef.html"
+    },
+    {
+      "path": "Exercises/Hashing/HashMCQlinprob.html",
+      "dir": "Hashing",
+      "name": "HashMCQlinprob",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Hashing Question: Linear Probing</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HashMCQlinprobp\">\n          <p class=\"question\">What is a disadvantage of linear probing?</p>\n          <div class=\"solution\">You tend to get primary clustering</div>\n          <ul class=\"choices\" data-show=\"4\" data-none=\"true\">\n            <li>It can lead to allocating a lot of extra memory</li>\n            <li>You tend to get primary clustering</li>\n            <li>You tend to get secondary clustering</li>\n            <li>The algorithm is difficult to program</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Clusters pile up into bigger clusters.</p>\n            <p>This is called primary clustering.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "0a16beeaad09b5bd406ca7cdbc42368dc6013384",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Hashing/HashMCQlinprob.html",
+      "display_title": "HashMCQlinprob.html"
+    },
+    {
+      "path": "Exercises/Hashing/HashMCQopen.html",
+      "dir": "Hashing",
+      "name": "HashMCQopen",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Hashing Question: Open Hashing</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HashMCQopenp\">\n          <p class=\"question\"> Which of the following is true of open hashing? </p>\n          <div class=\"solution\">Records are stored on a list associated\n            with a slot in the hash table</div>\n          <ul class=\"choices\">\n            <li>All records are stored directly within the hash table</li>\n            <li>The algorithm running time is determined by probes of\n              different table cells until an empty one is found</li>\n          </ul>\n          <div class=\"hints\">\n            <p>In open hashing, where are the records stored?</p>\n            <p>They are stored in linked lists outside the table.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "509bd8f78ef4f66a5718d9ab75ee0e776e8d98f9",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Hashing/HashMCQopen.html",
+      "display_title": "HashMCQopen.html"
+    },
+    {
+      "path": "Exercises/Hashing/HashMCQprobe.html",
+      "dir": "Hashing",
+      "name": "HashMCQprobe",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Hashing Question: Probe Sequence</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HashMCQprobep\">\n          <p class=\"question\"> Which is the best definition for\n            a probe sequence?</p>\n          <div class=\"solution\">The order in which collision resolution\n            will visit the slots of the hash table</div>\n          <ul class=\"choices\">\n            <li>It is another name for a hash function</li>\n            <li>The order in which the hash function will visit the slots of the hash table</li>\n            <li>It is another name for collision resolution</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Probing is part of collision resolution.</p>\n            <p>The probe sequence tells you where to look next.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "00575a215928fb0c6e4c903892e62436befd4b48",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Hashing/HashMCQprobe.html",
+      "display_title": "HashMCQprobe.html"
+    },
+    {
+      "path": "Exercises/Hashing/HashMCQtablesize.html",
+      "dir": "Hashing",
+      "name": "HashMCQtablesize",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Hashing Question: Array Change</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HashMCQtablesizep\">\n          <p class=\"question\">If you double the size of a hash table,\n            can you keep using the same hash function?</p>\n          <div class=\"solution\">Yes, but you will not hash to the new slots</div>\n          <ul class=\"choices\">\n            <li>Yes, it works fine since the table size does not matter to the hash function</li>\n            <li>No, the hash function would now generate illegal values</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Will the old hash function go to an illegal index in the\n              new table?</p>\n            <p>Will the old hash function go to all slots of the new table?</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "e0e5269e57e858eb1fed70a703393533d6ec3085",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Hashing/HashMCQtablesize.html",
+      "display_title": "HashMCQtablesize.html"
+    },
+    {
+      "path": "Exercises/Binary/BSTdMCQ.html",
+      "dir": "Binary",
+      "name": "BSTdMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>BST Runtime</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"BSTdMCQp\">\n          <p class=\"question\">BST search, insert, and delete operations\n            typically run in time O(d). What is d?</p>\n          <div class=\"solution\">The depth of the relevant node in the tree</div>\n          <ul class=\"choices\">\n            <li>The number of divisions at each level</li>\n            <li>The number of entries in each node</li>\n            <li>The number of nodes in the tree</li>\n            <li>The total number of entries in all the nodes of the tree</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Think about a given insert or search operation.</p>\n            <p>How many nodes get looked at?</p>\n            <p>The operation moves down the tree, looking at a node at\n              each level that it visits.</p>\n            <p>So the total work is the number of nodes that it visits,\n              which is the same as the depth of the last node.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "7cd095a3cd6f03ebc8ca18aaec9f03aaba3b7926",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Binary/BSTdMCQ.html",
+      "display_title": "BSTdMCQ.html"
+    },
+    {
+      "path": "Exercises/Binary/DFullCompMCQ.html",
+      "dir": "Binary",
+      "name": "DFullCompMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Binary Trees: Tree Types</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"DFullCompMCQp\">\n          <p class=\"question\">Select the one true statement.</p>\n          <div class=\"solution\">None of the above</div>\n          <ul class=\"choices\" data-category=\"true\">\n            <li>Every binary tree is either complete or full</li>\n            <li>Every complete binary tree is also a full binary tree</li>\n            <li>Every full binary tree is also a complete binary tree</li>\n            <li>No binary tree is both complete and full</li>\n            <li>None of the above</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Not every binary tree is either complete or full.</p>\n            <p>Not every complete binary tree is full.</p>\n            <p>Not every full binary tree is complete.</p>\n            <p>Some complete trees are full.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "6b172ff24e42a40e9c0442255547407776d2f192",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Binary/DFullCompMCQ.html",
+      "display_title": "DFullCompMCQ.html"
+    },
+    {
+      "path": "Exercises/Binary/HfeatureMCQ.html",
+      "dir": "Binary",
+      "name": "HfeatureMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Heaps: Feature</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HfeatureMCQp\">\n          <p class=\"question\">Which feature of heaps allows them to be\n            efficienty implemented using an array?</p>\n          <div class=\"solution\">Heaps are complete binary trees</div>\n          <ul class=\"choices\">\n            <li>Heaps are binary trees</li>\n            <li>Heaps are binary search trees</li>\n            <li>Heaps are full binary trees</li>\n          </ul>\n          <div class=\"hints\">\n            <p>A heap is not a BST.</p>\n            <p>In general, just being a binary tree (or even a full binary\n              tree) is not enough to let something be implemented\n              using an array.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "de565d8050fb6d0b6a961453577582080c92e0ae",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Binary/HfeatureMCQ.html",
+      "display_title": "HfeatureMCQ.html"
+    },
+    {
+      "path": "Exercises/Binary/HgreatestMCQ.html",
+      "dir": "Binary",
+      "name": "HgreatestMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Heaps: Greatest Element</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HgreatestMCQp\">\n          <p class=\"question\">In a max-heap containing <code>n</code>\n            elements, what is the position of the element with the\n            greatest value?</p>\n          <div class=\"solution\"><code>0</code></div>\n          <ul class=\"choices\">\n            <li><code>n-1</code></li>\n            <li><code>n+1</code></li>\n            <li><code>n</code></li>\n            <li><code>2*n+1</code></li>\n            <li><code>2*n+2</code></li>\n            <li>Possibly in any leaf node</li>\n            <li>The leftmost leaf node</li>\n            <li>The rightmost leaf node</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Remember this is a max-heap. So where is the biggest\n              element?</p>\n            <p>It is at the root. So, what position holds the root?</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "48ba9fde993317485fd586d012108d24d0108f81",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Binary/HgreatestMCQ.html",
+      "display_title": "HgreatestMCQ.html"
+    },
+    {
+      "path": "Exercises/Binary/HleastMCQ.html",
+      "dir": "Binary",
+      "name": "HleastMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Heaps: Least Element</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HleastMCQp\">\n          <p class=\"question\">In a max-heap containing n\n            elements, what is the position of the element with the least value?</p>\n          <div class=\"solution\">Possibly in any leaf node</div>\n          <ul class=\"choices\">\n            <li><code>n-1</code></li>\n            <li><code>n+1</code></li>\n            <li><code>n</code></li>\n            <li><code>2*n+1</code></li>\n            <li><code>2*n+2</code></li>\n            <li><code>0</code></li>\n            <li>The leftmost leaf node</li>\n            <li>The rightmost leaf node</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Remember this is a max-heap. So where is the smallest\n              element?</p>\n            <p>It has to be at the bottom.</p>\n            <p>But, it could be anywhere at the bottom.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "b293a696be406f5201984061c13d1a69d2089490",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Binary/HleastMCQ.html",
+      "display_title": "HleastMCQ.html"
+    },
+    {
+      "path": "Exercises/Binary/HworstMCQ.html",
+      "dir": "Binary",
+      "name": "HworstMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Heaps: Worst Case</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HworstMCQp\">\n          <p class=\"question\">Which of these is a true statement about the\n            worst-case time for operations on heaps?</p>\n          <div class=\"solution\">Both insertion and removal are better than linear</div>\n          <ul class=\"choices\">\n            <li>Insertion is better than linear, but removal is not</li>\n            <li>Removal is better than linear, but insertion is not</li>\n            <li>Neither insertion nor removal are better than linear</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Insert works by putting the new element at the end of\n              the array, and moving it up the tree as appropriate.</p>\n            <p>So its worst-case cost is proportional to the depth of the tree.</p>\n            <p>Remove works swapping the element to remove with the\n              one at the end of the array. Then move that moved item up\n              or down the tree, as appropriate.</p>\n            <p>So its worst-case cost is proportional to the depth of the tree.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "b1ba2cdf7c7ce1821547bb24e1081790f4fe41d7",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Binary/HworstMCQ.html",
+      "display_title": "HworstMCQ.html"
+    },
+    {
+      "path": "Exercises/AlgAnal/AlgAnlsMCQalgdfn.html",
+      "dir": "AlgAnal",
+      "name": "AlgAnlsMCQalgdfn",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Algorithm Analysis Exercise: Algorithm Definition</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"AlgAnlsMCQalgdfnp\">\n          <p class=\"question\">Which is the best definition for algorithm?</p>\n          <div class=\"solution\">A recipe</div>\n          <ul class=\"choices\">\n            <li>A program</li>\n            <li>A mapping from input to output</li>\n          </ul>\n          <div class=\"hints\">\n            <p>An algorithm is implemented using a program, but it is not\n              a program.</p>\n            <p>A problem is a mapping from input to output.</p>\n            <p>While informal, the term \"recipe\" captures the essence of what an\n              algorithm is.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "2c5ddb1f16fe9421655401816a6e08475ec190c7",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/AlgAnal/AlgAnlsMCQalgdfn.html",
+      "display_title": "AlgAnlsMCQalgdfn.html"
+    },
+    {
+      "path": "Exercises/AlgAnal/AlgAnlsMCQrelalgprb.html",
+      "dir": "AlgAnal",
+      "name": "AlgAnlsMCQrelalgprb",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Algorithm Analysis Exercise: Algorithm/Problem</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"AlgAnlsMCQrelalgprbp\">\n          <p class=\"question\">Which is true about the relationship between\n            algorithms and problems?</p>\n          <div class=\"solution\">A problem is a mapping from inputs to\n            outputs, and there might be many algorithms that can\n            accomplish this mapping.</div> \n          <ul class=\"choices\">\n            <li>A problem is a mapping from inputs to outputs. Since\n              this mapping is fixed, there is only one right way to\n              compute the mapping.</li> \n            <li>An algorithm is another term for a problem.</li>\n            <li>A problem is a recipe, and an algorithm is a solution to a problem.</li>\n          </ul>\n          <div class=\"hints\">\n            <p>A problem is a mapping from inputs to outputs.</p>\n            <p>An algorithm is a recipe.</p>\n            <p>There are many algorithms that can solve a given problem.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "0ab26c254939ee6b5286159928d5a519377166c0",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/AlgAnal/AlgAnlsMCQrelalgprb.html",
+      "display_title": "AlgAnlsMCQrelalgprb.html"
+    },
+    {
+      "path": "Exercises/AlgAnal/AlgAnlsMCQsqlsrch.html",
+      "dir": "AlgAnal",
+      "name": "AlgAnlsMCQsqlsrch",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Algorithm Analysis Exercise: Sequential Search</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"AlgAnlsMCQsqlsrchp\">\n          <p class=\"question\">For sequential search, the best case occurs when:</p>\n          <div class=\"solution\">The search target is near the front of the array</div>\n          <ul class=\"choices\">\n            <li>The array is small</li>\n            <li>The algorithm is implemented efficiently</li>\n            <li>The search key is small</li>\n          </ul>\n          <div class=\"hints\">\n            <p>It is a serious misunderstanding of algorithm analysis to\n              think that best case is related to input size. The array\n              being small has nothing to do with what is the best case\n              input (of a given size).</p>\n            <p>Implementation of an algorithm (as a program) has nothing\n              to do with the algorithm's best case.</p>\n            <p>Since sequential search can be used on an unsorted array,\n              the value for the search key (large or small) might have\n              nothing to do with where the record with that key will be in\n              the array.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "722866a74a7569025aa8d628386471fd5cd1f51f",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/AlgAnal/AlgAnlsMCQsqlsrch.html",
+      "display_title": "AlgAnlsMCQsqlsrch.html"
+    },
+    {
+      "path": "Exercises/AlgAnal/AnlsIntroMCQtmcmplx.html",
+      "dir": "AlgAnal",
+      "name": "AnlsIntroMCQtmcmplx",
+      "content": "<!DOCTYPE html>\r\n<html data-require=\"math\" lang=\"en\">\r\n  <head>\r\n    <title> Analysis Introduction Exercise: Time Complexity</title>\r\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\r\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\r\n  </head>\r\n\r\n  <body>\r\n    <div class=\"exercise\">\r\n      <div class=\"problems\">\r\n        <div id=\"AnlsIntroMCQtmcmplxp\">\r\n          <p class=\"question\"> Suppose that a particular algorithm has\r\n            time complexity <code> T(n) = 3 \\times 2^n </code> and that executing\r\n            an implementation of it on a particular machine\r\n            takes <code>t </code> seconds for <code>n</code> inputs. Now\r\n            suppose that we are presented with a machine that is 64 times as\r\n            fast. How many inputs could we process on the new machine\r\n            in <code>t</code> seconds? </p>\r\n          <p class=\"solution\"><code>n+6</code></p>\r\n          <ul class=\"choices\">\r\n            <li><code>6</code></li>\r\n            <li><code>3</code></li>\r\n            <li><code>3n</code></li>\r\n            <li><code>6n</code></li>\r\n            <li><code>n^2</code></li>\r\n            <li><code>n+3</code></li>\r\n            <li><code>64</code></li>\r\n            <li><code>64n</code></li>\r\n          </ul>\r\n          <div class=\"hints\">\r\n            <p>This problem has an exponential growth rate. The behavior\r\n              of an exponential growth rate is different from a polynomial\r\n              growth rate.</p>\r\n            <p>With a polynomial growth rate, a faster computer leads to a\r\n              new problem size that is bigger by some factor multiplied by\r\n              the original problem size that can done in the same amount\r\n              of time.</p>\r\n            <p>But with an exponential growth rate, we only get an\r\n              additive improvement.</p>\r\n            <p>Regardless of the value of <code>t</code>, the machine that\r\n              is 64 times faster can only do a problem size that is 6\r\n              larger in the same amount of time\r\n              (because <code>\\log 64 = 6</code>).</p>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </body>\r\n</html>\r\n",
+      "encoding": "utf-8",
+      "sha": "169735ae64f6f54d24bd35c479e4e985ccd8ae5f",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/AlgAnal/AnlsIntroMCQtmcmplx.html",
+      "display_title": "AnlsIntroMCQtmcmplx.html"
+    },
+    {
+      "path": "Exercises/AlgAnal/AnlsIntroMCQszip.html",
+      "dir": "AlgAnal",
+      "name": "AnlsIntroMCQszip",
+      "content": "<!DOCTYPE html>\r\n<html data-require=\"math\" lang=\"en\">\r\n  <head>\r\n    <title> Analysis Introduction Exercise: Size Input</title>\r\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\r\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\r\n  </head>\r\n\r\n  <body>\r\n    <div class=\"exercise\">\r\n      <div class=\"problems\">\r\n        <div id=\"AnlsIntroMCQszipp\">\r\n          <p class=\"question\"> Hardware vendor XYZ Corp. claims that their\r\n            latest computer will run 100 times faster than that of their\r\n            competitor, Prunes, Inc. If the Prunes, Inc. computer can\r\n            execute a program on input of size <code>n</code> in one hour,\r\n            what size input can XYZ's computer execute in one hour for an\r\n            algorithm whose growth rate is <code>n^2</code>?</p>\r\n          <p class=\"solution\"><code>10n</code></p>\r\n          <ul class=\"choices\">\r\n            <li><code>10</code></li>\r\n            <li><code>100</code></li>\r\n            <li><code>100n</code></li>\r\n            <li><code>n</code></li>\r\n            <li><code>n^2</code></li>\r\n            <li><code>10n^2</code></li>\r\n            <li><code>100n^2</code></li>\r\n            <li><code>n+10</code></li>\r\n            <li><code>n+100</code></li>\r\n          </ul>\r\n          <div class=\"hints\">\r\n            <p>If the XYZ Corp. computer runs 100 times faster, then if\r\n              the Prunes computer does <code>S</code> computations in an\r\n              hour, the XYZ Corp. computer does <code>100S</code>\r\n              computations in an hour.</p>\r\n            <p>Assume that the Prunes computer can solve a problem size of\r\n              at most <code>P</code> in an hour. This means it makes about\r\n              <code>P^2 = S</code> computations.</p>\r\n            <p>How much bigger size than <code>P</code> can run in\r\n              <code>100S</code>, given that the growth rate of the\r\n              algorithm on input size <code>P</code> is\r\n              <code>T(P) = P^2</code>?</p>\r\n            <p>If <code>P \\approx S</code>, then\r\n              <code>T(10P) = (10P)^2 \\approx 100S</code>.</p>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </body>\r\n</html>\r\n",
+      "encoding": "utf-8",
+      "sha": "2d91375b67128e080256b1a48174378779824f7c",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/AlgAnal/AnlsIntroMCQszip.html",
+      "display_title": "AnlsIntroMCQszip.html"
+    },
+    {
+      "path": "Exercises/AlgAnal/ThetaUpperMCQ.html",
+      "dir": "AlgAnal",
+      "name": "ThetaUpperMCQ",
+      "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Theta vs. big-oh</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ThetaUpperMCQp\">\n          <p class=\"question\">If we know that algorithm X is <code>\\Theta(n)</code> in\n            the average case, then what can we say about\n            its TIGHTEST upper bound?</p>\n          <div class=\"solution\">It is <code>O(n)</code> in the average case.</div>\n          <ul class=\"choices\">\n            <li>It is <code>O(n)</code> or greater in the average case, but we don't have enough information to say more.</li>\n            <li>It is <code>O(n)</code> or less in the average case, but we don't have enough information to say more.</li>\n            <li>We don't have enough information to say.</li>\n          </ul>\n          <div class=\"hints\">\n            <p>What is the definition of <code>\\Theta(n)</code>?</p>\n            <p>Being <code>\\Theta(n)</code> means that we know a tight\n              bound (both the upper and the lower bounds match).</p>\n            <p>If X is <code>\\Theta(n)</code>, then it is\n              both <code>O(n)</code> and <code>\\Omega(n)</code>.\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+      "encoding": "utf-8",
+      "sha": "13dec777b37ec2ca7b47f6b923f9bb80c5c30cf4",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/AlgAnal/ThetaUpperMCQ.html",
+      "display_title": "ThetaUpperMCQ.html"
+    },
+    {
+      "path": "MIT-license.txt",
+      "content": "OpenDSA Project\nDistributed under the MIT License\n\nCopyright (c) 2011-2025 - Ville Karavirta and Cliff Shaffer\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n",
+      "encoding": "utf-8",
+      "sha": "d8864458bc16f5920861dfecd2f08de0a6ff15cb",
+      "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/MIT-license.txt",
+      "display_title": "MIT-license.txt"
+    }
+,
+{
+  "path": "Exercises/List/ALMCQdelarb.html",
+  "dir": "List",
+  "name": "ALMCQdelarb",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA Array List Exercise: Delete Arabitary</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ALMCQdelarbp\">\n          <p class=\"question\">Given an array-based list implementation,\n            deleting the element at arbitrary position <code>i</code> takes\n            how long in the average case?</p>\n          <div class=\"solution\"><code>\\Theta(n)</code> time</div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(1)</code> time</li>\n            <li><code>\\Theta(\\log n)</code> time</li>\n            <li><code>\\Theta(n \\log n)</code> time</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Position <code>i</code> could be anywhere in the list\n              (of <code>n</code> values).</p>\n            <p>We will need to shift values from position <code>i</code> to\n              the list end back by one position.</p>\n            <p>How many we shift depends on the value of <code>i</code>.</p>\n            <p>On average, it will be half the elements in the list.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "076605dcda72d767922c735d6ef3e11dbad025cb",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/ALMCQdelarb.html",
+  "display_title": "ALMCQdelarb.html"
+},
+{
+  "path": "Exercises/List/ALMCQinsarb.html",
+  "dir": "List",
+  "name": "ALMCQinsarb",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA Array List Exercise: Insert to Arbitary Position</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"ALMCQinsarbp\">\n          <p class=\"question\">Given an array-based list implementation,\n            inserting a new element to arbitrary position <code>i</code>\n            takes how long in the average case?</p>\n          <div class=\"solution\"><code>\\Theta(n)</code> time</div>\n          <ul class=\"choices\">\n            <li><code>\\Theta(1)</code> time</li>\n            <li><code>\\Theta(\\log n)</code> time</li>\n            <li><code>\\Theta(n \\log n)</code> time</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Position <code>i</code> could be anywhere in the list.</p>\n            <p>We will need to shift values from position <code>i</code> to\n              the list end forward by one position.</p>\n            <p>How many we shift depends on the value of <code>i</code>.</p>\n            <p>On average, it will be half the elements in the list.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "2060be41e90a39ed0e1fcc4540c53f2944fc6461",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/ALMCQinsarb.html",
+  "display_title": "ALMCQinsarb.html"
+},
+{
+  "path": "Exercises/List/LLMCQaccs.html",
+  "dir": "List",
+  "name": "LLMCQaccs",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA  List Linked Exercise: Access Node i </title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"LLMCQaccsp\">\n          <p class=\"question\">To access the node at\n            position <code>i</code> in a singly-linked list</p>\n          <div class=\"solution\">requires that all its predecessors be visited</div>\n          <ul class=\"choices\">\n            <li>takes one step</li>\n            <li>takes two steps</li>\n            <li>requires that all its successors be visited</li>\n          </ul>\n          <div class=\"hints\">\n            <p>How can we reach the <code>i</code>th position?</p>\n            <p>We have to work from the front.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "ff86057f0c821c2993187e888fba40708d2fc59d",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/LLMCQaccs.html",
+  "display_title": "LLMCQaccs.html"
+},
+{
+  "path": "Exercises/List/LLMCQadv.html",
+  "dir": "List",
+  "name": "LLMCQadv",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n<head>\n  <title>OpenDSA List Linked Exercise: Advantage of a Linked List </title>\n  <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n  <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  <script src=\"../../lib/splice-iframe.js\"></script> \n</head>\n\n<body>\n<div class=\"exercise\">\n  <div class=\"problems\">\n    <div id=\"LLMCQadvp\">\n      <p class=\"question\">An advantage of linked lists over the\n      array-based list implementation is: </p>\n      <div class=\"solution\">Expandability</div>\n      <ul class=\"choices\">\n\t<li>Low access cost to arbitrary positions</li>\n        <li>Optimal search speed</li>\n\t<li>Zero overhead</li>\n        <li>None of these</li>\n      </ul>\n      <div class=\"hints\">\n        <p>Linked lists are not good for reaching arbitrary\n          positions.</p>\n        <p>Linked lists do not help with search.</p>\n        <p>Linked list nodes each have the overhead of a \"next\" field</p>\n      </div>\n    </div> \n  </div>\n</div>\n</body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "f7116c852d24b87dc41600aa7f97fc7e4465c6c7",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/LLMCQadv.html",
+  "display_title": "LLMCQadv.html"
+},
+{
+  "path": "Exercises/List/LLMCQfndelm.html",
+  "dir": "List",
+  "name": "LLMCQfndelm",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA List Linked Exercise: Find Element </title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"LLMCQfndelmp\">\n          <p class=\"question\">To find an element with value <code>X</code>\n            in a linked list with <code>n</code> nodes requires how many\n            nodes to be visited in the worst case?</p>\n          <div class=\"solution\"><code>n</code> nodes</div>\n          <ul class=\"choices\">\n            <li>Two nodes</li>\n            <li><code>\\log n</code> nodes</li>\n            <li>One node</li>\n            <li><code>n^2</code> nodes</li>\n          </ul>\n          <div class=\"hints\">\n            <p>How many nodes might we have to visit to find the one\n              that we are looking for?<p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "d5728bb284c207d265f34c7946aaa71547b2fbd5",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/LLMCQfndelm.html",
+  "display_title": "LLMCQfndelm.html"
+},
+{
+  "path": "Exercises/List/LLMCQsuccelm.html",
+  "dir": "List",
+  "name": "LLMCQsuccelm",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA List Linked Exercise: Successive Elements </title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"LLMCQsuccelmp\">\n          <p class=\"question\">In a linked list, the successive elements in\n            the list: </p>\n          <div class=\"solution\">Need not occupy contiguous space in memory</div>\n          <ul class=\"choices\">\n            <li>Must occupy contiguous space in memory</li>\n            <li>Must not occupy contiguous space in memory</li>\n            <li>None of these</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Unlike an array-based list, the linked list is created\n              by linking together separate objects.</p>\n            <p>Those objects can be created at any time, and you don't\n              control where they are in memory when they are made.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "ff955ab24514ff6bb0dac38ecb1210dadd928677",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/LLMCQsuccelm.html",
+  "display_title": "LLMCQsuccelm.html"
+},
+{
+  "path": "Exercises/List/StackQMCQqenq.html",
+  "dir": "List",
+  "name": "StackQMCQqenq",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n<head>\n  <title>OpenDSA Stack/Queue Exercise: Queue Enqueue</title>\n  <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n  <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  <script src=\"../../lib/splice-iframe.js\"></script> \n</head>\n\n<body>\n<div class=\"exercise\">\n  <div class=\"problems\">\n    <div id=\"StackQMCQqenqp\">\n      <p class=\"question\">It is an error to enqueue data onto a(n) _______ queue.</p>\n      <div class=\"solution\">Full</div>\n      <ul class=\"choices\">\n\t<li>Empty</li>\n\t<li>Initialized</li>\n        <li>Array-based</li>\n        <li>Linked</li>\n      </ul>\n      <div class=\"hints\">\n        <p>\"Enqueue\" means to add something to the queue. When can we\n          not do that?</p>\n      </div>\n    </div> \n  </div>\n</div>\n</body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "6e0b14ae324ccf818d38e37345384fe656e0b97c",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/StackQMCQqenq.html",
+  "display_title": "StackQMCQqenq.html"
+},
+{
+  "path": "Exercises/List/StackQMCQqrmv.html",
+  "dir": "List",
+  "name": "StackQMCQqrmv",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Stack/Queue Exercise: Remove Characters from Queue</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"StackQMCQqrmvp\">\n          <p class=\"question\">If the characters 'D', 'C', 'B', 'A' are\n            placed in a queue (in that order), and then removed one at a\n            time, in what order will they be removed?</p>\n          <div class=\"solution\">DCBA</div>\n          <ul class=\"choices\">\n            <li>ABCD</li>\n            <li>ABDC</li>\n            <li>DCAB</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Items are removed from a queue in the same order as\n              they arrived.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "8641f64d76812a557d2c00e593d2cc6918fedc9c",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/StackQMCQqrmv.html",
+  "display_title": "StackQMCQqrmv.html"
+},
+{
+  "path": "Exercises/List/StackQMCQspsh.html",
+  "dir": "List",
+  "name": "StackQMCQspsh",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>OpenDSA Stack/Queue Exercise:  Push to Stack</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"StackQMCQspshp\">\n          <p class=\"question\">It is an error to push data onto a(n) _______ stack.</p>\n          <div class=\"solution\">Full</div>\n          <ul class=\"choices\">\n            <li>Empty</li>\n            <li>Initialized</li>\n            <li>Array-based</li>\n            <li>Linked</li>\n          </ul>\n          <div class=\"hints\">\n            <p>\"Push\" means to put something onto the stack.</p>\n            <p>When can we not add something to the stack?</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "b2e1bf8f93cdedc254d5a7497629d3e283bb3016",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/StackQMCQspsh.html",
+  "display_title": "StackQMCQspsh.html"
+},
+{
+  "path": "Exercises/List/StackQMCQsrmv.html",
+  "dir": "List",
+  "name": "StackQMCQsrmv",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Stack/Queue Exercise: Remove Characters from Stack</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n    <script src=\"../../lib/splice-iframe.js\"></script> \n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"StackQMCQsrmvp\">\n          <p class=\"question\">If the characters 'D', 'C', 'B', 'A' are\n            placed in a stack (in that order), and then removed one at a\n            time, in what order will they be removed?</p>\n          <div class=\"solution\">ABCD</div>\n          <ul class=\"choices\">\n            <li>ABDC</li>\n            <li>DCAB</li>\n            <li>DCBA</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Items come off of a stack in the opposite order from how\n              they went in.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "13c8e1ed8c52585233a6e37ec4e8cac9f32996d0",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/List/StackQMCQsrmv.html",
+  "display_title": "StackQMCQsrmv.html"
+},
+{
+  "path": "Exercises/Hashing/HashDelMCQ1.html",
+  "dir": "Hashing",
+  "name": "HashDelMCQ1",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Hash Deletion Question 1</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HashDelMCQ1p\">\n          <p class=\"question\">Which is true about deletion from a hash\n            table using tombstones?</p>\n          <div class=\"solution\">It causes a slight increase in the\n          average time to insert and search</div>\n          <ul class=\"choices\" data-category=\"true\">\n            <li>It causes a large decrease in the average time to insert and search</li>\n            <li>It causes a slight decrease in the average time to insert and search</li>\n            <li>It has no effect on the average time to insert and search</li>\n            <li>It causes a slight increase in the average time to insert and search</li>\n            <li>It causes a large increase in the average time to insert and search</li>\n          </ul>\n          <div class=\"hints\">\n            <p>The tombstones fill some slots of the table.</p>\n            <p>While tombstone slots can be reused, they do have to be\n              searched through.</p>\n            <p>The fraction of hash table slots taken up by tombstones\n            is normally not large, so while there is an increased\n            cost, is is not large.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n</div>\n</body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "33416f66204da25ec4a369a9e9cf780fdb5c8eb7",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Hashing/HashDelMCQ1.html",
+  "display_title": "HashDelMCQ1.html"
+},
+{
+  "path": "Exercises/Hashing/HashDelMCQ2.html",
+  "dir": "Hashing",
+  "name": "HashDelMCQ2",
+  "content": "<!DOCTYPE html>\n<html data-require=\"math\" lang=\"en\">\n  <head>\n    <title>Hash Deletion Question 2</title>\n    <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n    <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n  </head>\n\n  <body>\n    <div class=\"exercise\">\n      <div class=\"problems\">\n        <div id=\"HashDelMCQ2p\">\n          <p class=\"question\">The special value used to signal a\n            position in a hash table from which a record has been deleted\n            is called a:</p>\n          <div class=\"solution\">Tombstone</div>\n          <ul class=\"choices\">\n            <li>Flag</li>\n            <li>Sentinal</li>\n            <li>Gravestone</li>\n          </ul>\n          <div class=\"hints\">\n            <p>Starts with a T.</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </body>\n</html>\n",
+  "encoding": "utf-8",
+  "sha": "78fe1b6747e0757c0f7eb62498ba3dd774cd16de",
+  "display_url": "https://github.com/OpenDSA/OpenDSA/blob/master/Exercises/Hashing/HashDelMCQ2.html",
+  "display_title": "HashDelMCQ2.html"
+}
+  ]
+}

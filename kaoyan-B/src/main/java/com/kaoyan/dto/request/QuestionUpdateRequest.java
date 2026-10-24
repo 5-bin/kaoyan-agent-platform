@@ -17,7 +17,7 @@ public record QuestionUpdateRequest(
     @NotBlank(message="选项D不能为空") @Size(max=2000) String optionD,
     @NotBlank @Pattern(regexp="[A-Da-d]", message="答案必须为A至D的单个字母") String answer,
     @NotBlank(message="解析不能为空") @Size(max=10000) String analysis,
-    @NotBlank @Pattern(regexp="REAL_EXAM|MOCK|ORIGINAL", message="来源类别不合法") String sourceType,
+    @NotBlank @Pattern(regexp="REAL_EXAM|MOCK|ORIGINAL|COURSE_EXERCISE", message="来源类别不合法") String sourceType,
     @NotBlank(message="来源名称不能为空") @Size(max=255) String sourceName,
     @NotBlank(message="来源定位不能为空") @Size(max=1000) String sourceLocator,
     @Min(1900) @Max(2100) Integer sourceYear,

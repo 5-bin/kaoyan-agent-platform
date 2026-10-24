@@ -19,7 +19,7 @@
       </div>
       <label>标准答案<select v-model="form.answer" aria-label="标准答案"><option v-for="key in optionKeys" :key="key">{{ key }}</option></select></label>
       <label>来源类别<select v-model="form.sourceType" aria-label="来源类别">
-        <option value="ORIGINAL">自编题</option><option value="MOCK">模拟题</option><option value="REAL_EXAM">真题</option>
+        <option value="ORIGINAL">自编题</option><option value="MOCK">模拟题</option><option value="REAL_EXAM">真题</option><option value="COURSE_EXERCISE">课程习题</option>
       </select></label>
       <label class="wide" for="entry-analysis">解析</label>
       <el-input id="entry-analysis" v-model="form.analysis" class="wide" type="textarea" :rows="3" maxlength="10000" />

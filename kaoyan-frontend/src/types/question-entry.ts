@@ -1,6 +1,6 @@
 import type { Question } from './api'
 
-export type SourceType = 'REAL_EXAM' | 'MOCK' | 'ORIGINAL'
+export type SourceType = 'REAL_EXAM' | 'MOCK' | 'ORIGINAL' | 'COURSE_EXERCISE'
 export interface QuestionEntry {
   subject: string; knowledgePoint: string; difficulty: 'EASY' | 'MEDIUM' | 'HARD'
   content: string; optionA: string; optionB: string; optionC: string; optionD: string

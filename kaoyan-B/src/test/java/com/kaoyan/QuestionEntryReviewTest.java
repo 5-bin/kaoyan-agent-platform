@@ -132,6 +132,13 @@ class QuestionEntryReviewTest {
         assertEquals("第1题", q.path("sourceQuestionNo").asText());
         for (String key : List.of("sourceType", "sourceName", "sourceLocator", "permissionNote")) assertEquals(body.get(key), q.path(key).asText());
         var mock = entry(); mock.put("sourceType", "MOCK"); assertTrue(create(admin, mock) > 0);
+        var course = entry(); course.put("sourceType", "COURSE_EXERCISE");
+        course.put("sourceName", "OpenDSA");
+        long courseId = create(admin, course);
+        assertEquals("COURSE_EXERCISE", detail(admin, courseId).path("sourceType").asText());
+        course.put("version", 1);
+        call(put("/api/questions/admin/" + courseId), admin, course, 200);
+        assertEquals("COURSE_EXERCISE", detail(admin, courseId).path("sourceType").asText());
     }
 
     @Test void studentsCannotUseAnyManagementRouteOrForgeReviewerIdentity() throws Exception {
