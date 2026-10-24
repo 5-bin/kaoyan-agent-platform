@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     LLM_THINKING_MODE: Literal["default", "enabled", "disabled"] = "default"
     LLM_TIMEOUT: float = Field(default=20, ge=1, le=30)
     MAX_MODEL_CALLS_PER_DAY: int = Field(default=100, ge=1)
-    RAG_BACKEND: Literal["lexical", "qdrant"] = "lexical"
+    RAG_BACKEND: Literal["lexical", "bm25", "qdrant", "hybrid"] = "lexical"
     RAG_DATA: Path = ROOT / "knowledge" / "corpus.json"
     RAG_SOURCE_POLICY_FILE: Path = DEFAULT_SOURCE_POLICY
     RAG_INDEX: Path = ROOT / ".cache" / "rag"

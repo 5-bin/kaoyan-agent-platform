@@ -38,10 +38,17 @@ export interface Task {
 export interface SourceReference {
   id: string; title: string; url: string; locator: string; version: string; retrievedAt: string; excerpt: string
 }
+export interface CitationSupport {
+  status: 'SUPPORTED' | 'PARTIAL' | 'UNSUPPORTED' | 'NOT_CHECKED'
+  checked: number; supported: number; ratio: number
+  unsupported: { text: string; reason: string; sourceIds?: string[] }[]
+  items?: { text: string; sourceIds: string[]; supported: boolean; reason?: string; ratio?: number }[]
+}
 export interface SchoolCandidate {
   programId: string; school: string; college: string; major: string; majorCode: string; year: number
   degreeType: 'academic' | 'professional'; region: string; studyMode: string; examSubjects: string[]
   matchedConditions: string[]; pendingChecks: string[]; sourceIds: string[]; explanation: string
+  citationSupport?: CitationSupport
 }
 export interface AssistantAction {
   id: string; type: string; status: 'PENDING' | 'SUCCESS' | 'DISMISSED' | 'FAILED'; title: string
@@ -60,6 +67,7 @@ export interface TaskResult {
   candidates?: SchoolCandidate[]; coverage?: string; weakPoints?: string[]; accuracy?: number
   evidence?: AssistantEvidence[]; actions?: AssistantAction[]
   retrievalStatus?: 'READY' | 'BUILDING' | 'BUSY' | 'FAILED' | 'UNAVAILABLE'
+  citationSupport?: CitationSupport
   conditions?: Record<string, unknown>
   documentProposal?: { operation: 'create' | 'update'; documentId?: string; baseVersion?: number; title: string; content: string }
 }

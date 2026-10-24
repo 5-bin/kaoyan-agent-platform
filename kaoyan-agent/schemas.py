@@ -119,9 +119,17 @@ class Intent(StrictModel):
     intent: Literal["SCHOOL_RECOMMEND", "KNOWLEDGE_QA", "CHAT"]
 
 
+class Claim(StrictModel):
+    text: str = Field(min_length=1, max_length=1000)
+    sourceIds: list[str] = Field(min_length=1, max_length=5)
+
+
 class Answer(StrictModel):
     answer: str = Field(min_length=1, max_length=12000)
     sourceIds: list[str] = Field(min_length=1, max_length=5)
+    # Optional for older callers and fake models; when present each claim is
+    # checked against only its own cited excerpts.
+    claims: list[Claim] = Field(default_factory=list, max_length=10)
 
 
 class Explanation(StrictModel):

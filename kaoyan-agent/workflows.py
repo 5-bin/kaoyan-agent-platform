@@ -5,6 +5,9 @@ from pydantic import Field
 from schemas import StrictModel, Answer, Intent, Explanations, Summary
 from prompts import get
 from learning import model_allowed, has_scope, model_messages
+from retrieval import detect_subject
+from grounding import verify, aggregate
+from langchain_core.documents import Document
 from langsmith.run_helpers import tracing_context
 
 log = logging.getLogger(__name__)
@@ -30,10 +33,15 @@ class Workflows:
         from conversation import KnowledgeRetriever
         from langchain.tools import tool
         self.knowledge_retriever = KnowledgeRetriever(backend=retriever)
+
         @tool
-        async def search_knowledge(query: str):
+        async def search_knowledge(query: str, subject: str | None = None):
             """检索当前审核版本408资料，保留来源与原文定位。"""
-            return await self.knowledge_retriever.ainvoke(query)
+            # Direct backend search keeps the optional subject filter; the
+            # retriever wrapper remains for compatibility with existing callers.
+            return [Document(page_content=d.content, metadata={"chunk": d})
+                    for d in self.retriever.search(query, "knowledge", 5, subject)]
+
         self.knowledge_search = search_knowledge
         self.programs = [(Admission.model_validate(d.metadata), d) for d in corpus.documents if d.domain == "school"]
         if len({p.programId for p, _ in self.programs}) != len(self.programs):
@@ -86,7 +94,13 @@ class Workflows:
         return "CHAT"
 
     async def qa(self, req):
-        docs = [d.metadata["chunk"] for d in await self.knowledge_search.ainvoke({"query": req.userInput})]
+        subject = detect_subject(req.userInput or "")
+        docs = [d.metadata["chunk"] for d in await self.knowledge_search.ainvoke(
+            {"query": req.userInput, "subject": subject})]
+        if not docs and subject:
+            # A weak subject hint must not turn a covered question into "no data".
+            docs = [d.metadata["chunk"] for d in await self.knowledge_search.ainvoke(
+                {"query": req.userInput, "subject": None})]
         if not docs:
             return {"outcome": "UNSUPPORTED", "answer": "当前审核资料未覆盖该问题，请缩小问题范围或补充资料。"}
         result = {"outcome": "COMPLETED", "answer": "以下为来源摘要：\n" + "\n".join(d.content for d in docs),
@@ -97,10 +111,22 @@ class Workflows:
                     {"input": req.userInput, "messages": model_messages(req),
                      "references": [{"id": d.id, "content": d.content} for d in docs]}, Answer)
                 ids = set(answer.sourceIds)
-                if not ids <= {d.id for d in docs}:
+                claim_ids = {source for claim in answer.claims for source in claim.sourceIds}
+                if not (ids | claim_ids) <= {d.id for d in docs}:
                     raise ValueError("unknown_source")
-                result.update(answer=answer.answer, explanationMode="ai",
-                    references=[d.reference().model_dump() for d in docs if d.id in ids])
+                support = verify(answer.answer, list(ids), {d.id: d for d in docs},
+                                 claims=[claim.model_dump() for claim in answer.claims] or None)
+                result["citationSupport"] = support
+                if support["status"] == "UNSUPPORTED":
+                    # A model answer whose sentences are not grounded in the
+                    # cited excerpts must not replace the deterministic summary.
+                    result.update(explanationMode="fallback",
+                        notice="模型回答未能与引用原文充分对齐，已保留来源摘要。")
+                else:
+                    result.update(answer=answer.answer, explanationMode="ai",
+                        references=[d.reference().model_dump() for d in docs if d.id in ids | claim_ids])
+                    if support["status"] == "PARTIAL":
+                        result["notice"] = "部分结论未能与引用原文充分对齐，请核对来源。"
             except Exception as e:
                 log.warning("qaModelFailure=%s", type(e).__name__)
                 result.update(explanationMode="fallback", notice="AI解释不可用，已保留来源摘要。")
@@ -169,6 +195,18 @@ class Workflows:
                         raise ValueError("unknown_source")
                 for c in candidates:
                     c["explanation"] = mapping[c["programId"]].text
+                by_id = {row[3].id: row[3] for row in selected}
+                items = []
+                for c in candidates:
+                    explanation = mapping[c["programId"]]
+                    item = verify(explanation.text, list(explanation.sourceIds), by_id)
+                    c["citationSupport"] = item
+                    items.append(item)
+                result["citationSupport"] = aggregate(items)
+                if result["citationSupport"]["status"] == "UNSUPPORTED":
+                    result["notice"] = "部分解释未能与招生资料原文充分对齐，请以来源为准。"
+                elif result["citationSupport"]["status"] == "PARTIAL":
+                    result["notice"] = "部分解释未能与招生资料原文充分对齐，请核对来源。"
                 result["explanationMode"] = "ai"
             except Exception as e:
                 log.warning("schoolModelFailure=%s", type(e).__name__)

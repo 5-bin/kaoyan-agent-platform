@@ -1,8 +1,10 @@
 """Independent, versioned replica corpus. Never connects to the business database."""
 import hashlib
 import json
+import math
 import os
 import re
+from collections import Counter
 from threading import Lock
 from pathlib import Path
 from urllib.parse import urlparse
@@ -50,6 +52,72 @@ def terms(text):
     return set(words + [chinese[i:i+2] for i in range(len(chinese)-1)])
 
 
+def bm25_tokens(text):
+    """Chinese unigrams + bigrams and ASCII words. No external tokenizer needed."""
+    text = text.lower()
+    words = re.findall(r"[a-z0-9]+", text)
+    chinese = "".join(re.findall(r"[\u4e00-\u9fff]", text))
+    return words + list(chinese) + [chinese[i:i+2] for i in range(len(chinese)-1)]
+
+
+class BM25Index:
+    """Small in-memory BM25 baseline over the immutable corpus chunks."""
+
+    def __init__(self, chunks, k1=1.5, b=0.75):
+        self.chunks, self.k1, self.b = chunks, k1, b
+        tokenized = [bm25_tokens(d.title + " " + d.content + " " + " ".join(d.keywords)) for d in chunks]
+        self.lengths = [len(values) for values in tokenized]
+        self.avgdl = sum(self.lengths) / max(1, len(self.lengths))
+        self.term_freq = [Counter(values) for values in tokenized]
+        self.doc_freq = Counter()
+        for values in tokenized:
+            self.doc_freq.update(values)
+        self.total = len(chunks)
+
+    def search(self, query, domain, limit=5, subject=None):
+        if not self.total:
+            return []
+        candidates = set(bm25_tokens(query))
+        # Multi-character queries must match a bigram or ASCII word. Single
+        # Chinese characters are too common ("次" in "层次") to be useful.
+        wanted = {term for term in candidates if len(term) > 1} or candidates
+        ranked = []
+        for index, chunk in enumerate(self.chunks):
+            if chunk.domain != domain or (subject and chunk.subject != subject):
+                continue
+            score = 0.0
+            for term in wanted:
+                frequency = self.term_freq[index].get(term, 0)
+                if not frequency:
+                    continue
+                document_frequency = self.doc_freq.get(term, 0)
+                idf = math.log(1 + (self.total - document_frequency + 0.5) / (document_frequency + 0.5))
+                normalizer = frequency + self.k1 * (
+                    1 - self.b + self.b * self.lengths[index] / max(self.avgdl, 1e-9))
+                score += idf * frequency * (self.k1 + 1) / normalizer
+            if score > 0:
+                ranked.append((score, chunk))
+        ranked.sort(key=lambda row: (-row[0], row[1].id))
+        return [chunk for _, chunk in ranked[:limit]]
+
+
+SUBJECT_HINTS = (
+    ("数据结构", ("数据结构", "栈", "队列", "链表", "二叉树", "图", "排序", "查找", "散列", "哈希")),
+    ("计算机组成原理", ("计算机组成原理", "组成原理", "主存", "存储层次", "指令", "总线", "浮点", "cache", "缓存")),
+    ("操作系统", ("操作系统", "进程", "线程", "死锁", "调度", "虚拟内存", "文件系统", "信号量")),
+    ("计算机网络", ("计算机网络", "tcp", "udp", "ip", "路由", "拥塞", "http", "dns", "以太网")),
+)
+
+
+def detect_subject(text):
+    """Best-effort subject hint. Callers must fall back to unfiltered search."""
+    lowered = (text or "").lower()
+    for subject, hints in SUBJECT_HINTS:
+        if any(hint.lower() in lowered for hint in hints):
+            return subject
+    return None
+
+
 class Corpus:
     def __init__(self, path, policy_path=None):
         policy = ReferenceSourcePolicy(policy_path)
@@ -71,6 +139,7 @@ class Corpus:
                 self.chunks.append(d.model_copy(update={"id": f"{d.id}#{start // 350}",
                     "content": d.content[start:start+450], "locator": f"{d.locator}；字符{start+1}起"}))
         self.chunk_by_id = {d.id: d for d in self.chunks}
+        self._bm25, self._bm25_lock = None, Lock()
 
     def lexical(self, query, domain, limit=5, subject=None):
         ranked, query_terms = [], terms(query)
@@ -82,6 +151,13 @@ class Corpus:
             if score:
                 ranked.append((score, d))
         return [d for _, d in sorted(ranked, key=lambda r: (-r[0], r[1].id))[:limit]]
+
+    def bm25(self, query, domain, limit=5, subject=None):
+        if self._bm25 is None:
+            with self._bm25_lock:
+                if self._bm25 is None:
+                    self._bm25 = BM25Index(self.chunks)
+        return self._bm25.search(query, domain, limit, subject)
 
 
 class FastEmbedEncoder:
@@ -156,14 +232,50 @@ class Retriever:
         self.settings, self.corpus, self.vector = settings, corpus, None
         self.lock = Lock()
 
-    def search(self, query, domain="knowledge", limit=5, subject=None):
-        if self.settings.RAG_BACKEND == "lexical":
-            return self.corpus.lexical(query, domain, limit, subject)
+    def _vector_index(self):
         with self.lock:
             if self.vector is None:
                 self.vector = VectorIndex(self.settings, self.corpus)
-            return self.vector.search(query, domain, limit, subject)
+            return self.vector
+
+    def search(self, query, domain="knowledge", limit=5, subject=None):
+        backend = self.settings.RAG_BACKEND
+        if backend == "lexical":
+            return _dedupe(self.corpus.lexical(query, domain, limit, subject))
+        if backend == "bm25":
+            return _dedupe(self.corpus.bm25(query, domain, limit, subject))
+        if backend == "qdrant":
+            return _dedupe(self._vector_index().search(query, domain, limit, subject))
+        if backend == "hybrid":
+            # Reciprocal-rank fusion; lexical remains available when the vector
+            # index is absent so a demo does not fail before `ingest.py` ran.
+            lexical = self.corpus.bm25(query, domain, 20, subject)
+            vector = []
+            try:
+                vector = self._vector_index().search(query, domain, 20, subject)
+            except (RuntimeError, ImportError):
+                pass
+            fused = {}
+            for rank, doc in enumerate(lexical):
+                fused[doc.id] = fused.get(doc.id, 0.0) + 1 / (60 + rank + 1)
+            for rank, doc in enumerate(vector):
+                fused[doc.id] = fused.get(doc.id, 0.0) + 1 / (60 + rank + 1)
+            ranked = sorted(fused.items(), key=lambda row: (-row[1], row[0]))
+            return _dedupe([self.corpus.chunk_by_id[key] for key, _ in ranked])[:limit]
+        raise ValueError("未知检索后端")
 
     def close(self):
         if self.vector:
             self.vector.close()
+
+
+def _dedupe(chunks):
+    """Keep the first chunk of each document; citations stay document-level."""
+    seen, result = set(), []
+    for chunk in chunks:
+        base = chunk.id.split("#", 1)[0]
+        if base in seen:
+            continue
+        seen.add(base)
+        result.append(chunk)
+    return result
