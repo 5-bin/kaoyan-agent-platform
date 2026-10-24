@@ -75,3 +75,6 @@ jobs:
             kaoyan-B/target/agent-chain.log
             kaoyan-frontend/test-results/
             .cache/smoke-debug-*/
+            .cache/chat-debug-*/
+            .cache/chat-browser-*/
+            .cache/learning-browser-*/

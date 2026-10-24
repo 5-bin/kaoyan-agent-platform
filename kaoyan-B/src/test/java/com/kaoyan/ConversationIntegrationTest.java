@@ -2,6 +2,7 @@ package com.kaoyan;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kaoyan.config.AgentProperties;
 import com.kaoyan.service.ConversationService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,7 @@ class ConversationIntegrationTest {
     @Autowired ObjectMapper json;
     @Autowired JdbcTemplate jdbc;
     @Autowired ConversationService service;
+    @Autowired AgentProperties agentProperties;
     @MockitoBean StringRedisTemplate redis;
     static Process python;
     static final HttpClient HTTP=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
@@ -49,6 +51,7 @@ class ConversationIntegrationTest {
         builder.directory(Path.of("..","kaoyan-agent").toAbsolutePath().normalize().toFile());
         builder.environment().put("AGENT_INTERNAL_KEY","test-only-internal-key-123456");
         builder.environment().put("LANGCHAIN_TRACING_V2","false");
+        builder.environment().put("QUESTION_TEST_SLOW_INDEX","true");
         builder.redirectErrorStream(true).redirectOutput(Path.of("target","chat-python.log").toFile());
         python=builder.start();
         String base="http://127.0.0.1:"+port;
@@ -98,13 +101,16 @@ class ConversationIntegrationTest {
         return attempts.get(attempts.size()-1);
     }
     JsonNode finish(String token,String id) throws Exception {
+        boolean retriedIndex=false;
         for(int i=0;i<160;i++) {
             var value=latest(token,id);
             if(!value.path("status").asText().equals("RUNNING")) {
                 String state=value.path("result").path("retrievalStatus").asText();
                 if(Set.of("BUILDING","BUSY").contains(state)) {
-                    // First request truthfully reports warm-up; retry only in this test helper.
-                    assertTrue(value.path("result").path("actions").isEmpty());Thread.sleep(100);
+                    assertTrue(value.path("result").path("actions").isEmpty());
+                    assertFalse(retriedIndex,"索引就绪后仍返回准备中，不再创建重试任务");
+                    awaitQuestionIndex(value.path("taskId").asText());
+                    retriedIndex=true;
                     var message=call(token,"GET","/conversations/"+id+"/messages",null,200).path("list").get(0);
                     call(token,"POST","/conversations/"+id+"/messages/"+message.path("id").asText()+"/retry",Map.of("clientRequestId",UUID.randomUUID().toString()),200);
                 } else return value;
@@ -112,6 +118,38 @@ class ConversationIntegrationTest {
             Thread.sleep(50);
         }
         fail("生成未按时结束"); return null;
+    }
+
+    void awaitQuestionIndex(String taskId) throws Exception {
+        var context=json.readTree(jdbc.queryForObject("SELECT context_json FROM chat_generation WHERE task_id=?",String.class,taskId));
+        String release=context.path("_learning").path("_questionRelease").asText();
+        assertTrue(release.matches("questions-[a-f0-9]{32}"),"准备中的任务必须记录索引版本");
+        long deadline=System.nanoTime()+Duration.ofSeconds(30).toNanos();
+        while(System.nanoTime()<deadline) {
+            // Status subscriptions do not create generations or spend task quota.
+            var response=HTTP.send(HttpRequest.newBuilder(URI.create(agentProperties.getBaseUrl()+"/internal/rag/questions/index/"+release))
+                .timeout(Duration.ofSeconds(2)).header("X-Internal-Key",agentProperties.getInternalKey()).GET().build(),HttpResponse.BodyHandlers.ofString());
+            assertEquals(200,response.statusCode(),"隔离索引状态请求失败");
+            String state=json.readTree(response.body()).path("status").asText();
+            if("READY".equals(state))return;
+            assertEquals("BUILDING",state,"隔离题目索引未能正常构建");
+            Thread.sleep(100);
+        }
+        fail("隔离题目索引未按时就绪");
+    }
+
+    @Test void slowColdQuestionIndexNeedsOnlyOneRetryAndPreservesQuota() throws Exception {
+        String token=privateAccount(),id=conversation(token);
+        long owner=call(token,"GET","/users/me",null,200).path("id").asLong(),question=6000000+owner;
+        jdbc.update("INSERT INTO question(id,subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES(?,'数据结构','二叉树','合成冷启动题','甲','乙','丙','丁','A','未提交解析','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')",question);
+        send(token,id,"在全题库搜索涉及二叉树的题目","slow-index");
+        var result=finish(token,id);
+        assertEquals("SUCCESS",result.path("status").asText(),result.toString());
+        assertEquals("READY",result.path("result").path("retrievalStatus").asText());
+        assertTrue(result.path("result").path("actions").isEmpty());
+        assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM chat_generation WHERE conversation_id=?",Integer.class,id));
+        assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM task WHERE user_id=?",Integer.class,owner));
+        assertEquals(6,agentProperties.getMinuteTaskLimit());
     }
 
     @Test void actualStreamHasIncrementBeforeCompletionAndReconnectDoesNotGenerateAgain() throws Exception {

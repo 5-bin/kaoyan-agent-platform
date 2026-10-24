@@ -12,8 +12,9 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
   try {
     for (const width of [1280, 390]) {
       const context = await browser.newContext({ viewport: { width, height: 900 } });
+      const page = await context.newPage();
+      let stage = 'login';
       try {
-        const page = await context.newPage();
         const username = 'browser_chat_' + width;
         const response = await context.request.post(base + '/api/auth/register', { data: { username, password: 'test-only-chat-password' } });
         assert.equal(response.status(), 200);
@@ -28,17 +29,20 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
         const consent = await (await context.request.get(base + '/api/privacy/settings', { headers })).json();
         assert.equal((await context.request.put(base + '/api/privacy/settings', { headers, data: { modelAllowed: true, scopes: ['profile', 'document'], provider: consent.data.provider } })).status(), 200);
         await page.reload();
+        stage = 'continuous_chat';
         await input.fill('进程与线程');
         await page.getByRole('button', { name: '发送', exact: true }).click();
-        await page.getByText('线程共享地址空间，保留各自的栈。', { exact: true }).waitFor();
+        const answers = page.locator('.task-result .markdown').getByText('线程共享地址空间，保留各自的栈。', { exact: true });
+        await answers.waitFor();
         assert.ok(new URL(page.url()).searchParams.get('conversationId'));
         const conversationUrl = page.url();
         await input.fill('它们共享哪些资源');
         await page.getByRole('button', { name: '发送', exact: true }).click();
-        await page.getByText('线程共享地址空间，保留各自的栈。', { exact: true }).nth(1).waitFor();
+        await answers.nth(1).waitFor();
         await page.reload();
-        await page.getByText('线程共享地址空间，保留各自的栈。', { exact: true }).nth(1).waitFor();
+        await answers.nth(1).waitFor();
         checks.push(width + ': continuous_followup_and_refresh');
+        stage = 'document_proposals';
         await input.fill('创建线程学习笔记');
         await page.getByRole('button', { name: '发送', exact: true }).click();
         await page.getByRole('button', { name: '预览笔记建议' }).click();
@@ -52,6 +56,7 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
         await page.getByText('已保存', { exact: true }).waitFor();
         await page.getByText('已选 v2', { exact: false }).waitFor();
         checks.push(width + ': document_create_update_and_confirm');
+        stage = 'cancel_retry';
         await input.fill('进程与线程，等待停止');
         await page.getByRole('button', { name: '发送', exact: true }).click();
         await page.getByRole('button', { name: '停止生成' }).click();
@@ -61,19 +66,30 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
         await page.getByText('已停止生成', { exact: true }).nth(1).waitFor();
         assert.equal(await page.getByText('已停止生成', { exact: true }).count(), 2);
         checks.push(width + ': cancel_and_retry');
+        stage = 'manual_note_create';
         await page.goto(base + '/notes');
         await page.getByRole('button', { name: '新建笔记', exact: true }).click();
         await page.getByRole('textbox', { name: '笔记标题', exact: true }).fill('手动学习笔记' + width);
         await page.getByRole('textbox', { name: '笔记正文', exact: true }).fill('# 手动复习记录\n保留第一版内容');
         await page.getByRole('button', { name: '创建笔记', exact: true }).click();
+        // The v1 heading can appear before save() finishes updating the route.
+        await page.waitForURL(url => url.pathname === '/notes' && !!url.searchParams.get('noteId'));
         await page.getByText('编辑笔记 · v1', { exact: true }).waitFor();
         const noteUrl = page.url();
+        const noteId = new URL(noteUrl).searchParams.get('noteId');
+        assert.ok(noteId, 'reload must target the saved note');
+        stage = 'manual_note_update';
         await page.getByRole('textbox', { name: '笔记正文', exact: true }).fill('# 手动复习记录\n增加第二版内容');
+        const updated = page.waitForResponse(response => response.request().method() === 'PUT'
+          && new URL(response.url()).pathname === '/api/personal-documents/' + noteId);
         await page.getByRole('button', { name: '保存新版本', exact: true }).click();
+        assert.equal((await updated).status(), 200, 'manual note update persists successfully');
         await page.getByText('编辑笔记 · v2', { exact: true }).waitFor();
+        stage = 'manual_note_reload';
         await page.goto(noteUrl);
         await page.getByText('编辑笔记 · v2', { exact: true }).waitFor();
         assert.equal(await page.getByRole('textbox', { name: '笔记正文', exact: true }).inputValue(), '# 手动复习记录\n增加第二版内容');
+        stage = 'manual_note_history';
         await page.getByRole('button', { name: '历史版本', exact: true }).click();
         const history = page.getByRole('dialog', { name: '笔记历史版本', exact: true });
         await history.getByRole('button', { name: '查看此版本' }).last().click();
@@ -84,6 +100,7 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
         if (screenshotDir) { fs.mkdirSync(screenshotDir, { recursive: true }); await page.screenshot({ path: path.join(screenshotDir, `notes-${width}.png`), fullPage: true }); }
         checks.push(width + ': personal_notes_create_update_history_and_reload');
+        stage = 'readonly_history';
         await page.goto(conversationUrl);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
         if (width === 390) {
@@ -93,6 +110,12 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
         } else await page.getByRole('link', { name: '任务历史' }).click();
         await page.getByRole('heading', { name: '任务历史', exact: true }).waitFor();
         checks.push(width + ': layout_and_readonly_history');
+      } catch (error) {
+        if (screenshotDir) {
+          fs.mkdirSync(screenshotDir, { recursive: true });
+          await page.screenshot({ path: path.join(screenshotDir, `chat-failure-${width}-${stage}.png`), fullPage: true }).catch(() => {});
+        }
+        throw new Error(`${width}:${stage}: ${error.message}`);
       } finally { await context.close(); }
     }
     console.log(JSON.stringify({ scope: 'real Java/Python/LangChain; H2, Redis and provider doubles; desktop and simulated390', checks }));
