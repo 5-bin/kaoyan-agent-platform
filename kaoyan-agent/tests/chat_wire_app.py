@@ -5,6 +5,8 @@ chunks, with a pause before the tail; no completed answer is split for playback.
 """
 import asyncio
 import json
+import os
+import time
 import httpx
 from openai import AsyncOpenAI
 from config import Settings
@@ -54,9 +56,19 @@ model.client = AsyncOpenAI(api_key="test-only", base_url="https://provider.inval
 from tempfile import TemporaryDirectory
 from question_search import QuestionIndex
 from tests.question_fixture import ContractEncoder
+
+
+class ControlledQuestionIndex(QuestionIndex):
+    def _build(self, release, records):
+        # Reproduce slow cold starts without changing production index behavior.
+        if os.environ.get('QUESTION_TEST_SLOW_INDEX') == 'true':
+            time.sleep(2)
+        return super()._build(release, records)
+
+
 question_folder = TemporaryDirectory(prefix="question-wire-index-")
 settings.QUESTION_INDEX = __import__('pathlib').Path(question_folder.name)
-app = create_app(settings, model=model, question_index=QuestionIndex(settings, encoder=ContractEncoder()))
+app = create_app(settings, model=model, question_index=ControlledQuestionIndex(settings, encoder=ContractEncoder()))
 
 # Deliberately malformed upstream envelopes exercise Java's trust boundary.
 # These routes exist only in this isolated fixture, never in main.create_app.

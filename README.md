@@ -10,6 +10,7 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 
 ## 文档入口
 
+- [CI索引冷启动重试修复](docs/ci-index-warmup-fix-2026-10-24.md)：复现Linux CI中的429，等待索引就绪后仅重试一次，保留正式任务限额。
 - [引用来源与收藏主题修复验证](docs/reference-policy-fix-verification-2026-10-24.md)：共享域名策略、堆排序解析、命令跳过知识检索及固定失败码，本轮隔离验证与生效边界。
 - [本机真实数据接入与清理](docs/real-data-import-2026-10-24.md)：当前日常库的10校15专业、44道真实课程习题、16篇四科资料，备份、清理范围与真实MySQL页面验收。
 - [真实数据来源清单](docs/real-data-sources-2026-10-24.md)：逐题原文、版本、许可及四科资料来源；课程习题不冒称408真题。
