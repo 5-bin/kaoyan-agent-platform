@@ -4,10 +4,10 @@
     <el-alert v-else-if="task.status === 'CANCELLED'" type="info" :closable="false" title="已停止生成" />
     <template v-else-if="result">
       <div v-if="result.outcome !== 'COMPLETED'" class="meta">
-        <el-tag>{{ outcomeLabels[result.outcome] }}</el-tag>
+        <el-tag>{{ result.retrievalStatus && retrievalLabels[result.retrievalStatus] || outcomeLabels[result.outcome] }}</el-tag>
       </div>
       <SafeMarkdown :content="result.answer" :allowed-urls="result.references?.map(source => source.url).filter(url => !!safeUrl(url))" />
-      <div v-if="result.evidence?.length" class="source"><strong>学习依据</strong><p v-for="item in result.evidence" :key="item.ref"><router-link v-if="resourceRoute(item.resource)" :to="resourceRoute(item.resource)!">{{ item.ref }} · {{ item.title }}</router-link><span v-else>{{ item.ref }} · {{ item.title }}</span> · {{ item.locator || '原文位置未记录' }} · {{ item.version || '版本未记录' }}</p></div>
+      <div v-if="result.evidence?.length" class="source"><strong>学习依据</strong><p v-for="item in result.evidence" :key="item.ref"><router-link v-if="resourceRoute(item.resource)" :to="resourceRoute(item.resource)!">{{ item.ref }} · {{ item.title }}</router-link><span v-else>{{ item.ref }} · {{ item.title }}</span> · {{ item.locator || '原文位置未记录' }} · {{ item.version || '版本未记录' }}<template v-if="item.matchMethod"><br><span class="match-label">{{ item.matchMethod === 'LABEL' ? '知识点匹配' : '语义相关' }} · {{ item.matchTopic }}</span><br>{{ item.summary }}</template></p></div>
       <el-alert v-if="result.notice || result.explanationMode === 'fallback'" type="warning" :closable="false" :title="result.notice || 'AI解释暂不可用，已保留资料与规则结果。'" />
       <ul v-if="result.followUp?.length"><li v-for="item in result.followUp" :key="item">{{ item }}</li></ul>
       <article v-for="(candidate, index) in result.candidates" :key="candidate.programId" class="candidate">
@@ -49,9 +49,11 @@ const result = computed(() => {
   return value?.outcome && value.explanationMode ? value : null
 })
 const outcomeLabels = { COMPLETED: '已完成', NEEDS_INPUT: '需补充条件', UNSUPPORTED: '资料未覆盖' }
+const retrievalLabels = { READY: '', BUILDING: '题目索引准备中', BUSY: '题目索引准备中', FAILED: '题目索引构建失败', UNAVAILABLE: '题目检索暂不可用' }
 function safeUrl(value: string) { return safeSourceUrl(value) }
 </script>
 <style scoped>
+.match-label { display:inline-block; margin:4px 0; padding:2px 6px; border:1px solid var(--c-line); border-radius:4px; color:var(--c-primary); background:var(--c-primary-light); font-size:12px; white-space:normal }
 .task-result { overflow-wrap: anywhere; }
 .meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .answer { white-space: pre-wrap; line-height: 1.8; }

@@ -60,6 +60,46 @@ def test_current_instruction_separates_reads_from_writes(text, operation, target
     assert result.ordinal == ordinal
 
 
+@pytest.mark.parametrize("prefix", ["有关", "涉及", "关于"])
+def test_compound_heap_sort_topic_is_preserved(prefix):
+    plan = local_learning_plan(f"{prefix}堆排序的题目帮我加入收藏")
+    assert plan.knowledgePoint == "堆排序"
+    assert plan.operation == "FAVORITE_ADD" and not plan.clarification
+    ambiguous = local_learning_plan(f"{prefix}堆和排序的题目帮我加入收藏")
+    assert ambiguous.clarification and ambiguous.operation == "NONE"
+    assert local_learning_plan(f"不要把{prefix}堆排序的题目加入收藏").operation == "NONE"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("operation", ["FAVORITE_ADD", "FAVORITE_REMOVE", "WRONG_REMOVE", "PRACTICE_CREATE"])
+async def test_commands_skip_public_retrieval_and_model(operation):
+    service = engine()
+    service.knowledge_search = AsyncMock()
+    req = request(privacy={"modelAllowed": True, "scopes": ["wrong"]}, learningContext=context(),
+        preparedPlan={"action": "LEARNING_ANALYSIS", "standaloneQuery": "处理堆排序题目",
+                      "reads": ["wrong"], "operation": operation})
+    result = await ConversationWorkflow(service).run(req)
+    assert result["outcome"] == "COMPLETED" and result["references"] == []
+    assert "相关审核资料" not in result["answer"]
+    service.knowledge_search.ainvoke.assert_not_awaited()
+    service.model.generate.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status,outcome", [("BUILDING", "UNSUPPORTED"), ("READY", "COMPLETED")])
+async def test_command_keeps_question_retrieval_state_and_empty_results(status, outcome):
+    service = engine()
+    service.knowledge_search = AsyncMock()
+    req = request(learningContext={"retrievalStatus": status, "items": [], "notice": "合成状态"},
+        preparedPlan={"action": "LEARNING_ANALYSIS", "standaloneQuery": "收藏堆排序题目",
+                      "reads": ["questions"], "target": "normal", "operation": "FAVORITE_ADD"})
+    result = await ConversationWorkflow(service).run(req)
+    assert result["retrievalStatus"] == status and result["outcome"] == outcome
+    assert result["references"] == []
+    service.knowledge_search.ainvoke.assert_not_awaited()
+    service.model.generate.assert_not_awaited()
+
+
 @pytest.mark.parametrize("topic,expected", [("tcp协议", "TCP"), ("TCP", "TCP"),
     ("t c p", "TCP"), ("传输控制协议", "TCP"), ("TCP序号", "TCP序号"),
     ("UDP", "UDP"), ("AVL树", "AVL树"), ("TCP流量控制", "TCP流量控制")])
@@ -73,9 +113,10 @@ def test_collection_topic_is_independent_of_favorite_destination(topic, expected
 def test_explicit_refs_keep_history_binding_and_unknown_topic_never_drops_filter():
     plan = local_learning_plan("将错题本中的 Q1 加入收藏")
     assert plan.target == "selected" and plan.questionRefs == ["Q1"]
-    for text in ("将错题本中涉及未知主题的题加入收藏", "将错题本中涉及 TCP 和队列的题加入收藏", "将错题本中涉及 ATCP 的题加入收藏"):
+    for text in ("将错题本中涉及未知主题的题加入收藏", "将错题本中涉及 TCP 和队列的题加入收藏"):
         unclear = local_learning_plan(text)
         assert unclear.clarification and unclear.operation == "NONE"
+    assert local_learning_plan("将错题本中涉及 ATCP 的题加入收藏").knowledgePoint == "ATCP"
     plan = local_learning_plan("将收藏列表中涉及 TCP 的题取消收藏")
     assert plan.target == "favorite" and plan.reads == ["favorite"]
 

@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     QDRANT_API_KEY: str = ""
     EMBEDDING_MODEL: str = "BAAI/bge-small-zh-v1.5"
     RAG_MIN_SCORE: float = Field(default=0.65, ge=0, le=1)
+    QUESTION_INDEX: Path = ROOT / ".cache" / "questions"
+    QUESTION_MODEL_CACHE: Path = ROOT / ".cache" / "embedding"
+    QUESTION_MIN_SCORE: float = Field(default=0.75, ge=0, le=1)
     LOG_LEVEL: str = "INFO"
 
     @model_validator(mode="after")

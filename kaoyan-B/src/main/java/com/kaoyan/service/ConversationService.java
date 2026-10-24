@@ -209,7 +209,10 @@ public class ConversationService {
             if(((Number)message.get("sequenceNo")).intValue()!=((Number)conv.get("nextSequence")).intValue()-1)
                 throw new ApiException(409,"仅能重试最后一条问题");
             var last=db.one("SELECT * FROM chat_generation WHERE message_id=? ORDER BY attempt_no DESC LIMIT 1",messageId);
-            if(!Set.of("FAILED","CANCELLED").contains(last.get("status"))) throw new ApiException(409,"仅失败或停止后的问题可以重试");
+            var lastResult=db.object(last.get("result"));
+            boolean retrySearch="SUCCESS".equals(last.get("status")) && "UNSUPPORTED".equals(lastResult.get("outcome"))
+                && Set.of("BUILDING","BUSY","FAILED","UNAVAILABLE").contains(Objects.toString(lastResult.get("retrievalStatus"),""));
+            if(!retrySearch&&!Set.of("FAILED","CANCELLED").contains(last.get("status"))) throw new ApiException(409,"仅失败、停止或题目检索尚未就绪的问题可以重试");
             var original=db.object(last.get("context"));
             Map<String,Object> document=null;
             var selected=db.object(original.get("document"));
@@ -356,6 +359,8 @@ public class ConversationService {
                         validateProposal(output,context);
                         failureCode = Code.UNEXPECTED_ERROR;
                         output.put("evidence",data.getOrDefault("evidence",List.of()));
+                        if(data.get("retrievalStatus")!=null)output.put("retrievalStatus",data.get("retrievalStatus"));
+                        else output.remove("retrievalStatus");
                         output.put("dataScopes",dataScopes(context,data));
                         output.put("readScope",data.getOrDefault("scope",List.of()));
                         output.put("standaloneQuery",context.get("userInput"));
@@ -467,7 +472,7 @@ public class ConversationService {
                             result.put("answer",message);
                         }
                         result.put("outcome","COMPLETED");
-                    } else if(!"NONE".equals(operation)) {
+                    } else if(!"NONE".equals(operation) && !Set.of("BUILDING","BUSY","FAILED","UNAVAILABLE").contains(Objects.toString(db.object(context.get("_learning")).get("retrievalStatus"),""))) {
                         result.put("answer","当前筛选条件下没有可操作的题目，未创建练习或修改记录。请调整知识点或选择题目。\n推荐问法：将我的错题本中涉及 TCP 的题目加入收藏；也可先查看错题本确认主题，再说：收藏 Q1。 ");
                         result.put("outcome","NEEDS_INPUT");
                     }
@@ -587,7 +592,7 @@ public class ConversationService {
     private void validatePlan(Map<String,Object> plan,String query) {
         if(!Set.of("KNOWLEDGE_QA","SCHOOL_RECOMMEND","DOCUMENT_CREATE","DOCUMENT_UPDATE","CHAT","LEARNING_ANALYSIS").contains(plan.get("action")))
             throw new IllegalStateException("invalid_plan");
-        if(!(plan.get("reads") instanceof List<?> reads) || reads.size()>5 || !Set.of("wrong","favorite","stats","practice","documents").containsAll(reads))
+        if(!(plan.get("reads") instanceof List<?> reads) || reads.size()>6 || !Set.of("wrong","favorite","stats","practice","documents","questions").containsAll(reads))
             throw new IllegalStateException("invalid_reads");
         String op=Objects.toString(plan.get("operation"),"NONE");
         if(!Set.of("NONE","FAVORITE_ADD","FAVORITE_REMOVE","WRONG_REMOVE","PRACTICE_CREATE").contains(op)) throw new IllegalStateException("invalid_operation");

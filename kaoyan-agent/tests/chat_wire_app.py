@@ -49,7 +49,14 @@ settings = Settings(_env_file=None, LLM_ENABLED=True, LLM_API_KEY="test-only", R
 model = ModelClient(settings)
 model.client = AsyncOpenAI(api_key="test-only", base_url="https://provider.invalid/v1", max_retries=0,
     http_client=httpx.AsyncClient(transport=httpx.MockTransport(provider)))
-app = create_app(settings, model=model)
+# An isolated embedded index with explicit vectors exercises the HTTP contract.
+# It does not measure real model quality or download model files during tests.
+from tempfile import TemporaryDirectory
+from question_search import QuestionIndex
+from tests.question_fixture import ContractEncoder
+question_folder = TemporaryDirectory(prefix="question-wire-index-")
+settings.QUESTION_INDEX = __import__('pathlib').Path(question_folder.name)
+app = create_app(settings, model=model, question_index=QuestionIndex(settings, encoder=ContractEncoder()))
 
 # Deliberately malformed upstream envelopes exercise Java's trust boundary.
 # These routes exist only in this isolated fixture, never in main.create_app.

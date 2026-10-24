@@ -85,9 +85,9 @@ class Corpus:
 
 
 class FastEmbedEncoder:
-    def __init__(self, model):
+    def __init__(self, model, cache_dir=None, threads=None, local_files_only=False):
         from fastembed import TextEmbedding
-        self.model = TextEmbedding(model_name=model)
+        self.model = TextEmbedding(model_name=model, cache_dir=cache_dir, threads=threads, local_files_only=local_files_only)
 
     def encode(self, texts):
         return [v.tolist() for v in self.model.embed(texts)]

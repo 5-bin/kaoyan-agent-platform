@@ -154,7 +154,7 @@ class ConversationResolution(StrictModel):
     standaloneQuery: str = Field(min_length=1, max_length=8000)
     conditionPatch: ConversationConditions = Field(default_factory=ConversationConditions)
     clarification: str | None = Field(default=None, max_length=1000)
-    reads: list[Literal["wrong", "favorite", "stats", "practice", "documents"]] = Field(default_factory=list, max_length=5)
+    reads: list[Literal["wrong", "favorite", "stats", "practice", "documents", "questions"]] = Field(default_factory=list, max_length=6)
     operation: Literal["NONE", "FAVORITE_ADD", "FAVORITE_REMOVE", "WRONG_REMOVE", "PRACTICE_CREATE"] = "NONE"
     target: Literal["selected", "visible", "wrong", "favorite", "normal"] = "selected"
     questionRefs: list[str] = Field(default_factory=list, max_length=50)

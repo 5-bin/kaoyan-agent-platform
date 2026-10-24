@@ -14,7 +14,7 @@ public class AssistantSmokeServer {
     }
     @TestConfiguration(proxyBeanMethods=false)
     static class Fixtures {
-        @Bean ApplicationRunner assistantFixtures(JdbcTemplate jdbc,DataSource data) {
+        @Bean ApplicationRunner assistantFixtures(JdbcTemplate jdbc,DataSource data,org.springframework.core.env.Environment environment) {
             return args -> {
                 try(var connection=data.getConnection()) {
                     String url=connection.getMetaData().getURL();
@@ -25,6 +25,11 @@ public class AssistantSmokeServer {
                 jdbc.execute("CREATE TABLE IF NOT EXISTS document(id BIGINT PRIMARY KEY,title VARCHAR(255),subject VARCHAR(50),content TEXT,source_url VARCHAR(1000),status VARCHAR(30),creator_user_id BIGINT,reviewer_user_id BIGINT,reviewed_at TIMESTAMP,created_at TIMESTAMP,updated_at TIMESTAMP)");
                 if(jdbc.queryForObject("SELECT COUNT(*) FROM document WHERE id=9122",Integer.class)==0)
                     jdbc.update("INSERT INTO document(id,title,subject,content,status,created_at,updated_at) VALUES(9122,'合成线程复习资料','操作系统','合成学习资料正文：同一进程的线程共享地址空间，各线程保留各自的栈和寄存器。仅供隔离测试，不是正式教材。','PUBLISHED',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)");
+                if(environment.getProperty("kaoyan.smoke.questions",Boolean.class,false))for(int i=0;i<3;i++) {
+                    long id=9021+i;
+                    if(jdbc.queryForObject("SELECT COUNT(*) FROM question WHERE id=?",Integer.class,id)==0)
+                        jdbc.update("INSERT INTO question(id,subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES(?,'数据结构',?,?,'甲','乙','丙','丁','A','不得用于检索的解析','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')",id,i==0?"二叉树":i==1?"遍历":"队列",i==1?"左右孩子的访问顺序":"合成题目");
+                }
             };
         }
     }

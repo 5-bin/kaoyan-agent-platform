@@ -30,18 +30,20 @@ public class AssistantLearningService {
     private final StudyStatService statistics;
     private final JdbcTemplate jdbc;
     private final ObjectMapper json;
+    private final QuestionSearchService questionSearch;
 
     public Map<String,Object> read(Long owner, Map<String,Object> plan, Map<String,Object> pageContext) {
         Map<String,Object> inputPage = pageContext == null ? Map.of() : pageContext;
         Set<String> reads = strings(plan.get("reads"));
-        if (!Set.of("wrong","favorite","stats","practice","documents").containsAll(reads)) throw bad("读取工具无效");
+        if (!Set.of("wrong","favorite","stats","practice","documents","questions").containsAll(reads)) throw bad("读取工具无效");
         String operation = string(plan,"operation","NONE");
         String target = string(plan,"target", "selected");
+        boolean publicQuestions=reads.contains("questions") && "normal".equals(target);
         boolean collection=Set.of("wrong","favorite").contains(target);
-        Map<String,Object> page=collection?Map.of("page",target):inputPage;
+        Map<String,Object> page=publicQuestions?Map.of():collection?Map.of("page",target):inputPage;
         String subject = string(plan,"subject",string(page,"subject",null));
         String knowledgePoint = string(plan,"knowledgePoint",null);
-        boolean readQuestions=!"NONE".equals(operation)||reads.stream().anyMatch(Set.of("wrong","favorite","practice")::contains);
+        boolean readQuestions=!"NONE".equals(operation)||reads.stream().anyMatch(Set.of("wrong","favorite","practice","questions")::contains);
         List<Long> visible = readQuestions?ids(page.get("visibleQuestionIds")):List.of();
         List<Long> selected = readQuestions?ids(page.get("selectedQuestionIds")):List.of();
         List<Long> concrete = new ArrayList<>();
@@ -62,32 +64,74 @@ public class AssistantLearningService {
                 if (session != null) practice.sessionDetail(owner,session).forEach(r -> ids.add(r.getQuestionId()));
                 else practice.lambdaQuery().eq(PracticeRecord::getUserId,owner).orderByDesc(PracticeRecord::getCreatedAt).list().forEach(r -> ids.add(r.getQuestionId()));
             }
-            if ("PRACTICE_CREATE".equals(operation) && "normal".equals(target))
-                questions.selectForPractice(subject,string(plan,"difficulty",null),knowledgePoint,50).forEach(q -> ids.add(q.getId()));
+            if (publicQuestions || "PRACTICE_CREATE".equals(operation) && "normal".equals(target))
+                questionSearch.published().forEach(q -> ids.add(q.getId()));
         }
         // Page state contains only references. Load contents and validate membership again.
         for(Long id:focused?concrete:union(selected,visible))checkPageMembership(owner,page,id);
-        List<Long> filtered = ids.stream().distinct().filter(id -> {
-            Question q = questions.selectById(id);
-            PracticeRecord r = contextRecord(owner,page,id);
-            if (!QuestionHistoryView.playable(q) && (r == null || r.getIsCorrect()==null)) return false;
-            Map<String,Object> snapshot=r!=null&&r.getQuestionSnapshot()!=null?r.getQuestionSnapshot():Map.of();
-            Object actualSubject=snapshot.getOrDefault("subject",q==null?"":Objects.toString(q.getSubject(),""));
-            Object actualPoint=snapshot.getOrDefault("knowledgePoint",q==null?"":Objects.toString(q.getKnowledgePoint(),""));
-            return (subject==null || subject.equals(actualSubject)) && LearningTopic.matches(knowledgePoint,actualPoint);
-        }).toList();
+        Map<Long,Map<String,Object>> questionCandidates=new LinkedHashMap<>();
+        Map<Long,QuestionContentVO> candidateViews=new LinkedHashMap<>();
+        Map<Long,PracticeRecord> candidateRecords=new LinkedHashMap<>();
+        Map<String,Object> candidateFingerprints=new LinkedHashMap<>();
+        int missingSnapshots=0;
+        for(Long id:ids.stream().distinct().toList()) {
+            // Capture before loading contents; a concurrent edit invalidates the preview.
+            Map<String,Object> originalFingerprint=fingerprint(owner,id);
+            Question current=questions.selectById(id);
+            PracticeRecord record=publicQuestions?null:contextRecord(owner,page,id);
+            if(!QuestionHistoryView.playable(current)&&(record==null||record.getIsCorrect()==null))continue;
+            QuestionContentVO view=new QuestionContentVO();QuestionHistoryView.populate(view,record,current);
+            if(view.getContent()==null){missingSnapshots++;continue;}
+            if(subject!=null&&!subject.equals(view.getSubject()))continue;
+            if(plan.get("difficulty")!=null&&!plan.get("difficulty").equals(view.getDifficulty()))continue;
+            Map<String,Object> snapshot=new LinkedHashMap<>();snapshot.put("id",id);snapshot.put("version",view.getVersion());
+            Map<String,Object> fields=json.convertValue(view,new TypeReference<LinkedHashMap<String,Object>>(){});
+            for(String key:List.of("subject","difficulty","knowledgePoint","content","optionA","optionB","optionC","optionD")) {
+                snapshot.put(key,Objects.toString(fields.get(key),""));
+            }
+            questionCandidates.put(id,snapshot);
+            candidateViews.put(id,view);candidateRecords.put(id,record);candidateFingerprints.put(id.toString(),originalFingerprint);
+        }
         Map<String,Object> result = new LinkedHashMap<>();
+        Map<Long,Map<String,Object>> matchInfo=new LinkedHashMap<>();
+        List<Long> filtered=new ArrayList<>(questionCandidates.keySet());
+        if(knowledgePoint!=null) {
+            var search=questionSearch.search(knowledgePoint,new ArrayList<>(questionCandidates.values()));
+            String state=search==null?"UNAVAILABLE":search.status();
+            result.put("retrievalStatus",state);result.put("matchTopic",knowledgePoint);
+            if(search!=null)result.put("_questionRelease",search.releaseId());
+            filtered=new ArrayList<>();
+            if("READY".equals(state)) {
+                for(var match:search.matches()) {
+                    Long id=((Number)match.get("id")).longValue();
+                    if(!questionCandidates.containsKey(id))throw bad("题目匹配结果无效");
+                    filtered.add(id);matchInfo.put(id,match);
+                }
+            } else result.put("notice",switch(state) {
+                case "BUILDING","BUSY" -> "已识别主题“"+knowledgePoint+"”，题目语义索引正在准备，请稍后重试；本次未修改记录。";
+                case "FAILED" -> "已识别主题“"+knowledgePoint+"”，题目索引构建失败，请检查本地模型与索引配置；本次未修改记录。";
+                default -> "已识别主题“"+knowledgePoint+"”，题目检索服务暂时不可用，请稍后重试；本次未修改记录。";
+            });
+            result.put("_topicMatches",matchInfo);
+            Map<String,Object> titles=new LinkedHashMap<>();
+            for(Long id:filtered)titles.put(id.toString(),questionCandidates.get(id).get("content"));
+            result.put("_matchedTitles",titles);
+            Map<String,Object> fingerprints=new LinkedHashMap<>();
+            for(Long id:filtered)fingerprints.put(id.toString(),candidateFingerprints.get(id.toString()));
+            result.put("_matchFingerprints",fingerprints);
+        }
+        if(missingSnapshots>0)result.put("notice",Objects.toString(result.get("notice"),"")+" 有"+missingSnapshots+"道历史题目快照缺失，未按现行题目补造匹配依据。");
         List<Map<String,Object>> items = new ArrayList<>(), evidence = new ArrayList<>();
         Map<String,Long> refs = new LinkedHashMap<>();
         for (Long id : filtered.stream().limit(20).toList()) {
-            PracticeRecord r = contextRecord(owner,page,id); QuestionContentVO view = new QuestionContentVO();
+            PracticeRecord r = candidateRecords.get(id); QuestionContentVO view = candidateViews.get(id);
             boolean answered=r!=null&&r.getIsCorrect()!=null;
-            QuestionHistoryView.populate(view,r,!answered ? questions.selectById(id) : null);
             Map<String,Object> item = json.convertValue(view,new TypeReference<LinkedHashMap<String,Object>>(){});
             String ref = "Q"+(items.size()+1); item.put("ref",ref);
             item.put("answered",answered);item.put("snapshotMissing","MISSING".equals(view.getSnapshotStatus())||"UNAVAILABLE".equals(view.getSnapshotStatus()));
-            item.put("scope","wrong".equals(target)?"wrong":marks.isFavorite(owner,id)&&(reads.contains("favorite")||"favorite".equals(page.get("page")))?"favorite":"wrong");
-            item.put("inWrongBook",marks.listWrong(owner).stream().anyMatch(mark -> id.equals(mark.getQuestionId())));
+            item.put("scope",publicQuestions?"questions":"wrong".equals(target)?"wrong":marks.isFavorite(owner,id)&&(reads.contains("favorite")||"favorite".equals(page.get("page")))?"favorite":"wrong");
+            if(!publicQuestions)item.put("inWrongBook",marks.listWrong(owner).stream().anyMatch(mark -> id.equals(mark.getQuestionId())));
+            if(matchInfo.containsKey(id)) {item.put("matchMethod",matchInfo.get(id).get("method"));item.put("matchTopic",knowledgePoint);}
             if (r != null) {item.put("userAnswer",r.getUserAnswer());item.put("correct",r.getIsCorrect());}
             items.add(item); refs.put(ref,id);
             Map<String,Object> e = new LinkedHashMap<>(); e.put("ref",ref);e.put("kind",answered ? "attempt" : "question");
@@ -98,6 +142,7 @@ public class AssistantLearningService {
                 case "UNAVAILABLE" -> "本人历史作答；题目当前不可用";
                 default -> "本人作答的题目版本快照缺失";
             });
+            if(matchInfo.containsKey(id)){e.put("matchMethod",matchInfo.get(id).get("method"));e.put("matchTopic",knowledgePoint);e.put("summary",Objects.toString(view.getContent(),"").substring(0,Math.min(180,Objects.toString(view.getContent(),"").length())));}
             e.put("version",view.getVersion());e.put("resource",Map.of("type","question","id",id));evidence.add(e);
         }
         result.put("items",items);result.put("total",filtered.size());result.put("readCount",items.size());
@@ -171,11 +216,27 @@ public class AssistantLearningService {
         String subject=string(plan,"subject",string(page,"subject",null));
         String difficulty=string(plan,"difficulty",null);
         String knowledgePoint=string(plan,"knowledgePoint",null);
-        if(subject!=null)unique=unique.stream().filter(id->{Question q=questions.selectById(id);return q!=null&&subject.equals(q.getSubject());}).toList();
-        if(knowledgePoint!=null)unique=unique.stream().filter(id->{Question q=questions.selectById(id);return q!=null&&LearningTopic.matches(knowledgePoint,q.getKnowledgePoint());}).toList();
+        boolean topicMatched=knowledgePoint!=null && "READY".equals(context.get("retrievalStatus")) && context.get("_topicMatches") instanceof Map<?,?>;
+        if(knowledgePoint!=null&&context.get("retrievalStatus")!=null&&!topicMatched)return List.of();
+        if(topicMatched) {
+            Map<?,?> matched=(Map<?,?>)context.get("_topicMatches");
+            Map<?,?> fixed=(Map<?,?>)context.get("_matchFingerprints");
+            unique=unique.stream().filter(qid->matched.containsKey(qid)||matched.containsKey(qid.toString()))
+                .filter(qid->QuestionHistoryView.playable(questions.selectById(qid))).toList();
+            for(Long qid:unique)if(fixed==null||!Objects.equals(encode(fixed.get(qid.toString())),encode(fingerprint(owner,qid))))
+                throw new ApiException(409,409,"目标已变化，请重新生成操作预览");
+        }
+        if(subject!=null&&!topicMatched)unique=unique.stream().filter(id->{Question q=questions.selectById(id);return q!=null&&subject.equals(q.getSubject());}).toList();
+        if(knowledgePoint!=null&&!topicMatched)unique=unique.stream().filter(id->{Question q=questions.selectById(id);return q!=null&&LearningTopic.matches(knowledgePoint,q.getKnowledgePoint());}).toList();
         int count=plan.get("count") instanceof Number n?n.intValue():5;
         if(count<1||count>50)throw bad("题目数量须为1至50");
         if ("PRACTICE_CREATE".equals(operation)) {
+            if(topicMatched) {
+                Map<?,?> matched=(Map<?,?>)context.get("_topicMatches");
+                unique=unique.stream().filter(qid->{Object rawMatch=matched.containsKey(qid)?matched.get(qid):matched.get(qid.toString());
+                    Question current=questions.selectById(qid);
+                    return rawMatch instanceof Map<?,?> match && current!=null && Objects.equals(match.get("version"),current.getVersion());}).toList();
+            }
             if("normal".equals(target)&&unique.isEmpty()&&!context.containsKey("_operationQuestionIds"))
                 unique=questions.selectForPractice(subject,difficulty,knowledgePoint,count).stream().map(Question::getId)
                     .filter(qid->LearningTopic.matches(knowledgePoint,questions.selectById(qid).getKnowledgePoint())).toList();
@@ -189,12 +250,16 @@ public class AssistantLearningService {
         payload.put("targets",unique.stream().map(qid -> {
             Question q=questions.selectById(qid);
             String title=q==null||q.getContent()==null?"历史题目":q.getContent();
-            return Map.of("title",title.substring(0,Math.min(120,title.length())),"resource",Map.of("type","question","id",qid));
+            if(topicMatched&&context.get("_matchedTitles") instanceof Map<?,?> titles)title=Objects.toString(titles.get(qid.toString()),title);
+            Map<String,Object> display=new LinkedHashMap<>();display.put("title",title.substring(0,Math.min(120,title.length())));display.put("resource",Map.of("type","question","id",qid));
+            if(topicMatched){Map<?,?> matched=(Map<?,?>)context.get("_topicMatches");Object info=matched.containsKey(qid)?matched.get(qid):matched.get(qid.toString());
+                if(info instanceof Map<?,?> m){display.put("matchMethod",m.get("method"));display.put("matchTopic",knowledgePoint);}}
+            return display;
         }).toList());
         payload.put("source", "wrong".equals(target)?"WRONG":"favorite".equals(target)?"FAVORITE":"NORMAL");
         payload.put("subject",subject);payload.put("difficulty",difficulty);payload.put("count",count);
         String id=UUID.randomUUID().toString();
-        boolean direct="FAVORITE_ADD".equals(operation)&&unique.size()==1&&(!requested.isEmpty()||ordinal!=null||"selected".equals(target));
+        boolean direct=knowledgePoint==null&&"FAVORITE_ADD".equals(operation)&&unique.size()==1&&(!requested.isEmpty()||ordinal!=null||"selected".equals(target));
         jdbc.update("INSERT INTO assistant_action(id,user_id,conversation_id,task_id,operation,status,payload_json,result_json,created_at,updated_at) VALUES (?,?,?,?,?,'PENDING',?,'{}',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)",id,owner,conversationId,taskId,operation,encode(payload));
         if(direct)execute(id,owner,operation,payload);
         return actions(owner,taskId);
@@ -241,7 +306,9 @@ public class AssistantLearningService {
         Question q=questions.selectById(id);Map<String,Object> result=new LinkedHashMap<>();result.put("id",id);
         result.put("version",q==null?null:q.getVersion());result.put("active",q==null?null:q.getActive());result.put("review",q==null?null:q.getReviewStatus());
         UserQuestionMark mark=marks.lambdaQuery().eq(UserQuestionMark::getUserId,owner).eq(UserQuestionMark::getQuestionId,id).one();
-        result.put("favorite",mark==null?0:mark.getIsFavorite());result.put("wrong",mark==null?0:mark.getIsWrong());return result;
+        result.put("favorite",mark==null?0:mark.getIsFavorite());result.put("wrong",mark==null?0:mark.getIsWrong());
+        result.put("contentHash",q==null?null:hash(encode(QuestionSearchService.snapshot(q))));
+        PracticeRecord record=latest(owner,id);result.put("historyHash",record==null?null:hash(encode(record.getQuestionSnapshot())));return result;
     }
     private Map<String,Object> view(Map<String,Object> row) {
         String operation=String.valueOf(row.get("operation"));Map<String,Object> payload=decode(row.get("payload_json"));

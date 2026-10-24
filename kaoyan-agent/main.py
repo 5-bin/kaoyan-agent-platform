@@ -3,6 +3,7 @@ import asyncio
 import logging
 import secrets
 import json
+import re
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import StreamingResponse
@@ -17,26 +18,30 @@ from schemas import ConversationRequest
 from conversation import ConversationWorkflow
 from llm_client import stream_sink, request_model_calls, quota_exempt
 from langsmith.run_helpers import tracing_context
+from question_search import QuestionIndex, IndexRequest, SearchRequest
 
 log = logging.getLogger(__name__)
 
 
-def create_app(settings=None, model=None, retriever=None):
+def create_app(settings=None, model=None, retriever=None, question_index=None):
     settings = settings or Settings()
     corpus = Corpus(settings.RAG_DATA, settings.RAG_SOURCE_POLICY_FILE)
     model = model or ModelClient(settings)
     retriever = retriever or Retriever(settings, corpus)
     engine = Workflows(settings, corpus, retriever, model)
     conversation = ConversationWorkflow(engine)
+    question_index = question_index or QuestionIndex(settings)
 
     @asynccontextmanager
     async def lifespan(app):
         yield
         await model.close()
         retriever.close()
+        await asyncio.to_thread(question_index.close)
 
     app = FastAPI(title="考研RAG内部服务", lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
     app.state.engine = engine
+    app.state.question_index = question_index
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request, error):
@@ -69,6 +74,24 @@ def create_app(settings=None, model=None, retriever=None):
         provider = provider_identifier(settings.LLM_BASE_URL)
         return {"status": "ok", "releaseId": corpus.release_id, "retrievalBackend": settings.RAG_BACKEND,
                 "modelEnabled": settings.LLM_ENABLED, "provider": provider}
+
+    @app.post("/internal/rag/questions/index", dependencies=[Depends(authenticate)])
+    async def question_index_submit(req: IndexRequest):
+        return await asyncio.to_thread(question_index.submit, req.questions)
+
+    @app.get("/internal/rag/questions/index/{release_id}", dependencies=[Depends(authenticate)])
+    async def question_index_status(release_id: str):
+        if not re.fullmatch(r"questions-[a-f0-9]{32}", release_id):
+            raise HTTPException(422, "invalid release")
+        return await asyncio.to_thread(question_index.status, release_id)
+
+    @app.post("/internal/rag/questions/search", dependencies=[Depends(authenticate)])
+    async def question_search(req: SearchRequest):
+        try:
+            return await asyncio.wait_for(asyncio.to_thread(question_index.search, req), timeout=12)
+        except Exception as error:
+            log.warning("questionSearchFailure=%s", type(error).__name__)
+            raise HTTPException(503, "题目语义检索暂时不可用。") from None
 
     @app.post("/internal/rag/conversation/plan", dependencies=[Depends(authenticate)])
     async def conversation_plan(req: ConversationRequest):

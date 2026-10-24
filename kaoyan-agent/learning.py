@@ -36,6 +36,35 @@ def chinese_number(text):
 
 
 def requested_knowledge_point(text):
+    def normalize(value):
+        value = re.sub(r"\s+", "", value).strip('“”"\'：:')
+        value = re.sub(r"tcp", "TCP", value, flags=re.I)
+        value = re.sub(r"udp", "UDP", value, flags=re.I)
+        return value.replace("传输控制协议", "TCP").replace("用户数据报协议", "UDP").replace("TCP协议", "TCP").replace("UDP协议", "UDP")
+
+    # Accept new topics without consulting a dictionary. Stop before commands.
+    end = r"(?:内容|有关|相关|的(?:题|错题|部分)|[，。；\n”\"]|$)"
+    # In “堆有关错题”, 有关 follows the topic; do not treat 错题 as a new topic.
+    topic_prefix = r"(?:涉及|关于|有关(?!的|错题|题目|试题|题)|跟|(?<!进程)与)"
+    explicit = re.search(r"知识点\s*(?:为|是|[:：])\s*[“\"]?(.{1,255}?)" + end, text)
+    topic = re.search(topic_prefix + r"\s*(.{0,255}?)" + end, text)
+    if explicit is None:
+        topics = {normalize(m[1]) for m in re.finditer(topic_prefix + r"\s*(.{0,255}?)" + end, text) if normalize(m[1])}
+        if len(topics) > 1:
+            return None
+    else:
+        explicit_topics = {normalize(m[1]) for m in re.finditer(r"知识点\s*(?:为|是|[:：])\s*[“\"]?(.{1,255}?)" + end, text)}
+        if len(explicit_topics) > 1:
+            return None
+    direct = re.search(r"(?:搜索|查找|找|查)(?:出|一些|几道|\d+道)?\s*([^，。；\n]{1,100}?)(?:相关的?|的)?(?:题目|试题|题)(?:[，。；\n]|$)", text)
+    match = explicit or topic or direct
+    if match:
+        value = normalize(match[1])
+        value = re.sub(r"^(?:一些|几道|[0-9一二两三四五六七八九十]+道)", "", value)
+        if (not value or value in {"这", "这个", "那个", "它", "上述", "未知主题", "某个知识点"}
+                or (value != "进程与线程" and re.search(r"和|以及|或者|或|、|与|并且|同时|加入|收藏|移出|取消|创建|生成", value))):
+            return None
+        return value
     # Known labels are read filters, never executable expressions or write targets.
     labels = ("线性表", "栈", "队列", "树的遍历", "AVL树", "拓扑排序", "最小生成树",
               "最短路径", "堆", "散列表", "排序", "查找", "图", "进程与线程",
@@ -46,9 +75,6 @@ def requested_knowledge_point(text):
         (r"(?<![A-Z0-9])" if label[0].isascii() else "") + re.escape(label.upper())
         + (r"(?![A-Z0-9])" if label[-1].isascii() else ""), normalized)]
     found = [label for label in found if not any(label != other and label in other for other in found)]
-    explicit = re.search(r"知识点\s*(?:为|是|[:：])\s*[“\"]?([^，。；\n”\"]{1,50})", text)
-    if explicit:
-        return explicit[1].strip()
     if len(found) != 1:
         return None
     # Preserve a requested subtopic instead of silently widening it to its parent.
@@ -147,6 +173,15 @@ def local_learning_plan(text, page_context=None):
             clarification, ordinal = "请指定当前可见列表1至50范围内的题目。", None
     refs = list(dict.fromkeys(re.findall(r"\bQ[1-9]\d{0,2}\b", text)))[:50]
     point = requested_knowledge_point(text)
+    public_questions = ("题库" in text or (not any(k in reads for k in ("wrong", "practice"))
+                        and not re.search(r"收藏(?:夹|本|列表|中|里|内|的)", text)
+                        and bool(re.search(r"找.{0,80}题|搜索.{0,80}题|查找.{0,80}题", text))))
+    if public_questions and not refs and ordinal is None:
+        reads = ["questions"]
+        target = "normal"
+        subject = next((s for s in ("数据结构", "计算机组成原理", "操作系统", "计算机网络") if s in text), None)
+    if operation == "PRACTICE_CREATE" and target == "normal" and not reads:
+        reads = ["questions"]
     # The collection being read is distinct from the destination of a write.
     # Explicit references still bind to the prior answer instead of a fresh list.
     source = None
@@ -215,17 +250,21 @@ def safe_learning_context(req, *, external=True, plan=None):
         if not isinstance(item, dict) or not re.fullmatch(r"Q[1-9]\d{0,2}", str(item.get("ref", ""))):
             continue
         kind = item.get("scope", item.get("kind"))
-        if kind not in {"wrong", "favorite", "practice"}:
+        if kind not in {"wrong", "favorite", "practice", "questions"}:
             # Unknown sensitivity must not be inferred from a model's read plan.
             if external:
                 continue
             kind = next((value for value in ("wrong", "favorite", "practice") if value in reads), None)
         category = "wrong" if kind == "practice" else kind
-        if category not in requested_categories or external and category not in scopes:
+        if category not in requested_categories or external and category != "questions" and category not in scopes:
             continue
         clean = _fields(item, ("ref", "subject", "knowledgePoint", "content", "optionA", "optionB", "optionC", "optionD",
-                               "difficulty", "userAnswer", "correct", "answered", "inWrongBook", "version", "snapshotStatus", "snapshotMissing", "notice", "scope", "kind"))
-        if item.get("answered") is True and not item.get("snapshotMissing"):
+                               "difficulty", "userAnswer", "correct", "answered", "inWrongBook", "version", "snapshotStatus", "snapshotMissing", "notice", "scope", "kind", "matchMethod", "matchTopic"))
+        if category == "questions":
+            for field in ("userAnswer", "correct", "inWrongBook"):
+                clean.pop(field, None)
+            clean["answered"] = False
+        if category != "questions" and item.get("answered") is True and not item.get("snapshotMissing"):
             clean.update(_fields(item, ("answer", "analysis")))
         items.append(clean)
     if items:
@@ -236,7 +275,7 @@ def safe_learning_context(req, *, external=True, plan=None):
         source_categories = {"wrong" if value == "practice" else value for value in source_categories}
         # A union total may reveal the size of an unconsented collection even
         # when every emitted item individually passes its category check.
-        if not external or (source_categories <= scopes and len(items) == len(source.get("items", [])[:20])):
+        if not external or (source_categories <= scopes | {"questions"} and len(items) == len(source.get("items", [])[:20])):
             result.update(_fields(source, ("total", "readCount", "notice")))
         else:
             result["readCount"] = len(items)
@@ -261,6 +300,8 @@ def safe_learning_context(req, *, external=True, plan=None):
     result["evidence"] = [_fields(item, ("ref", "kind", "title", "locator", "version"))
                           for item in source.get("evidence", [])[:30]
                           if isinstance(item, dict) and item.get("ref") in refs]
+    if not external:
+        result.update(_fields(source, ("retrievalStatus", "notice", "matchTopic")))
     return result
 
 
@@ -272,6 +313,10 @@ class LearningAnswer(StrictModel):
 
 def rule_learning_answer(context, plan):
     lines = []
+    if context.get("notice"):
+        lines.append(context["notice"])
+    if context.get("matchTopic"):
+        lines.append("筛选主题：" + context["matchTopic"])
     stats = context.get("statistics")
     if stats:
         count = stats.get("questionCount", 0)
@@ -289,6 +334,8 @@ def rule_learning_answer(context, plan):
         lines.append(f"本次读取{len(items)}条记录，总量{context.get('total', len(items))}；列表节选不代表全部学习情况。")
         for item in items:
             lines.append(f"[{item['ref']}] {item.get('knowledgePoint') or item.get('subject') or '题目'}："
+                         + (("知识点匹配" if item.get("matchMethod") == "LABEL" else "语义相关") + "；" if item.get("matchMethod") else "")
+                         + (item.get("content", "")[:180] + "；" if item.get("matchMethod") else "")
                          + ("历史快照缺失，不能补造当时题干与答案。" if item.get("snapshotMissing") else
                             "尚未提交，标准答案与完整解析保持隐藏。" if not item.get("answered") else
                             "最近一次已提交作答正确；仍保留在错题本。" if item.get("inWrongBook") and item.get("correct") == 1 else
@@ -299,4 +346,6 @@ def rule_learning_answer(context, plan):
         lines.append("已识别操作意图，是否执行以及执行结果由业务后端核验；需要确认的操作请先查看预览。")
     if not lines:
         lines.append("没有读取到本次请求所需记录。请明确对象或筛选范围；未授权外发时仍可使用本地页面功能。")
+    if context.get("retrievalStatus") == "READY" and not items:
+        lines.append("没有找到符合该主题的题目，未修改记录。")
     return "\n".join(lines)

@@ -46,10 +46,11 @@ export interface SchoolCandidate {
 export interface AssistantAction {
   id: string; type: string; status: 'PENDING' | 'SUCCESS' | 'DISMISSED' | 'FAILED'; title: string
   count: number; requiresConfirmation: boolean; result?: { sessionId?: string; actualCount?: number }
-  requestedCount?: number; targets?: { title: string; resource: AssistantEvidence['resource'] }[]
+  requestedCount?: number; targets?: { title: string; resource: AssistantEvidence['resource']; matchMethod?: 'LABEL' | 'SEMANTIC'; matchTopic?: string }[]
 }
 export interface AssistantEvidence {
   ref: string; kind: string; title: string; locator?: string; version?: string
+  matchMethod?: 'LABEL' | 'SEMANTIC'; matchTopic?: string; summary?: string
   resource?: { type: 'question' | 'document' | 'practice' | 'stats'; id?: string | number }
 }
 export interface TaskResult {
@@ -58,6 +59,7 @@ export interface TaskResult {
   releaseId: string; references: SourceReference[]; followUp?: string[]; notice?: string
   candidates?: SchoolCandidate[]; coverage?: string; weakPoints?: string[]; accuracy?: number
   evidence?: AssistantEvidence[]; actions?: AssistantAction[]
+  retrievalStatus?: 'READY' | 'BUILDING' | 'BUSY' | 'FAILED' | 'UNAVAILABLE'
   conditions?: Record<string, unknown>
   documentProposal?: { operation: 'create' | 'update'; documentId?: string; baseVersion?: number; title: string; content: string }
 }

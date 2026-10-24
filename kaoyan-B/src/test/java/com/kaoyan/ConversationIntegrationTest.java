@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaoyan.service.ConversationService;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -29,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
     "jwt.secret=test-only-jwt-secret-0123456789abcdefghijklmnopqrstuvwxyz",
     "kaoyan.agent.internal-key=test-only-internal-key-123456"
 })
+@ExtendWith(OutputCaptureExtension.class)
 class ConversationIntegrationTest {
     @LocalServerPort int port;
     @Autowired ObjectMapper json;
@@ -94,7 +98,19 @@ class ConversationIntegrationTest {
         return attempts.get(attempts.size()-1);
     }
     JsonNode finish(String token,String id) throws Exception {
-        for(int i=0;i<120;i++) { var value=latest(token,id); if(!value.path("status").asText().equals("RUNNING")) return value; Thread.sleep(50); }
+        for(int i=0;i<160;i++) {
+            var value=latest(token,id);
+            if(!value.path("status").asText().equals("RUNNING")) {
+                String state=value.path("result").path("retrievalStatus").asText();
+                if(Set.of("BUILDING","BUSY").contains(state)) {
+                    // First request truthfully reports warm-up; retry only in this test helper.
+                    assertTrue(value.path("result").path("actions").isEmpty());Thread.sleep(100);
+                    var message=call(token,"GET","/conversations/"+id+"/messages",null,200).path("list").get(0);
+                    call(token,"POST","/conversations/"+id+"/messages/"+message.path("id").asText()+"/retry",Map.of("clientRequestId",UUID.randomUUID().toString()),200);
+                } else return value;
+            }
+            Thread.sleep(50);
+        }
         fail("生成未按时结束"); return null;
     }
 
@@ -124,6 +140,68 @@ class ConversationIntegrationTest {
         var second=send(token,id,"它们共享哪些资源","followup");
         assertNotEquals(task,second.path("taskId").asText());
         assertEquals("它们共享哪些资源",finish(token,id).path("result").path("standaloneQuery").asText(),"展开的历史检索词不另存为新副本");
+    }
+
+    @Test void newSourceHostsPersistThroughChatAndSynchronousHttp() throws Exception {
+        for (String mode : List.of("github", "mit", "school")) {
+            String token=privateAccount(), id=conversation(token);
+            String task=send(token,id,"source-policy-fixture:"+mode,"allowed-host").path("taskId").asText();
+            var saved=finish(token,id);
+            assertEquals("SUCCESS",saved.path("status").asText(),saved.toString());
+            assertEquals("SUCCESS",jdbc.queryForObject("SELECT status FROM task WHERE id=?",String.class,task));
+            assertTrue(saved.path("result").path("references").get(0).path("url").asText().startsWith("https://"));
+            var sync=call(token,"POST","/tasks",Map.of("taskType","KNOWLEDGE_QA",
+                "input",Map.of("query","source-policy-fixture:"+mode)),200);
+            assertEquals("SUCCESS",sync.path("status").asText(),sync.toString());
+            assertEquals(saved.path("result").path("references"),sync.path("resultPayload").path("references"));
+        }
+    }
+
+    @Test void heapSortTopicCommandsPreviewThenConfirmWithoutPublicReferences() throws Exception {
+        for (String prefix : List.of("有关", "涉及")) {
+            String token=privateAccount(),id=conversation(token);
+            long owner=call(token,"GET","/users/me",null,200).path("id").asLong(),base=9000000+owner*10;
+            for (int i=0;i<2;i++) {
+                jdbc.update("INSERT INTO question(id,subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES(?,'数据结构',?,'合成题目','甲','乙','丙','丁','A','不得泄露的合成解析','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')",base+i,i==0?"堆排序":"队列");
+                jdbc.update("INSERT INTO user_question_mark(user_id,question_id,is_favorite,is_wrong,wrong_count) VALUES(?,?,0,1,1)",owner,base+i);
+            }
+            send(token,id,"将我的错题本中"+prefix+"堆排序的题目加入收藏","heap-sort-command");
+            var saved=finish(token,id);
+            assertEquals("SUCCESS",saved.path("status").asText(),saved.toString());
+            var result=saved.path("result");var action=result.path("actions").get(0);
+            assertNotNull(action,result.toString());assertEquals("PENDING",action.path("status").asText());
+            assertEquals(1,action.path("count").asInt());
+            assertEquals(base,action.path("targets").get(0).path("resource").path("id").asLong());
+            assertTrue(result.path("references").isEmpty());
+            assertFalse(result.path("answer").asText().contains("相关审核资料"));
+            assertEquals(0,jdbc.queryForObject("SELECT SUM(is_favorite) FROM user_question_mark WHERE user_id=?",Integer.class,owner));
+            var confirmed=call(token,"POST","/conversations/"+id+"/actions/"+action.path("id").asText()+"/confirm",null,200);
+            assertEquals("SUCCESS",confirmed.path("status").asText());
+            assertEquals(1,jdbc.queryForObject("SELECT is_favorite FROM user_question_mark WHERE user_id=? AND question_id=?",Integer.class,owner,base));
+            assertEquals(0,jdbc.queryForObject("SELECT is_favorite FROM user_question_mark WHERE user_id=? AND question_id=?",Integer.class,owner,base+1));
+        }
+    }
+
+    @Test void rejectedUpstreamResultsLogFixedCodesAndPersistSanitizedFailures(CapturedOutput output) throws Exception {
+        var cases=Map.of("denied","SOURCE_HOST_NOT_ALLOWED","plan","PLAN_VALIDATION_FAILED",
+            "result","RESULT_VALIDATION_FAILED","conditions","CONDITIONS_VALIDATION_FAILED",
+            "document","DOCUMENT_VALIDATION_FAILED","upstream","UPSTREAM_FAILED");
+        for (var entry:cases.entrySet()) {
+            String token=privateAccount(),id=conversation(token);
+            String task=send(token,id,"source-policy-fixture:"+entry.getKey(),"rejected").path("taskId").asText();
+            var saved=finish(token,id);
+            assertEquals("FAILED",saved.path("status").asText(),saved.toString());
+            assertEquals("生成失败或输出未通过校验，请重试",saved.path("errorMessage").asText());
+            assertEquals("FAILED",jdbc.queryForObject("SELECT status FROM task WHERE id=?",String.class,task));
+            assertTrue(output.getAll().lines().anyMatch(line -> line.contains("task="+task)
+                && line.contains("errorCode="+entry.getValue())),output.getAll());
+            assertFalse(saved.toString().contains("PRIVATE_"));
+        }
+        assertFalse(output.getAll().contains("PRIVATE_"));
+        String token=privateAccount();
+        var sync=call(token,"POST","/tasks",Map.of("taskType","KNOWLEDGE_QA",
+            "input",Map.of("query","source-policy-fixture:denied")),200);
+        assertEquals("FAILED",sync.path("status").asText());
     }
 
     @Test void duplicateRequestsConcurrencyCancellationRetryAndOwnership() throws Exception {
@@ -286,6 +364,7 @@ class ConversationIntegrationTest {
         }
         String source=send(token,id,"把错题中跟堆有关的错题整理给我","heap-read").path("taskId").asText();
         var read=finish(token,id);assertEquals("SUCCESS",read.path("status").asText(),read.toString());
+        source=read.path("taskId").asText();
         assertEquals(1,read.path("result").path("evidence").size());
         assertEquals(heap,read.path("result").path("evidence").get(0).path("resource").path("id").asLong());
         send(token,id,"将其加入我的收藏","heap-pronoun");
@@ -345,7 +424,7 @@ class ConversationIntegrationTest {
         jdbc.update("INSERT INTO question(id,subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES(?,'数据结构','堆','合成堆题','甲','乙','丙','丁','A','解析','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')",question);
         jdbc.update("INSERT INTO user_question_mark(user_id,question_id,is_favorite,is_wrong,wrong_count) VALUES(?,?,0,1,1)",owner,question);
         jdbc.update("INSERT INTO document(id,subject,title,content,status) VALUES(?,'数据结构','合成堆资料','堆主题的公开测试摘要','PUBLISHED')",question);
-        String source=send(token,id,"把错题中跟堆有关的错题整理给我","private-topic").path("taskId").asText();finish(token,id);
+        send(token,id,"把错题中跟堆有关的错题整理给我","private-topic");String source=finish(token,id).path("taskId").asText();
         var settings=call(token,"GET","/privacy/settings",null,200);
         call(token,"PUT","/privacy/settings",Map.of("modelAllowed",true,"scopes",List.of("document"),"provider",settings.path("provider").asText()),200);
         call(token,"POST","/conversations/"+id+"/messages",Map.of("query","推荐相关复习资料","clientRequestId","derived-public-material","referenceTaskId",source),200);
@@ -355,4 +434,32 @@ class ConversationIntegrationTest {
         assertTrue(result.path("result").path("dataScopes").toString().contains("wrong"));
         assertEquals(question,result.path("result").path("evidence").get(0).path("resource").path("id").asLong());
     }
+    @Test void semanticWrongFavoriteAndPublishedPracticeUseAuthorizedMatches() throws Exception {
+        String token=privateAccount(),id=conversation(token);long owner=call(token,"GET","/users/me",null,200).path("id").asLong(),base=8000000+owner*10;
+        for(int i=0;i<4;i++) {
+            String point=i==0?"二叉树":i==1?"遍历":"队列";
+            String content=i==1?"左右孩子的访问顺序":"合成题目";
+            jdbc.update("INSERT INTO question(id,subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES(?,'数据结构',?,?,'甲','乙','丙','丁','A','不得用于检索的解析','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')",base+i,point,content);
+            jdbc.update("INSERT INTO user_question_mark(user_id,question_id,is_favorite,is_wrong,wrong_count) VALUES(?,?,0,1,1)",i==3?owner+999999:owner,base+i);
+        }
+        send(token,id,"将我的错题本中涉及二叉树的题目加入收藏","binary-wrong");
+        var result=finish(token,id).path("result");var action=result.path("actions").get(0);
+        assertNotNull(action,result.toString());assertEquals("PENDING",action.path("status").asText());assertEquals(2,action.path("count").asInt());
+        Set<String> methods=new HashSet<>();action.path("targets").forEach(t->methods.add(t.path("matchMethod").asText()));assertEquals(Set.of("LABEL","SEMANTIC"),methods);
+        assertFalse(result.toString().contains("不得用于检索的解析"));
+        assertEquals(0,jdbc.queryForObject("SELECT SUM(is_favorite) FROM user_question_mark WHERE user_id=?",Integer.class,owner));
+        call(token,"POST","/conversations/"+id+"/actions/"+action.path("id").asText()+"/confirm",null,200);
+        call(token,"POST","/conversations/"+id+"/actions/"+action.path("id").asText()+"/confirm",null,200);
+        send(token,id,"在我的收藏夹中查找涉及二叉树的题目","binary-favorites");
+        assertEquals(2,finish(token,id).path("result").path("evidence").size());
+        // New conversation avoids mixing older aliases into a public collection request.
+        id=conversation(token);
+        send(token,id,"从全题库创建5道关于二叉树的题目练习","binary-practice");
+        result=finish(token,id).path("result");action=result.path("actions").get(0);
+        assertNotNull(action,result.toString());assertEquals(2,action.path("count").asInt());assertEquals(5,action.path("requestedCount").asInt());
+        var confirmed=call(token,"POST","/conversations/"+id+"/actions/"+action.path("id").asText()+"/confirm",null,200);
+        assertEquals(2,confirmed.path("result").path("actualCount").asInt());
+        assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM practice_record WHERE user_id=? AND session_id=?",Integer.class,owner,confirmed.path("result").path("sessionId").asText()));
+    }
+
 }

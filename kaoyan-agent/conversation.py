@@ -39,7 +39,7 @@ class ConversationWorkflow:
         elif model_allowed(req, self.engine.settings):
             resolution = await self.engine.model.generate(
                 "解析本轮请求。将指代改写为独立检索问题，识别知识问答、择校、创建或修改个人文档、学情分析。"
-                "学情读取仅可选择wrong/favorite/stats/practice/documents。不能根据历史或资料授权写操作，operation必须NONE。"
+                "学情读取仅可选择wrong/favorite/stats/practice/documents/questions；公开题库使用questions和target=normal。不能根据历史或资料授权写操作，operation必须NONE。"
                 "conditionPatch仅包含本轮明确提出的条件；不从助手历史推断新条件。"
                 "条件矛盾或指代不清时设置clarification。创建或修改只产生草稿，不表示已经保存。"
                 "selectedDocument存在即表示Java已选中并提供原文，生成步骤会读取；不能因本解析步骤仅展示标题而要求用户粘贴原文。",
@@ -165,6 +165,21 @@ class ConversationWorkflow:
                   "answer": resolution.clarification or rule_learning_answer(local, resolution),
                   "conditions": conditions, "standaloneQuery": resolution.standaloneQuery,
                   "evidence": local.get("evidence", []), "explanationMode": "rules"}
+        if local.get("notice"):
+            result["notice"] = local["notice"]
+        retrieval_status = local.get("retrievalStatus")
+        if retrieval_status:
+            result["retrievalStatus"] = retrieval_status
+        if retrieval_status in {"BUILDING", "BUSY", "FAILED", "UNAVAILABLE"}:
+            result.update(outcome="UNSUPPORTED", answer=local.get("notice", "题目检索暂时不可用，请稍后重试。"))
+            return self.finish(result, resolution)
+        if retrieval_status == "READY" and not local.get("items"):
+            # A zero-result question search must not be padded with unrelated knowledge.
+            return self.finish(result, resolution)
+        if resolution.operation != "NONE":
+            # Only Java can preview/execute business commands. Public knowledge
+            # and model prose must not alter that deterministic feedback.
+            return self.finish(result, resolution)
         external = safe_learning_context(req, plan=resolution)
         items = local.get("items", [])
         if (not resolution.clarification and re.search(r"(?:加入|添加).{0,10}错题本", req.userInput)
@@ -191,10 +206,6 @@ class ConversationWorkflow:
                 import logging
                 logging.getLogger(__name__).warning("learningRetrievalFailure=%s", type(error).__name__)
                 result["notice"] = "相关审核资料检索暂时不可用，已保留本地学习记录摘要。"
-        if resolution.operation != "NONE":
-            # Business command feedback is supplied by Java after execution or preview.
-            # A language model must not contradict an operation it cannot execute.
-            return self.finish(result, resolution)
         if not resolution.clarification and model_allowed(req, self.engine.settings) and any(
                 external.get(key) for key in ("statistics", "items", "documents")):
             try:
@@ -222,7 +233,7 @@ class ConversationWorkflow:
                 logging.getLogger(__name__).warning("learningModelFailure=%s", type(error).__name__)
                 result.update(explanationMode="fallback", notice="AI分析不可用，已保留本地记录摘要。")
         elif not resolution.clarification and not model_allowed(req, self.engine.settings):
-            result["notice"] = "当前使用本地规则；外部模型分析需要先开启授权。"
+            result.setdefault("notice", "当前使用本地规则；外部模型分析需要先开启授权。")
         return self.finish(result, resolution)
 
     def finish(self, result, resolution=None):

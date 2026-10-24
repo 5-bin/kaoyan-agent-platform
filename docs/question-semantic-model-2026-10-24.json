@@ -1,0 +1,120 @@
+{
+  "scope": "self-authored engineering cases; real local FastEmbed + embedded Qdrant; no human domain review",
+  "model": "BAAI/bge-small-zh-v1.5",
+  "threshold": 0.75,
+  "releaseId": "questions-f3988809cee3a08eed9cd2ed362a23d0",
+  "coldBuildSeconds": 0.6074,
+  "paidModelCalls": 0,
+  "cases": [
+    {
+      "query": "二叉树",
+      "expectedRelevant": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "expectedIrrelevant": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "matches": [
+        {
+          "id": 1,
+          "version": 1,
+          "method": "LABEL",
+          "score": 0.7706353648696695
+        }
+      ],
+      "missed": [
+        2,
+        4,
+        5
+      ],
+      "falsePositives": [],
+      "seconds": 0.0026
+    },
+    {
+      "query": "查找二叉搜索树的元素",
+      "expectedRelevant": [
+        2
+      ],
+      "expectedIrrelevant": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "matches": [
+        {
+          "id": 2,
+          "version": 1,
+          "method": "SEMANTIC",
+          "score": 0.8584013783543721
+        }
+      ],
+      "missed": [],
+      "falsePositives": [],
+      "seconds": 0.0017
+    },
+    {
+      "query": "发送方根据网络拥堵调整发送速率",
+      "expectedRelevant": [
+        3
+      ],
+      "expectedIrrelevant": [
+        1,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "matches": [
+        {
+          "id": 3,
+          "version": 1,
+          "method": "SEMANTIC",
+          "score": 0.8560603735546333
+        }
+      ],
+      "missed": [],
+      "falsePositives": [],
+      "seconds": 0.0018
+    },
+    {
+      "query": "每个节点最多有两个孩子的树",
+      "expectedRelevant": [
+        4,
+        5
+      ],
+      "expectedIrrelevant": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "matches": [
+        {
+          "id": 4,
+          "version": 1,
+          "method": "SEMANTIC",
+          "score": 0.769062464255763
+        }
+      ],
+      "missed": [
+        5
+      ],
+      "falsePositives": [],
+      "seconds": 0.0017
+    }
+  ],
+  "modelSource": "https://huggingface.co/BAAI/bge-small-zh-v1.5",
+  "modelLicense": "MIT",
+  "limits": "Short topics can miss unlabeled questions; scores are not probabilities. Cases are not a representative benchmark."
+}

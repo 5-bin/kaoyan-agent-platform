@@ -6,6 +6,9 @@ import com.kaoyan.entity.*;
 import com.kaoyan.mapper.*;
 import com.kaoyan.service.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,6 +38,17 @@ class AssistantLearningServiceTest {
     @Autowired JdbcTemplate jdbc;
     @Autowired ObjectMapper json;
     @MockitoBean AgentFeignClient agent;
+    @MockitoBean QuestionSearchService search;
+    @BeforeEach void deterministicSearchContract() {
+        when(search.published()).thenAnswer(call->questions.selectList(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Question>()
+            .eq(Question::getActive,1).eq(Question::getReviewStatus,"APPROVED").orderByAsc(Question::getId)));
+        when(search.search(anyString(),anyList())).thenAnswer(call->{
+            String topic=call.<String>getArgument(0).replace("传输控制协议","TCP").replace("TCP协议","TCP");List<Map<String,Object>> candidates=call.getArgument(1);
+            var matches=candidates.stream().filter(row->java.util.regex.Pattern.compile("(?<![A-Z0-9])"+java.util.regex.Pattern.quote(topic.toUpperCase())+"(?![A-Z0-9])").matcher(Objects.toString(row.get("knowledgePoint"),"").toUpperCase()).find())
+                .map(row->{Map<String,Object> m=new LinkedHashMap<>();m.put("id",row.get("id"));m.put("version",row.get("version"));m.put("method","LABEL");return m;}).toList();
+            return new QuestionSearchService.Result("READY","synthetic-index",matches);
+        });
+    }
     @MockitoBean StringRedisTemplate redis;
 
     Question question() {
@@ -181,6 +195,54 @@ class AssistantLearningServiceTest {
         assertEquals(0,stats.learning(owner+1,from,to,q.getSubject()).get("questionCount"));
         assertTrue(practice.sessionSummary(owner,unfinished).get("accuracy").equals(0.0));
     }
+    @Test void semanticSingleQuestionRequiresPreviewAndSurvivesStoredContext() throws Exception {
+        long owner=owner();Question q=question();q.setKnowledgePoint("遍历");q.setContent("左右孩子的访问顺序");questions.updateById(q);marks.markWrong(owner,q.getId());
+        when(search.search(eq("二叉树"),anyList())).thenAnswer(call->{
+            List<Map<String,Object>> candidates=call.getArgument(1);assertEquals(List.of(q.getId()),candidates.stream().map(x->x.get("id")).toList());
+            assertFalse(candidates.get(0).containsKey("answer"));assertFalse(candidates.get(0).containsKey("analysis"));
+            return new QuestionSearchService.Result("READY","synthetic",List.of(Map.of("id",q.getId(),"version",1,"method","SEMANTIC","score",.91)));
+        });
+        var plan=Map.<String,Object>of("reads",List.of("wrong"),"target","wrong","operation","FAVORITE_ADD","knowledgePoint","二叉树");
+        var read=assistant.read(owner,plan,Map.of());
+        @SuppressWarnings("unchecked") Map<String,Object> stored=json.readValue(json.writeValueAsString(read),Map.class);
+        String conversation=conversation(owner);
+        var pending=assistant.finalizeActions(owner,conversation,task(owner),plan,Map.of("page","wrong"),stored).get(0);
+        assertEquals("PENDING",pending.get("status"));assertFalse(marks.isFavorite(owner,q.getId()));
+        assertEquals("SEMANTIC",((Map<?,?>)((List<?>)pending.get("targets")).get(0)).get("matchMethod"));
+        assertEquals("SUCCESS",assistant.confirm(owner,conversation,pending.get("id").toString()).get("status"));
+        assertEquals("SUCCESS",assistant.confirm(owner,conversation,pending.get("id").toString()).get("status"));
+        assertTrue(marks.isFavorite(owner,q.getId()));
+    }
+
+    @Test void indexingFailureCannotFallBackToWholeCollectionAndPublicSearchHidesPersonalAnswers() {
+        long owner=owner();Question q=question();marks.markWrong(owner,q.getId());
+        var plan=Map.<String,Object>of("reads",List.of("wrong"),"target","wrong","operation","FAVORITE_ADD","knowledgePoint","二叉树");
+        for(String state:List.of("BUILDING","BUSY","FAILED","UNAVAILABLE")) {
+            when(search.search(anyString(),anyList())).thenReturn(new QuestionSearchService.Result(state,"synthetic",List.of()));
+            var read=assistant.read(owner,plan,Map.of());assertEquals(state,read.get("retrievalStatus"));assertEquals(0,read.get("total"));
+            assertTrue(assistant.finalizeActions(owner,conversation(owner),task(owner),plan,Map.of(),read).isEmpty());
+            assertFalse(marks.isFavorite(owner,q.getId()));
+        }
+        var publicPlan=Map.<String,Object>of("reads",List.of("questions"),"target","normal");
+        String session=practice.startSession(owner,q.getSubject(),null,1);practice.answer(owner,session,q.getId(),"A");
+        var read=assistant.read(owner,publicPlan,Map.of("page","wrong","selectedQuestionIds",List.of(q.getId())));
+        @SuppressWarnings("unchecked") var items=(List<Map<String,Object>>)read.get("items");
+        var found=items.stream().filter(x->q.getContent().equals(x.get("content"))).findFirst().orElseThrow();
+        assertEquals("questions",found.get("scope"));assertEquals(false,found.get("answered"));
+        assertFalse(found.containsKey("answer"));assertFalse(found.containsKey("userAnswer"));assertFalse(found.containsKey("inWrongBook"));
+    }
+
+    @Test void semanticMatchDetectsChangesBeforePreviewAndBeforeConfirmation() {
+        long owner=owner();Question q=question();marks.markWrong(owner,q.getId());
+        var plan=Map.<String,Object>of("reads",List.of("wrong"),"target","wrong","operation","FAVORITE_ADD","knowledgePoint","进程调度");
+        var read=assistant.read(owner,plan,Map.of());q.setVersion(2);questions.updateById(q);
+        assertEquals(409,assertThrows(ApiException.class,()->assistant.finalizeActions(owner,conversation(owner),task(owner),plan,Map.of(),read)).getHttpStatus());
+        var refreshed=assistant.read(owner,plan,Map.of());String c=conversation(owner);
+        var action=assistant.finalizeActions(owner,c,task(owner),plan,Map.of(),refreshed).get(0);
+        marks.removeWrong(owner,q.getId());
+        assertEquals(409,assertThrows(ApiException.class,()->assistant.confirm(owner,c,action.get("id").toString())).getHttpStatus());
+    }
+
     @Test void focusedReadsAndMixedScopesNeverMislabelPrivateWrongAttempts() {
         long owner=owner();Question wrong=question(),favorite=question();
         String old=practice.startSession(owner,wrong.getSubject(),null,1);practice.answer(owner,old,wrong.getId(),"A");

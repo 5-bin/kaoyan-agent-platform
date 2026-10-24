@@ -38,7 +38,7 @@
             <div v-for="action in attempt.result?.actions" :key="action.id" class="action-card">
               <strong>{{ action.title }}</strong><p>涉及 {{ action.count }} 题 · {{ actionLabels[action.status] }}</p>
               <p v-if="action.requestedCount && action.requestedCount > action.count">请求 {{ action.requestedCount }} 题，当前可用 {{ action.count }} 题。</p>
-              <ul v-if="action.targets?.length"><li v-for="(target, index) in action.targets" :key="index"><router-link v-if="resourceRoute(target.resource)" :to="resourceRoute(target.resource)!">{{ target.title }}</router-link><span v-else>{{ target.title }}</span></li></ul>
+              <ul v-if="action.targets?.length"><li v-for="(target, index) in action.targets" :key="index"><router-link v-if="resourceRoute(target.resource)" :to="resourceRoute(target.resource)!">{{ target.title }}</router-link><span v-else>{{ target.title }}</span><br v-if="target.matchMethod"><span v-if="target.matchMethod" class="match-label">{{ target.matchMethod === 'LABEL' ? '知识点匹配' : '语义相关' }} · {{ target.matchTopic }}</span></li></ul>
               <template v-if="action.status === 'PENDING'"><el-button type="primary" :loading="busyAction === action.id" @click="handleAction(action, true)">确认操作</el-button><el-button :disabled="!!busyAction" @click="handleAction(action, false)">放弃</el-button></template>
               <router-link v-if="action.status === 'SUCCESS' && action.result?.sessionId" :to="'/practice/session/' + encodeURIComponent(action.result.sessionId)">打开练习（{{ action.result.actualCount ?? action.count }}题）</router-link>
             </div>
@@ -166,7 +166,7 @@ function trackScroll() { const node = scrollArea.value; if (node) atBottom.value
 async function scrollIfNeeded() { if (!atBottom.value) return; await nextTick(); if (scrollArea.value) scrollArea.value.scrollTop = scrollArea.value.scrollHeight }
 function draftText(attempt: Generation) { return Object.values(attempt.draft || {}).join('\n\n') }
 function asTask(attempt: Generation): Task { return { id: attempt.taskId, userId: 0, taskType: 'CHAT', status: attempt.status, resultPayload: attempt.result, errorMessage: attempt.errorMessage, createdAt: '' } }
-function canRetry(message: ChatMessage, attempt: Generation) { return !activeGeneration.value && message.id === messages.value.at(-1)?.id && attempt.taskId === message.attempts.at(-1)?.taskId && ['FAILED','CANCELLED'].includes(attempt.status) }
+function canRetry(message: ChatMessage, attempt: Generation) { return !activeGeneration.value && message.id === messages.value.at(-1)?.id && attempt.taskId === message.attempts.at(-1)?.taskId && (['FAILED','CANCELLED'].includes(attempt.status) || attempt.status === 'SUCCESS' && attempt.result?.outcome === 'UNSUPPORTED' && ['BUILDING','BUSY','FAILED','UNAVAILABLE'].includes(attempt.result?.retrievalStatus || '')) }
 function referenceQuestion(attempt: Generation, ref: string) { referenceTaskId.value = attempt.taskId; input.value = '收藏 ' + ref }
 // List requests belong to the account, not to the currently selected chat.
 function listGuard() {
@@ -391,6 +391,7 @@ onBeforeUnmount(() => { unmounted = true; epoch++; stream?.abort() })
 .privacy-summary { display:flex; flex-direction:column; gap:4px; padding:8px 12px; font-size:12px; color:var(--c-ink-2); border-bottom:1px solid var(--c-line) }
 .quick-prompts { display:flex; flex-wrap:wrap; gap:6px; padding:8px }.quick-prompts .el-button { margin:0 }
 .scope-options { display:flex; flex-wrap:wrap; margin:14px 0 }.clear-controls { display:flex; flex-wrap:wrap; gap:8px }
+.match-label { display:inline-block; margin:4px 0; padding:2px 6px; border:1px solid var(--c-line); border-radius:4px; color:var(--c-primary); background:var(--c-primary-light); font-size:12px; white-space:normal }
 .action-card { padding:12px; margin:10px 0; border:1px solid var(--c-line); border-radius:8px }
 .assistant.compact { position:fixed; top:56px; bottom:0; right:0; width:440px; max-width:100vw; height:auto; z-index:100; box-shadow:-4px 0 20px #0002 }
 .compact .conversation-list { display:none }.compact .mobile-menu { display:inline-flex }.compact .chat-heading { flex-wrap:wrap; gap:8px; padding:10px }.compact .messages { padding:10px }.compact .composer { padding:10px }.compact .chat-heading h2 { font-size:16px }
