@@ -6,8 +6,13 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 
 本轮实现内部接口加固、408与院校独立检索副本、确定性择校、场景识别及可选LLM解释。具体协议、验收和限制见 [RAG说明](docs/rag.md)。`docs/work*.md`、`docs/agent.md` 是历史生成提示词，不是当前运行说明。
 
+本机日常数据已于2026-10-24替换为真实来源：10校15专业、44道OpenDSA课程习题中文翻译、四科各4篇资料；演示数据及经确认的关联历史已清理。题目目前仅覆盖数据结构，非408统考真题；Agent使用31条对应语料。日常MySQL／Redis、Java8080、Agent8001及前端5173已实际连通，见下述本轮记录。
+
 ## 文档入口
 
+- [引用来源与收藏主题修复验证](docs/reference-policy-fix-verification-2026-10-24.md)：共享域名策略、堆排序解析、命令跳过知识检索及固定失败码，本轮隔离验证与生效边界。
+- [本机真实数据接入与清理](docs/real-data-import-2026-10-24.md)：当前日常库的10校15专业、44道真实课程习题、16篇四科资料，备份、清理范围与真实MySQL页面验收。
+- [真实数据来源清单](docs/real-data-sources-2026-10-24.md)：逐题原文、版本、许可及四科资料来源；课程习题不冒称408真题。
 - [完整平台搭建文档](考研Agent平台搭建文档.md)：需求、当前契约与后续建设目标。
 - [框架适配历史记录](docs/当前框架适配.md)：同学在合并前的验证与限制。
 - [合并审查记录](docs/merge-review-2026-10-14.md)：本次冲突处理和重新验证范围。
@@ -15,7 +20,10 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 - [连续聊天与个人文档契约](docs/conversations.md)：LangChain工作流、SSE、会话和文档版本。
 - [个人笔记与题目引用修复验证](docs/assistant-notes-fix-verification-2026-10-23.md)：独立笔记页、复合意图、跨轮收藏及本轮验证边界。
 - [学情助手与隐私契约](docs/assistant-learning-contract.md)：错题／收藏／统计／资料读取、受控操作、分类授权和30天清除。
+- [题目语义检索验证](docs/question-semantic-search-verification-2026-10-24.md)：通用主题提取、独立本地Qdrant、授权集合和真实模型限制。
+- [检索质量与引用支持度验证](docs/quality-eval-2026-10-24.md)：BM25／hybrid、逐条结论引用、未核实降级、10例离线与4例真实模型结果。
 - [主题筛选与澄清问法验证](docs/assistant-topic-filter-verification-2026-10-23.md)：按主题预览收藏、未知条件推荐问法及隔离链路验证。
+- [院校下拉筛选验证](docs/school-options-verification-2026-10-24.md)：库内省份／专业选项接口、下拉交互及隔离真实后端验证。
 - [聊天验证记录](docs/chat-verification-2026-10-22.md)：隔离验证结果与未运行范围。
 - [学情与隐私验证记录](docs/assistant-learning-verification-2026-10-23.md)：三端实际链路、分类授权、清除、定向练习及隔离MySQL验证。
 - [本机测试数据](docs/local-test-data-2026-10-22.md)：已写入的数据、待审核边界、备份及可重复执行的补充脚本。
@@ -31,6 +39,7 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 - 学情助手可读取本人错题、收藏、有效作答统计和平台已发布资料，支持页面侧栏、单题收藏及确认后移出错题／取消收藏／创建错题或收藏练习。统计按上海日期近30天统一，未记录指标不推算。
 - 外部模型默认未获用户授权；可在助手“隐私”中按类别开启并撤回，个人文档还需逐份选择。聊天及上下文30天清理，可主动清除；原始学习记录和已保存文档独立保留。V12未应用前不能运行新版Java。
 - 左侧“复习”分组的`/notes`管理个人Markdown笔记，支持手动创建／编辑、预览差异及历史版本。助手可基于获授权的错题／统计生成或修改笔记，预览确认后保存；沿用个人文档API及已有版本，不新增迁移。
+- 助手可按自然语言主题查找本人错题、收藏或全题库题目；合并标签与本地语义匹配，主题操作均先预览确认。首次需准备下述本地模型；短主题的语义召回仍有限，不能保证找全。
 - 题目引用绑定来源回答，单题明确收藏返回Java执行结果；知识点筛选先于列表截取，相关练习不足时显示实际数量，不补入无关题。错题标记和最近作答正误分别表述。
 
 - `/internal/rag/chat`：内部凭证认证、任务枚举、输入上限、类型化上下文、结果和引用校验。
@@ -65,6 +74,8 @@ py -3.13 -m venv .venv
 所有服务使用根目录 `.env`。脚本生成随机内部凭证与JWT签名密钥，不覆盖已有文件、不打印凭证。填写自己MySQL的 `DB_USER`、`DB_PASSWORD` 及 Redis 的 `REDIS_HOST`、`REDIS_PORT`、可选 `REDIS_PASSWORD`，不要沿用历史代码中的密码。Redis不可用时受保护接口会失败，不能通过关闭注销撤销来绕过。Python自动读取根 `.env`；Java由启动脚本显式加载。OSS可不配置，未配置时文件接口返回503，不阻止核心服务启动。
 
 ### 数据库
+
+当前本机`kaoyan_dev`已具备V7—V12结构，无需重新建库或执行旧种子。真实数据入口为`scripts/import-real-data.py`，默认仅离线预览，`--inspect`只读核对；`--apply`涉及完整备份和明确演示数据清理，仅在授权范围执行。不要再执行V2—V6或旧演示seed把虚构内容补回日常库。真实数据及恢复步骤见[接入记录](docs/real-data-import-2026-10-24.md)。
 
 连续聊天版本启动前，须在已有V9基础上各执行一次`V10__chat_conversation.sql`、`V11__personal_document.sql`和`V12__assistant_privacy.sql`。这三份脚本新增会话、个人文档、隐私授权与助手操作表，保留旧任务；本次不自动操作日常数据库。新能力和兼容边界见[聊天契约](docs/conversations.md)。
 
@@ -104,6 +115,8 @@ npm run dev
 Linux/macOS使用 `python3.13 -m venv .venv` 和 `.venv/bin/python`。Java启动前在可信的根目录执行 `set -a; . ./.env; set +a`，随后进入 `kaoyan-B` 运行 `bash mvnw -B -ntp package` 和 `java -jar target/kaoyan-backend-1.0.0.jar`。运行Java测试时，设置 `PYTHON_EXECUTABLE` 为该虚拟环境Python的绝对路径。
 
 ## 启用中文向量检索
+
+引用来源由共享文件[`config/reference-hosts.json`](config/reference-hosts.json)维护。默认Python直接读取，Java构建时将同一文件打包进JAR；新增来源先更新清单，再重建Java并加载两端新版配置。也可在两端设置`RAG_SOURCE_POLICY_FILE`为同一个绝对路径JSON文件；覆盖文件独立替换默认清单，不自动合并。配置缺失、格式错误或清单为空时拒绝启动，Python加载语料／导入索引前还会逐条检查来源。无需修改前端域名表；域名通过不代表资料内容或引用支持度已验收。详细规则见[RAG契约](docs/rag.md#引用来源策略)。
 
 默认 `RAG_BACKEND=lexical`，不用下载权重即可检查规则、来源和页面。向量模式使用已实现的Qdrant＋FastEmbed，**不是把词项检索冒充Embedding**。
 
@@ -160,6 +173,16 @@ npm run test:e2e
 
 Java测试在独立H2库启动真实Python子进程，不读日常MySQL，也不调用模型；子进程结束后清理。浏览器测试使用隔离上下文和模拟API，验证页面、历史显示、来源、文本安全和390宽度；不等于整站真实手机验收。
 
+检索/引用质量评测默认离线，不调用模型；`--model` 才读取根`.env`并产生真实供应商请求与费用。使用已安装LangChain依赖的Python环境执行（本机为`.cache/chat-venv`）：
+
+```bash
+.cache/chat-venv/bin/python scripts/eval-quality.py --output .cache/quality-report.json
+.cache/chat-venv/bin/python scripts/eval-quality.py --backend bm25 --output .cache/quality-bm25.json
+.cache/chat-venv/bin/python scripts/eval-quality.py --model --only qa-stack,qa-tcp --output .cache/quality-model.json
+```
+
+报告路径已存在时拒绝覆盖；本轮结果与限制见[质量评测记录](docs/quality-eval-2026-10-24.md)。
+
 浏览器也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定本机Chrome或Edge；不读取日常浏览器资料。CI已按三个新目录执行Python、Java真实链路、前端构建与浏览器测试。实际验证结果见 [本轮验证记录](docs/validation-rag.md)。
 
 ## 隔离HTTP与真实后端浏览器检查
@@ -189,3 +212,32 @@ python scripts/smoke-question-admin.py --output .cache/new-question-admin-browse
 
 使用已安装项目依赖的Python（macOS／Linux可使用`.venv/bin/python`），浏览器按前述Playwright安装方式准备，或通过`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`指定本机Chrome。
 脚本使用随机回环端口、专用内存H2、Redis替身和独立浏览器上下文，自动创建测试账号；测试夹具拒绝写入其他数据库。检查1280与390宽度下的录题、过期编辑、审核、停用／恢复、学生权限和历史快照，完成后关闭临时进程。报告路径已存在时拒绝覆盖；不读取日常数据库、不调用模型，也不代表真实MySQL或手机实机验收。
+
+
+## 本地题目语义检索
+
+复用现有依赖，无新增数据库迁移。新Java、Python及前端需一起加载；本次不自动重启已有服务。题目索引独立于知识资料的RAG_BACKEND，默认使用本地持久Qdrant；Python仅接收Java提供的已发布题目副本。
+
+从项目根目录准备本地权重（首次下载公开模型文件，不调用付费模型，不读取业务库）：
+
+```bash
+.cache/chat-venv/bin/python scripts/prepare-question-model.py
+```
+
+上例使用本项目现有验证环境；独立安装时用README准备环境得到的`.venv/bin/python`，Windows为`.venv\Scripts\python.exe`。EMBEDDING_MODEL沿用`BAAI/bge-small-zh-v1.5`；QUESTION_MODEL_CACHE默认`kaoyan-agent/.cache/embedding`，QUESTION_INDEX默认`kaoyan-agent/.cache/questions`，QUESTION_MIN_SCORE默认0.75。权重、索引与缓存均不提交。模型来源、许可及实际效果见[验证记录](docs/question-semantic-search-verification-2026-10-24.md)。
+
+示例：“将我的错题本中涉及二叉树的题目加入收藏”“在收藏夹中找关于二叉树的题目”“从全题库创建5道关于二叉树的题目练习”。首次查询或题库变更后可能显示索引准备中；准备完成后可点“重试此问题”。未就绪不生成操作，已就绪零匹配另行提示。所有主题操作先预览确认，缺题时明确实际数量。
+
+独立真实本地模型验证：
+
+```bash
+.cache/chat-venv/bin/python scripts/verify-question-semantic.py --output .cache/question-model-new-report.json
+```
+
+隔离页面验证（独立H2、随机端口、临时浏览器目录、真实Qdrant，向量使用测试替身）：
+
+```bash
+.cache/chat-venv/bin/python scripts/smoke-chat.py --questions --output .cache/question-browser-new-report.json
+```
+
+页面脚本沿用既有Node/Chrome配置，需先完成Java verify和前端build。旧题目索引不自动删除；经授权停用Agent后可运行`scripts/maintain-question-index.py --keep <完整版本>`查看清单，确认范围后再加`--apply`。这不操作业务数据库或知识资料索引。

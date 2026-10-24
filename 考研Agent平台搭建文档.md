@@ -10,7 +10,13 @@
 
 2026-10-23后续数据接入：按用户“合并”授权，将10校15专业、160道可练习原创测试题、12道审核样例及4份公共摘要补入日常`kaoyan_dev`，保留旧记录并补齐V12；日常Agent通过`RAG_DATA`加载10校语料。此为本机功能测试数据接入，不代表题目人工审核、完整刷题流程或全国招生覆盖；备份、正常启动及本轮验证见[日常库合并记录](docs/development-data-merge-2026-10-23.md)。
 
+2026-10-24日常数据替换：用户确认只保留真实内容后，完整备份并验证恢复，清理明确识别的演示公共数据及其关联练习／统计、未修改的合成任务与笔记。当前日常库保留10校15条2027专业，接入44道OpenDSA课程习题中文翻译、四科各4篇来源可追溯资料。课程习题仅覆盖数据结构，其他科目缺题返回实际空结果；来源和许可核对不等于教师人工审核。Agent日常语料为31条，已获用户授权启动Redis并重启Java／Agent。真实MySQL、Redis、Java、Agent、本地向量检索及隔离浏览器25项检查通过；数量与边界见[本轮接入记录](docs/real-data-import-2026-10-24.md)。上文2026-10-23数量保留为历史记录。
+
 ## 阅读导航
+
+2026-10-24引用来源修复契约：Java聊天及同步任务统一使用`config/reference-hosts.json`中的精确域名清单；Python加载语料时逐条校验，配置缺失、损坏或存在未授权来源时拒绝启动／导入。默认Java从同一配置源打包资源，Python读取仓库配置；可通过`RAG_SOURCE_POLICY_FILE`为两端指定同一个绝对路径文件，修改后须重新构建／加载对应服务。保留HTTPS、无凭证URL、引用字段、候选范围及版本校验；域名允许不等于引用支持结论。公开接口、任务状态及语料releaseId不变。
+
+学情主题提取支持“有关堆排序的题目”，完整主题优先，多主题仍澄清。命令类计划在本地记录及题目检索状态处理后直接返回，不调用知识资料检索或模型；Java继续负责预览、确认和执行。聊天失败日志只记录任务编号、固定失败码及异常类名，外部失败文案不变。全局lexical阈值本轮不调整，分析类请求仍可能召回弱相关资料。实现与本次实际验证另见修复记录，不将本契约当作验收结果。
 
 - [1. 项目定位、课程要求与交付物](#requirements)
 - [2. 参考资料与复用边界](#references)
@@ -140,8 +146,8 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 | --- | --- | --- |
 | `/profile` | 保存当前档案 | 必填与可选条件、学位类型、地区软硬偏好、自评成绩口径 |
 | `/tasks`、`/tasks/history` | 持久连续聊天、笔记建议预览保存、绑定来源回答的题目引用；只读任务历史 | 扩大审核资料覆盖；新增协议见连续聊天契约 |
-| `/notes` | 个人笔记手动创建／编辑、预览差异、历史版本及“让助手修改”；沿用个人文档API与版本，无新迁移 | 导入导出与共享未实现 |
-| `/schools`、`/schools/:id` | 院校筛选与详情 | 扩充院校资料与内容审核；当前已有专业／年份条件、来源及任务历史 |
+| `/notes` | 个人笔记手动创建／编辑、预览差异、历史版本及“让助手修改”；列表内部滚动，默认5份并逐批展开，切换笔记保留展开状态；沿用个人文档API与版本，无新迁移 | 导入导出与共享未实现 |
+| `/schools`、`/schools/:id` | 院校筛选与详情；省份、专业名单选支持搜索选项和清空，选项来自院校库，点击搜索按钮查询 | 扩充院校资料与内容审核；当前已有专业／年份条件、来源及任务历史 |
 | `/practice`、`/practice/session/:sessionId` | 抽题、逐题作答、回顾和AI总结 | 四模式、答题卡、持久草稿、提示及正式结束入口 |
 | `/wrong`、`/favorite` | 本人错题／收藏、助手侧栏与确认后定向练习 | 完整撤回提示、自动掌握状态 |
 | `/stat` | 上海日期近30天有效作答、去重题数、小样本提示和助手分析 | 提示辅助／独立正确率和覆盖范围仍未记录 |
@@ -178,6 +184,11 @@ PR #10审查修复（2026-10-21，基线`1bf60bc`）：首次加载、下一题�
 ## 5. 技术架构与模块职责
 
 2026-10-23学情助手增量：目标用户仍为408备考学生，助手通过Java业务工具读取本人错题、收藏、统计和已发布资料，支持页面侧栏、直接单题收藏及确认后练习等操作；新增分类外发授权、端点绑定和30天清除。主题操作区分来源集合与写入目的，支持大小写、协议别名及子主题筛选，多题操作先预览确认；请求不明确时说明缺失条件并给出可套用的推荐问法。完整新增接口、工具与隐私契约统一见[学情助手契约](docs/assistant-learning-contract.md)。新增V12仅提供迁移脚本，未应用日常库。学习效果和真实访谈仍需独立证据，本次不声称已验证学习能力提升。
+
+2026-10-24主题理解与题目语义检索增量：自然语言主题不再以固定词表为接受前提。Java确定本人错题／收藏或当前已发布全题库候选，将公开题目白名单快照交给Python独立本地Qdrant；标签与题干／选项语义结果合并，标准答案与个人作答不参与匹配，历史版本仅在内存匹配。题库变更生成新索引版本，未就绪不使用旧索引生成操作；主题操作（包括单题）先预览确认，确认复核账号、来源、版本与内容指纹。新增内部索引同步、状态及检索接口，沿用外部聊天／操作接口，仅扩展结果可选字段，无新增数据库迁移。详细协议与运行限制见[学情助手契约](docs/assistant-learning-contract.md)，真实验证和短主题漏检见[本次验证记录](docs/question-semantic-search-verification-2026-10-24.md)；不将工程案例当作完整领域效果。
+
+
+2026-10-23会话列表展开：桌面侧栏与手机抽屉默认显示最近5条，每次点击“展开更多”追加5条；加载中防止重复请求，失败可重试，全部加载后隐藏按钮。切换历史会话保留展开列表、分页和滚动位置，生成完成后的列表更新保留已加载页数；新建、删除或刷新页面后恢复前5条。详细规则见[连续聊天契约](docs/conversations.md#会话列表展开)。
 
 2026-10-23会话列表删除：桌面侧栏与手机抽屉提供常驻删除按钮和二次确认，复用已有本人会话删除接口。删除当前会话切换到剩余会话，最后一条删除后保留空聊天；已保存个人笔记独立保留。交互、分页与迟到响应规则见[连续聊天契约](docs/conversations.md#会话列表删除)。本次验证范围另见[删除会话验证记录](docs/conversation-delete-verification-2026-10-23.md)。
 
@@ -379,6 +390,7 @@ Issue #9（本地适配契约，2026-10-21）：学生抽题及详情改用白�
 | GET／POST `/api/tasks`、GET `/api/tasks/{taskId}` | 分页历史、类型化输入、本人任务 | 同步调用并保存状态；历史及total排除已删除项，跨账号或已删除详情404 |
 | GET `/api/documents` | subject，可返回已发布资料列表 | 尚非Agent知识检索接口 |
 | GET `/api/schools`、POST `/api/schools/search`、GET `/api/schools/{schoolId}` | province／level／majorName，院校及专业详情 | 列表不是核验推荐，未提供完整当年专业条件筛选 |
+| GET `/api/schools/options` | `{provinces: string[], majorNames: string[]}`，沿用认证及统一响应包装 | 从院校库读取全部非空、去重、排序的省份和专业名；专业关联现存院校，不随筛选结果缩减；空库返回空数组，不代表招生资料已核验 |
 | POST `/api/recommends/generate`、GET `/api/recommends`、DELETE `/api/recommends/{taskId}` | `{query,preferences}`、本人近期Task历史／字符串taskId删除 | 与任务同一流程；仅隐藏本人SUCCESS／FAILED推荐并保留额度，重复删除404，未结束409 |
 | GET `/api/questions/practice`、GET `/api/questions/{id}` | subject／difficulty／knowledgePoint／limit，StudentQuestionVO | 抽题及详情仅审核启用题，不返回答案、解析或审核字段 |
 | POST `/api/practice/sessions` | subject、difficulty、count；返回sessionId | 固定stable_order及记录，上限100在Service截取；无正式状态与版本 |
@@ -403,7 +415,7 @@ Issue #9（本地适配契约，2026-10-21）：学生抽题及详情改用白�
 开发基线`28f7aec`，功能分支`feat/question-entry-review`。以下为本次实现契约，测试及部署状态另记验证报告。
 
 - ADMIN沿用`POST /api/questions/admin`录入、`PUT /api/questions/admin/{id}`完整修改未发布题、`GET /api/questions/admin/pending`分页及`POST /api/questions/admin/{id}/review`审核；新增`GET /api/questions/admin/{id}`完整详情。学生仍使用答案隐藏DTO，包装及数字ID不变。
-- 录题白名单字段：subject（408四科中文名称）、knowledgePoint、difficulty（EASY/MEDIUM/HARD）、content、optionA/B/C/D、answer（A—D，兼容小写归一）、analysis、sourceType（REAL_EXAM/MOCK/ORIGINAL）、sourceName、sourceLocator、sourceYear、sourceQuestionNo、permissionNote。题干／解析各限10000字符，选项各限2000，知识点／来源名称各255，来源定位1000，原题号64，权限说明2000。除年份及原题号外均非空；真题必须有1900—2100年份及原题号，其他题年份可空。
+- 录题白名单字段：subject（408四科中文名称）、knowledgePoint、difficulty（EASY/MEDIUM/HARD）、content、optionA/B/C/D、answer（A—D，兼容小写归一）、analysis、sourceType（REAL_EXAM/MOCK/ORIGINAL/COURSE_EXERCISE）、sourceName、sourceLocator、sourceYear、sourceQuestionNo、permissionNote。COURSE_EXERCISE展示为“课程习题”，保留课程原题标识及翻译说明，不表示408统考真题；沿用现有VARCHAR(20)，无需新迁移。题干／解析各限10000字符，选项各限2000，知识点／来源名称各255，来源定位1000，原题号64，权限说明2000。除年份及原题号外均非空；真题必须有1900—2100年份及原题号，其他题年份可空。
 - ID、questionType、stableOrder、审核身份／状态／时间由服务端控制，不接受额外字段。POST继续拒绝version和active；PUT使用独立的平铺修改DTO，录题字段之外必填正整数version，表示读取时的预期版本，不授予客户端设置下一版本的权限。新题version=1、active=1、SINGLE_CHOICE、PENDING_REVIEW；待审核不进入学生题池。修改仅允许PENDING_REVIEW或REJECTED，完整校验后重新待审核、清除旧审核信息并增加version；APPROVED返回409，正式新版本发布另做。POST／PUT成功均返回已保存的完整管理题目，页面不自行合成版本或审核记录。
 - 审核请求为`{status,comment,version}`，status仅APPROVED或REJECTED，version必填正整数；驳回原因非空、最多2000字。仅待审核题可审；行锁串行化修改及审核，版本过期或重复审核409。修改、审核和启停每次成功均将version加一；失败不更改数据。审核人来自认证，不接受客户端伪造。通过前重新校验题目与来源完整性；不完整旧题需先补充。历史已发布题不批量改状态。
 - `PUT /api/questions/admin/{id}/active`仅ADMIN可用，白名单请求`{active:0|1,version}`；version必填正整数。仅APPROVED题可切换，行锁内核对版本，重复状态或过期请求409，缺题404，非法入参400；成功返回保存后的完整管理题目。停用只修改active、version和updatedAt，保留来源、审核与历史作答；恢复校验单选题内容和答案，并校验来源。六个来源字段**全部为NULL**的历史题允许依据原APPROVED结果恢复，仍标注来源待补充；部分缺失或空字符串不享受此例外。无需新增迁移。此次启停不改变历史判分、快照、错题和统计，不等同于正式撤回及统计重算。
