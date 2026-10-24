@@ -40,4 +40,14 @@ git diff --check
 
 本轮日志保存在本机`/private/tmp/kaoyan-ci-slow-index-before-20261024.log`、`/private/tmp/kaoyan-ci-index-fix-java-20261024.log`和`/private/tmp/kaoyan-ci-index-fix-python-20261024.log`。远程Linux结果以修复PR的Actions检查为准，不将本机Java25结果表述为Linux／Java17验收。
 
-前端代码未变，本轮前端构建及浏览器回归未运行；真实MySQL、真实Redis、付费模型、公网、Windows及真实手机验收均未运行。
+首轮索引修复没有前端代码变更，未重跑前端构建及浏览器回归；后续浏览器检查见下节。真实MySQL、真实Redis、付费模型、公网、Windows及真实手机验收均未运行。
+
+## 后续浏览器检查与预览服务修复
+
+[修复PR的首次CI](https://github.com/5-bin/kaoyan-agent-platform/actions/runs/40085788767)已通过Linux／Java17的129项Java测试，以及Python、文档和前端生产构建。浏览器检查为145项通过、1项失败：笔记退出登录用例在等待被挂起的第2页成功响应时超时。
+
+下载该次诊断包并核对trace：分页请求的网络终态为`net::ERR_ABORTED`，登录页发生完整文档请求，Vite客户端在同一页面再次连接；测试本身没有调用reload。由此判断开发态重载干扰了迟到响应测试。
+
+Playwright服务入口改为`vite preview`，复用CI前序步骤已经生成的生产构建，不加载Vite开发客户端。README同步明确先构建再运行浏览器检查。保留原有迟到响应与账号隔离断言，不通过放宽等待时间或跳过用例来规避失败。
+
+本轮本机重新执行`npm run build`通过，保留既有大chunk提示；随后使用全新Chrome上下文运行完整桌面／移动端浏览器回归，146项全部通过（2.1分钟），包含原退出登录失败用例。日志为`/private/tmp/kaoyan-ci-preview-build-20261024.log`和`/private/tmp/kaoyan-ci-preview-e2e-20261024.log`。未改动应用业务代码或放宽测试断言。

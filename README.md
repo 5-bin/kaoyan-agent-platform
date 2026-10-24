@@ -10,7 +10,7 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 
 ## 文档入口
 
-- [CI索引冷启动重试修复](docs/ci-index-warmup-fix-2026-10-24.md)：复现Linux CI中的429，等待索引就绪后仅重试一次，保留正式任务限额。
+- [CI索引冷启动与浏览器检查修复](docs/ci-index-warmup-fix-2026-10-24.md)：等待索引就绪后仅重试一次，保留正式任务限额；浏览器测试使用生产预览，避免开发态重载。
 - [引用来源与收藏主题修复验证](docs/reference-policy-fix-verification-2026-10-24.md)：共享域名策略、堆排序解析、命令跳过知识检索及固定失败码，本轮隔离验证与生效边界。
 - [本机真实数据接入与清理](docs/real-data-import-2026-10-24.md)：当前日常库的10校15专业、44道真实课程习题、16篇四科资料，备份、清理范围与真实MySQL页面验收。
 - [真实数据来源清单](docs/real-data-sources-2026-10-24.md)：逐题原文、版本、许可及四科资料来源；课程习题不冒称408真题。
@@ -172,7 +172,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Java测试在独立H2库启动真实Python子进程，不读日常MySQL，也不调用模型；子进程结束后清理。浏览器测试使用隔离上下文和模拟API，验证页面、历史显示、来源、文本安全和390宽度；不等于整站真实手机验收。
+Java测试在独立H2库启动真实Python子进程，不读日常MySQL，也不调用模型；子进程结束后清理。浏览器测试使用已有生产构建的Vite preview、隔离上下文和模拟API；须先执行`npm run build`，避免开发态依赖优化重载干扰迟到请求测试。验证页面、历史显示、来源、文本安全和390宽度；不等于整站真实手机验收。
 
 检索/引用质量评测默认离线，不调用模型；`--model` 才读取根`.env`并产生真实供应商请求与费用。使用已安装LangChain依赖的Python环境执行（本机为`.cache/chat-venv`）：
 
