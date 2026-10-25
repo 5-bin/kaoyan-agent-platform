@@ -14,7 +14,7 @@ import java.util.Map;
 public record TaskSubmitRequest(
         @Schema(description = "任务类型", example = "KNOWLEDGE_QA")
         @NotBlank(message = "taskType 不能为空")
-        @Pattern(regexp = "KNOWLEDGE_QA|SCHOOL_RECOMMEND|PRACTICE_SUMMARY|CHAT", message = "未知任务类型")
+        @Pattern(regexp = "KNOWLEDGE_QA|SCHOOL_RECOMMEND|PRACTICE_SUMMARY|CHAT|WRONG_QUESTION_TUTOR", message = "未知任务类型")
         String taskType,
 
         @Schema(description = "输入参数")

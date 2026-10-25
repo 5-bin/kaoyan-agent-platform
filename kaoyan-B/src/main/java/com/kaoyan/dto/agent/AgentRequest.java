@@ -12,12 +12,13 @@ import java.util.Map;
 public class AgentRequest {
     private String taskId;
     private Long userId;
-    /** KNOWLEDGE_QA / SCHOOL_RECOMMEND / PRACTICE_SUMMARY / CHAT */
+    /** Includes WRONG_QUESTION_TUTOR for an authorized wrong attempt. */
     private String taskType;
     private String userInput;
     private String sessionId;
     /** Server-authorized and already graded snapshots, never client supplied IDs. */
     private List<Map<String, Object>> questions;
+    private Map<String, Object> attempt;
     private Map<String, Object> preferences;
     private List<Object> messages;
     private Map<String, Object> profile;

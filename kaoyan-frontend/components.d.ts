@@ -33,10 +33,12 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    QuestionBatchImport: typeof import('./src/components/QuestionBatchImport.vue')['default']
     QuestionEntryForm: typeof import('./src/components/QuestionEntryForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TaskResultView: typeof import('./src/components/TaskResultView.vue')['default']
+    WrongQuestionTutor: typeof import('./src/components/WrongQuestionTutor.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

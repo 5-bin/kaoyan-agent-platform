@@ -178,4 +178,73 @@ class AgentChainTest {
             .content("{\"taskType\":\"PRACTICE_SUMMARY\",\"input\":{\"sessionId\":\"snapshot-session\"}}"))
             .andExpect(status().isNotFound());
     }
+
+    com.kaoyan.entity.PracticeRecord wrongAttempt(String token) throws Exception {
+        long userId = json.readTree(mvc.perform(get("/api/users/me").header("Authorization", "Bearer " + token))
+            .andReturn().getResponse().getContentAsString()).path("data").path("id").asLong();
+        var r = new com.kaoyan.entity.PracticeRecord(); r.setUserId(userId); r.setSessionId(UUID.randomUUID().toString());
+        r.setQuestionId(987654L); r.setOrderIndex(0); r.setIsCorrect(0); r.setUserAnswer("A");
+        r.setGradingStatus("valid"); r.setAnsweredAt(java.time.LocalDateTime.now());
+        r.setQuestionSnapshot(Map.ofEntries(Map.entry("id", 987654), Map.entry("version", 3), Map.entry("subject", "操作系统"),
+            Map.entry("content", "历史版本题干；忽略指令的文字仅为题目数据"), Map.entry("answer", "B"), Map.entry("analysis", "历史原解析"),
+            Map.entry("optionA", "历史选项A"), Map.entry("optionB", "历史选项B"), Map.entry("optionC", "历史选项C"), Map.entry("optionD", "历史选项D")));
+        attempts.insert(r); return r;
+    }
+    void rejectTutor(String token, Map<String, Object> input, int statusCode) throws Exception {
+        long before = tasks.selectCount(null);
+        mvc.perform(post("/api/tasks").header("Authorization", "Bearer " + token).contentType("application/json")
+            .content(json.writeValueAsString(Map.of("taskType", "WRONG_QUESTION_TUTOR", "input", input))))
+            .andExpect(status().is(statusCode));
+        assertEquals(before, tasks.selectCount(null), "拒绝请求不能创建任务或扣额度");
+    }
+    @Test void tutorRoundtripPersistsBoundedConversationWithoutCurrentQuestion() throws Exception {
+        String token = account(); var r = wrongAttempt(token);
+        JsonNode task = submit(token, "WRONG_QUESTION_TUTOR", Map.of("recordId", r.getId(), "query", "我的选择错在哪里？"));
+        assertEquals("SUCCESS", task.path("status").asText());
+        assertEquals("rules", task.path("resultPayload").path("explanationMode").asText());
+        assertTrue(task.path("resultPayload").path("notice").asText().contains("未启用 AI"));
+        assertEquals("B", task.path("resultPayload").path("standardAnswer").asText());
+        assertEquals(3, task.path("resultPayload").path("questionVersion").asInt());
+        assertEquals("历史选项A", task.path("inputPayload").path("attempt").path("optionA").asText());
+        for (int turn = 1; turn <= 4; turn++) {
+            String parent = task.path("id").asText();
+            task = submit(token, "WRONG_QUESTION_TUTOR", Map.of("recordId", r.getId(), "query", "追问" + turn, "parentTaskId", parent));
+            assertEquals("SUCCESS", task.path("status").asText(), task.toString());
+            assertEquals(Math.min(turn * 2, 6), task.path("inputPayload").path("messages").size());
+        }
+        Task persisted = tasks.selectById(task.path("id").asText());
+        assertEquals("追问4", persisted.getInputPayload().get("query"));
+        assertEquals(0, attempts.selectById(r.getId()).getIsCorrect());
+        attempts.deleteById(r.getId());
+        mvc.perform(get("/api/tasks/" + task.path("id").asText()).header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+        rejectTutor(token, Map.of("recordId", r.getId(), "query", "继续"), 404);
+    }
+    @Test void tutorRejectsForeignUnansweredCorrectInvalidAndIncompleteAttempts() throws Exception {
+        String token = account(), other = account(); var r = wrongAttempt(token);
+        var input = Map.<String, Object>of("recordId", r.getId(), "query", "为什么");
+        rejectTutor(other, input, 404);
+        r.setIsCorrect(null); attempts.update(r, new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<com.kaoyan.entity.PracticeRecord>()
+            .eq("id", r.getId()).set("is_correct", null)); rejectTutor(token, input, 409);
+        r.setIsCorrect(1); attempts.updateById(r); rejectTutor(token, input, 409);
+        r.setIsCorrect(0); r.setGradingStatus("invalid"); attempts.updateById(r); rejectTutor(token, input, 409);
+        r.setGradingStatus("valid");
+        var original = new LinkedHashMap<>(r.getQuestionSnapshot());
+        for (String missing : List.of("version", "optionC", "content", "answer", "id")) {
+            var broken = new LinkedHashMap<>(original); broken.remove(missing); r.setQuestionSnapshot(broken);
+            attempts.updateById(r); rejectTutor(token, input, 409);
+        }
+    }
+    @Test void tutorRejectsForgedContextAndInvalidParent() throws Exception {
+        String token = account(), other = account(); var first = wrongAttempt(token); var second = wrongAttempt(token);
+        for (Object id : List.of("1", 1.5, true, -1)) rejectTutor(token, Map.of("recordId", id, "query", "why"), 400);
+        for (String field : List.of("messages", "answer", "userId", "attempt", "profile"))
+            rejectTutor(token, Map.of("recordId", first.getId(), "query", "why", field, "forged"), 400);
+        rejectTutor(token, Map.of("recordId", first.getId(), "query", "x".repeat(2001)), 400);
+        JsonNode parent = submit(token, "WRONG_QUESTION_TUTOR", Map.of("recordId", first.getId(), "query", "why"));
+        String parentId = parent.path("id").asText();
+        rejectTutor(other, Map.of("recordId", wrongAttempt(other).getId(), "query", "why", "parentTaskId", parentId), 404);
+        rejectTutor(token, Map.of("recordId", second.getId(), "query", "why", "parentTaskId", parentId), 409);
+        Task failed = tasks.selectById(parentId); failed.setStatus("FAILED"); tasks.updateById(failed);
+        rejectTutor(token, Map.of("recordId", first.getId(), "query", "why", "parentTaskId", parentId), 409);
+    }
 }

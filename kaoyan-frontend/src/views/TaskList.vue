@@ -55,7 +55,9 @@
       </template>
     </el-dialog>
     <el-dialog :model-value="!!selected" title="任务结果" width="min(760px, 94vw)" @close="selected = null">
-      <TaskResultView v-if="selected" :task="selected" />
+      <WrongQuestionTutor v-if="selected?.taskType === 'WRONG_QUESTION_TUTOR' && typeof selected.inputPayload?.recordId === 'number'"
+        :key="selected.id" :record-id="selected.inputPayload.recordId" :initial-task="selected" />
+      <TaskResultView v-else-if="selected" :task="selected" />
     </el-dialog>
   </div>
 </template>
@@ -65,6 +67,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { getTaskList, submitTask } from '@/api/task'
 import type { Task } from '@/types/api'
 import TaskResultView from '@/components/TaskResultView.vue'
+import WrongQuestionTutor from '@/components/WrongQuestionTutor.vue'
 
 const dialog = ref(false)
 const submitting = ref(false)
@@ -72,7 +75,7 @@ const loading = ref(false)
 const rows = ref<Task[]>([])
 const selected = ref<Task | null>(null)
 const page = ref(1), total = ref(0)
-const typeLabels: Record<Task['taskType'], string> = { KNOWLEDGE_QA: '知识问答', SCHOOL_RECOMMEND: '院校推荐', PRACTICE_SUMMARY: '练习总结', CHAT: '自动识别' }
+const typeLabels: Record<Task['taskType'], string> = { KNOWLEDGE_QA: '知识问答', SCHOOL_RECOMMEND: '院校推荐', PRACTICE_SUMMARY: '练习总结', CHAT: '自动识别', WRONG_QUESTION_TUTOR: '错题 AI 辅导' }
 const form = reactive({ taskType: 'KNOWLEDGE_QA', input: '' })
 
 const load = async () => {

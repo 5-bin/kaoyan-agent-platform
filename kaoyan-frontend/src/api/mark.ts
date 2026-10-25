@@ -1,6 +1,8 @@
 ﻿import request from './request'
 
 export interface MarkItem {
+  recordId?: number
+  isCorrect?: number | null
   questionId: number
   wrongCount?: number
   subject?: string

@@ -2,20 +2,24 @@
   <div class="page question-admin">
     <div class="page-head heading">
       <div><h2 class="page-title">题目录入与审核</h2><p class="page-sub">核对题目、来源与使用权限后，再发布给学生练习。</p></div>
-      <el-button type="primary" :disabled="editingOpen || reviewing || detailLoading" @click="startEntry()">录入题目</el-button>
+      <div class="buttons">
+        <el-button :disabled="editingOpen || importOpen || reviewing || detailLoading" @click="importOpen = true">批量导入</el-button>
+        <el-button type="primary" :disabled="editingOpen || importOpen || reviewing || detailLoading" @click="startEntry()">录入题目</el-button>
+      </div>
     </div>
 
     <QuestionEntryForm v-if="editingOpen" :key="editing?.id ?? 'new'" :initial="editing" @saved="onSaved" @cancel="editingOpen = false" />
+    <QuestionBatchImport v-if="importOpen" @imported="onImported" @cancel="importOpen = false" />
     <p v-if="savedNotice" class="notice" role="status">{{ savedNotice }}</p>
 
     <form class="lookup" @submit.prevent="lookup">
       <label for="question-lookup">按题目ID查看</label>
       <el-input id="question-lookup" v-model="lookupId" inputmode="numeric" placeholder="查看已保存题目及审核结果" />
-      <el-button native-type="submit" :loading="detailLoading" :disabled="editingOpen || reviewing">查看题目</el-button>
+      <el-button native-type="submit" :loading="detailLoading" :disabled="editingOpen || importOpen || reviewing">查看题目</el-button>
     </form>
     <p v-if="detailError" class="error" role="alert">{{ detailError }}</p>
 
-    <section v-if="selected && !editingOpen" class="card detail" aria-label="题目详情">
+    <section v-if="selected && !editingOpen && !importOpen" class="card detail" aria-label="题目详情">
       <div class="heading"><h3>题目 #{{ selected.id }} · 版本 {{ selected.version }}</h3>
         <el-tag :type="selected.reviewStatus === 'APPROVED' ? 'success' : selected.reviewStatus === 'REJECTED' ? 'danger' : 'warning'">{{ statusName(selected.reviewStatus) }}</el-tag></div>
       <p>启用状态：{{ selected.active === 1 ? '已启用' : '已停用' }}</p>
@@ -64,7 +68,7 @@
         <article v-for="row in rows" :key="row.id" class="queue-item">
           <div><b>#{{ row.id }} · {{ row.subject }}</b><p>{{ row.content }}</p>
             <small>{{ sourceName(row.sourceType) }} · {{ row.sourceName || '来源待补充' }}</small></div>
-          <el-button :disabled="reviewing || detailLoading || editingOpen" @click="showDetail(row.id)">查看并审核</el-button>
+          <el-button :disabled="reviewing || detailLoading || editingOpen || importOpen" @click="showDetail(row.id)">查看并审核</el-button>
         </article>
         <div class="pager">
           <el-button :disabled="pageNum <= 1 || loading" @click="changePage(-1)">上一页</el-button>
@@ -82,6 +86,7 @@ import { ElMessageBox } from 'element-plus'
 import { getAdminPending, getAdminQuestion, reviewQuestion, changeQuestionActive } from '@/api/question'
 import type { AdminQuestion } from '@/types/question-entry'
 import QuestionEntryForm from '@/components/QuestionEntryForm.vue'
+import QuestionBatchImport from '@/components/QuestionBatchImport.vue'
 
 const rows = ref<AdminQuestion[]>([])
 const total = ref(0)
@@ -94,6 +99,7 @@ const detailLoading = ref(false)
 const detailError = ref('')
 const lookupId = ref('')
 const editingOpen = ref(false)
+const importOpen = ref(false)
 const editing = ref<AdminQuestion>()
 const savedNotice = ref('')
 const comment = ref('')
@@ -128,6 +134,11 @@ async function onSaved(question: AdminQuestion) {
   pageNum.value = 1
   await load()
 }
+async function onImported() {
+  selected.value = undefined; savedNotice.value = ''
+  pageNum.value = 1
+  await load()
+}
 async function showDetail(id: number) {
   if (detailLoading.value || reviewing.value) return
   selected.value = undefined; detailLoading.value = true; detailError.value = ''; reviewError.value = ''; comment.value = ''
@@ -136,7 +147,7 @@ async function showDetail(id: number) {
   finally { detailLoading.value = false }
 }
 async function lookup() {
-  if (editingOpen.value || reviewing.value) return
+  if (editingOpen.value || importOpen.value || reviewing.value) return
   const id = Number(lookupId.value)
   if (!/^\d+$/.test(lookupId.value) || !Number.isSafeInteger(id) || id < 1) { detailError.value = '请输入有效的正整数题目ID。'; return }
   await showDetail(id)

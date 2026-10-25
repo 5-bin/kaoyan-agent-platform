@@ -1,7 +1,7 @@
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-TaskType = Literal["KNOWLEDGE_QA", "SCHOOL_RECOMMEND", "PRACTICE_SUMMARY", "CHAT"]
+TaskType = Literal["KNOWLEDGE_QA", "SCHOOL_RECOMMEND", "PRACTICE_SUMMARY", "CHAT", "WRONG_QUESTION_TUTOR"]
 
 
 class StrictModel(BaseModel):
@@ -48,6 +48,33 @@ class QuestionSnapshot(StrictModel):
     correct: bool
 
 
+class TutoringAttempt(StrictModel):
+    recordId: int = Field(gt=0, strict=True)
+    id: int = Field(gt=0, strict=True)
+    version: int = Field(ge=1, strict=True)
+    subject: str = Field(min_length=1, max_length=50)
+    knowledgePoint: str | None = Field(default=None, max_length=255)
+    content: str = Field(min_length=1, max_length=10000)
+    optionA: str = Field(min_length=1, max_length=10000)
+    optionB: str = Field(min_length=1, max_length=10000)
+    optionC: str = Field(min_length=1, max_length=10000)
+    optionD: str = Field(min_length=1, max_length=10000)
+    answer: Literal["A", "B", "C", "D"]
+    userAnswer: Literal["A", "B", "C", "D"]
+    analysis: str | None = Field(default=None, max_length=10000)
+
+    @model_validator(mode="after")
+    def wrong_only(self):
+        if self.answer == self.userAnswer:
+            raise ValueError("辅导仅接受已判错作答")
+        return self
+
+
+class TutorExplanation(StrictModel):
+    explanation: str = Field(min_length=1, max_length=4000)
+    standardAnswer: Literal["A", "B", "C", "D"]
+
+
 class ChatRequest(StrictModel):
     taskId: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
     userId: int = Field(gt=0)
@@ -58,6 +85,7 @@ class ChatRequest(StrictModel):
     profile: Profile = Field(default_factory=Profile)
     preferences: Preferences = Field(default_factory=Preferences)
     questions: list[QuestionSnapshot] = Field(default_factory=list, max_length=50)
+    attempt: TutoringAttempt | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -71,6 +99,11 @@ class ChatRequest(StrictModel):
 
     @model_validator(mode="after")
     def task_fields(self):
+        if self.taskType == "WRONG_QUESTION_TUTOR":
+            if self.attempt is None or not self.userInput or len(self.userInput) > 2000:
+                raise ValueError("辅导需要授权作答及1—2000字符问题")
+        elif self.attempt is not None:
+            raise ValueError("仅错题辅导接受 attempt")
         if self.taskType == "PRACTICE_SUMMARY" and not self.sessionId:
             raise ValueError("总结需要合法批次编号")
         if self.taskType != "PRACTICE_SUMMARY" and not self.userInput:

@@ -142,7 +142,7 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 | `/practice`、`/practice/session/:sessionId` | 抽题、逐题作答、回顾和AI总结 | 四模式、答题卡、持久草稿、提示及正式结束入口 |
 | `/wrong`、`/favorite` | 本人错题和收藏 | 重练批次、撤回提示、掌握状态与辅导入口 |
 | `/stat` | 学习统计 | 统一口径、样本量、独立正确率和覆盖范围 |
-| `/admin/documents`、`/admin/questions` | 资料管理、单选题录入／来源登记／审核及待审分页 | 批量导入、不可变题目新版本发布；招生管理待建设 |
+| `/admin/documents`、`/admin/questions` | 资料管理、单选题录入／来源登记／审核及待审分页、JSON批量预览与送审 | 不可变题目新版本发布、整卷管理；招生管理待建设 |
 
 前端守卫与菜单不授予权限。localStorage 当前缓存令牌与用户展示信息，正式档案、任务和作答在后端保存；未来草稿也必须通过后端恢复。
 
@@ -307,7 +307,7 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 ### 6.7 错题辅导与批次总结
 
-当前PRACTICE_SUMMARY要求本人批次valid项目全部已答，且每条question_snapshot非NULL、非空对象。快照缺失时Java返回409及历史依据缺失说明，不创建任务、不调用Agent、不消耗任务额度。快照完整时读取全部有效作答，代码计算正确题数与正确率，模型仅可解释；不能用新题目冒充旧依据。判分时快照不等于抽题时固定整个批次，正式错题辅导、提示与重练仍待建设。
+当前PRACTICE_SUMMARY要求本人批次valid项目全部已答，且每条question_snapshot非NULL、非空对象。快照缺失时Java返回409及历史依据缺失说明，不创建任务、不调用Agent、不消耗任务额度。快照完整时读取全部有效作答，代码计算正确题数与正确率，模型仅可解释；不能用新题目冒充旧依据。错题解释与追问见7.4.1；判分时快照不等于抽题时固定整个批次，提示与重练仍待建设。
 
 目标错题流程：Java验证本人attemptId → 读取题目版本与判分快照 → Python关联知识点并检索 → 解释选择错误的条件和正确解法 → 推荐已审核题目 → 检查与标准答案一致 → Java保存任务。答案与资料冲突时待管理员核查，保留既有判分，不静默改答案。
 
@@ -398,11 +398,18 @@ Issue #9（本地适配契约，2026-10-21）：学生抽题及详情改用白�
 - `PUT /api/questions/admin/{id}/active`仅ADMIN可用，白名单请求`{active:0|1,version}`；version必填正整数。仅APPROVED题可切换，行锁内核对版本，重复状态或过期请求409，缺题404，非法入参400；成功返回保存后的完整管理题目。停用只修改active、version和updatedAt，保留来源、审核与历史作答；恢复校验单选题内容和答案，并校验来源。六个来源字段**全部为NULL**的历史题允许依据原APPROVED结果恢复，仍标注来源待补充；部分缺失或空字符串不享受此例外。无需新增迁移。此次启停不改变历史判分、快照、错题和统计，不等同于正式撤回及统计重算。
 - V9增量脚本在question增加6个可空列：source_type VARCHAR(20)、source_name VARCHAR(255)、source_locator VARCHAR(1000)、source_year INT、source_question_no VARCHAR(64)、permission_note VARCHAR(2000)。先核对已有V7/V8，在受控流程执行一次V9再启动新Java；不改V1、不补造旧题来源、不执行V4删题种子。迁移与#5协调，MySQL验收及执行由后续步骤完成。
 - 前端`/admin/questions`提供录题、详情、修改未发布题、通过／驳回、待审核分页和按ID查看已审核结果；真实失败保留表单与重试，不把错误当作空列表。来源信息只向管理员展示，Python及学生题目DTO保持原契约。
-- 验收覆盖录入→持久化→待审核不可抽→审核通过可练与Java判分、驳回不可抽、学生403、伪造字段400、已发布修改409、过期审核409、旧题／快照保留，以及桌面／390px页面。批量导入、真题采集、重复题检测、整卷／年份筛选和完整不可变版本不属本期。
+- 验收覆盖录入→持久化→待审核不可抽→审核通过可练与Java判分、驳回不可抽、学生403、伪造字段400、已发布修改409、过期审核409、旧题／快照保留，以及桌面／390px页面。Issue #11原范围不含批量导入；后续JSON导入及精确重复检查见7.2.2，真题采集、整卷／年份筛选和完整不可变版本仍待建设。
+
+### 7.2.2 题库批量导入契约
+
+- ADMIN新增`POST /api/questions/admin/import/preview`（只校验，不写入）和`POST /api/questions/admin/import`（事务保存），共用白名单请求`{questions:[题目录入字段...]}`，每批1—50道单选题。每题沿用7.2.1的字段和来源要求；sourceYear仅接受JSON整数或null，拒绝字符串及小数。额外字段、空题目及不完整来源返回400；业务校验错误包含从1起的题目序号。
+- 预览返回`{count,questions}`，questions为规范化后的管理题目；确认导入时重新执行全部校验，不信任预览结果。成功返回同结构及持久化ID，所有题均为version=1、PENDING_REVIEW；仍须逐题审核才能进入学生题池。一题失败整批不写入，数据库写入异常由事务回滚，不接受客户端发布或审核字段。
+- 比较去除首尾空白后的科目、题干及四个选项，批内相同题返回400，数据库中已存在的相同题返回409及已存在ID；不覆盖旧题或自动合并答案。此检查不属于模糊查重或数据库唯一约束，不保证多个服务实例／并发录入的全局幂等。响应丢失时先刷新待审列表核对，不自动重试导入。
+- 页面支持下载UTF-8 JSON示例、选择最大2MiB的JSON文件或粘贴JSON、服务端校验预览、展开核对答案／解析／来源、确认整批送审。输入或文件变更后原预览失效，确认前需重新校验；失败保留输入与错误，导入结果列出ID。示例为408四科8道自编练习，明确不是真题或完整题库，不自动写入日常数据库。本功能复用V9，无新增迁移；Excel、PDF识别、整卷组织、模糊查重和并发幂等另行建设。
 
 ### 7.3 当前任务入参与示例
 
-文本任务接受非空 `input.query`，最长8000字符，可附最多6条user／assistant历史；SCHOOL_RECOMMEND和CHAT可附白名单preferences。PRACTICE_SUMMARY仅接受非空且最长64字符的input.sessionId。客户端不能提交userId、profile或作答快照，Java从本人业务记录构造上下文；详细字段上限见[RAG契约](docs/rag.md)。示例为契约演示，编号不代表已有数据或已执行请求。
+KNOWLEDGE_QA、SCHOOL_RECOMMEND和CHAT接受非空 `input.query`，最长8000字符，可附最多6条user／assistant历史；SCHOOL_RECOMMEND和CHAT可附白名单preferences。PRACTICE_SUMMARY仅接受非空且最长64字符的input.sessionId。WRONG_QUESTION_TUTOR的recordId、query及parentTaskId规则见7.4.1，其对话历史由Java构造。客户端不能提交userId、profile或作答快照，Java从本人业务记录构造上下文；详细字段上限见[RAG契约](docs/rag.md)。示例为契约演示，编号不代表已有数据或已执行请求。
 
 ```json
 {
@@ -424,7 +431,7 @@ Issue #9（本地适配契约，2026-10-21）：学生抽题及详情改用白�
 
 内部`POST /internal/rag/chat`使用X-Internal-Key；401表示凭证无效，422表示输入非法，处理异常返回status=FAILED并保存简短原因。main以`create_app`工厂启动，默认LLM_ENABLED=false，Python不需要数据库账号。
 
-Java发送taskId、userId、taskType，以及适用于该任务的userInput、sessionId、questions、messages、profile、preferences；questions为本人已判分的题目版本快照，旧correctQuestionIds／wrongQuestionIds不再接受。未知字段拒绝。messages和profile可将Java null归一为空容器，但不允许system消息或伪造归属。完整上限和筛选规则见[RAG契约](docs/rag.md)。
+Java发送taskId、userId、taskType，以及适用于该任务的userInput、sessionId、questions、attempt、messages、profile、preferences；questions为总结使用的本人已判分快照，attempt仅供错题辅导，旧correctQuestionIds／wrongQuestionIds不再接受。未知字段拒绝。messages和profile可将Java null归一为空容器，但不允许system消息或伪造归属。完整上限和筛选规则见[RAG契约](docs/rag.md)。
 
 ```json
 {
@@ -435,7 +442,21 @@ Java发送taskId、userId、taskType，以及适用于该任务的userInput、se
 
 响应含taskId、status、result、references、releaseId和可选errorMessage。result.outcome为大写COMPLETED／NEEDS_INPUT／UNSUPPORTED，三者均可对应SUCCESS；页面必须显示资料不足／补充条件，不能只看HTTP200或SUCCESS。新结果另含resolvedTaskType与explanationMode=rules／ai／fallback。引用包含id、title、url、locator、version、retrievedAt、excerpt，模型只能选择当前证据编号；Python补全元数据，Java核对任务身份、版本、来源及候选引用范围。
 
-Java不在远程调用时持有数据库事务。task表先保存RUNNING，再保存结果／失败；单实例重启保留记录并标记中断FAILED。当前没有持久多轮会话，messages字段不等于已实现长期记忆。
+Java不在远程调用时持有数据库事务。task表先保存RUNNING，再保存结果／失败；单实例重启保留记录并标记中断FAILED。错题辅导保存各轮任务并读取最近三轮历史，其余文本任务的messages仍由调用方提供，不代表通用长期记忆。
+
+#### 7.4.1 错题解释与追问
+
+领域任务包含 KNOWLEDGE_QA／SCHOOL_RECOMMEND／PRACTICE_SUMMARY／CHAT，以及错题辅导 WRONG_QUESTION_TUTOR。CHAT 不自动触发错题辅导。
+
+错题辅导通过 POST `/api/tasks` 提交 `{taskType:"WRONG_QUESTION_TUTOR",input:{recordId:123,query:"为什么我的选项不对？",parentTaskId:"可选的上一轮任务ID"}}`。recordId 必须为正整数，query 为1—2000字符；仅接受这三个输入字段。Java 校验本人作答、valid、已判错及完整历史快照（题号、版本、科目、题干、四个非空选项、标准答案）；未答、答对、撤回或依据缺失返回409，跨账号或不存在返回404，均在创建任务和扣额度之前拒绝，不读取现行题表补造。解析可为空，模型必须承认缺失。
+
+追问只能关联本人、同一作答、SUCCESS 的 WRONG_QUESTION_TUTOR 父任务。Java 从已保存任务构造最多最近三轮（六条消息）的对话；客户端不得上传 messages、答案、判分或题目。每轮仍重新检查原作答状态，继续复用任务限流与用量（默认每日30次、每分钟6次，所有类型共享）。完整各轮保存在任务表，页面显示最近三轮历史加当前一轮；刷新或退出后可在 Agent 助手的任务历史查看和继续追问。删除原作答后历史可只读，新追问404。
+
+内部 AgentRequest 新增可空 attempt，仅辅导任务接受：recordId、id、version、subject、knowledgePoint、content、optionA/B/C/D、answer、analysis、userAnswer。Java 将授权 attempt 及服务端 messages 保存到 inputPayload。Python 不访问业务库、不改判分；模型只返回 explanation（1—4000字符）及 standardAnswer，standardAnswer 必须等于快照，否则降级为已保存解析。结果包含 standardAnswer、userAnswer、questionVersion、recordId、explanationMode，Java再次核对这些字段；解释文字供辅助理解，以单独显示的服务端标准答案与判分为准。当前不新增检索引用，不把模型解释冒充已审核解析。
+
+LLM_ENABLED 默认 false 时不请求模型，显示原题解析并提示未启用 AI，不能假称已回答个性化追问；启用后的超时、预算不足、模型异常或格式错误均保留原解析并标记 fallback。Agent 整体离线时任务 FAILED，判分与原解析不受影响，可重试。题目、历史和追问仅作为结构化用户数据，不能更改系统指令或触发工具。本功能无新数据库迁移，也不自动开启付费模型。正式批次固定快照、提示辅助标记及重练仍待建设。
+
+DeepSeek 官方接入（2026-10-25核对）：base_url为`https://api.deepseek.com`，V4.1-Flash-1017当前API模型标识为`deepseek-flash`，不能将网页展示名直接填入model。LLM_MODEL_MAIN和LLM_MODEL_ROUTER均可配置该标识。客户端仅对主机名严格等于`api.deepseek.com`且选中模型为`deepseek-flash`的请求发送`thinking:{type:"disabled"}`，使用非思考模式适配现有响应时限；不向其他供应商发送此参数。保留JSON输出、结构校验、超时、预算和零自动重试。配置步骤集中于README；实际模型别名随官方发布可能变化，不承诺固定模型权重或真实讲解质量。依据：[官方接入](https://api-docs.deepseek.com/)、[模型说明](https://api-docs.deepseek.com/quick_start/pricing)、[思考模式](https://api-docs.deepseek.com/guides/thinking_mode)。
 
 ### 7.5 目标数据与接口变化（未实现）
 
@@ -452,8 +473,6 @@ Java不在远程调用时持有数据库事务。task表先保存RUNNING，再�
 | 任务／推荐 | 授权contextSnapshot、releaseId、resultSchemaVersion及正式推荐快照 | 旧任务按版本1解析，不改写历史结果 |
 
 刷题目标在 `/api/practice/sessions` 路径上扩展mode、知识点和实际数量；增加 `PUT /{sessionId}/progress`、`POST /{sessionId}/items/{itemId}/hints`、`POST /{sessionId}/finish`、`GET /{sessionId}/result`。现有answer入口补充版本、itemId、clientRequestId并返回服务端判分视图；详情／回顾已使用隐藏未答答案的DTO，后续继续保持这一边界。收藏可保留现有路径，保证添加／取消幂等及资源可访问；DELETE批次需停止破坏历史，旧页面同步切换结束动作，不能悄悄把删除当作现有完成行为。
-
-领域任务保留现有四类型，正式问答和择校分别增强KNOWLEDGE_QA／SCHOOL_RECOMMEND，新增WRONG_QUESTION_TUTOR与attemptId输入；PRACTICE_SUMMARY继续存在。CHAT只是可选交互，不替代正式领域任务类型。未来subject等新字段按类型加入；preferences已按白名单支持，不允许客户端上传完整授权context。
 
 当前内部入口、releaseId、类型化授权快照及大写outcome已实现，见7.4；未来增加resultSchemaVersion或新任务前须同步三端和兼容测试。旧记录保留旧格式，不按新语料改写，不引入与现行大小写不同的终态。
 

@@ -20,7 +20,7 @@
 
 ## 接口与业务安全
 
-- 当前对外包装为 `{code,message,data}`，分页从 1 起；任务使用 `KNOWLEDGE_QA/SCHOOL_RECOMMEND/PRACTICE_SUMMARY/CHAT`，业务任务状态为 `RUNNING/SUCCESS/FAILED`，内部入口为 `/internal/rag/chat`。
+- 当前对外包装为 `{code,message,data}`，分页从 1 起；任务使用 `KNOWLEDGE_QA/SCHOOL_RECOMMEND/PRACTICE_SUMMARY/CHAT/WRONG_QUESTION_TUTOR`，业务任务状态为 `RUNNING/SUCCESS/FAILED`，内部入口为 `/internal/rag/chat`。
 - 接口修改先更新搭建文档契约，同时检查前端请求和类型、Java DTO／序列化、Python 模型、结果保存和测试。新增字段或终态必须说明兼容方式，不能只改某一端，也不能把目标设计写成当前支持。
 - 私有资源归属取自 Java 认证上下文，不信任客户端传入的 userId 或 ownerId。公开注册只能创建 STUDENT；管理员由服务端受控方式授权。跨账号资源查询返回404，非管理员管理请求返回403。
 - 对外使用白名单展示DTO，不序列化账号密码哈希、内部凭证或未提交题目答案；注册和本人资料响应也需核对敏感字段，不能直接以实体完整返回作为安全依据。

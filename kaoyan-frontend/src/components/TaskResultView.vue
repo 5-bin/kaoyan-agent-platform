@@ -8,6 +8,9 @@
         <small>版本 {{ task.releaseId || result.releaseId }}</small>
       </div>
       <p class="answer">{{ result.answer }}</p>
+      <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="saved-result">
+        已保存作答 · 题目版本 {{ result.questionVersion }} · 你的选择 {{ result.userAnswer }} · 标准答案 {{ result.standardAnswer }}
+      </p>
       <el-alert v-if="result.notice" type="warning" :closable="false" :title="result.notice" />
       <ul v-if="result.followUp?.length"><li v-for="item in result.followUp" :key="item">{{ item }}</li></ul>
       <p v-if="result.followUp?.length"><router-link to="/profile">补充个人档案</router-link></p>

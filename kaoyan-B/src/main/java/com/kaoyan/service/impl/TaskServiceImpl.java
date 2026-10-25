@@ -24,19 +24,21 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements TaskService, ApplicationRunner {
-    private static final Set<String> TYPES = Set.of("KNOWLEDGE_QA", "SCHOOL_RECOMMEND", "PRACTICE_SUMMARY", "CHAT");
+    private static final Set<String> TYPES = Set.of("KNOWLEDGE_QA", "SCHOOL_RECOMMEND", "PRACTICE_SUMMARY", "CHAT", "WRONG_QUESTION_TUTOR");
     private final AgentFeignClient agentClient;
     private final AgentProperties agentProps;
     private final UserMapper userMapper;
     private final PracticeRecordMapper practiceRecordMapper;
     private final QuestionMapper questionMapper;
     private final TaskStore store;
+    private final WrongQuestionTutorContext tutorContext;
 
     @Override
     public Task submit(Long userId, String taskType, Map<String, Object> input) {
         if (taskType == null || !TYPES.contains(taskType)) throw new ApiException(400, "未知任务类型");
         Map<String, Object> fields = input == null ? Map.of() : input;
         Set<String> allowed = switch (taskType) {
+            case "WRONG_QUESTION_TUTOR" -> Set.of("recordId", "query", "parentTaskId");
             case "PRACTICE_SUMMARY" -> Set.of("sessionId");
             case "SCHOOL_RECOMMEND", "CHAT" -> Set.of("query", "preferences", "messages");
             default -> Set.of("query", "messages");
@@ -52,6 +54,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         Map<String, Object> snapshot = new LinkedHashMap<>(fields);
         snapshot.put("profileSnapshot", request.getProfile());
         if (request.getQuestions() != null) snapshot.put("questions", request.getQuestions());
+        if (request.getAttempt() != null) {
+            snapshot.put("attempt", request.getAttempt());
+            snapshot.put("messages", request.getMessages());
+        }
         task.setInputPayload(snapshot);
         synchronized (store) { store.begin(task); }
         try {
@@ -86,6 +92,12 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         profile.put("examYear", user.getExamYear());
         profile.put("background", user.getBackground());
         request.setProfile(profile);
+        if ("WRONG_QUESTION_TUTOR".equals(type)) {
+            // This path accepts only record IDs and queries, never client-provided context.
+            request.setProfile(Map.of());
+            tutorContext.populate(request, userId, input);
+            return request;
+        }
         if (!"PRACTICE_SUMMARY".equals(type)) {
             Object query = input.get("query");
             if (!(query instanceof String text) || text.isBlank() || text.strip().length() > 8000)
@@ -175,6 +187,16 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             throw new IllegalStateException("Agent response mismatch");
         if (!"SUCCESS".equals(response.getStatus())) return;
         Map<String, Object> result = asMap(response.getResult());
+        if ("WRONG_QUESTION_TUTOR".equals(task.getTaskType())) {
+            Map<String, Object> attempt = asMap(task.getInputPayload().get("attempt"));
+            for (String field : List.of("standardAnswer", "userAnswer", "questionVersion", "recordId")) {
+                String source = field.equals("standardAnswer") ? "answer" : field.equals("questionVersion") ? "version" : field;
+                if (!Objects.toString(attempt.get(source)).equals(Objects.toString(result.get(field))))
+                    throw new IllegalStateException("Tutor changed authoritative result");
+            }
+            if (!(result.get("answer") instanceof String explanation) || explanation.isBlank() || explanation.length() > 4000
+                    || !response.getReferences().isEmpty()) throw new IllegalStateException("Invalid tutor result");
+        }
         if (result.get("outcome") == null || !Set.of("COMPLETED", "NEEDS_INPUT", "UNSUPPORTED").contains(result.get("outcome"))
                 || !response.getReleaseId().equals(result.get("releaseId"))
                 || result.get("explanationMode") == null || !Set.of("rules", "ai", "fallback").contains(result.get("explanationMode"))

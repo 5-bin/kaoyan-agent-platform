@@ -26,7 +26,7 @@ export interface User {
 export interface Task {
   id: string
   userId: number
-  taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND' | 'PRACTICE_SUMMARY' | 'CHAT'
+  taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND' | 'PRACTICE_SUMMARY' | 'CHAT' | 'WRONG_QUESTION_TUTOR'
   status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED'
   inputPayload?: Record<string, unknown>
   resultPayload?: TaskResult
@@ -48,6 +48,7 @@ export interface TaskResult {
   resolvedTaskType: Task['taskType']; explanationMode: 'rules' | 'ai' | 'fallback'
   releaseId: string; references: SourceReference[]; followUp?: string[]; notice?: string
   candidates?: SchoolCandidate[]; coverage?: string; weakPoints?: string[]; accuracy?: number
+  recordId?: number; standardAnswer?: string; userAnswer?: string; questionVersion?: number
 }
 
 export interface Document {

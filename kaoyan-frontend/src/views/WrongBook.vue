@@ -21,6 +21,8 @@
           <el-button size="large" v-if="it.isFavorite !== 1" type="primary" plain @click="fav(it.questionId)">收藏</el-button>
           <el-button size="large" type="danger" plain @click="remove(it.questionId)">移出错题</el-button>
         </div>
+        <WrongQuestionTutor v-if="it.isCorrect === 0 && it.recordId && it.snapshotStatus === 'AVAILABLE'"
+          :key="it.recordId" :record-id="it.recordId" />
       </div>
     </div>
     <div v-if="items.length < total" class="more">
@@ -31,6 +33,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import WrongQuestionTutor from '@/components/WrongQuestionTutor.vue'
 import { historyNotice } from '@/utils/question-history'
 import { getWrongPage, removeWrong, addFavorite, type MarkItem } from '@/api/mark'
 

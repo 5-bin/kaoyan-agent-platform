@@ -8,6 +8,8 @@ export interface QuestionEntry {
   sourceLocator: string; sourceYear?: number; sourceQuestionNo: string; permissionNote: string
 }
 export interface QuestionUpdate extends QuestionEntry { version: number }
+export interface QuestionImportPreview { count: number; questions: QuestionEntry[] }
+export interface QuestionImportResult { count: number; questions: AdminQuestion[] }
 
 export interface AdminQuestion extends Question {
   version: number

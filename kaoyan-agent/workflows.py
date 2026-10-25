@@ -2,7 +2,7 @@
 import asyncio
 import logging
 from pydantic import Field
-from schemas import StrictModel, Answer, Intent, Explanations, Summary
+from schemas import StrictModel, Answer, Intent, Explanations, Summary, TutorExplanation
 from prompts import get
 
 log = logging.getLogger(__name__)
@@ -39,6 +39,8 @@ class Workflows:
             result = await self.qa(req)
         elif task_type == "PRACTICE_SUMMARY":
             result = await self.summary(req)
+        elif task_type == "WRONG_QUESTION_TUTOR":
+            result = await self.tutor(req)
         else:
             result = {"outcome": "NEEDS_INPUT", "answer": "请明确你想了解的408知识，或提供择校目标。",
                       "followUp": ["你要咨询408概念还是院校专业？"]}
@@ -157,6 +159,29 @@ class Workflows:
             except Exception as e:
                 log.warning("schoolModelFailure=%s", type(e).__name__)
                 result.update(explanationMode="fallback", notice="AI解释不可用，规则候选及来源已保留。")
+        return result
+
+    async def tutor(self, req):
+        attempt = req.attempt
+        analysis = attempt.analysis or "此版本未保存解析，无法从已有解析解释原因。"
+        result = {"outcome": "COMPLETED", "recordId": attempt.recordId,
+            "standardAnswer": attempt.answer, "userAnswer": attempt.userAnswer, "questionVersion": attempt.version,
+            "answer": f"你的选择：{attempt.userAnswer}；此版本标准答案：{attempt.answer}。\n原题解析：{analysis[:3500]}",
+            "explanationMode": "rules", "notice": "未启用 AI，当前仅展示原题解析，尚未生成个性化解释或追问回答。"}
+        if self.settings.LLM_ENABLED:
+            try:
+                output = await self.model.generate(get("wrong_question_tutor"),
+                    {"attempt": attempt.model_dump(), "query": req.userInput,
+                     "messages": [m.model_dump() for m in req.messages]}, TutorExplanation)
+                # Revalidate even a custom provider adapter's output.
+                output = TutorExplanation.model_validate(output.model_dump())
+                if output.standardAnswer != attempt.answer:
+                    raise ValueError("standard_answer_mismatch")
+                result.update(answer=output.explanation, explanationMode="ai",
+                    notice="AI 辅助解释可能有误，标准答案和判分以已保存作答为准。")
+            except Exception as e:
+                log.warning("tutorModelFailure=%s", type(e).__name__)
+                result.update(explanationMode="fallback", notice="AI 解释或追问暂不可用，已保留原题解析，可稍后重试。")
         return result
 
     async def summary(self, req):

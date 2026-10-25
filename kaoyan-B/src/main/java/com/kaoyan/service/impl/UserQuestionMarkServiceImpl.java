@@ -132,5 +132,9 @@ public class UserQuestionMarkServiceImpl extends ServiceImpl<UserQuestionMarkMap
             .isNotNull(PracticeRecord::getIsCorrect).eq(PracticeRecord::getGradingStatus, "valid")
             .orderByDesc(PracticeRecord::getAnsweredAt).orderByDesc(PracticeRecord::getId).last("LIMIT 1"));
         QuestionHistoryView.populate(view, latest, latest == null ? questions.selectById(view.getQuestionId()) : null);
+        if (latest != null) {
+            view.setRecordId(latest.getId());
+            view.setIsCorrect(latest.getIsCorrect());
+        }
     }
 }

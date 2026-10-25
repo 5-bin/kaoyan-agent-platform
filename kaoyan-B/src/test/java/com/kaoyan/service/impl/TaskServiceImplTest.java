@@ -36,7 +36,8 @@ class TaskServiceImplTest {
         var user = new com.kaoyan.entity.User(); user.setId(1L);
         when(users.selectById(1L)).thenReturn(user);
         store = new TaskStore(tasks, new AgentProperties());
-        service = spy(new TaskServiceImpl(agent, new AgentProperties(), users, records, mock(QuestionMapper.class), store));
+        service = spy(new TaskServiceImpl(agent, new AgentProperties(), users, records, mock(QuestionMapper.class), store,
+            new WrongQuestionTutorContext(records, tasks)));
         ReflectionTestUtils.setField(service, "baseMapper", tasks);
         when(tasks.insert(any(Task.class))).thenReturn(1);
         when(tasks.updateById(any(Task.class))).thenReturn(1);

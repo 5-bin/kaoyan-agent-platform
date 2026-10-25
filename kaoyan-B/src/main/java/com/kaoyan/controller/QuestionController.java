@@ -5,6 +5,8 @@ import com.kaoyan.common.Result;
 import com.kaoyan.dto.query.PageQuery;
 import com.kaoyan.dto.query.QuestionPracticeQuery;
 import com.kaoyan.dto.request.QuestionEntryRequest;
+import com.kaoyan.dto.request.QuestionImportRequest;
+import com.kaoyan.dto.response.QuestionImportVO;
 import com.kaoyan.dto.request.QuestionUpdateRequest;
 import com.kaoyan.dto.request.QuestionActiveRequest;
 import com.kaoyan.dto.request.QuestionReviewRequest;
@@ -71,6 +73,20 @@ public class QuestionController {
     @PostMapping("/admin")
     public Result<Question> create(@Valid @RequestBody QuestionEntryRequest request) {
         return Result.ok(questionService.create(request));
+    }
+
+    @Operation(summary = "校验批量导入题目（不写入）")
+    @PostMapping("/admin/import/preview")
+    public Result<QuestionImportVO> previewImport(@Valid @RequestBody QuestionImportRequest request) {
+        var questions = questionService.previewImport(request.questions());
+        return Result.ok(new QuestionImportVO(questions.size(), questions));
+    }
+
+    @Operation(summary = "整批导入待审核题目")
+    @PostMapping("/admin/import")
+    public Result<QuestionImportVO> importQuestions(@Valid @RequestBody QuestionImportRequest request) {
+        var questions = questionService.importQuestions(request.questions());
+        return Result.ok(new QuestionImportVO(questions.size(), questions));
     }
 
     @Operation(summary = "管理端题目完整详情")

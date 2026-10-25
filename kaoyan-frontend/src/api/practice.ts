@@ -3,6 +3,7 @@
 import type { PracticeRecord } from '@/types/api'
 
 export interface AnswerResult {
+  recordId?: number
   questionId: number
   userAnswer: string
   isCorrect: 0 | 1
@@ -37,6 +38,7 @@ export const getSessionPage = (params: { pageNum: number; pageSize: number }) =>
   request.get<unknown, { total: number; list: SessionSummary[] }>('/practice/sessions/page', { params })
 
 export interface ReviewRecord {
+  recordId?: number
   questionId: number
   orderIndex: number
   userAnswer?: string
