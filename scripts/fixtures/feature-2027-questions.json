@@ -1,0 +1,4260 @@
+[
+  {
+    "code": "DS001",
+    "subject": "数据结构",
+    "knowledgePoint": "线性表",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS001】静态顺序表按已知下标读取一个元素的时间复杂度是？",
+    "options": [
+      "O(1)",
+      "O(n)",
+      "O(n²)",
+      "O(log n)"
+    ],
+    "answer": "A",
+    "analysis": "元素连续存放，可由基址与下标直接算出地址。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS001",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS002",
+    "subject": "数据结构",
+    "knowledgePoint": "线性表",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS002】仅持有单链表头指针时，定位第k个结点通常依靠什么操作？",
+    "options": [
+      "先执行堆排序",
+      "从头逐结点沿next访问",
+      "直接按下标计算地址",
+      "读取尾结点的前驱域"
+    ],
+    "answer": "B",
+    "analysis": "单链表结点不要求连续存储，需沿链接定位。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS002",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS003",
+    "subject": "数据结构",
+    "knowledgePoint": "栈",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS003】限定只在一端插入和删除的栈采用什么次序？",
+    "options": [
+      "随机先出",
+      "按值从小到大",
+      "后进先出",
+      "先进先出"
+    ],
+    "answer": "C",
+    "analysis": "最后入栈且未移除的元素位于栈顶。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS003",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS004",
+    "subject": "数据结构",
+    "knowledgePoint": "队列",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS004】普通队列的基本访问次序是？",
+    "options": [
+      "后进先出",
+      "按键值排序",
+      "按地址排序",
+      "先进先出"
+    ],
+    "answer": "D",
+    "analysis": "新元素在队尾进入，最早进入的元素先从队头离开。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS004",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS005",
+    "subject": "数据结构",
+    "knowledgePoint": "树",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS005】二叉树中一个结点最多有几个直接孩子？",
+    "options": [
+      "2",
+      "1",
+      "3",
+      "4"
+    ],
+    "answer": "A",
+    "analysis": "二叉树按定义最多含左、右两个孩子。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS005",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS006",
+    "subject": "数据结构",
+    "knowledgePoint": "图",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS006】无权图中求源点到各可达顶点的最少边数，应优先使用？",
+    "options": [
+      "直接堆排序",
+      "广度优先搜索",
+      "深度优先搜索且不回溯",
+      "拓扑排序"
+    ],
+    "answer": "B",
+    "analysis": "BFS按距源点的层数扩展，首次到达即得到最少边数。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS006",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS007",
+    "subject": "数据结构",
+    "knowledgePoint": "查找",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS007】对顺序存储的有序数组进行折半查找，最坏时间复杂度是？",
+    "options": [
+      "O(n)",
+      "O(1)",
+      "O(log n)",
+      "O(n²)"
+    ],
+    "answer": "C",
+    "analysis": "每步将剩余候选范围约减半。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS007",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS008",
+    "subject": "数据结构",
+    "knowledgePoint": "排序",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS008】采用严格大于才交换的相邻交换冒泡排序，其稳定性是？",
+    "options": [
+      "必定不稳定",
+      "只对奇数长度稳定",
+      "必须使用递归才稳定",
+      "稳定"
+    ],
+    "answer": "D",
+    "analysis": "相等关键字不会相互越过，原相对次序保留。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS008",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS009",
+    "subject": "数据结构",
+    "knowledgePoint": "散列表",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS009】两个不同关键字经同一散列函数得到相同表地址，称为？",
+    "options": [
+      "冲突",
+      "递归",
+      "溢出中断",
+      "拓扑环"
+    ],
+    "answer": "A",
+    "analysis": "地址相同不代表关键字相同，需要冲突处理策略。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS009",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS010",
+    "subject": "数据结构",
+    "knowledgePoint": "堆",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS010】大根堆中堆顶关键字满足什么性质？",
+    "options": [
+      "一定等于最后一个叶子",
+      "不小于堆中任一关键字",
+      "总是全堆最小值",
+      "等于所有关键字平均值"
+    ],
+    "answer": "B",
+    "analysis": "父结点不小于孩子，沿路径传递可得根为最大值。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS010",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS011",
+    "subject": "数据结构",
+    "knowledgePoint": "树的遍历",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS011】互异关键字二叉搜索树的中序遍历结果是？",
+    "options": [
+      "总等于层序",
+      "总等于先序",
+      "严格递增",
+      "严格递减"
+    ],
+    "answer": "C",
+    "analysis": "左子树所有键小于根，右子树所有键大于根。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS011",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS012",
+    "subject": "数据结构",
+    "knowledgePoint": "最短路径",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS012】直接使用经典Dijkstra算法的通常前提是？",
+    "options": [
+      "图必须无环",
+      "边权必须全相同",
+      "所有顶点入度为零",
+      "所有边权非负"
+    ],
+    "answer": "D",
+    "analysis": "负边会破坏已确定最短距离不再改善的贪心依据。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS012",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS013",
+    "subject": "数据结构",
+    "knowledgePoint": "最小生成树",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS013】对连通无向带权图，Kruskal算法每步选择什么边？",
+    "options": [
+      "当前可加入且不成环的最小权边",
+      "任意最大权边",
+      "仅与起点相接的边",
+      "按顶点编号最大的边"
+    ],
+    "answer": "A",
+    "analysis": "将边按权值排序，用并查集排除成环边。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS013",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS014",
+    "subject": "数据结构",
+    "knowledgePoint": "拓扑排序",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS014】有向图存在拓扑序的充要条件是？",
+    "options": [
+      "图必须是二叉树",
+      "图无有向环",
+      "图一定连通",
+      "所有顶点出度为一"
+    ],
+    "answer": "B",
+    "analysis": "有向无环图可反复删除零入度顶点得到拓扑序。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS014",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS015",
+    "subject": "数据结构",
+    "knowledgePoint": "AVL树",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS015】AVL树要求任意结点左右子树高度差绝对值满足？",
+    "options": [
+      "至少为2",
+      "等于叶子个数",
+      "不超过1",
+      "恒等于0"
+    ],
+    "answer": "C",
+    "analysis": "允许高度差为0或1，并通过旋转维持平衡。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS015",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS016",
+    "subject": "数据结构",
+    "knowledgePoint": "排序",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS016】常见原地快速排序的最坏时间复杂度是？",
+    "options": [
+      "O(log n)",
+      "O(n)",
+      "O(1)",
+      "O(n²)"
+    ],
+    "answer": "D",
+    "analysis": "连续选择极端主元会得到规模n减1的递归子问题。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS016",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS017",
+    "subject": "数据结构",
+    "knowledgePoint": "排序",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS017】常规数组归并排序在归并时相等元素先取左段，其结果是？",
+    "options": [
+      "稳定且最坏O(n log n)",
+      "不稳定且最坏O(1)",
+      "稳定且最坏O(n³)",
+      "不稳定且无需比较"
+    ],
+    "answer": "A",
+    "analysis": "相等键先取左侧保留相对顺序，每层归并总工作量为线性。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS017",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS018",
+    "subject": "数据结构",
+    "knowledgePoint": "字符串",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS018】KMP使用部分匹配信息的主要作用是？",
+    "options": [
+      "完全取消字符比较",
+      "失配时避免主串指针回退",
+      "把模式串变成二叉树",
+      "保证模式串长度为二次幂"
+    ],
+    "answer": "B",
+    "analysis": "已匹配前后缀信息决定模式串移动位置。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS018",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS019",
+    "subject": "数据结构",
+    "knowledgePoint": "树的遍历",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS019】互异标号二叉树仅有先序和后序遍历时，一般能否唯一确定？",
+    "options": [
+      "只能得到空树",
+      "必须为满二叉树",
+      "不能，一孩子结点的左右位置可能不唯一",
+      "总能唯一确定"
+    ],
+    "answer": "C",
+    "analysis": "根只有一个孩子时，左孩子和右孩子可产生相同先后序。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS019",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS020",
+    "subject": "数据结构",
+    "knowledgePoint": "图的存储",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS020】稀疏图使用邻接表相较邻接矩阵的常见优势是？",
+    "options": [
+      "所有边查询都保证O(1)",
+      "完全无需存顶点",
+      "只能表示无向图",
+      "空间可达O(V+E)"
+    ],
+    "answer": "D",
+    "analysis": "只为实际存在的边保留记录，避免V平方的矩阵空间。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS020",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "DS021",
+    "subject": "数据结构",
+    "knowledgePoint": "顺序表",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS021】数组A[0..15]的首地址为200，每元素4字节，A[7]的地址是多少？",
+    "options": [
+      "228",
+      "229",
+      "230",
+      "231"
+    ],
+    "answer": "A",
+    "analysis": "地址等于200加7乘4。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS021",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "page_address",
+      "parameters": [
+        7,
+        4,
+        200
+      ]
+    }
+  },
+  {
+    "code": "DS022",
+    "subject": "数据结构",
+    "knowledgePoint": "栈",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS022】空栈依次压入3、5、8，再弹出一次，此时栈顶元素是多少？",
+    "options": [
+      "8",
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": "B",
+    "analysis": "8先被弹出，留下3和5，栈顶为5。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS022",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        5
+      ]
+    }
+  },
+  {
+    "code": "DS023",
+    "subject": "数据结构",
+    "knowledgePoint": "队列",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS023】空队列依次入队4、9、12，出队一次后队首是多少？",
+    "options": [
+      "11",
+      "12",
+      "9",
+      "10"
+    ],
+    "answer": "C",
+    "analysis": "4先出队，队首变为9。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS023",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        9
+      ]
+    }
+  },
+  {
+    "code": "DS024",
+    "subject": "数据结构",
+    "knowledgePoint": "二叉树",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS024】有15个结点的非空二叉树有多少条父子边？",
+    "options": [
+      "15",
+      "16",
+      "17",
+      "14"
+    ],
+    "answer": "D",
+    "analysis": "任意树的边数等于结点数减1。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS024",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        15,
+        1
+      ]
+    }
+  },
+  {
+    "code": "DS025",
+    "subject": "数据结构",
+    "knowledgePoint": "图",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS025】6个顶点的无向完全简单图有多少条边？",
+    "options": [
+      "15",
+      "16",
+      "17",
+      "18"
+    ],
+    "answer": "A",
+    "analysis": "每对不同顶点恰对应一条边，共6乘5除2。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS025",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "edges",
+      "parameters": [
+        6
+      ]
+    }
+  },
+  {
+    "code": "DS026",
+    "subject": "数据结构",
+    "knowledgePoint": "复杂度",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 DS026】循环i从0至7，每次执行3次常数操作，总操作次数为多少？",
+    "options": [
+      "27",
+      "24",
+      "25",
+      "26"
+    ],
+    "answer": "B",
+    "analysis": "外层8次，内层3次，共24次。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS026",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        8,
+        3
+      ]
+    }
+  },
+  {
+    "code": "DS027",
+    "subject": "数据结构",
+    "knowledgePoint": "循环队列",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS027】容量为10的循环数组中，front=8、rear=3，约定空出一个位置，当前元素数为多少？",
+    "options": [
+      "7",
+      "8",
+      "5",
+      "6"
+    ],
+    "answer": "C",
+    "analysis": "元素数为(rear-front+10)模10。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS027",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "queue",
+      "parameters": [
+        8,
+        3,
+        10
+      ]
+    }
+  },
+  {
+    "code": "DS028",
+    "subject": "数据结构",
+    "knowledgePoint": "树的层数",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS028】根为第1层的完全二叉树有31个结点，其层数为多少？",
+    "options": [
+      "6",
+      "7",
+      "8",
+      "5"
+    ],
+    "answer": "D",
+    "analysis": "满5层恰有2的5次方减1等于31个结点。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS028",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "tree_depth",
+      "parameters": [
+        31
+      ]
+    }
+  },
+  {
+    "code": "DS029",
+    "subject": "数据结构",
+    "knowledgePoint": "排序",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS029】对5个互异元素做不提前结束的标准冒泡排序，各趟比较4、3、2、1次，总比较几次？",
+    "options": [
+      "10",
+      "11",
+      "12",
+      "13"
+    ],
+    "answer": "A",
+    "analysis": "逐趟求和得到10。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS029",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        4,
+        3,
+        2,
+        1
+      ]
+    }
+  },
+  {
+    "code": "DS030",
+    "subject": "数据结构",
+    "knowledgePoint": "散列表",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS030】散列函数h(k)=k模11，关键字38的初始散列地址是多少？",
+    "options": [
+      "8",
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": "B",
+    "analysis": "38除以11余5。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS030",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        5
+      ]
+    }
+  },
+  {
+    "code": "DS031",
+    "subject": "数据结构",
+    "knowledgePoint": "二叉树",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS031】一棵仅含度为0或2的非空二叉树共有19个结点，叶子数是多少？",
+    "options": [
+      "12",
+      "13",
+      "10",
+      "11"
+    ],
+    "answer": "C",
+    "analysis": "设叶子n0、度2结点n2，有n0=n2+1且n0+n2=19。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS031",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "tree_leaves",
+      "parameters": [
+        19
+      ]
+    }
+  },
+  {
+    "code": "DS032",
+    "subject": "数据结构",
+    "knowledgePoint": "逆序对",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 DS032】序列[4,1,3,2]中逆序对有多少个？",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "4"
+    ],
+    "answer": "D",
+    "analysis": "分别为(4,1)、(4,3)、(4,2)、(3,2)。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS032",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "inversions",
+      "parameters": [
+        4,
+        1,
+        3,
+        2
+      ]
+    }
+  },
+  {
+    "code": "DS033",
+    "subject": "数据结构",
+    "knowledgePoint": "哈夫曼树",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 DS033】权值2、3、7、9构成哈夫曼树，其带权路径长度是多少？",
+    "options": [
+      "38",
+      "39",
+      "40",
+      "41"
+    ],
+    "answer": "A",
+    "analysis": "合并2+3=5、5+7=12、9+12=21；代价5+12+21=38。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS033",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "huffman",
+      "parameters": [
+        2,
+        3,
+        7,
+        9
+      ]
+    }
+  },
+  {
+    "code": "DS034",
+    "subject": "数据结构",
+    "knowledgePoint": "哈夫曼树",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 DS034】权值1、4、6、8构成哈夫曼树，其带权路径长度是多少？",
+    "options": [
+      "38",
+      "35",
+      "36",
+      "37"
+    ],
+    "answer": "B",
+    "analysis": "合并代价依次5、11、19，总和35。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS034",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "huffman",
+      "parameters": [
+        1,
+        4,
+        6,
+        8
+      ]
+    }
+  },
+  {
+    "code": "DS035",
+    "subject": "数据结构",
+    "knowledgePoint": "最短路径",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 DS035】有向边0→1权2、0→2权8、1→2权3、1→3权9、2→3权1，0到3最短距离是多少？",
+    "options": [
+      "8",
+      "9",
+      "6",
+      "7"
+    ],
+    "answer": "C",
+    "analysis": "路径0→1→2→3的权值2+3+1=6。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS035",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "shortest",
+      "parameters": [
+        4,
+        [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            2,
+            8
+          ],
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            1,
+            3,
+            9
+          ],
+          [
+            2,
+            3,
+            1
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "code": "DS036",
+    "subject": "数据结构",
+    "knowledgePoint": "折半查找",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 DS036】对含63个元素的有序数组做经典折半查找，查找成功的最坏比较次数是多少？",
+    "options": [
+      "7",
+      "8",
+      "9",
+      "6"
+    ],
+    "answer": "D",
+    "analysis": "最多检查6层；2的6次方减1为63。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS036",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "binary_search",
+      "parameters": [
+        63
+      ]
+    }
+  },
+  {
+    "code": "DS037",
+    "subject": "数据结构",
+    "knowledgePoint": "图",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 DS037】含9个顶点的无向完全简单图，其所有顶点度数之和是多少？",
+    "options": [
+      "72",
+      "73",
+      "74",
+      "75"
+    ],
+    "answer": "A",
+    "analysis": "每个顶点度数8，总度数9乘8，也等于两倍边数。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS037",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        9,
+        8
+      ]
+    }
+  },
+  {
+    "code": "DS038",
+    "subject": "数据结构",
+    "knowledgePoint": "排序",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 DS038】对8个元素进行自底向上二路归并，初始段长1，到段长8需几轮归并？",
+    "options": [
+      "6",
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": "B",
+    "analysis": "段长依次2、4、8，共3轮。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS038",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        3
+      ]
+    }
+  },
+  {
+    "code": "DS039",
+    "subject": "数据结构",
+    "knowledgePoint": "树与图",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 DS039】一片森林有23个顶点、5棵树，边数是多少？",
+    "options": [
+      "20",
+      "21",
+      "18",
+      "19"
+    ],
+    "answer": "C",
+    "analysis": "每棵树边数为顶点数减1，汇总为23减5。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS039",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        23,
+        5
+      ]
+    }
+  },
+  {
+    "code": "DS040",
+    "subject": "数据结构",
+    "knowledgePoint": "哈夫曼树",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 DS040】权值3、4、5、12构成哈夫曼树，其带权路径长度是多少？",
+    "options": [
+      "44",
+      "45",
+      "46",
+      "43"
+    ],
+    "answer": "D",
+    "analysis": "合并代价7、12、24，总和43。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DS040",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "huffman",
+      "parameters": [
+        3,
+        4,
+        5,
+        12
+      ]
+    }
+  },
+  {
+    "code": "OS001",
+    "subject": "操作系统",
+    "knowledgePoint": "进程与线程",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS001】操作系统为运行中程序维护进程状态等信息的典型结构是？",
+    "options": [
+      "进程控制块PCB",
+      "页内偏移",
+      "以太网帧",
+      "函数实参列表"
+    ],
+    "answer": "A",
+    "analysis": "PCB保存调度、资源与执行上下文等管理信息。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS001",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS002",
+    "subject": "操作系统",
+    "knowledgePoint": "进程状态",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS002】进程因等待尚未完成的磁盘I/O而无法运行，通常进入？",
+    "options": [
+      "内核编译态",
+      "阻塞态",
+      "运行态",
+      "永久终止态"
+    ],
+    "answer": "B",
+    "analysis": "等待事件而非等待CPU的进程处于阻塞状态。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS002",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS003",
+    "subject": "操作系统",
+    "knowledgePoint": "进程与线程",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS003】同一进程内的多个线程通常共享什么？",
+    "options": [
+      "各自调用栈全部内容",
+      "所有CPU寄存器的瞬时值",
+      "进程地址空间",
+      "各自程序计数器的当前值"
+    ],
+    "answer": "C",
+    "analysis": "线程有独立栈和寄存器上下文，通常共享进程资源。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS003",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS004",
+    "subject": "操作系统",
+    "knowledgePoint": "系统调用",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS004】用户程序请求操作系统受控服务的典型入口是？",
+    "options": [
+      "修改中断向量表",
+      "直接改页表基址寄存器",
+      "任意写内核地址",
+      "系统调用"
+    ],
+    "answer": "D",
+    "analysis": "系统调用经受控入口进入内核并进行参数和权限检查。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS004",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS005",
+    "subject": "操作系统",
+    "knowledgePoint": "调度",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS005】时间片轮转调度主要通过什么机制切换运行进程？",
+    "options": [
+      "时间片到期触发调度",
+      "按文件名排序",
+      "只允许一个进程存在",
+      "等待所有进程结束"
+    ],
+    "answer": "A",
+    "analysis": "时钟中断支持时间片用尽后的抢占。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS005",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS006",
+    "subject": "操作系统",
+    "knowledgePoint": "内存管理",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS006】固定大小分页系统中，逻辑地址通常分为？",
+    "options": [
+      "用户号和密码",
+      "页号和页内偏移",
+      "柱面号和磁头号",
+      "端口号和协议号"
+    ],
+    "answer": "B",
+    "analysis": "页号经映射得到页框号，偏移在转换中保留。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS006",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS007",
+    "subject": "操作系统",
+    "knowledgePoint": "虚拟内存",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS007】请求页尚不在物理内存且访问合法时，通常触发？",
+    "options": [
+      "网络重传",
+      "立即编译所有程序",
+      "缺页异常",
+      "除零异常"
+    ],
+    "answer": "C",
+    "analysis": "系统处理缺页，调入页面后重试相应访问。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS007",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS008",
+    "subject": "操作系统",
+    "knowledgePoint": "文件系统",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS008】Unix类系统中，文件名到inode的关联通常存放于？",
+    "options": [
+      "CPU指令寄存器",
+      "TLB项",
+      "TCP首部",
+      "目录项"
+    ],
+    "answer": "D",
+    "analysis": "目录项记录文件名与对应inode标识的联系。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS008",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS009",
+    "subject": "操作系统",
+    "knowledgePoint": "设备管理",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS009】DMA传输大量数据时，典型的数据搬运路径是？",
+    "options": [
+      "设备与主存之间",
+      "每字节都必须先进入用户程序栈",
+      "只能在两个CPU寄存器间",
+      "必须经过DNS服务器"
+    ],
+    "answer": "A",
+    "analysis": "CPU建立传输后由DMA控制器搬运，结束再通知CPU。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS009",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS010",
+    "subject": "操作系统",
+    "knowledgePoint": "同步互斥",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS010】保护共享计数器的读改写操作时，最直接需要保证？",
+    "options": [
+      "禁止创建任何线程",
+      "临界区互斥",
+      "所有文件只读",
+      "关闭所有网络设备"
+    ],
+    "answer": "B",
+    "analysis": "并发读改写可能丢失更新，需互斥保护。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS010",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS011",
+    "subject": "操作系统",
+    "knowledgePoint": "死锁",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS011】死锁必要条件之一的循环等待指什么？",
+    "options": [
+      "每个进程都无限循环执行算术",
+      "内存地址必须连续",
+      "存在进程资源等待环",
+      "进程一定按同一顺序退出"
+    ],
+    "answer": "C",
+    "analysis": "等待环中每个进程等待下一进程占有的资源。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS011",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS012",
+    "subject": "操作系统",
+    "knowledgePoint": "信号量",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS012】计数信号量初值表示3个同类可用资源时，初值应为？",
+    "options": [
+      "0",
+      "1",
+      "负3",
+      "3"
+    ],
+    "answer": "D",
+    "analysis": "资源信号量可用来表示同类资源当前可用数量。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS012",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS013",
+    "subject": "操作系统",
+    "knowledgePoint": "调度",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS013】非抢占SJF的核心选择依据是？",
+    "options": [
+      "已就绪作业预计CPU运行时间最短",
+      "用户名最短",
+      "总选最新到达作业",
+      "总选内存占用最大者"
+    ],
+    "answer": "A",
+    "analysis": "SJF基于估计运行时间选择，不代表实际运行时间总可事先精确知道。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS013",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS014",
+    "subject": "操作系统",
+    "knowledgePoint": "内存碎片",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS014】仅采用固定大小分页分配时，典型的空间浪费主要是？",
+    "options": [
+      "所有空闲页框不可复用",
+      "最后一页的内部碎片",
+      "每两个页框间必有外部碎片",
+      "每个页面都完全空闲"
+    ],
+    "answer": "B",
+    "analysis": "按整页分配可能造成末页未使用空间。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS014",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS015",
+    "subject": "操作系统",
+    "knowledgePoint": "页面置换",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS015】FIFO页面置换可能出现什么现象？",
+    "options": [
+      "总达到理论最少缺页",
+      "页框越多缺页必严格减少",
+      "增加页框数反而增加缺页",
+      "所有访问都不缺页"
+    ],
+    "answer": "C",
+    "analysis": "FIFO存在Belady异常，不能保证缺页数对页框数单调。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS015",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS016",
+    "subject": "操作系统",
+    "knowledgePoint": "内存保护",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS016】TLB的主要用途是？",
+    "options": [
+      "长期保存全部文件正文",
+      "替代进程调度器",
+      "缓存所有网络报文",
+      "缓存地址转换信息"
+    ],
+    "answer": "D",
+    "analysis": "TLB命中可避免相应页表访问，但不能替代所有内存访问。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS016",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS017",
+    "subject": "操作系统",
+    "knowledgePoint": "死锁避免",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS017】银行家算法批准资源请求前主要检查？",
+    "options": [
+      "试分配后的状态是否安全",
+      "请求进程是否最新创建",
+      "磁盘是否为空",
+      "所有资源是否都已分配"
+    ],
+    "answer": "A",
+    "analysis": "安全状态存在可让全部进程依次完成的资源分配序列。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS017",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS018",
+    "subject": "操作系统",
+    "knowledgePoint": "文件分配",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS018】相较连续分配，索引分配便于什么？",
+    "options": [
+      "取消磁盘访问",
+      "文件扩展和按块定位",
+      "保证文件始终物理连续",
+      "完全不保存块地址"
+    ],
+    "answer": "B",
+    "analysis": "索引记录数据块地址，文件不必占连续物理块。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS018",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS019",
+    "subject": "操作系统",
+    "knowledgePoint": "并发",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS019】自旋锁等待时的主要行为是？",
+    "options": [
+      "把所有共享内存清零",
+      "必须进行磁盘格式化",
+      "循环检查锁状态并消耗CPU",
+      "立即永远退出"
+    ],
+    "answer": "C",
+    "analysis": "短临界区中自旋可避免睡眠唤醒开销，但长等待会浪费CPU。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS019",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS020",
+    "subject": "操作系统",
+    "knowledgePoint": "虚拟内存",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS020】进程工作集超过可用页框并频繁换页，可能导致？",
+    "options": [
+      "TCP拥塞窗口扩大",
+      "死代码消除",
+      "CPU主频自动变为零",
+      "抖动"
+    ],
+    "answer": "D",
+    "analysis": "缺页和换页占据大量时间，实际执行效率下降。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS020",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "OS021",
+    "subject": "操作系统",
+    "knowledgePoint": "分页",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS021】页大小4096字节，逻辑地址8199对应的页号是多少？",
+    "options": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": "A",
+    "analysis": "8199=2乘4096加7。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS021",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        2
+      ]
+    }
+  },
+  {
+    "code": "OS022",
+    "subject": "操作系统",
+    "knowledgePoint": "分页",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS022】页大小4096字节，逻辑地址8199的页内偏移是多少？",
+    "options": [
+      "10",
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": "B",
+    "analysis": "偏移为8199模4096，等于7。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS022",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        8199,
+        8192
+      ]
+    }
+  },
+  {
+    "code": "OS023",
+    "subject": "操作系统",
+    "knowledgePoint": "内存分配",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS023】进程需10000字节，页大小4096字节，至少需几页？",
+    "options": [
+      "5",
+      "6",
+      "3",
+      "4"
+    ],
+    "answer": "C",
+    "analysis": "页数取10000除4096的上取整。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS023",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "ceil_div",
+      "parameters": [
+        10000,
+        4096
+      ]
+    }
+  },
+  {
+    "code": "OS024",
+    "subject": "操作系统",
+    "knowledgePoint": "信号量",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS024】计数资源信号量初值5，连续成功申请3次且无人归还，剩余资源数是多少？",
+    "options": [
+      "3",
+      "4",
+      "5",
+      "2"
+    ],
+    "answer": "D",
+    "analysis": "可用资源每次申请减1。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS024",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        5,
+        3
+      ]
+    }
+  },
+  {
+    "code": "OS025",
+    "subject": "操作系统",
+    "knowledgePoint": "调度",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS025】作业到达时刻2、完成时刻11，周转时间是多少？",
+    "options": [
+      "9",
+      "10",
+      "11",
+      "12"
+    ],
+    "answer": "A",
+    "analysis": "周转时间等于完成减到达。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS025",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        11,
+        2
+      ]
+    }
+  },
+  {
+    "code": "OS026",
+    "subject": "操作系统",
+    "knowledgePoint": "文件系统",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 OS026】文件长度9000字节，块大小1024字节，无稀疏块，数据至少占几块？",
+    "options": [
+      "12",
+      "9",
+      "10",
+      "11"
+    ],
+    "answer": "B",
+    "analysis": "按块分配，取上整为9块。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS026",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "ceil_div",
+      "parameters": [
+        9000,
+        1024
+      ]
+    }
+  },
+  {
+    "code": "OS027",
+    "subject": "操作系统",
+    "knowledgePoint": "地址转换",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS027】页大小1024字节，目标页映射到页框7，页内偏移25，物理地址是多少？",
+    "options": [
+      "7195",
+      "7196",
+      "7193",
+      "7194"
+    ],
+    "answer": "C",
+    "analysis": "物理地址为7乘1024加25。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS027",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "page_address",
+      "parameters": [
+        7,
+        1024,
+        25
+      ]
+    }
+  },
+  {
+    "code": "OS028",
+    "subject": "操作系统",
+    "knowledgePoint": "调度",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS028】3个进程同时到达，FCFS按CPU时长3、5、2依次执行，总等待时间是多少？",
+    "options": [
+      "12",
+      "13",
+      "14",
+      "11"
+    ],
+    "answer": "D",
+    "analysis": "等待时间分别0、3、8，总和11。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS028",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "fcfs_wait",
+      "parameters": [
+        3,
+        5,
+        2
+      ]
+    }
+  },
+  {
+    "code": "OS029",
+    "subject": "操作系统",
+    "knowledgePoint": "调度",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS029】3个进程同时到达，非抢占SJF，CPU时长3、5、2，总周转时间是多少？",
+    "options": [
+      "17",
+      "18",
+      "19",
+      "20"
+    ],
+    "answer": "A",
+    "analysis": "执行顺序2、3、5，完成时刻2、5、10，总和17。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS029",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sjf_turn",
+      "parameters": [
+        3,
+        5,
+        2
+      ]
+    }
+  },
+  {
+    "code": "OS030",
+    "subject": "操作系统",
+    "knowledgePoint": "磁盘",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS030】磁盘转速6000转/分，理想平均旋转等待时间为多少毫秒？",
+    "options": [
+      "8",
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": "B",
+    "analysis": "一圈10毫秒，平均等半圈为5毫秒。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS030",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "div",
+      "parameters": [
+        60000,
+        12000
+      ]
+    }
+  },
+  {
+    "code": "OS031",
+    "subject": "操作系统",
+    "knowledgePoint": "内存分配",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS031】进程需10000字节，分配3个4096字节页框，内部碎片多少字节？",
+    "options": [
+      "2290",
+      "2291",
+      "2288",
+      "2289"
+    ],
+    "answer": "C",
+    "analysis": "已分配12288字节减实际使用10000字节。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS031",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        12288,
+        10000
+      ]
+    }
+  },
+  {
+    "code": "OS032",
+    "subject": "操作系统",
+    "knowledgePoint": "页表",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 OS032】32位字节地址、4KiB页、每页表项4字节，单级页表大小多少KiB？",
+    "options": [
+      "4097",
+      "4098",
+      "4099",
+      "4096"
+    ],
+    "answer": "D",
+    "analysis": "虚页数2的20次方，乘4字节得4MiB，即4096KiB。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS032",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "power",
+      "parameters": [
+        2,
+        12
+      ]
+    }
+  },
+  {
+    "code": "OS033",
+    "subject": "操作系统",
+    "knowledgePoint": "页面置换",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 OS033】空内存、3个页框，引用串1,2,3,1,4,2,5采用FIFO，缺页几次？",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "answer": "A",
+    "analysis": "前三次缺页；1命中；4换出1；2命中；5换出2，共5次。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS033",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "fifo",
+      "parameters": [
+        [
+          1,
+          2,
+          3,
+          1,
+          4,
+          2,
+          5
+        ],
+        3
+      ]
+    }
+  },
+  {
+    "code": "OS034",
+    "subject": "操作系统",
+    "knowledgePoint": "页面置换",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 OS034】空内存、3个页框，引用串1,2,3,1,4,2,5采用LRU，缺页几次？",
+    "options": [
+      "9",
+      "6",
+      "7",
+      "8"
+    ],
+    "answer": "B",
+    "analysis": "前三次缺页；1命中后4淘汰2，接着2与5均缺页，共6次。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS034",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "lru",
+      "parameters": [
+        [
+          1,
+          2,
+          3,
+          1,
+          4,
+          2,
+          5
+        ],
+        3
+      ]
+    }
+  },
+  {
+    "code": "OS035",
+    "subject": "操作系统",
+    "knowledgePoint": "有效访存时间",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 OS035】TLB命中率0.8，命中总耗时100ns，未命中总耗时200ns，平均耗时多少ns？",
+    "options": [
+      "122",
+      "123",
+      "120",
+      "121"
+    ],
+    "answer": "C",
+    "analysis": "0.8乘100加0.2乘200等于120。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS035",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "eat",
+      "parameters": [
+        0.8,
+        100,
+        200
+      ]
+    }
+  },
+  {
+    "code": "OS036",
+    "subject": "操作系统",
+    "knowledgePoint": "页面置换",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 OS036】空内存、3个页框，引用串1,2,3,4,1,2,5,1,2,3,4,5采用FIFO，缺页几次？",
+    "options": [
+      "10",
+      "11",
+      "12",
+      "9"
+    ],
+    "answer": "D",
+    "analysis": "按队列逐次淘汰最早装入页面，可得9次缺页。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS036",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "fifo",
+      "parameters": [
+        [
+          1,
+          2,
+          3,
+          4,
+          1,
+          2,
+          5,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        3
+      ]
+    }
+  },
+  {
+    "code": "OS037",
+    "subject": "操作系统",
+    "knowledgePoint": "页面置换",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 OS037】同一引用串1,2,3,4,1,2,5,1,2,3,4,5从空内存开始用FIFO及4个页框，缺页几次？",
+    "options": [
+      "10",
+      "11",
+      "12",
+      "13"
+    ],
+    "answer": "A",
+    "analysis": "FIFO在此产生Belady异常，4页框缺页10次。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS037",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "fifo",
+      "parameters": [
+        [
+          1,
+          2,
+          3,
+          4,
+          1,
+          2,
+          5,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        4
+      ]
+    }
+  },
+  {
+    "code": "OS038",
+    "subject": "操作系统",
+    "knowledgePoint": "索引分配",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 OS038】一个1024字节索引块，每地址项4字节，最多可指向多少个数据块？",
+    "options": [
+      "259",
+      "256",
+      "257",
+      "258"
+    ],
+    "answer": "B",
+    "analysis": "索引块容量除以单项大小为256。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS038",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "div",
+      "parameters": [
+        1024,
+        4
+      ]
+    }
+  },
+  {
+    "code": "OS039",
+    "subject": "操作系统",
+    "knowledgePoint": "调度",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 OS039】进程CPU需求为10、量子3，忽略I/O与切换开销，至少需获得几次时间片？",
+    "options": [
+      "6",
+      "7",
+      "4",
+      "5"
+    ],
+    "answer": "C",
+    "analysis": "3+3+3+1需要4次调度执行。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS039",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "ceil_div",
+      "parameters": [
+        10,
+        3
+      ]
+    }
+  },
+  {
+    "code": "OS040",
+    "subject": "操作系统",
+    "knowledgePoint": "文件系统",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 OS040】文件由256个数据块组成，每块4KiB，不计索引块，文件数据容量是多少KiB？",
+    "options": [
+      "1025",
+      "1026",
+      "1027",
+      "1024"
+    ],
+    "answer": "D",
+    "analysis": "256乘4等于1024KiB。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OS040",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        256,
+        4
+      ]
+    }
+  },
+  {
+    "code": "CO001",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO001】二进制数各位的权值通常按什么规则变化？",
+    "options": [
+      "相邻整数位权相差2倍",
+      "相邻位权相差10倍",
+      "所有位权均为1",
+      "按质数递增"
+    ],
+    "answer": "A",
+    "analysis": "二进制采用以2为基数的位权表示。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO001",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO002",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO002】采用8位补码表示有符号整数，其最小值是？",
+    "options": [
+      "-255",
+      "-128",
+      "-127",
+      "0"
+    ],
+    "answer": "B",
+    "analysis": "8位补码范围为负2的7次方至2的7次方减1。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO002",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO003",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "存储层次",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO003】通常访问延迟最小的存储部件是？",
+    "options": [
+      "远程对象存储",
+      "光盘",
+      "CPU寄存器",
+      "机械硬盘"
+    ],
+    "answer": "C",
+    "analysis": "寄存器位于CPU内部，适合保存立即使用的操作数。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO003",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO004",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "指令系统",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO004】程序计数器PC通常用于保存什么？",
+    "options": [
+      "当前进程全部文件",
+      "所有主存数据",
+      "网卡物理地址",
+      "后续取指所需的指令地址"
+    ],
+    "answer": "D",
+    "analysis": "PC参与确定下一次取指位置，分支等指令可以改变它。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO004",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO005",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "CPU数据通路",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO005】算术逻辑运算的主要执行部件是？",
+    "options": [
+      "ALU",
+      "TLB",
+      "磁盘控制器",
+      "以太网交换机"
+    ],
+    "answer": "A",
+    "analysis": "ALU执行加减、位逻辑等运算。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO005",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO006",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "存储器",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO006】一般DRAM相对SRAM的典型特点是？",
+    "options": [
+      "只能读不能写",
+      "需要周期性刷新",
+      "不需要任何供电",
+      "总比寄存器更快"
+    ],
+    "answer": "B",
+    "analysis": "DRAM电容电荷会泄漏，需要刷新维持信息。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO006",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO007",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "字节序",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO007】小端序存储多字节整数时，最低地址存放什么？",
+    "options": [
+      "必定存符号位的独立字节",
+      "必定存零",
+      "最低有效字节",
+      "最高有效字节"
+    ],
+    "answer": "C",
+    "analysis": "小端按有效性从低到高排列字节。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO007",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO008",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "总线",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO008】用于选择被访问存储单元位置的是？",
+    "options": [
+      "中断返回地址栈",
+      "声卡缓冲",
+      "源代码注释",
+      "地址总线"
+    ],
+    "answer": "D",
+    "analysis": "地址信息决定访问位置，数据总线承载传输数据。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO008",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO009",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "指令系统",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO009】立即寻址中操作数通常位于？",
+    "options": [
+      "指令编码内",
+      "必须位于磁盘首扇区",
+      "只能位于远程主机",
+      "页表项的权限位"
+    ],
+    "answer": "A",
+    "analysis": "立即数作为指令的一部分提供。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO009",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO010",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "中断",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO010】保存被中断程序的必要上下文主要为了？",
+    "options": [
+      "强迫程序从第一条指令重启",
+      "处理完成后恢复执行",
+      "删除所有历史文件",
+      "保证没有任何异常"
+    ],
+    "answer": "B",
+    "analysis": "恢复执行需要保留返回位置及必要状态。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO010",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO011",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "Cache",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO011】时间局部性指什么？",
+    "options": [
+      "只访问最高地址",
+      "相邻地址永远不访问",
+      "近期访问内容可能很快再次访问",
+      "所有地址访问概率恒等"
+    ],
+    "answer": "C",
+    "analysis": "缓存可利用重复访问降低平均访存时间。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO011",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO012",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "Cache",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO012】直接映射Cache中每个主存块可映射到几个Cache行？",
+    "options": [
+      "任意多个同时占用",
+      "必须为2",
+      "等于主存所有块数",
+      "1"
+    ],
+    "answer": "D",
+    "analysis": "直接映射通过固定索引确定唯一目标行。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO012",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO013",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "流水线",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO013】理想流水线在充满后主要改善什么？",
+    "options": [
+      "连续指令的吞吐率",
+      "保证每条指令延迟恒为零",
+      "完全消除所有数据相关",
+      "使主存容量无限"
+    ],
+    "answer": "A",
+    "analysis": "多条指令的不同阶段重叠执行提高单位时间完成量。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO013",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO014",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据相关",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO014】后一条指令需要前一条尚未产生的结果，属于？",
+    "options": [
+      "完全无关",
+      "RAW读后写相关",
+      "WAW写后写相关",
+      "RAR读后读相关"
+    ],
+    "answer": "B",
+    "analysis": "消费者读到生产者的新值前必须解决数据相关。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO014",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO015",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "浮点数",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO015】IEEE 754单精度浮点数的阶码字段宽度是？",
+    "options": [
+      "10位",
+      "16位",
+      "8位",
+      "7位"
+    ],
+    "answer": "C",
+    "analysis": "单精度共32位，其中符号1位、阶码8位、尾数字段23位。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO015",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO016",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO016】判断补码加法有符号溢出的常用依据是？",
+    "options": [
+      "任何最高位进位都表示有符号溢出",
+      "结果为零必溢出",
+      "异号相加必溢出",
+      "同号相加得到异号结果"
+    ],
+    "answer": "D",
+    "analysis": "在固定字长内，同号和超出表示范围时符号会反转。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO016",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO017",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "I/O",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO017】存储器映射I/O的主要特征是？",
+    "options": [
+      "设备寄存器占用统一地址空间",
+      "设备完全不需要地址",
+      "所有设备只能用磁盘指令",
+      "取消CPU访存指令"
+    ],
+    "answer": "A",
+    "analysis": "CPU可用相应访存指令访问映射的设备寄存器。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO017",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO018",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "微程序控制",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO018】微程序控制器中的微指令主要用于？",
+    "options": [
+      "管理DNS区域",
+      "产生数据通路控制信号",
+      "替代操作系统全部调度",
+      "保存全部用户图像"
+    ],
+    "answer": "B",
+    "analysis": "微指令编码控制动作，组织机器指令的执行步骤。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO018",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO019",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "指令系统",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO019】相对寻址计算有效地址通常需要什么？",
+    "options": [
+      "对立即数做DNS解析",
+      "固定取地址零",
+      "基准PC值加有符号位移",
+      "只取硬盘转速"
+    ],
+    "answer": "C",
+    "analysis": "具体PC基准由指令集约定，位移形成相对目标。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO019",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO020",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "性能",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO020】其他条件不变时，CPU执行时间通常可表示为？",
+    "options": [
+      "频率乘内存容量",
+      "指令数除以磁盘容量",
+      "CPI除以指令数再乘频率",
+      "指令数乘平均CPI除以时钟频率"
+    ],
+    "answer": "D",
+    "analysis": "执行周期数等于指令数乘平均CPI，时间为周期数除以频率。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO020",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CO021",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO021】二进制101101对应十进制多少？",
+    "options": [
+      "45",
+      "46",
+      "47",
+      "48"
+    ],
+    "answer": "A",
+    "analysis": "32+8+4+1=45。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO021",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "bits",
+      "parameters": [
+        "101101",
+        2
+      ]
+    }
+  },
+  {
+    "code": "CO022",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO022】十六进制2F对应十进制多少？",
+    "options": [
+      "50",
+      "47",
+      "48",
+      "49"
+    ],
+    "answer": "B",
+    "analysis": "2乘16加15等于47。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO022",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "bits",
+      "parameters": [
+        "2F",
+        16
+      ]
+    }
+  },
+  {
+    "code": "CO023",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "存储容量",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO023】按字节编址且有16根地址线，最大可寻址多少字节？",
+    "options": [
+      "65538",
+      "65539",
+      "65536",
+      "65537"
+    ],
+    "answer": "C",
+    "analysis": "16位地址共有2的16次方种地址。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO023",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "power",
+      "parameters": [
+        2,
+        16
+      ]
+    }
+  },
+  {
+    "code": "CO024",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO024】8位无符号整数最大值是多少？",
+    "options": [
+      "256",
+      "257",
+      "258",
+      "255"
+    ],
+    "answer": "D",
+    "analysis": "全1编码为2的8次方减1。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO024",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        256,
+        1
+      ]
+    }
+  },
+  {
+    "code": "CO025",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "性能",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO025】频率2GHz对应时钟周期多少纳秒？",
+    "options": [
+      "0.5",
+      "1.5",
+      "2.5",
+      "3.5"
+    ],
+    "answer": "A",
+    "analysis": "频率单位GHz的倒数给出周期单位ns。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO025",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "div",
+      "parameters": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "code": "CO026",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "存储容量",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CO026】64个32位字共多少字节？",
+    "options": [
+      "259",
+      "256",
+      "257",
+      "258"
+    ],
+    "answer": "B",
+    "analysis": "每字4字节，共64乘4。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO026",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        64,
+        4
+      ]
+    }
+  },
+  {
+    "code": "CO027",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "补码",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO027】8位补码11110110表示的十进制整数是多少？",
+    "options": [
+      "-8",
+      "-7",
+      "-10",
+      "-9"
+    ],
+    "answer": "C",
+    "analysis": "最高位为1，用无符号值246减256得到负10。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO027",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "signed",
+      "parameters": [
+        246,
+        8
+      ]
+    }
+  },
+  {
+    "code": "CO028",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "Cache",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO028】32位字节地址，直接映射Cache有64行、每行16字节，标记字段有几位？",
+    "options": [
+      "23",
+      "24",
+      "25",
+      "22"
+    ],
+    "answer": "D",
+    "analysis": "行内偏移4位、索引6位，标记32减10为22位。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO028",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        32,
+        10
+      ]
+    }
+  },
+  {
+    "code": "CO029",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "Cache",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO029】Cache数据区4KiB、块大小32字节，共有多少行？",
+    "options": [
+      "128",
+      "129",
+      "130",
+      "131"
+    ],
+    "answer": "A",
+    "analysis": "数据容量除以块大小得到128行。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO029",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "div",
+      "parameters": [
+        4096,
+        32
+      ]
+    }
+  },
+  {
+    "code": "CO030",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "性能",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO030】执行100万条指令，平均CPI=2，频率1GHz，耗时多少毫秒？",
+    "options": [
+      "5",
+      "2",
+      "3",
+      "4"
+    ],
+    "answer": "B",
+    "analysis": "200万周期除以每毫秒100万周期，得到2毫秒。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO030",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "div",
+      "parameters": [
+        2000000,
+        1000000
+      ]
+    }
+  },
+  {
+    "code": "CO031",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "总线",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO031】32位总线每周期传1次、频率100MHz，理论带宽多少MB/s（十进制）？",
+    "options": [
+      "402",
+      "403",
+      "400",
+      "401"
+    ],
+    "answer": "C",
+    "analysis": "每次4字节，每秒1亿次，得400MB/s。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO031",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        4,
+        100
+      ]
+    }
+  },
+  {
+    "code": "CO032",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "流水线",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CO032】5级理想等时流水线连续完成10条指令，需要几个周期？",
+    "options": [
+      "15",
+      "16",
+      "17",
+      "14"
+    ],
+    "answer": "D",
+    "analysis": "首次完成需5周期，此后每周期完成1条，合计5+10-1。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO032",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "pipeline",
+      "parameters": [
+        5,
+        10
+      ]
+    }
+  },
+  {
+    "code": "CO033",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "Amdahl定律",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CO033】原执行时间中50%部分加速到2倍，整体加速比是多少？",
+    "options": [
+      "1.333",
+      "2.333",
+      "3.333",
+      "4.333"
+    ],
+    "answer": "A",
+    "analysis": "新时间比例0.5+0.5/2=0.75，倒数约1.333。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO033",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "speedup",
+      "parameters": [
+        0.5,
+        2
+      ]
+    }
+  },
+  {
+    "code": "CO034",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "Cache",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CO034】Cache命中耗时2ns，未命中总耗时102ns，命中率0.95，平均访存时间多少ns？",
+    "options": [
+      "10",
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": "B",
+    "analysis": "0.95乘2加0.05乘102等于7。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO034",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "eat",
+      "parameters": [
+        0.95,
+        2,
+        102
+      ]
+    }
+  },
+  {
+    "code": "CO035",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "性能",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CO035】程序两类指令各占一半，CPI分别1和3，平均CPI是多少？",
+    "options": [
+      "4",
+      "5",
+      "2",
+      "3"
+    ],
+    "answer": "C",
+    "analysis": "按动态指令比例加权：0.5乘1加0.5乘3。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO035",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "eat",
+      "parameters": [
+        0.5,
+        1,
+        3
+      ]
+    }
+  },
+  {
+    "code": "CO036",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "流水线",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CO036】6级理想等时流水线完成20条指令需几个周期？",
+    "options": [
+      "26",
+      "27",
+      "28",
+      "25"
+    ],
+    "answer": "D",
+    "analysis": "总周期为级数加指令数减1。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO036",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "pipeline",
+      "parameters": [
+        6,
+        20
+      ]
+    }
+  },
+  {
+    "code": "CO037",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "Amdahl定律",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CO037】原执行时间中80%部分加速到4倍，整体加速比是多少？",
+    "options": [
+      "2.5",
+      "3.5",
+      "4.5",
+      "5.5"
+    ],
+    "answer": "A",
+    "analysis": "新时间比例0.2+0.8/4=0.4，倒数2.5。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO037",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "speedup",
+      "parameters": [
+        0.8,
+        4
+      ]
+    }
+  },
+  {
+    "code": "CO038",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "Cache地址",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CO038】32位字节地址，全相联Cache块大小64字节，不计状态位，标记字段几位？",
+    "options": [
+      "29",
+      "26",
+      "27",
+      "28"
+    ],
+    "answer": "B",
+    "analysis": "全相联无行索引，块内偏移6位，剩26位标记。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO038",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        32,
+        6
+      ]
+    }
+  },
+  {
+    "code": "CO039",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "存储器扩展",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CO039】构建64K×8位存储器，使用16K×4位芯片，需要几片？",
+    "options": [
+      "10",
+      "11",
+      "8",
+      "9"
+    ],
+    "answer": "C",
+    "analysis": "字扩展4倍、位扩展2倍，总共8片。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO039",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        4,
+        2
+      ]
+    }
+  },
+  {
+    "code": "CO040",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "CPU性能",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CO040】某程序10的8次方条指令、平均CPI=1.5、频率3GHz，执行时间多少毫秒？",
+    "options": [
+      "51",
+      "52",
+      "53",
+      "50"
+    ],
+    "answer": "D",
+    "analysis": "共1.5亿周期，每毫秒300万周期，耗时50毫秒。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CO040",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "div",
+      "parameters": [
+        150000000,
+        3000000
+      ]
+    }
+  },
+  {
+    "code": "CN001",
+    "subject": "计算机网络",
+    "knowledgePoint": "网络分层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN001】IP协议主要属于TCP/IP模型的哪一层？",
+    "options": [
+      "网际层",
+      "应用层",
+      "物理层",
+      "用户界面层"
+    ],
+    "answer": "A",
+    "analysis": "IP负责跨网络分组寻址与转发。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN001",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN002",
+    "subject": "计算机网络",
+    "knowledgePoint": "运输层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN002】TCP向应用提供的典型服务是？",
+    "options": [
+      "自动共享文件目录",
+      "可靠有序字节流",
+      "保证固定时延的报文流",
+      "不保序的无连接服务"
+    ],
+    "answer": "B",
+    "analysis": "TCP不保留应用消息边界，提供可靠有序字节流。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN002",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN003",
+    "subject": "计算机网络",
+    "knowledgePoint": "运输层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN003】UDP相较TCP的典型特征是？",
+    "options": [
+      "必定按序到达",
+      "自带无限次重传",
+      "无连接且不承诺可靠交付",
+      "必须三次握手"
+    ],
+    "answer": "C",
+    "analysis": "UDP提供数据报服务，可靠性可由应用另行设计。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN003",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN004",
+    "subject": "计算机网络",
+    "knowledgePoint": "应用层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN004】DNS的主要用途是？",
+    "options": [
+      "分配CPU时间片",
+      "替换所有路由协议",
+      "加密所有硬盘",
+      "名称解析"
+    ],
+    "answer": "D",
+    "analysis": "DNS可将域名解析为相关资源记录，包括IP地址。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN004",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN005",
+    "subject": "计算机网络",
+    "knowledgePoint": "数据链路层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN005】经典ARP在IPv4局域网中主要解析什么？",
+    "options": [
+      "IPv4地址对应的链路层地址",
+      "域名对应邮箱密码",
+      "TCP端口对应进程源码",
+      "文件路径对应磁盘柱面"
+    ],
+    "answer": "A",
+    "analysis": "ARP用于在本地链路发现目标IPv4地址对应的MAC地址。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN005",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN006",
+    "subject": "计算机网络",
+    "knowledgePoint": "网络层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN006】IPv4地址的基本长度是？",
+    "options": [
+      "128位",
+      "32位",
+      "16位",
+      "48位"
+    ],
+    "answer": "B",
+    "analysis": "IPv4地址由32位组成，IPv6地址则为128位。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN006",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN007",
+    "subject": "计算机网络",
+    "knowledgePoint": "数据链路层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN007】常见以太网MAC地址的长度是？",
+    "options": [
+      "32位",
+      "256位",
+      "48位",
+      "8位"
+    ],
+    "answer": "C",
+    "analysis": "常见以太网使用48位MAC地址，不应和IPv4地址混淆。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN007",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN008",
+    "subject": "计算机网络",
+    "knowledgePoint": "运输层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN008】运输层端口号主要用于区分？",
+    "options": [
+      "硬盘扇区",
+      "CPU物理核心",
+      "网线颜色",
+      "主机上的应用端点"
+    ],
+    "answer": "D",
+    "analysis": "地址标识主机或接口，端口进一步区分应用端点。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN008",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN009",
+    "subject": "计算机网络",
+    "knowledgePoint": "应用层",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN009】HTTPS通常通过什么机制保护HTTP传输？",
+    "options": [
+      "TLS",
+      "ARP",
+      "FIFO",
+      "PCB"
+    ],
+    "answer": "A",
+    "analysis": "TLS提供加密、完整性和对端认证等保护。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN009",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN010",
+    "subject": "计算机网络",
+    "knowledgePoint": "网络设备",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN010】通常根据目的IP前缀转发分组的设备是？",
+    "options": [
+      "内存条",
+      "路由器",
+      "纯物理集线器",
+      "键盘控制器"
+    ],
+    "answer": "B",
+    "analysis": "路由器按路由表和最长前缀匹配选择转发路径。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN010",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN011",
+    "subject": "计算机网络",
+    "knowledgePoint": "路由选择",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN011】存在多条匹配路由时，通常优先选择？",
+    "options": [
+      "表中字符数最少的项",
+      "总选择默认路由",
+      "前缀最长的匹配项",
+      "前缀最短的匹配项"
+    ],
+    "answer": "C",
+    "analysis": "更长前缀表示更具体的目的地址范围。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN011",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN012",
+    "subject": "计算机网络",
+    "knowledgePoint": "TCP序号",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN012】TCP确认号通常表示什么？",
+    "options": [
+      "已经收到的报文段个数",
+      "对方MAC地址",
+      "本机监听端口数量",
+      "期望收到的下一个字节序号"
+    ],
+    "answer": "D",
+    "analysis": "TCP按字节编号，累计确认号表明连续数据的下一期待序号。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN012",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN013",
+    "subject": "计算机网络",
+    "knowledgePoint": "TCP连接",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN013】TCP建立连接的标准过程通常需要？",
+    "options": [
+      "三次握手",
+      "一次DNS查询即完成",
+      "七次ARP广播",
+      "只发送FIN"
+    ],
+    "answer": "A",
+    "analysis": "SYN与确认协商初始序号并建立双向状态。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN013",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN014",
+    "subject": "计算机网络",
+    "knowledgePoint": "TCP拥塞控制",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN014】经典慢启动在无丢包且每段均被确认的理想条件下，窗口按RTT大致如何变化？",
+    "options": [
+      "立刻变为零",
+      "近似翻倍直到阈值限制",
+      "始终不变",
+      "每RTT减半"
+    ],
+    "answer": "B",
+    "analysis": "每次确认推动窗口增长，按轮次近似呈指数增加。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN014",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN015",
+    "subject": "计算机网络",
+    "knowledgePoint": "IP分片",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN015】IPv4分片偏移字段的计量单位是？",
+    "options": [
+      "1字节",
+      "1024字节",
+      "8字节",
+      "1位"
+    ],
+    "answer": "C",
+    "analysis": "除最后片外分片载荷需满足8字节对齐要求。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN015",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN016",
+    "subject": "计算机网络",
+    "knowledgePoint": "网络层",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN016】IPv4路由转发时TTL通常如何变化？",
+    "options": [
+      "每经一个路由器加1",
+      "在应用退出时才变化",
+      "始终等于TCP端口号",
+      "每经一个路由器减1"
+    ],
+    "answer": "D",
+    "analysis": "TTL限制分组在网络中的存活跳数，减到零时丢弃。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN016",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN017",
+    "subject": "计算机网络",
+    "knowledgePoint": "差错检测",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN017】CRC的主要作用是？",
+    "options": [
+      "检测传输差错",
+      "保证所有差错都能纠正",
+      "实现域名解析",
+      "代替所有加密算法"
+    ],
+    "answer": "A",
+    "analysis": "CRC基于多项式余数检测差错，不等同于通用纠错或认证。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN017",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN018",
+    "subject": "计算机网络",
+    "knowledgePoint": "数据链路层",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN018】全双工交换式以太网链路通常为何不需要CSMA/CD处理冲突？",
+    "options": [
+      "TCP自动禁用了所有重传",
+      "收发可同时进行且无共享介质争用",
+      "所有站点都必须轮流广播",
+      "以太网不再有帧"
+    ],
+    "answer": "B",
+    "analysis": "独享的全双工链路没有传统半双工共享介质冲突。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN018",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN019",
+    "subject": "计算机网络",
+    "knowledgePoint": "应用层",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN019】HTTP的无状态主要指什么？",
+    "options": [
+      "每个请求必须建立新的物理网线",
+      "无法使用Cookie",
+      "协议本身不要求为请求保留应用会话状态",
+      "服务器不能有数据库"
+    ],
+    "answer": "C",
+    "analysis": "Cookie和服务端会话可在无状态HTTP之上维护应用状态。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN019",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN020",
+    "subject": "计算机网络",
+    "knowledgePoint": "流量与拥塞",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN020】TCP发送窗口同时受接收窗口和拥塞窗口限制时，可发送上限通常取？",
+    "options": [
+      "两者的和",
+      "两者的乘积",
+      "两者的较大值",
+      "两者的较小值"
+    ],
+    "answer": "D",
+    "analysis": "接收端缓冲约束与网络拥塞约束都必须满足。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN020",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1
+  },
+  {
+    "code": "CN021",
+    "subject": "计算机网络",
+    "knowledgePoint": "IPv4子网",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN021】普通IPv4 /24子网，扣除网络和广播地址，可用主机地址数是多少？",
+    "options": [
+      "254",
+      "255",
+      "256",
+      "257"
+    ],
+    "answer": "A",
+    "analysis": "主机位8位，2的8次方减2。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN021",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "hosts",
+      "parameters": [
+        24
+      ]
+    }
+  },
+  {
+    "code": "CN022",
+    "subject": "计算机网络",
+    "knowledgePoint": "IPv4子网",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN022】普通IPv4 /26子网，扣除网络和广播地址，可用主机地址数是多少？",
+    "options": [
+      "65",
+      "62",
+      "63",
+      "64"
+    ],
+    "answer": "B",
+    "analysis": "主机位6位，共64个地址，扣除2个。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN022",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "hosts",
+      "parameters": [
+        26
+      ]
+    }
+  },
+  {
+    "code": "CN023",
+    "subject": "计算机网络",
+    "knowledgePoint": "传输时延",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN023】1000字节分组在1Mbps链路上的发送时延是多少毫秒？",
+    "options": [
+      "10",
+      "11",
+      "8",
+      "9"
+    ],
+    "answer": "C",
+    "analysis": "1000乘8比特除以每毫秒1000比特。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN023",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "serialization",
+      "parameters": [
+        1000,
+        1000
+      ]
+    }
+  },
+  {
+    "code": "CN024",
+    "subject": "计算机网络",
+    "knowledgePoint": "传播时延",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN024】链路长200km，传播速度200000km/s，传播时延多少毫秒？",
+    "options": [
+      "2",
+      "3",
+      "4",
+      "1"
+    ],
+    "answer": "D",
+    "analysis": "每毫秒传播200km，所需1毫秒。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN024",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "div",
+      "parameters": [
+        200,
+        200
+      ]
+    }
+  },
+  {
+    "code": "CN025",
+    "subject": "计算机网络",
+    "knowledgePoint": "UDP",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN025】UDP首部8字节、应用数据32字节，UDP总长度多少字节？",
+    "options": [
+      "40",
+      "41",
+      "42",
+      "43"
+    ],
+    "answer": "A",
+    "analysis": "首部与数据长度相加。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN025",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        8,
+        32
+      ]
+    }
+  },
+  {
+    "code": "CN026",
+    "subject": "计算机网络",
+    "knowledgePoint": "TCP序号",
+    "difficulty": "EASY",
+    "content": "【功能测试自编题 CN026】不含SYN/FIN的TCP段序号100、数据长度20，连续接收后期望确认号是多少？",
+    "options": [
+      "123",
+      "120",
+      "121",
+      "122"
+    ],
+    "answer": "B",
+    "analysis": "最后一个字节序号119，下一期待120。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN026",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        100,
+        20
+      ]
+    }
+  },
+  {
+    "code": "CN027",
+    "subject": "计算机网络",
+    "knowledgePoint": "IPv4子网",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN027】一个 /24地址块等分为 /27子网，共能分成几个？",
+    "options": [
+      "10",
+      "11",
+      "8",
+      "9"
+    ],
+    "answer": "C",
+    "analysis": "前缀增加3位，可区分2的3次方个子网。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN027",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "power",
+      "parameters": [
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "code": "CN028",
+    "subject": "计算机网络",
+    "knowledgePoint": "IPv4分片",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN028】某IPv4片的首数据字节位于原始数据偏移1480字节，分片偏移字段值是多少？",
+    "options": [
+      "186",
+      "187",
+      "188",
+      "185"
+    ],
+    "answer": "D",
+    "analysis": "字段以8字节为单位，1480除8得185。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN028",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "fragment_offset",
+      "parameters": [
+        1480
+      ]
+    }
+  },
+  {
+    "code": "CN029",
+    "subject": "计算机网络",
+    "knowledgePoint": "滑动窗口",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN029】接收窗口12000字节、拥塞窗口8000字节，尚无未确认数据，发送上限多少字节？",
+    "options": [
+      "8000",
+      "8001",
+      "8002",
+      "8003"
+    ],
+    "answer": "A",
+    "analysis": "两种窗口同时限制，取较小者8000。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN029",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sum",
+      "parameters": [
+        8000
+      ]
+    }
+  },
+  {
+    "code": "CN030",
+    "subject": "计算机网络",
+    "knowledgePoint": "带宽时延积",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN030】带宽10Mbps、RTT为20ms，带宽时延积是多少字节？",
+    "options": [
+      "25003",
+      "25000",
+      "25001",
+      "25002"
+    ],
+    "answer": "B",
+    "analysis": "10乘10的6次方乘0.02得20万比特，再除8。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN030",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "div",
+      "parameters": [
+        200000,
+        8
+      ]
+    }
+  },
+  {
+    "code": "CN031",
+    "subject": "计算机网络",
+    "knowledgePoint": "IP首部",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN031】IPv4首部IHL字段值为6，首部长度多少字节？",
+    "options": [
+      "26",
+      "27",
+      "24",
+      "25"
+    ],
+    "answer": "C",
+    "analysis": "IHL按32位字计数，每单位4字节。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN031",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        6,
+        4
+      ]
+    }
+  },
+  {
+    "code": "CN032",
+    "subject": "计算机网络",
+    "knowledgePoint": "TCP首部",
+    "difficulty": "MEDIUM",
+    "content": "【功能测试自编题 CN032】TCP数据偏移字段值为8，TCP首部长度多少字节？",
+    "options": [
+      "33",
+      "34",
+      "35",
+      "32"
+    ],
+    "answer": "D",
+    "analysis": "数据偏移单位为32位字，即4字节。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN032",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        8,
+        4
+      ]
+    }
+  },
+  {
+    "code": "CN033",
+    "subject": "计算机网络",
+    "knowledgePoint": "存储转发",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CN033】3条串联等速链路，每段发送完整分组耗时2ms，忽略传播和排队，1个分组到终点需多少ms？",
+    "options": [
+      "6",
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": "A",
+    "analysis": "存储转发逐跳接收完整分组后再发送，三跳共6毫秒。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN033",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "product",
+      "parameters": [
+        3,
+        2
+      ]
+    }
+  },
+  {
+    "code": "CN034",
+    "subject": "计算机网络",
+    "knowledgePoint": "分组流水",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CN034】3条串联等速链路，5个等长分组，每链路每分组发送耗时2ms，忽略其他时延，全部到达需多少ms？",
+    "options": [
+      "17",
+      "14",
+      "15",
+      "16"
+    ],
+    "answer": "B",
+    "analysis": "首包需6毫秒，余4包每2毫秒到达，合计14。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN034",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "link_pipeline",
+      "parameters": [
+        3,
+        5,
+        2
+      ]
+    }
+  },
+  {
+    "code": "CN035",
+    "subject": "计算机网络",
+    "knowledgePoint": "TCP慢启动",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CN035】理想慢启动初始cwnd=1 MSS，连续4轮RTT每段均确认且阈值足够大，此后cwnd为几MSS？",
+    "options": [
+      "18",
+      "19",
+      "16",
+      "17"
+    ],
+    "answer": "C",
+    "analysis": "每轮近似翻倍，1到2到4到8到16。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN035",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "power",
+      "parameters": [
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "code": "CN036",
+    "subject": "计算机网络",
+    "knowledgePoint": "IPv4分片",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CN036】IPv4报文总长4000字节、首部20字节、MTU1500字节，无选项，最少分成几片？",
+    "options": [
+      "4",
+      "5",
+      "6",
+      "3"
+    ],
+    "answer": "D",
+    "analysis": "可承载1480字节且8字节对齐，3980字节需3片。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN036",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "ceil_div",
+      "parameters": [
+        3980,
+        1480
+      ]
+    }
+  },
+  {
+    "code": "CN037",
+    "subject": "计算机网络",
+    "knowledgePoint": "IPv4分片",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CN037】前题中最后一片数据起始于原数据2960字节处，分片偏移字段值是多少？",
+    "options": [
+      "370",
+      "371",
+      "372",
+      "373"
+    ],
+    "answer": "A",
+    "analysis": "2960除以8为370。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN037",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "fragment_offset",
+      "parameters": [
+        2960
+      ]
+    }
+  },
+  {
+    "code": "CN038",
+    "subject": "计算机网络",
+    "knowledgePoint": "选择重传",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CN038】序号字段4位的经典选择重传ARQ，收发窗口相等且避免歧义时最大窗口是多少帧？",
+    "options": [
+      "11",
+      "8",
+      "9",
+      "10"
+    ],
+    "answer": "B",
+    "analysis": "序号空间16，等长窗口不超过其一半8。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN038",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "power",
+      "parameters": [
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "code": "CN039",
+    "subject": "计算机网络",
+    "knowledgePoint": "回退N帧",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CN039】序号字段4位的经典GBN，接收窗口为1，发送窗口最大多少帧？",
+    "options": [
+      "17",
+      "18",
+      "15",
+      "16"
+    ],
+    "answer": "C",
+    "analysis": "GBN发送窗口上限为序号空间减1。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN039",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "sub",
+      "parameters": [
+        16,
+        1
+      ]
+    }
+  },
+  {
+    "code": "CN040",
+    "subject": "计算机网络",
+    "knowledgePoint": "分组流水",
+    "difficulty": "HARD",
+    "content": "【功能测试自编题 CN040】4条串联等速链路传6个等长分组，每链路发送一个分组需3ms，忽略其他开销，总时延多少ms？",
+    "options": [
+      "28",
+      "29",
+      "30",
+      "27"
+    ],
+    "answer": "D",
+    "analysis": "流水总时间为(链路数+分组数-1)乘单包发送时延。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CN040",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 1,
+    "verification": {
+      "kind": "link_pipeline",
+      "parameters": [
+        4,
+        6,
+        3
+      ]
+    }
+  },
+  {
+    "code": "DSADMIN1",
+    "subject": "数据结构",
+    "knowledgePoint": "线性表",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 DSADMIN1】静态顺序表按已知下标读取一个元素的时间复杂度是？",
+    "options": [
+      "O(1)",
+      "O(n)",
+      "O(n²)",
+      "O(log n)"
+    ],
+    "answer": "A",
+    "analysis": "元素连续存放，可由基址与下标直接算出地址。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DSADMIN1",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "PENDING_REVIEW",
+    "targetActive": 1,
+    "adminExample": true
+  },
+  {
+    "code": "DSADMIN2",
+    "subject": "数据结构",
+    "knowledgePoint": "线性表",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 DSADMIN2】静态顺序表按已知下标读取一个元素的时间复杂度是？",
+    "options": [
+      "O(1)",
+      "O(n)",
+      "O(n²)",
+      "O(log n)"
+    ],
+    "answer": "A",
+    "analysis": "元素连续存放，可由基址与下标直接算出地址。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DSADMIN2",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "REJECTED",
+    "targetActive": 1,
+    "adminExample": true
+  },
+  {
+    "code": "DSADMIN3",
+    "subject": "数据结构",
+    "knowledgePoint": "线性表",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 DSADMIN3】静态顺序表按已知下标读取一个元素的时间复杂度是？",
+    "options": [
+      "O(1)",
+      "O(n)",
+      "O(n²)",
+      "O(log n)"
+    ],
+    "answer": "A",
+    "analysis": "元素连续存放，可由基址与下标直接算出地址。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#DSADMIN3",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 0,
+    "adminExample": true
+  },
+  {
+    "code": "OSADMIN1",
+    "subject": "操作系统",
+    "knowledgePoint": "进程与线程",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 OSADMIN1】操作系统为运行中程序维护进程状态等信息的典型结构是？",
+    "options": [
+      "进程控制块PCB",
+      "页内偏移",
+      "以太网帧",
+      "函数实参列表"
+    ],
+    "answer": "A",
+    "analysis": "PCB保存调度、资源与执行上下文等管理信息。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OSADMIN1",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "PENDING_REVIEW",
+    "targetActive": 1,
+    "adminExample": true
+  },
+  {
+    "code": "OSADMIN2",
+    "subject": "操作系统",
+    "knowledgePoint": "进程与线程",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 OSADMIN2】操作系统为运行中程序维护进程状态等信息的典型结构是？",
+    "options": [
+      "进程控制块PCB",
+      "页内偏移",
+      "以太网帧",
+      "函数实参列表"
+    ],
+    "answer": "A",
+    "analysis": "PCB保存调度、资源与执行上下文等管理信息。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OSADMIN2",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "REJECTED",
+    "targetActive": 1,
+    "adminExample": true
+  },
+  {
+    "code": "OSADMIN3",
+    "subject": "操作系统",
+    "knowledgePoint": "进程与线程",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 OSADMIN3】操作系统为运行中程序维护进程状态等信息的典型结构是？",
+    "options": [
+      "进程控制块PCB",
+      "页内偏移",
+      "以太网帧",
+      "函数实参列表"
+    ],
+    "answer": "A",
+    "analysis": "PCB保存调度、资源与执行上下文等管理信息。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#OSADMIN3",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 0,
+    "adminExample": true
+  },
+  {
+    "code": "COADMIN1",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 COADMIN1】二进制数各位的权值通常按什么规则变化？",
+    "options": [
+      "相邻整数位权相差2倍",
+      "相邻位权相差10倍",
+      "所有位权均为1",
+      "按质数递增"
+    ],
+    "answer": "A",
+    "analysis": "二进制采用以2为基数的位权表示。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#COADMIN1",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "PENDING_REVIEW",
+    "targetActive": 1,
+    "adminExample": true
+  },
+  {
+    "code": "COADMIN2",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 COADMIN2】二进制数各位的权值通常按什么规则变化？",
+    "options": [
+      "相邻整数位权相差2倍",
+      "相邻位权相差10倍",
+      "所有位权均为1",
+      "按质数递增"
+    ],
+    "answer": "A",
+    "analysis": "二进制采用以2为基数的位权表示。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#COADMIN2",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "REJECTED",
+    "targetActive": 1,
+    "adminExample": true
+  },
+  {
+    "code": "COADMIN3",
+    "subject": "计算机组成原理",
+    "knowledgePoint": "数据表示",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 COADMIN3】二进制数各位的权值通常按什么规则变化？",
+    "options": [
+      "相邻整数位权相差2倍",
+      "相邻位权相差10倍",
+      "所有位权均为1",
+      "按质数递增"
+    ],
+    "answer": "A",
+    "analysis": "二进制采用以2为基数的位权表示。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#COADMIN3",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 0,
+    "adminExample": true
+  },
+  {
+    "code": "CNADMIN1",
+    "subject": "计算机网络",
+    "knowledgePoint": "网络分层",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 CNADMIN1】IP协议主要属于TCP/IP模型的哪一层？",
+    "options": [
+      "网际层",
+      "应用层",
+      "物理层",
+      "用户界面层"
+    ],
+    "answer": "A",
+    "analysis": "IP负责跨网络分组寻址与转发。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CNADMIN1",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "PENDING_REVIEW",
+    "targetActive": 1,
+    "adminExample": true
+  },
+  {
+    "code": "CNADMIN2",
+    "subject": "计算机网络",
+    "knowledgePoint": "网络分层",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 CNADMIN2】IP协议主要属于TCP/IP模型的哪一层？",
+    "options": [
+      "网际层",
+      "应用层",
+      "物理层",
+      "用户界面层"
+    ],
+    "answer": "A",
+    "analysis": "IP负责跨网络分组寻址与转发。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CNADMIN2",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "REJECTED",
+    "targetActive": 1,
+    "adminExample": true
+  },
+  {
+    "code": "CNADMIN3",
+    "subject": "计算机网络",
+    "knowledgePoint": "网络分层",
+    "difficulty": "EASY",
+    "content": "【审核流程测试 CNADMIN3】IP协议主要属于TCP/IP模型的哪一层？",
+    "options": [
+      "网际层",
+      "应用层",
+      "物理层",
+      "用户界面层"
+    ],
+    "answer": "A",
+    "analysis": "IP负责跨网络分组寻址与转发。",
+    "sourceType": "ORIGINAL",
+    "sourceName": "feature-test-2027-v1",
+    "sourceLocator": "scripts/fixtures/feature-2027-questions.json#CNADMIN3",
+    "permissionNote": "本项目原创功能测试题，非历年真题；自动化校验发布仅用于独立测试库，不冒充人工审核。",
+    "targetStatus": "APPROVED",
+    "targetActive": 0,
+    "adminExample": true
+  }
+]

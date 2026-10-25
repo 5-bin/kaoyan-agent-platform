@@ -21,7 +21,8 @@ class TaskServiceTest {
     QuestionMapper questions = mock(QuestionMapper.class);
     TaskStore store = mock(TaskStore.class);
     TaskServiceImpl service = new TaskServiceImpl(agent, new AgentProperties(), users, attempts, questions, store,
-        new WrongQuestionTutorContext(attempts, mock(TaskMapper.class)));
+        new WrongQuestionTutorContext(attempts, mock(TaskMapper.class)),
+        new com.kaoyan.service.ReferenceSourcePolicy(new AgentProperties(), new com.fasterxml.jackson.databind.ObjectMapper()));
 
     @BeforeEach void setup() {
         User user = new User(); user.setId(1L); user.setExamYear(2027); user.setTargetMajor("081200");
@@ -72,6 +73,20 @@ class TaskServiceTest {
         response.setReferences(List.of(Map.of("id", "bad", "url", "javascript:alert(1)", "version", "v1")));
         Task task = new Task(); task.setId("t"); task.setTaskType("KNOWLEDGE_QA");
         assertThrows(IllegalStateException.class, () -> TaskServiceImpl.validateResponse(task, response));
+    }
+
+    @Test void sharedPolicyAllowsNewHostsAndRejectsUnauthorizedReferencesBeforeSavingSuccess() {
+        for (String host : List.of("github.com", "ocw.mit.edu", "yzb.buaa.edu.cn", "github.com.attacker.invalid")) {
+            doAnswer(call -> {
+                AgentResponse response = response(call.getArgument(1));
+                response.setReferences(List.of(Map.of("id", "source#0", "url", "https://"+host+"/fixture",
+                    "version", "v1", "title", "合成来源", "locator", "合成位置", "retrievedAt", "2026-10-24", "excerpt", "合成摘录")));
+                return response;
+            }).when(agent).chat(anyString(), any());
+            Task task = service.submit(1L, "KNOWLEDGE_QA", Map.of("query", "合成引用策略验证"));
+            assertEquals(host.endsWith("attacker.invalid") ? "FAILED" : "SUCCESS", task.getStatus());
+            verify(store).finish(task);
+        }
     }
     @Test void summaryUsesStoredVersionRatherThanCurrentQuestion() {
         PracticeRecord record = new PracticeRecord(); record.setIsCorrect(0); record.setGradingStatus("valid");

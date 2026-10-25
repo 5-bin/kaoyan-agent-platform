@@ -1,6 +1,7 @@
 package com.kaoyan.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.kaoyan.dto.response.SchoolOptionsVO;
 import com.kaoyan.entity.School;
 
 import java.util.List;
@@ -10,6 +11,9 @@ import java.util.Map;
  * 院校 Service
  */
 public interface SchoolService extends IService<School> {
+
+    /** 库内全部有效省份、专业名，不随当前筛选条件缩减。 */
+    SchoolOptionsVO options();
 
     /**
      * 搜索院校

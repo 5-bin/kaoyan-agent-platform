@@ -1,0 +1,877 @@
+[
+  {
+    "id": "real-knowledge-8dd03a037f13",
+    "domain": "knowledge",
+    "title": "栈的后进先出与基本操作",
+    "subject": "数据结构",
+    "url": "https://github.com/krahets/hello-algo/blob/main/docs/chapter_stack_and_queue/stack.md",
+    "locator": "docs/chapter_stack_and_queue/stack.md；按主题中文节选整理；作者：靳宇栋（krahets）与Hello算法贡献者",
+    "version": "git-blob-9b03591ae2b38ac263380c386417f39931d0c22a",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://creativecommons.org/licenses/by-nc-sa/4.0/；中文节选整理，保留署名与相同许可。",
+    "reviewStatus": "verified",
+    "content": "栈在同一端进行插入和删除，这一端称为栈顶；另一端称为栈底。最后进入栈的元素最先离开，因此称为后进先出（LIFO）。入栈push把新元素放在栈顶，出栈pop删除并返回栈顶元素，peek只读取栈顶而不删除。访问或删除前应检查栈是否为空。栈可用动态数组或链表实现；数组实现利用尾部插入删除，链表实现可把表头作为栈顶。调用栈、括号匹配等问题都依赖这种逆序恢复关系。",
+    "keywords": [
+      "栈",
+      "基本操作"
+    ],
+    "metadata": {
+      "author": "靳宇栋（krahets）与Hello算法贡献者",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "docs/chapter_stack_and_queue/stack.md"
+    }
+  },
+  {
+    "id": "real-knowledge-8c50c11de7d4",
+    "domain": "knowledge",
+    "title": "队列的先进先出与双端实现",
+    "subject": "数据结构",
+    "url": "https://github.com/krahets/hello-algo/blob/main/docs/chapter_stack_and_queue/queue.md",
+    "locator": "docs/chapter_stack_and_queue/queue.md；按主题中文节选整理；作者：靳宇栋（krahets）与Hello算法贡献者",
+    "version": "git-blob-95d11dbf0bf0ebeaa325491d5c7512a482ea64db",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://creativecommons.org/licenses/by-nc-sa/4.0/；中文节选整理，保留署名与相同许可。",
+    "reviewStatus": "verified",
+    "content": "队列只允许在队尾加入元素、在队首移除元素，遵循先进先出（FIFO）。enqueue或offer表示入队，dequeue或poll表示出队，front或peek只访问队首。数组实现需要管理队首与队尾位置，不能把每次出队都平移整个数组当作高效实现；链表实现可用首尾指针完成两端操作。访问队首或出队前应检查是否为空。队列适合按到达顺序处理请求，也是广度优先遍历使用的基本结构。",
+    "keywords": [
+      "队列",
+      "基本操作"
+    ],
+    "metadata": {
+      "author": "靳宇栋（krahets）与Hello算法贡献者",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "docs/chapter_stack_and_queue/queue.md"
+    }
+  },
+  {
+    "id": "real-knowledge-55dbd86d544f",
+    "domain": "knowledge",
+    "title": "二叉树的节点与层级术语",
+    "subject": "数据结构",
+    "url": "https://github.com/krahets/hello-algo/blob/main/docs/chapter_tree/binary_tree.md",
+    "locator": "docs/chapter_tree/binary_tree.md；按主题中文节选整理；作者：靳宇栋（krahets）与Hello算法贡献者",
+    "version": "git-blob-549ebb0438b60be4977c0ff702b60e30d72e5319",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://creativecommons.org/licenses/by-nc-sa/4.0/；中文节选整理，保留署名与相同许可。",
+    "reviewStatus": "verified",
+    "content": "二叉树的节点包含一个值、左子节点引用和右子节点引用，每个节点最多有两个子节点。没有父节点的节点称为根；没有子节点的节点称为叶节点。父子连接构成边，从根到某节点的一串连接构成路径。二叉树体现分支和层级关系，不能把逻辑上的父子关系理解成内存中必须相邻。学习树的高度、深度、层数等指标时，要明确是否从0计数，避免不同定义导致一位之差。",
+    "keywords": [
+      "二叉树",
+      "节点"
+    ],
+    "metadata": {
+      "author": "靳宇栋（krahets）与Hello算法贡献者",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "docs/chapter_tree/binary_tree.md"
+    }
+  },
+  {
+    "id": "real-knowledge-593e3bc5fb36",
+    "domain": "knowledge",
+    "title": "二分查找的有序前提与边界",
+    "subject": "数据结构",
+    "url": "https://github.com/krahets/hello-algo/blob/main/docs/chapter_searching/binary_search.md",
+    "locator": "docs/chapter_searching/binary_search.md；按主题中文节选整理；作者：靳宇栋（krahets）与Hello算法贡献者",
+    "version": "git-blob-c220b0ec432b02cdba3cc380a15054c11b2ea6bc",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://creativecommons.org/licenses/by-nc-sa/4.0/；中文节选整理，保留署名与相同许可。",
+    "reviewStatus": "verified",
+    "content": "二分查找要求搜索区间具有有序性。对递增且无重复元素的数组，可初始化闭区间[i,j]=[0,n−1]，计算中点m，比较nums[m]与target。若中点较小，保留右半区间并令i=m+1；若中点较大，保留左半区间并令j=m−1；相等则返回索引。区间为空表示没有找到。每轮规模减半，迭代版本时间复杂度为O(log n)、辅助空间为O(1)。为避免i+j溢出，可用i+(j−i)/2的向下取整计算中点。",
+    "keywords": [
+      "二分查找",
+      "有序数组"
+    ],
+    "metadata": {
+      "author": "靳宇栋（krahets）与Hello算法贡献者",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "docs/chapter_searching/binary_search.md"
+    }
+  },
+  {
+    "id": "real-knowledge-944b2331372b",
+    "domain": "knowledge",
+    "title": "虚拟内存、页表与访问权限",
+    "subject": "操作系统",
+    "url": "https://ocw.mit.edu/courses/6-033-computer-system-engineering-spring-2018/pages/week-2/lecture-3-outline/",
+    "locator": "os-memory；按主题中文节选整理；作者：Katrina LaCurts / MIT OCW",
+    "version": "sha256-fd3176ec646e445db28be35bf4986966ef434fe87832d5a70a58c1f4d90e75f8",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://ocw.mit.edu/pages/privacy-and-terms-of-use/；教学讲义中文摘要，已修改表达；不含第三方图片。",
+    "reviewStatus": "verified",
+    "content": "操作系统通过地址虚拟化隔离不同程序的内存。虚拟地址被分解为虚拟页号和页内偏移，MMU按页表把虚拟页号映射为物理页号，偏移保持不变。页表项还记录页面是否驻留以及读写、用户或内核访问权限等信息。多级页表按需分配下级表，以减少一次性分配大页表的开销，但转换可能需要多次访问。仅有虚拟地址不足以保护页表，仍需用户态和内核态等硬件权限机制。本摘要对应课程中的32位示例，不推断所有体系结构的具体位数。",
+    "keywords": [
+      "虚拟内存",
+      "页表",
+      "内核态"
+    ],
+    "metadata": {
+      "author": "Katrina LaCurts / MIT OCW",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "os-memory"
+    }
+  },
+  {
+    "id": "real-knowledge-8cbcf3090854",
+    "domain": "knowledge",
+    "title": "有界缓冲区与互斥锁",
+    "subject": "操作系统",
+    "url": "https://ocw.mit.edu/courses/6-033-computer-system-engineering-spring-2018/pages/week-3/lecture-4-outline/",
+    "locator": "os-locks；按主题中文节选整理；作者：Katrina LaCurts / MIT OCW",
+    "version": "sha256-3fa23441cffe01645c2ad7d603b31f16807d664f926aca919e33e1578ecc4117",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://ocw.mit.edu/pages/privacy-and-terms-of-use/；教学讲义中文摘要，已修改表达；不含第三方图片。",
+    "reviewStatus": "verified",
+    "content": "有界缓冲区最多保存N条消息：为空时接收者需要等待，已满时发送者需要等待。多个发送者并发写入会使检查空间、写入消息和递增位置之间发生交错，导致覆盖或空洞。锁应保护需要作为一个整体完成的临界区，而不是机械地逐行加锁。检查条件与执行写入必须处于一致的同步规则之内；若在缓冲区已满时持锁无限等待，会阻止接收者取得锁并释放空间。原课程逐步比较这些错误实现，再给出正确同步方案。",
+    "keywords": [
+      "并发",
+      "互斥锁",
+      "有界缓冲区"
+    ],
+    "metadata": {
+      "author": "Katrina LaCurts / MIT OCW",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "os-locks"
+    }
+  },
+  {
+    "id": "real-knowledge-ce8032c29f01",
+    "domain": "knowledge",
+    "title": "线程切换、条件变量与丢失唤醒",
+    "subject": "操作系统",
+    "url": "https://ocw.mit.edu/courses/6-033-computer-system-engineering-spring-2018/pages/week-3/lecture-5-outline/",
+    "locator": "os-threads；按主题中文节选整理；作者：Katrina LaCurts / MIT OCW",
+    "version": "sha256-2ddbc3d1bea9850bd58d7c2bc383c62ce5d06dde03e3d2eabfd345b3e9c4ca12",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://ocw.mit.edu/pages/privacy-and-terms-of-use/；教学讲义中文摘要，已修改表达；不含第三方图片。",
+    "reviewStatus": "verified",
+    "content": "课程把线程视为虚拟处理器。线程切换需要保存当前执行状态，选择可运行线程，再恢复其状态。条件变量让等待线程休眠，由其他线程在状态变化后通知。若释放锁和进入等待分成互不关联的步骤，通知可能在等待真正开始前到达，从而造成丢失唤醒。因此等待操作需要同时处理条件变量与关联锁，并在休眠时按同步协议释放锁。抢占式调度还利用定时中断，使一个从不主动让出CPU的线程也不会永久垄断处理器。",
+    "keywords": [
+      "线程",
+      "上下文切换",
+      "条件变量"
+    ],
+    "metadata": {
+      "author": "Katrina LaCurts / MIT OCW",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "os-threads"
+    }
+  },
+  {
+    "id": "real-knowledge-961fcf592611",
+    "domain": "knowledge",
+    "title": "虚拟机监控器与微内核",
+    "subject": "操作系统",
+    "url": "https://ocw.mit.edu/courses/6-033-computer-system-engineering-spring-2018/pages/week-4/lecture-6-outline/",
+    "locator": "os-structure；按主题中文节选整理；作者：Katrina LaCurts / MIT OCW",
+    "version": "sha256-cb9bed9114a89e6fd7d9c01e9f40f9f8787f538f7cd80b105cd866e9dfe611e0",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://ocw.mit.edu/pages/privacy-and-terms-of-use/；教学讲义中文摘要，已修改表达；不含第三方图片。",
+    "reviewStatus": "verified",
+    "content": "虚拟机监控器VMM负责为多个客户操作系统分配资源、分派事件并处理需要访问真实硬件的操作。逐条解释执行兼容性较好但速度慢，直接执行普通指令并截获特权行为可改善性能；现代硬件提供额外虚拟化支持。客户虚拟地址、客户物理地址和宿主物理地址是不同层次，不能混用。微内核把部分服务移到用户空间以加强模块隔离，其通信开销与接口设计也带来权衡。虚拟机和微内核解决的目标不同：前者运行多个系统，后者拆分单个系统的内部职责。",
+    "keywords": [
+      "虚拟机",
+      "VMM",
+      "微内核"
+    ],
+    "metadata": {
+      "author": "Katrina LaCurts / MIT OCW",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "os-structure"
+    }
+  },
+  {
+    "id": "real-knowledge-58a2e4f28f0d",
+    "domain": "knowledge",
+    "title": "吞吐率、延迟与流水线性能",
+    "subject": "计算机组成原理",
+    "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/pages/c7/c7s1/",
+    "locator": "co-7；按主题中文节选整理；作者：Chris Terman / MIT OCW",
+    "version": "sha256-0f71f1773fe5a9dbbdd78346e55c6eb3f9bac375564ef0867bdbb626d7faef29",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://ocw.mit.edu/pages/privacy-and-terms-of-use/；教学讲义中文摘要，已修改表达；不含第三方图片。",
+    "reviewStatus": "verified",
+    "content": "延迟衡量一个输入从进入系统到产生输出所需的时间；吞吐率衡量单位时间完成的工作量。流水线通过让不同输入处于不同处理阶段，提高持续处理多项任务时的吞吐率，但不保证单项任务的延迟下降。时钟周期必须满足最慢阶段的时序要求，并考虑寄存器开销；不均衡阶段会形成瓶颈。比较性能时，应同时说明任务数量、阶段划分、启动和排空成本，不能把吞吐率的提升直接解释为每个任务都同倍加速。",
+    "keywords": [
+      "流水线",
+      "吞吐率",
+      "延迟"
+    ],
+    "metadata": {
+      "author": "Chris Terman / MIT OCW",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "co-7"
+    }
+  },
+  {
+    "id": "real-knowledge-12c54faa15c2",
+    "domain": "knowledge",
+    "title": "存储程序与指令集体系结构",
+    "subject": "计算机组成原理",
+    "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/pages/c9/c9s1/",
+    "locator": "co-9；按主题中文节选整理；作者：Chris Terman / MIT OCW",
+    "version": "sha256-2711f48fd0dfc2b55d0cc5e84648e0a354b586b9d1130b0fe964c8d4e5515c96",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://ocw.mit.edu/pages/privacy-and-terms-of-use/；教学讲义中文摘要，已修改表达；不含第三方图片。",
+    "reviewStatus": "verified",
+    "content": "存储程序思想把表示操作的指令编码存入存储器，使同一硬件可以通过改变程序处理不同计算任务。指令集体系结构ISA规定软件可见的操作、寄存器与存储访问约定，而不等同于某一种具体电路实现。课程使用Beta这一教学指令集，介绍ALU运算、常数操作数、加载、存储和分支等指令。数据通路负责数据移动和运算，控制逻辑根据指令选择相应动作。Beta的寄存器数、指令长度等是教学体系结构的约定，不能直接套用到所有处理器。",
+    "keywords": [
+      "存储程序",
+      "ISA",
+      "指令"
+    ],
+    "metadata": {
+      "author": "Chris Terman / MIT OCW",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "co-9"
+    }
+  },
+  {
+    "id": "real-knowledge-71f326537e8f",
+    "domain": "knowledge",
+    "title": "存储层次、局部性与Cache",
+    "subject": "计算机组成原理",
+    "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/pages/c14/c14s1/",
+    "locator": "co-14；按主题中文节选整理；作者：Chris Terman / MIT OCW",
+    "version": "sha256-4e089296633c5f34b0a42960f01a513e23accd38ef2fc88bc76f600e5f8ecc38",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://ocw.mit.edu/pages/privacy-and-terms-of-use/；教学讲义中文摘要，已修改表达；不含第三方图片。",
+    "reviewStatus": "verified",
+    "content": "处理器寄存器、SRAM、DRAM与非易失存储在容量、延迟和成本上各有取舍，形成存储层次。时间局部性表示近期访问的数据可能再次访问，空间局部性表示邻近地址可能很快被访问。Cache利用这些规律，把部分主存块保存在更快的存储中。直接映射为每个块规定唯一位置，可能发生冲突失效；组相联允许块放在对应组的若干路中，减少部分冲突但增加硬件选择成本。写直达和写回采用不同的一致性维护方式，写回通常需要脏位记录修改。",
+    "keywords": [
+      "Cache",
+      "存储层次",
+      "局部性"
+    ],
+    "metadata": {
+      "author": "Chris Terman / MIT OCW",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "co-14"
+    }
+  },
+  {
+    "id": "real-knowledge-1198aef3b78b",
+    "domain": "knowledge",
+    "title": "处理器流水线中的数据与控制冒险",
+    "subject": "计算机组成原理",
+    "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/pages/c15/c15s1/",
+    "locator": "co-15；按主题中文节选整理；作者：Chris Terman / MIT OCW",
+    "version": "sha256-3c0c23eb38e6676b26340980ae2d103b50c241037d1a191be50c9a669f6783cb",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY-NC-SA 4.0；https://ocw.mit.edu/pages/privacy-and-terms-of-use/；教学讲义中文摘要，已修改表达；不含第三方图片。",
+    "reviewStatus": "verified",
+    "content": "程序执行时间可分解为动态指令数量、平均每条指令周期数CPI和时钟周期时长的乘积。流水化缩短单级组合逻辑路径，但引入了多条指令重叠执行的依赖问题。数据冒险发生在后续指令需要尚未生成或写回的结果时，可使用暂停和旁路转发；某些加载后立即使用的情况仍需暂停。控制冒险来自分支去向尚未确定，可通过暂停、预测和出错后清除等机制处理。流水线的异常和中断还需要维持可理解的程序状态。",
+    "keywords": [
+      "流水线",
+      "数据冒险",
+      "控制冒险"
+    ],
+    "metadata": {
+      "author": "Chris Terman / MIT OCW",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "co-15"
+    }
+  },
+  {
+    "id": "real-knowledge-1deb28915ed5",
+    "domain": "knowledge",
+    "title": "网络分层、协议与服务接口",
+    "subject": "计算机网络",
+    "url": "https://github.com/SystemsApproach/book/blob/master/foundation/architecture.rst",
+    "locator": "foundation/architecture.rst；按主题中文节选整理；作者：Larry Peterson、Bruce Davie及Systems Approach贡献者",
+    "version": "git-blob-a039158b9b3a25821f161c19bf7158944b753a21",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY 4.0；https://creativecommons.org/licenses/by/4.0/；英文原文的中文摘要，已修改表达。",
+    "reviewStatus": "verified",
+    "content": "网络体系结构通过分层和抽象管理复杂性。每一层向上提供服务，并使用下一层的服务；同层对等实体之间遵守协议，层间则通过接口交互。发送端通常把上层数据封装为本层的协议数据单元，接收端按相反方向解释并交付。协议描述对等方如何通信，服务接口描述本层向上提供什么能力，两者不能混为一谈。OSI七层模型和互联网体系结构是不同的组织方法，实际互联网协议并不需要逐层一一对应OSI模型。",
+    "keywords": [
+      "网络分层",
+      "协议",
+      "封装"
+    ],
+    "metadata": {
+      "author": "Larry Peterson、Bruce Davie及Systems Approach贡献者",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "foundation/architecture.rst"
+    }
+  },
+  {
+    "id": "real-knowledge-051e20e265d7",
+    "domain": "knowledge",
+    "title": "网络带宽、时延与带宽时延积",
+    "subject": "计算机网络",
+    "url": "https://github.com/SystemsApproach/book/blob/master/foundation/performance.rst",
+    "locator": "foundation/performance.rst；按主题中文节选整理；作者：Larry Peterson、Bruce Davie及Systems Approach贡献者",
+    "version": "git-blob-156f2a3bda697f09a5bd6afeed0c5d8fe84463c9",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY 4.0；https://creativecommons.org/licenses/by/4.0/；英文原文的中文摘要，已修改表达。",
+    "reviewStatus": "verified",
+    "content": "网络性能的两个基本维度是带宽与时延。带宽可用单位时间可传输的比特数量衡量，实际吞吐率还受实现、协议和竞争等因素影响。传输时延与报文长度和链路速率有关，传播时延与距离和传播速度有关；排队和处理也会贡献时延。高带宽并不自动意味着低时延。带宽时延积描述一段时间内链路上可以在途的数据量；若讨论往返路径，必须明确使用的是RTT而不是单程传播时延，避免口径混用。",
+    "keywords": [
+      "带宽",
+      "时延",
+      "带宽时延积"
+    ],
+    "metadata": {
+      "author": "Larry Peterson、Bruce Davie及Systems Approach贡献者",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "foundation/performance.rst"
+    }
+  },
+  {
+    "id": "real-knowledge-6acf9aa564af",
+    "domain": "knowledge",
+    "title": "TCP可靠字节流、流量控制与拥塞控制",
+    "subject": "计算机网络",
+    "url": "https://github.com/SystemsApproach/book/blob/master/e2e/tcp.rst",
+    "locator": "e2e/tcp.rst；按主题中文节选整理；作者：Larry Peterson、Bruce Davie及Systems Approach贡献者",
+    "version": "git-blob-29be07153260bc1ce48bfa8807279a8cab7d4d63",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY 4.0；https://creativecommons.org/licenses/by/4.0/；英文原文的中文摘要，已修改表达。",
+    "reviewStatus": "verified",
+    "content": "TCP向应用提供面向连接、可靠且按序交付的字节流服务，而不是保留应用每次发送的报文边界。一条连接支持两个方向的字节流，属于全双工通信。序号、确认和重传用于处理丢失及乱序等问题。流量控制约束发送者，避免超过接收方的接收能力；拥塞控制关注网络承载能力，避免向拥塞路径继续过量注入数据。两种控制的目标不同，不能把接收窗口与拥塞窗口混为同一个概念。",
+    "keywords": [
+      "TCP",
+      "可靠传输",
+      "流量控制",
+      "拥塞控制"
+    ],
+    "metadata": {
+      "author": "Larry Peterson、Bruce Davie及Systems Approach贡献者",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "e2e/tcp.rst"
+    }
+  },
+  {
+    "id": "real-knowledge-4dbb41689d62",
+    "domain": "knowledge",
+    "title": "UDP端口与尽力交付",
+    "subject": "计算机网络",
+    "url": "https://github.com/SystemsApproach/book/blob/master/e2e/udp.rst",
+    "locator": "e2e/udp.rst；按主题中文节选整理；作者：Larry Peterson、Bruce Davie及Systems Approach贡献者",
+    "version": "git-blob-78fd540ac028fcb1f44a6fe553f5f7c3f902e0a4",
+    "retrievedAt": "2026-10-24",
+    "license": "CC BY 4.0；https://creativecommons.org/licenses/by/4.0/；英文原文的中文摘要，已修改表达。",
+    "reviewStatus": "verified",
+    "content": "UDP在网络层提供的主机到主机交付之上，通过端口把数据交付到相应的进程或应用端点。源端口和目的端口支持传输层的复用与分用。与TCP不同，UDP不提供连接建立、可靠有序字节流、流量控制或拥塞控制这一整套能力，而是保留数据报边界并使用简单的传输机制。应用若需要重传、排序或拥塞管理，应由应用或更高层协议实现；不能因UDP首部简单就推断它适合任意网络条件。",
+    "keywords": [
+      "UDP",
+      "端口",
+      "复用分用"
+    ],
+    "metadata": {
+      "author": "Larry Peterson、Bruce Davie及Systems Approach贡献者",
+      "adaptation": "中文摘要，非完整教材",
+      "sourcePath": "e2e/udp.rst"
+    }
+  },
+  {
+    "id": "nau-2027-081200-full-time",
+    "domain": "school",
+    "title": "南京审计大学2027年计算机科学与技术招生核验摘要",
+    "url": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+    "locator": "2027专业目录：学术学位／专业学位计算机学院全日制条目；081200",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "南京审计大学计算机学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。拟招生人数包含推免，不录入人数；不混入智能审计或其他专业。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "nau-2027-081200-full-time",
+      "school": "南京审计大学",
+      "college": "计算机学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "江苏",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "南京审计大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "nau-2027-085404-full-time",
+    "domain": "school",
+    "title": "南京审计大学2027年计算机技术招生核验摘要",
+    "url": "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+    "locator": "2027专业目录：学术学位／专业学位计算机学院全日制条目；085404",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "南京审计大学计算机学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。拟招生人数包含推免，不录入人数；不混入智能审计或其他专业。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "nau-2027-085404-full-time",
+      "school": "南京审计大学",
+      "college": "计算机学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "江苏",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "南京审计大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "ucas-2027-081200-full-time",
+    "domain": "school",
+    "title": "中国科学院大学2027年计算机科学与技术招生核验摘要",
+    "url": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+    "locator": "培养单位80086；2027硕士目录；普通全日制方向；081200",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "中国科学院大学计算机科学与技术学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。不包含代国际学院招生条目；学位授予单位为中国科学院大学，不将学院冒充独立大学。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "ucas-2027-081200-full-time",
+      "school": "中国科学院大学",
+      "college": "计算机科学与技术学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "中国科学院大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "ucas-2027-085404-full-time",
+    "domain": "school",
+    "title": "中国科学院大学2027年计算机技术招生核验摘要",
+    "url": "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+    "locator": "培养单位80086；2027硕士目录；普通全日制方向；085404",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "中国科学院大学计算机科学与技术学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。不包含代国际学院招生条目；学位授予单位为中国科学院大学，不将学院冒充独立大学。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "ucas-2027-085404-full-time",
+      "school": "中国科学院大学",
+      "college": "计算机科学与技术学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "中国科学院大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "cuc-2027-081200-full-time",
+    "domain": "school",
+    "title": "中国传媒大学2027年计算机科学与技术招生核验摘要",
+    "url": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+    "locator": "2027专业目录：全日制学术学位／全日制专业学位表；081200",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "中国传媒大学计算机与网络空间安全学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。仅普通项目；不混入中外合作或其他学院专业。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "cuc-2027-081200-full-time",
+      "school": "中国传媒大学",
+      "college": "计算机与网络空间安全学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "中国传媒大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "cuc-2027-085404-full-time",
+    "domain": "school",
+    "title": "中国传媒大学2027年计算机技术招生核验摘要",
+    "url": "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+    "locator": "2027专业目录：全日制学术学位／全日制专业学位表；085404",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "中国传媒大学计算机与网络空间安全学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。仅普通项目；不混入中外合作或其他学院专业。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "cuc-2027-085404-full-time",
+      "school": "中国传媒大学",
+      "college": "计算机与网络空间安全学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "中国传媒大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "buaa-2027-081200-full-time",
+    "domain": "school",
+    "title": "北京航空航天大学2027年计算机科学与技术招生核验摘要",
+    "url": "https://yzb.buaa.edu.cn/xlss/zymlcx.htm",
+    "locator": "公开目录查询：学院006；专业081200；方向01先进计算系统与环境；081200",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "北京航空航天大学计算机学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。公开查询POST回传结果注明全日制，学制3年；不将其他学院科目套用。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "buaa-2027-081200-full-time",
+      "school": "北京航空航天大学",
+      "college": "计算机学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "北京",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "北京航空航天大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "scu-2027-081200-full-time",
+    "domain": "school",
+    "title": "四川大学2027年计算机科学与技术招生核验摘要",
+    "url": "https://yz.scu.edu.cn/sszyml",
+    "locator": "年份2027；院系304；专业081200；01全日制计算机系统结构；081200",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "四川大学计算机学院（软件学院）2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。仅本学院普通全日制学术项目，不混入其他学院和专项。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "scu-2027-081200-full-time",
+      "school": "四川大学",
+      "college": "计算机学院（软件学院）",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "四川",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "四川大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "scnu-2027-085404-full-time",
+    "domain": "school",
+    "title": "华南师范大学2027年计算机技术招生核验摘要",
+    "url": "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx",
+    "locator": "年度2027；院系019；专业085404；全日制；085404",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "华南师范大学计算机学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。官方2027目录选择019计算机学院、专业型、全日制。计划数含士兵专项，不录入人数。 本次动态专业目录不可访问；保留2026-10-23核验日期与证据，未重新核验。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "scnu-2027-085404-full-time",
+      "school": "华南师范大学",
+      "college": "计算机学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "广东",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "华南师范大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "ysu-2027-081200-full-time",
+    "domain": "school",
+    "title": "燕山大学2027年计算机科学与技术招生核验摘要",
+    "url": "https://yz.chsi.com.cn/zsml/yjfxdetail?id=496dc291f5c9567f22e7fd845324df20",
+    "locator": "2027年硕士目录；招生单位10216燕山大学；院系021人工智能学院；081200；全日制；学术学位；统考",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "燕山大学人工智能学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。同年度研招网专业详情直接确认学术学位、全日制、统考；初试与学院目录交叉核对，人数不录入。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "ysu-2027-081200-full-time",
+      "school": "燕山大学",
+      "college": "人工智能学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "河北",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "燕山大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "zua-2027-085404-full-time",
+    "domain": "school",
+    "title": "郑州航空工业管理学院2027年计算机技术招生核验摘要",
+    "url": "https://yjsc.zua.edu.cn/ssyjszszy/a008jsjxy/a085404jsjjs.htm",
+    "locator": "2027硕士专业目录；008计算机学院；085404行；085404",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "郑州航空工业管理学院计算机学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。招生计划为暂定，不录入人数；同等学力加试离散数学、数据库原理。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "zua-2027-085404-full-time",
+      "school": "郑州航空工业管理学院",
+      "college": "计算机学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "河南",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "郑州航空工业管理学院",
+      "085404"
+    ]
+  },
+  {
+    "id": "zust-2027-085404-full-time",
+    "domain": "school",
+    "title": "浙江科技大学2027年计算机技术招生核验摘要",
+    "url": "https://itee.zust.edu.cn/zsgz/yjszs/zsxx/zsml.htm",
+    "locator": "页面标题2027目录；嵌入图片第1行085404；085404",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "浙江科技大学计算机科学与技术学院2027年全日制计算机技术（085404），专业学位，初试代码为101、204、302、408。图片注明全日制小和山校区，学制3年；不混入085409和085410。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "zust-2027-085404-full-time",
+      "school": "浙江科技大学",
+      "college": "计算机科学与技术学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "浙江",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "204",
+        "302",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "浙江科技大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "ahnu-2027-081200-full-time",
+    "domain": "school",
+    "title": "安徽师范大学2027年计算机科学与技术招生核验摘要",
+    "url": "https://yz.ahnu.edu.cn/info/1006/10276.htm",
+    "locator": "020计算机与信息学院；全日制081200／085404条目；081200",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "安徽师范大学计算机与信息学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。两个专业均为101、201、301、408；不招收同等学力考生。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "ahnu-2027-081200-full-time",
+      "school": "安徽师范大学",
+      "college": "计算机与信息学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "安徽",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "安徽师范大学",
+      "081200"
+    ]
+  },
+  {
+    "id": "ahnu-2027-085404-full-time",
+    "domain": "school",
+    "title": "安徽师范大学2027年计算机技术招生核验摘要",
+    "url": "https://yz.ahnu.edu.cn/info/1006/10276.htm",
+    "locator": "020计算机与信息学院；全日制081200／085404条目；085404",
+    "version": "official-2027-recheck-20261024",
+    "retrievedAt": "2026-10-24",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "安徽师范大学计算机与信息学院2027年全日制计算机技术（085404），专业学位，初试代码为101、201、301、408。两个专业均为101、201、301、408；不招收同等学力考生。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "ahnu-2027-085404-full-time",
+      "school": "安徽师范大学",
+      "college": "计算机与信息学院",
+      "major": "计算机技术",
+      "majorCode": "085404",
+      "year": 2027,
+      "degreeType": "professional",
+      "region": "安徽",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-24"
+    },
+    "keywords": [
+      "安徽师范大学",
+      "085404"
+    ]
+  },
+  {
+    "id": "scnu-2027-081200-full-time",
+    "domain": "school",
+    "title": "华南师范大学2027年计算机科学与技术招生核验摘要",
+    "url": "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx",
+    "locator": "年度2027；院系019；专业081200；学术型；全日制",
+    "version": "admissions-2027-feature-v1",
+    "retrievedAt": "2026-10-23",
+    "license": "本项目自编招生事实短摘要；原文版权归学校，仅摘录专业及考试条件并保留链接，不复制整页。",
+    "reviewStatus": "verified",
+    "content": "华南师范大学计算机学院2027年全日制计算机科学与技术（081200），学术学位，初试代码为101、201、301、408。官方2027目录显示普通全日制学术型，人数含推免不录入。 本次动态专业目录不可访问；保留2026-10-23核验日期与证据，未重新核验。未收录招生人数与复试线。",
+    "metadata": {
+      "programId": "scnu-2027-081200-full-time",
+      "school": "华南师范大学",
+      "college": "计算机学院",
+      "major": "计算机科学与技术",
+      "majorCode": "081200",
+      "year": 2027,
+      "degreeType": "academic",
+      "region": "广东",
+      "studyMode": "full_time",
+      "examSubjects": [
+        "101",
+        "201",
+        "301",
+        "408"
+      ],
+      "updatedAt": "2026-10-23"
+    },
+    "keywords": [
+      "华南师范大学",
+      "081200"
+    ]
+  }
+]

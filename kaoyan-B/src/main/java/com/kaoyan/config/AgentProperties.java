@@ -14,6 +14,8 @@ public class AgentProperties implements org.springframework.beans.factory.Initia
     private String baseUrl = "http://127.0.0.1:8001";
     @lombok.ToString.Exclude
     private String internalKey = "";
+    private String quotaExemptUsername = "robin";
+    private String sourcePolicyFile = "";
     @Min(1)
     private int dailyTaskLimit = 30;
     @Min(1)

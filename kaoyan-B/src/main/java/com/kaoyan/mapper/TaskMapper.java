@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
  */
 @Mapper
 public interface TaskMapper extends BaseMapper<Task> {
+    @Select("SELECT id FROM `user` WHERE id=#{owner} FOR UPDATE")
+    Long lockQuotaAccount(@Param("owner") Long owner);
+    @Select("SELECT username FROM `user` WHERE id=#{owner}")
+    String quotaUsername(@Param("owner") Long owner);
     // Includes hidden history and failures: deleting a recommendation never refunds usage.
     @Select("SELECT COUNT(*) FROM task WHERE user_id=#{owner} AND created_at >= #{since}")
     long countForUserSince(@Param("owner") Long owner, @Param("since") LocalDateTime since);

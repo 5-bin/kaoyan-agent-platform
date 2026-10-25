@@ -3,11 +3,11 @@
     <el-button v-if="!opened" type="primary" plain @click="opened = true">AI 解释与追问</el-button>
     <template v-else>
       <h4>错题 AI 辅导</h4>
-      <p class="hint">围绕这次作答提问，标准答案和判分不变。每轮保存在“Agent 助手”的任务历史，可在那里继续追问。</p>
+      <p class="hint">围绕这次作答提问，标准答案和判分不变。每轮保存在<router-link to="/tasks/history">任务历史</router-link>，可在那里继续追问。使用 AI 需先在<router-link to="/tasks">Agent 助手</router-link>的隐私设置中授权模型与错题外发。</p>
       <div v-for="(message, index) in messages" :key="index" class="message">
         <b>{{ message.role === 'user' ? '你的问题' : '历史解释' }}：</b>{{ message.content }}
       </div>
-      <p v-if="lastTask" class="message"><b>你的问题：</b>{{ lastTask.inputPayload?.query }}</p>
+      <p v-if="lastTask" class="message"><b>你的问题：</b>{{ lastTask.tutoring?.query }}</p>
       <TaskResultView v-if="lastTask" :task="lastTask" />
       <p v-if="error" role="alert">{{ error }}</p>
       <el-input v-model="query" type="textarea" :rows="3" :maxlength="2000" show-word-limit
@@ -44,12 +44,12 @@ watch(() => [props.recordId, props.initialTask] as const, () => {
   query.value = '请解释这道错题，指出我的选择错在哪里，并给出复习建议。'
   const task = props.initialTask
   parentTaskId = task?.status === 'SUCCESS' ? task.id :
-    typeof task?.inputPayload?.parentTaskId === 'string' ? task.inputPayload.parentTaskId : undefined
-  const history = task?.inputPayload?.messages
+    typeof task?.tutoring?.parentTaskId === 'string' ? task.tutoring.parentTaskId : undefined
+  const history = task?.tutoring?.messages
   messages.value = Array.isArray(history) ? history.filter((m): m is Message =>
     m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string').slice(-6) : []
   if (task?.status === 'SUCCESS') query.value = ''
-  else if (typeof task?.inputPayload?.query === 'string') query.value = task.inputPayload.query
+  else if (typeof task?.tutoring?.query === 'string') query.value = task.tutoring.query
 }, { immediate: true })
 
 async function send() {
@@ -64,7 +64,7 @@ async function send() {
     if (revision !== generation) return
     if (lastTask.value?.status === 'SUCCESS' && lastTask.value.resultPayload) {
       messages.value = [...messages.value,
-        { role: 'user' as const, content: String(lastTask.value.inputPayload?.query || '') },
+        { role: 'user' as const, content: String(lastTask.value.tutoring?.query || '') },
         { role: 'assistant' as const, content: lastTask.value.resultPayload.answer }].slice(-6)
     }
     lastTask.value = task

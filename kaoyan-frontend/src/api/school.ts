@@ -6,6 +6,14 @@ export interface SchoolDetailVO {
   details: SchoolDetail[]
 }
 
+export interface SchoolOptions {
+  provinces: string[]
+  majorNames: string[]
+}
+
+export const getSchoolOptions = () =>
+  request.get<unknown, SchoolOptions>('/schools/options')
+
 export const searchSchools = (params: {
   province?: string
   level?: string

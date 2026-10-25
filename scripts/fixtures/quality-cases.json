@@ -1,0 +1,68 @@
+[
+  {
+    "id": "qa-stack",
+    "taskType": "KNOWLEDGE_QA",
+    "userInput": "栈和队列有什么区别",
+    "expect": {"outcome": "COMPLETED", "referencePrefix": "ds-deque"}
+  },
+  {
+    "id": "qa-thread",
+    "taskType": "KNOWLEDGE_QA",
+    "userInput": "进程与线程的区别",
+    "expect": {"outcome": "COMPLETED", "referencePrefix": "os-threads"}
+  },
+  {
+    "id": "qa-tcp",
+    "taskType": "KNOWLEDGE_QA",
+    "userInput": "TCP如何保证可靠传输",
+    "expect": {"outcome": "COMPLETED", "referencePrefix": "cn-tcp"}
+  },
+  {
+    "id": "qa-memory",
+    "taskType": "KNOWLEDGE_QA",
+    "userInput": "主存和虚拟内存的关系",
+    "expect": {"outcome": "COMPLETED", "referencePrefix": "co-memory"}
+  },
+  {
+    "id": "qa-unsupported-handshake",
+    "taskType": "KNOWLEDGE_QA",
+    "userInput": "三次握手",
+    "expect": {"outcome": "UNSUPPORTED"}
+  },
+  {
+    "id": "qa-unsupported-topic",
+    "taskType": "KNOWLEDGE_QA",
+    "userInput": "海水观赏鱼繁育",
+    "expect": {"outcome": "UNSUPPORTED"}
+  },
+  {
+    "id": "school-academic",
+    "taskType": "SCHOOL_RECOMMEND",
+    "userInput": "请推荐2027年计算机学硕",
+    "profile": {"examYear": 2027, "targetMajor": "081200"},
+    "preferences": {"degreeType": "academic", "majorCodes": ["081200"]},
+    "expect": {"outcome": "COMPLETED", "candidatePrefix": "nau-2027-081200"}
+  },
+  {
+    "id": "school-missing-year",
+    "taskType": "SCHOOL_RECOMMEND",
+    "userInput": "请推荐计算机学硕",
+    "profile": {"targetMajor": "081200"},
+    "preferences": {"degreeType": "academic", "majorCodes": ["081200"]},
+    "expect": {"outcome": "NEEDS_INPUT"}
+  },
+  {
+    "id": "school-wrong-year",
+    "taskType": "SCHOOL_RECOMMEND",
+    "userInput": "请推荐2026年计算机学硕",
+    "profile": {"examYear": 2026, "targetMajor": "081200"},
+    "preferences": {"degreeType": "academic", "majorCodes": ["081200"]},
+    "expect": {"outcome": "UNSUPPORTED"}
+  },
+  {
+    "id": "chat-ambiguous",
+    "taskType": "CHAT",
+    "userInput": "帮我看看",
+    "expect": {"outcome": "NEEDS_INPUT"}
+  }
+]

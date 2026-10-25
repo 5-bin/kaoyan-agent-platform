@@ -4,6 +4,11 @@ import logging
 from pydantic import Field
 from schemas import StrictModel, Answer, Intent, Explanations, Summary, TutorExplanation
 from prompts import get
+from learning import model_allowed, has_scope, model_messages
+from retrieval import detect_subject
+from grounding import verify, aggregate
+from langchain_core.documents import Document
+from langsmith.run_helpers import tracing_context
 
 log = logging.getLogger(__name__)
 
@@ -25,14 +30,33 @@ class Admission(StrictModel):
 class Workflows:
     def __init__(self, settings, corpus, retriever, model):
         self.settings, self.corpus, self.retriever, self.model = settings, corpus, retriever, model
+        from conversation import KnowledgeRetriever
+        from langchain.tools import tool
+        self.knowledge_retriever = KnowledgeRetriever(backend=retriever)
+
+        @tool
+        async def search_knowledge(query: str, subject: str | None = None):
+            """检索当前审核版本408资料，保留来源与原文定位。"""
+            # Direct backend search keeps the optional subject filter; the
+            # retriever wrapper remains for compatibility with existing callers.
+            return [Document(page_content=d.content, metadata={"chunk": d})
+                    for d in self.retriever.search(query, "knowledge", 5, subject)]
+
+        self.knowledge_search = search_knowledge
         self.programs = [(Admission.model_validate(d.metadata), d) for d in corpus.documents if d.domain == "school"]
         if len({p.programId for p, _ in self.programs}) != len(self.programs):
             raise ValueError("招生专业编号重复")
 
     async def run(self, req):
+        with tracing_context(enabled=False):
+            return await self._run(req)
+
+    async def _run(self, req):
         task_type = req.taskType
         if task_type == "CHAT":
-            task_type = await self.resolve(req)
+            # Legacy synchronous tasks have no Java checkpoint between model
+            # calls. Resolve locally so consent is checked before the sole call.
+            task_type = await self.resolve(req, allow_model=False)
         if task_type == "SCHOOL_RECOMMEND":
             result = await self.schools(req)
         elif task_type == "KNOWLEDGE_QA":
@@ -51,7 +75,7 @@ class Workflows:
         result["releaseId"] = self.corpus.release_id
         return result
 
-    async def resolve(self, req):
+    async def resolve(self, req, allow_model=True):
         text = req.userInput or ""
         school = any(w in text for w in ("择校", "院校", "报考", "推荐学校", "推荐大学", "推荐专业"))
         knowledge = any(word.lower() in text.lower() for d in self.corpus.documents
@@ -62,31 +86,49 @@ class Workflows:
             return "SCHOOL_RECOMMEND"
         if knowledge:
             return "KNOWLEDGE_QA"
-        if self.settings.LLM_ENABLED:
+        if allow_model and model_allowed(req, self.settings):
             try:
                 answer = await self.model.generate(get("intent_router"),
-                    {"input": text, "messages": [m.model_dump() for m in req.messages]}, Intent, router=True)
+                    {"input": text, "messages": model_messages(req)}, Intent, router=True)
                 return answer.intent
             except Exception as e:
                 log.warning("routerFailure=%s", type(e).__name__)
         return "CHAT"
 
     async def qa(self, req):
-        docs = await asyncio.to_thread(self.retriever.search, req.userInput, "knowledge", 5)
+        subject = detect_subject(req.userInput or "")
+        docs = [d.metadata["chunk"] for d in await self.knowledge_search.ainvoke(
+            {"query": req.userInput, "subject": subject})]
+        if not docs and subject:
+            # A weak subject hint must not turn a covered question into "no data".
+            docs = [d.metadata["chunk"] for d in await self.knowledge_search.ainvoke(
+                {"query": req.userInput, "subject": None})]
         if not docs:
             return {"outcome": "UNSUPPORTED", "answer": "当前审核资料未覆盖该问题，请缩小问题范围或补充资料。"}
         result = {"outcome": "COMPLETED", "answer": "以下为来源摘要：\n" + "\n".join(d.content for d in docs),
                   "references": [d.reference().model_dump() for d in docs], "explanationMode": "rules"}
-        if self.settings.LLM_ENABLED:
+        if model_allowed(req, self.settings):
             try:
                 answer = await self.model.generate(get("zhishi_wenda"),
-                    {"input": req.userInput, "messages": [m.model_dump() for m in req.messages],
+                    {"input": req.userInput, "messages": model_messages(req),
                      "references": [{"id": d.id, "content": d.content} for d in docs]}, Answer)
                 ids = set(answer.sourceIds)
-                if not ids <= {d.id for d in docs}:
+                claim_ids = {source for claim in answer.claims for source in claim.sourceIds}
+                if not (ids | claim_ids) <= {d.id for d in docs}:
                     raise ValueError("unknown_source")
-                result.update(answer=answer.answer, explanationMode="ai",
-                    references=[d.reference().model_dump() for d in docs if d.id in ids])
+                support = verify(answer.answer, list(ids), {d.id: d for d in docs},
+                                 claims=[claim.model_dump() for claim in answer.claims] or None)
+                result["citationSupport"] = support
+                if support["status"] == "UNSUPPORTED":
+                    # A model answer whose sentences are not grounded in the
+                    # cited excerpts must not replace the deterministic summary.
+                    result.update(explanationMode="fallback",
+                        notice="模型回答未能与引用原文充分对齐，已保留来源摘要。")
+                else:
+                    result.update(answer=answer.answer, explanationMode="ai",
+                        references=[d.reference().model_dump() for d in docs if d.id in ids | claim_ids])
+                    if support["status"] == "PARTIAL":
+                        result["notice"] = "部分结论未能与引用原文充分对齐，请核对来源。"
             except Exception as e:
                 log.warning("qaModelFailure=%s", type(e).__name__)
                 result.update(explanationMode="fallback", notice="AI解释不可用，已保留来源摘要。")
@@ -140,12 +182,12 @@ class Workflows:
             "candidates": candidates, "unverifiedCandidates": [], "excluded": excluded,
             "references": [row[3].reference().model_dump() for row in selected], "explanationMode": "rules",
             "profileSnapshot": profile.model_dump(), "preferences": pref.model_dump(),
-            "coverage": "南京审计大学、中国科学院大学计算机学院、中国传媒大学；2027年081200/085404"}
-        if candidates and pref.explainWithAi and self.settings.LLM_ENABLED:
+            "coverage": "、".join(sorted({p.school for p, _ in self.programs})) + "；年份：" + "、".join(str(y) for y in sorted({p.year for p, _ in self.programs})) + "；专业：" + "/".join(sorted({p.majorCode for p, _ in self.programs}))}
+        if candidates and pref.explainWithAi and model_allowed(req, self.settings) and has_scope(req, "profile"):
             try:
                 answer = await self.model.generate(get("tuijian_yuanxiao"),
-                    {"input": req.userInput, "messages": [m.model_dump() for m in req.messages],
-                     "profile": profile.model_dump(), "candidates": candidates,
+                    {"input": req.userInput, "messages": model_messages(req),
+                     "profile": profile.model_dump(exclude={"background"}) if has_scope(req, "profile") else {}, "candidates": candidates,
                      "sources": [{"id": row[3].id, "content": row[3].content} for row in selected]}, Explanations)
                 mapping = {e.programId: e for e in answer.explanations}
                 if len(mapping) != len(answer.explanations) or set(mapping) != {c["programId"] for c in candidates}:
@@ -155,6 +197,18 @@ class Workflows:
                         raise ValueError("unknown_source")
                 for c in candidates:
                     c["explanation"] = mapping[c["programId"]].text
+                by_id = {row[3].id: row[3] for row in selected}
+                items = []
+                for c in candidates:
+                    explanation = mapping[c["programId"]]
+                    item = verify(explanation.text, list(explanation.sourceIds), by_id)
+                    c["citationSupport"] = item
+                    items.append(item)
+                result["citationSupport"] = aggregate(items)
+                if result["citationSupport"]["status"] == "UNSUPPORTED":
+                    result["notice"] = "部分解释未能与招生资料原文充分对齐，请以来源为准。"
+                elif result["citationSupport"]["status"] == "PARTIAL":
+                    result["notice"] = "部分解释未能与招生资料原文充分对齐，请核对来源。"
                 result["explanationMode"] = "ai"
             except Exception as e:
                 log.warning("schoolModelFailure=%s", type(e).__name__)
@@ -168,11 +222,13 @@ class Workflows:
             "standardAnswer": attempt.answer, "userAnswer": attempt.userAnswer, "questionVersion": attempt.version,
             "answer": f"你的选择：{attempt.userAnswer}；此版本标准答案：{attempt.answer}。\n原题解析：{analysis[:3500]}",
             "explanationMode": "rules", "notice": "未启用 AI，当前仅展示原题解析，尚未生成个性化解释或追问回答。"}
-        if self.settings.LLM_ENABLED:
+        if self.settings.LLM_ENABLED and not (model_allowed(req, self.settings) and has_scope(req, "wrong")):
+            result["notice"] = "尚未授权将错题发送给当前模型，仅展示原题解析；请在 Agent 助手的隐私设置中开启模型与错题授权。"
+        if model_allowed(req, self.settings) and has_scope(req, "wrong"):
             try:
                 output = await self.model.generate(get("wrong_question_tutor"),
-                    {"attempt": attempt.model_dump(), "query": req.userInput,
-                     "messages": [m.model_dump() for m in req.messages]}, TutorExplanation)
+                    {"attempt": attempt.model_dump(exclude={"id", "recordId"}), "query": req.userInput,
+                     "messages": model_messages(req)}, TutorExplanation)
                 # Revalidate even a custom provider adapter's output.
                 output = TutorExplanation.model_validate(output.model_dump())
                 if output.standardAnswer != attempt.answer:
@@ -193,10 +249,12 @@ class Workflows:
         result = {"outcome": "COMPLETED", "answer": f"有效作答{total}题，正确{correct}题。",
             "total": total, "correct": correct, "accuracy": round(correct / total * 100, 1),
             "weakPoints": weak, "explanationMode": "rules"}
-        if self.settings.LLM_ENABLED:
+        if model_allowed(req, self.settings) and (has_scope(req, "stats") or has_scope(req, "wrong")):
             try:
                 answer = await self.model.generate(get("practice_summary"),
-                    {"statistics": result, "questions": [q.model_dump() for q in req.questions]}, Summary)
+                    {"statistics": result if has_scope(req, "stats") else {},
+                     "questions": [{"ref": f"Q{i + 1}", **q.model_dump(exclude={"id"})}
+                                   for i, q in enumerate(req.questions)] if has_scope(req, "wrong") else []}, Summary)
                 result.update(answer=answer.summary, explanationMode="ai")
             except Exception as e:
                 log.warning("summaryModelFailure=%s", type(e).__name__)

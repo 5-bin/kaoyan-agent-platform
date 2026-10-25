@@ -71,6 +71,8 @@ kaoyan:
   agent:
     base-url: ${AGENT_BASE_URL:http://127.0.0.1:8001}
     internal-key: ${AGENT_INTERNAL_KEY:}
+    source-policy-file: ${RAG_SOURCE_POLICY_FILE:}
+    quota-exempt-username: ${QUOTA_EXEMPT_USERNAME:robin}
     daily-task-limit: ${DAILY_TASK_LIMIT:30}
     minute-task-limit: ${MINUTE_TASK_LIMIT:6}
 

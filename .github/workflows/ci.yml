@@ -27,6 +27,7 @@ jobs:
           cache-dependency-path: |
             kaoyan-agent/requirements.txt
             kaoyan-agent/requirements-dev.txt
+            kaoyan-agent/langchain-constraints.txt
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
@@ -41,6 +42,8 @@ jobs:
         run: |
           python scripts/check-project.py
           python scripts/check-framework.py
+          python scripts/feature-test.py
+          python -m unittest discover -s scripts/tests -v
       - name: Build Java and test the real Java to Python chain
         working-directory: kaoyan-B
         run: bash mvnw -B -ntp verify dependency:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/test-classpath.txt
@@ -56,6 +59,10 @@ jobs:
           npm run test:e2e
       - name: Real HTTP and browser regression with isolated H2 and Redis/model doubles
         run: python scripts/smoke-current.py --output .cache/ci-merge-http.json --browser-check --node node
+      - name: Continuous chat and document browser chain with controlled SDK stream
+        run: python scripts/smoke-chat.py --output .cache/ci-chat-http.json --node node
+      - name: Learning assistant privacy and controlled actions with real Java and Python
+        run: python scripts/smoke-chat.py --learning --output .cache/ci-learning-http.json --node node
       - name: Question admin with real Java and isolated H2
         run: python scripts/smoke-question-admin.py --output .cache/ci-question-admin-browser.json
       - uses: actions/upload-artifact@v6
@@ -68,3 +75,6 @@ jobs:
             kaoyan-B/target/agent-chain.log
             kaoyan-frontend/test-results/
             .cache/smoke-debug-*/
+            .cache/chat-debug-*/
+            .cache/chat-browser-*/
+            .cache/learning-browser-*/

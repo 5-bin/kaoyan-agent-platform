@@ -7,8 +7,8 @@ async function login(page: Page) {
   })
 }
 function task(id: string, input: Record<string, unknown>, mode = 'ai') {
-  return { id, userId: 1, taskType: 'WRONG_QUESTION_TUTOR', status: 'SUCCESS', createdAt: '2026-10-25',
-    inputPayload: input, resultPayload: { outcome: 'COMPLETED', resolvedTaskType: 'WRONG_QUESTION_TUTOR',
+  return { id, taskType: 'WRONG_QUESTION_TUTOR', status: 'SUCCESS', createdAt: '2026-10-25',
+    tutoring: { messages: [], ...input }, resultPayload: { outcome: 'COMPLETED', resolvedTaskType: 'WRONG_QUESTION_TUTOR',
       explanationMode: mode, answer: id === 'turn-1' ? '解释线程区别 <img src=x onerror=alert(1)>' : '通过例子说明本题。',
       recordId: 71, standardAnswer: 'B', userAnswer: 'A', questionVersion: 2, releaseId: 'rag-v1-1234567890abcdef', references: [],
       notice: mode === 'rules' ? '未启用 AI，当前仅展示原题解析，尚未生成个性化解释或追问回答。' : 'AI 辅助解释可能有误。' } }
@@ -30,8 +30,8 @@ test('wrong answer enables explicit explanation and chained followups, persisted
       if (saved.length) expect(body.input.parentTaskId).toBe(saved.at(-1)?.id)
       else expect(body.input).not.toHaveProperty('parentTaskId')
       const prior = saved.at(-1)
-      const messages = prior ? [...((prior.inputPayload.messages as unknown[]) || []),
-        { role: 'user', content: prior.inputPayload.query }, { role: 'assistant', content: prior.resultPayload.answer }].slice(-6) : []
+      const messages = prior ? [...((prior.tutoring.messages as unknown[]) || []),
+        { role: 'user', content: prior.tutoring.query }, { role: 'assistant', content: prior.resultPayload.answer }].slice(-6) : []
       data = task('turn-' + (saved.length + 1), { ...body.input, messages })
       saved.push(data as ReturnType<typeof task>)
     } else if (path.endsWith('/tasks')) data = { total: saved.length, list: [...saved].reverse() }
@@ -55,15 +55,16 @@ test('wrong answer enables explicit explanation and chained followups, persisted
   await page.getByRole('button', { name: '发送追问' }).click()
   await expect(page.locator('.task-result')).toContainText('通过例子说明本题')
   expect(saved).toHaveLength(2)
-  await page.goto('/tasks')
+  await page.goto('/tasks/history')
   await page.reload()
-  await page.getByRole('button', { name: '查看结果与来源' }).first().click()
+  await page.getByRole('button', { name: '查看', exact: true }).first().click()
   const dialog = page.getByRole('dialog')
   await expect(dialog).toContainText('能举个例子吗？')
   await expect(dialog).toContainText('解释线程区别')
   await dialog.getByRole('textbox', { name: '错题追问' }).fill('再解释一下')
   await dialog.getByRole('button', { name: '发送追问' }).click()
-  await expect(dialog.locator('.task-result')).toContainText('turn-3')
+  await expect(dialog.locator('.task-result')).toContainText('通过例子说明本题')
+  await expect(dialog.getByRole('textbox', { name: '错题追问' })).toHaveValue('')
   expect(saved).toHaveLength(3)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.screenshot({ path: testInfo.outputPath('tutor-followup.png'), fullPage: true })
@@ -130,7 +131,7 @@ test('agent offline keeps original analysis and permits retrying the same questi
       const input = route.request().postDataJSON().input
       expect(input).not.toHaveProperty('parentTaskId')
       const data = calls === 1 ? { id: 'failed-1', taskType: 'WRONG_QUESTION_TUTOR', status: 'FAILED',
-        inputPayload: input, errorMessage: 'Agent 暂时不可用' } : task('turn-1', input)
+        tutoring: { ...input, messages: [] }, errorMessage: 'Agent 暂时不可用' } : task('turn-1', input)
       return route.fulfill({ json: { code: 0, message: 'ok', data } })
     }
     await route.fulfill({ json: { code: 0, message: 'ok', data: { total: 1, list: [wrong] } } })

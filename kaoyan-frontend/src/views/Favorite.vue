@@ -4,10 +4,12 @@
       <h2 class="page-title">我的收藏</h2>
       <p class="page-sub">共 {{ total }} 道收藏题目</p>
     </div>
+    <p v-if="items.length > 50" class="page-sub">助手按前50题识别列表序号；可勾选具体题目（最多50题）后操作。</p>
     <div v-loading="loading">
       <el-empty v-if="!items.length && !loading" description="还没有收藏题目" :image-size="100" />
       <div v-for="it in items" :key="it.questionId" class="card item">
         <div class="item-head">
+          <el-checkbox :model-value="selected.includes(it.questionId)" :aria-label="'选择题目 ' + it.questionId" @change="toggle(it.questionId)" />
           <el-tag size="large" type="warning" effect="dark">藏</el-tag>
           <span class="q">{{ it.content || `[题目 #${it.questionId} 内容不可用]` }}</span>
         </div>
@@ -29,6 +31,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useAssistantPage } from '@/composables/assistant-page'
 import { historyNotice } from '@/utils/question-history'
 import { getFavoritePage, removeFavorite, type MarkItem } from '@/api/mark'
 
@@ -37,6 +40,8 @@ const items = ref<MarkItem[]>([])
 const total = ref(0)
 const page = ref(1)
 const size = 20
+const selected = ref<number[]>([])
+const toggle = (id: number) => { selected.value = selected.value.includes(id) ? selected.value.filter(value => value !== id) : [...selected.value, id].slice(0,50) }
 
 const load = async (append = false) => {
   loading.value = true
@@ -48,6 +53,7 @@ const load = async (append = false) => {
 }
 const loadMore = () => { page.value++; load(true) }
 const unfav = async (id: number) => { await removeFavorite(id); page.value = 1; load() }
+useAssistantPage(() => ({ page: 'favorite', selectedQuestionIds: selected.value, visibleQuestionIds: items.value.slice(0,50).map(item => item.questionId) }), () => { selected.value = []; page.value = 1; return load() })
 onMounted(() => load())
 </script>
 

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 const user = { id: 1, username: 'browser-test', role: 'STUDENT', status: 1, examYear: 2027, targetMajor: '081200' }
+const schoolOptions = { provinces: ['北京', '江苏'], majorNames: ['计算机科学与技术', '计算机技术'] }
 function task(outcome = 'COMPLETED') {
   return { id: 'browser-task', taskType: 'SCHOOL_RECOMMEND', userId: 1, status: 'SUCCESS', createdAt: '2026-10-14T12:00:00',
     releaseId: 'rag-v1-1234567890abcdef', resultPayload: { outcome, answer: outcome === 'COMPLETED' ? '满足条件的候选清单' : '当前资料没有符合条件的候选',
@@ -20,7 +21,8 @@ test('recommendation, safe rendering, sources and saved history', async ({ page 
   await page.route('http://127.0.0.1:4173/api/**', async route => {
     const url = new URL(route.request().url())
     let data: unknown = []
-    if (url.pathname.endsWith('/users/me')) data = user
+    if (url.pathname.endsWith('/schools/options')) data = schoolOptions
+    else if (url.pathname.endsWith('/users/me')) data = user
     else if (url.pathname.endsWith('/recommends/generate')) {
       const body = route.request().postDataJSON()
       expect(body.preferences.degreeType).toBe('academic')
@@ -49,7 +51,7 @@ test('recommendation, safe rendering, sources and saved history', async ({ page 
 test('no candidates remains an explicit outcome', async ({ page }) => {
   await page.route('http://127.0.0.1:4173/api/**', async route => {
     const path = new URL(route.request().url()).pathname
-    const data = path.endsWith('/users/me') ? user : path.endsWith('/recommends/generate') ? task('UNSUPPORTED') : []
+    const data = path.endsWith('/schools/options') ? schoolOptions : path.endsWith('/users/me') ? user : path.endsWith('/recommends/generate') ? task('UNSUPPORTED') : []
     await route.fulfill({ json: { code: 0, message: 'ok', data } })
   })
   await page.goto('/schools')
@@ -69,7 +71,7 @@ test('late unauthorized response cannot log out a newer account', async ({ page 
       started = true
       await gate
       await route.fulfill({ status: 401, json: { code: 401, message: 'old account expired' } })
-    } else await route.fulfill({ json: { code: 0, message: 'ok', data: path.endsWith('/users/me') ? user : [] } })
+    } else await route.fulfill({ json: { code: 0, message: 'ok', data: path.endsWith('/schools/options') ? schoolOptions : path.endsWith('/users/me') ? user : [] } })
   })
   await page.goto('/schools')
   await page.getByRole('button', { name: '条件推荐', exact: true }).click()

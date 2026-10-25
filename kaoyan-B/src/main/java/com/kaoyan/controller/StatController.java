@@ -51,4 +51,11 @@ public class StatController {
     public Result<Map<String, Object>> overview() {
         return Result.ok(studyStatService.overview(UserContext.currentUserId()));
     }
+    @GetMapping("/learning")
+    public Result<Map<String, Object>> learning(
+            @RequestParam(required = false) java.time.LocalDate from,
+            @RequestParam(required = false) java.time.LocalDate to,
+            @RequestParam(required = false) String subject) {
+        return Result.ok(studyStatService.learning(UserContext.currentUserId(), from, to, subject));
+    }
 }

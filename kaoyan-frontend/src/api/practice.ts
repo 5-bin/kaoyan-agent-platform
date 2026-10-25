@@ -11,7 +11,7 @@ export interface AnswerResult {
   analysis?: string
 }
 
-export const startSession = (data: { subject: string; difficulty?: string; count: number }) =>
+export const startSession = (data: { subject: string; difficulty?: string; count: number; source?: 'NORMAL' | 'WRONG' | 'FAVORITE'; questionIds?: number[] }) =>
   request.post<unknown, { sessionId: string }>('/practice/sessions', data)
 
 export const answerQuestion = (

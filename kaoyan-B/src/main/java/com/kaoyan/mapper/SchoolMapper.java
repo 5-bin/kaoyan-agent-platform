@@ -13,6 +13,10 @@ import java.util.List;
 @Mapper
 public interface SchoolMapper extends BaseMapper<School> {
 
+    List<String> listProvinces();
+
+    List<String> listMajorNames();
+
     /**
      * 多条件搜索院校：province / level / majorName 任意组合，都不传才查全部
      * （SQL 见 resources/mapper/SchoolMapper.xml）

@@ -4,10 +4,12 @@
       <h2 class="page-title">错题本</h2>
       <p class="page-sub">共 {{ total }} 道错题，坚持复习</p>
     </div>
+    <p v-if="items.length > 50" class="page-sub">助手按前50题识别列表序号；可勾选具体题目（最多50题）后操作。</p>
     <div v-loading="loading">
       <el-empty v-if="!items.length && !loading" description="暂时没有错题" :image-size="100" />
       <div v-for="it in items" :key="it.questionId" class="card item">
         <div class="item-head">
+          <el-checkbox :model-value="selected.includes(it.questionId)" :aria-label="'选择题目 ' + it.questionId" @change="toggle(it.questionId)" />
           <el-tag size="large" type="danger" effect="dark">错</el-tag>
           <el-tag v-if="it.isFavorite === 1" size="large" type="warning" effect="plain">已收藏</el-tag>
           <span class="q">{{ it.content || `[题目 #${it.questionId} 内容不可用]` }}</span>
@@ -34,6 +36,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import WrongQuestionTutor from '@/components/WrongQuestionTutor.vue'
+import { useAssistantPage } from '@/composables/assistant-page'
 import { historyNotice } from '@/utils/question-history'
 import { getWrongPage, removeWrong, addFavorite, type MarkItem } from '@/api/mark'
 
@@ -42,6 +45,8 @@ const items = ref<MarkItem[]>([])
 const total = ref(0)
 const page = ref(1)
 const size = 20
+const selected = ref<number[]>([])
+const toggle = (id: number) => { selected.value = selected.value.includes(id) ? selected.value.filter(value => value !== id) : [...selected.value, id].slice(0,50) }
 
 const load = async (append = false) => {
   loading.value = true
@@ -54,6 +59,7 @@ const load = async (append = false) => {
 const loadMore = () => { page.value++; load(true) }
 const remove = async (id: number) => { await removeWrong(id); page.value = 1; load() }
 const fav = async (id: number) => { await addFavorite(id); load() }
+useAssistantPage(() => ({ page: 'wrong', selectedQuestionIds: selected.value, visibleQuestionIds: items.value.slice(0,50).map(item => item.questionId) }), () => { selected.value = []; page.value = 1; return load() })
 onMounted(() => load())
 </script>
 

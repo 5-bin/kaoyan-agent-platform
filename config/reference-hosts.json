@@ -1,0 +1,19 @@
+{
+  "allowedHosts": [
+    "admission.ucas.edu.cn",
+    "docs.python.org",
+    "github.com",
+    "gs.nau.edu.cn",
+    "itee.zust.edu.cn",
+    "ocw.mit.edu",
+    "pages.cs.wisc.edu",
+    "www.rfc-editor.org",
+    "yanzhao.scnu.edu.cn",
+    "yjsc.zua.edu.cn",
+    "yz.ahnu.edu.cn",
+    "yz.chsi.com.cn",
+    "yz.cuc.edu.cn",
+    "yz.scu.edu.cn",
+    "yzb.buaa.edu.cn"
+  ]
+}

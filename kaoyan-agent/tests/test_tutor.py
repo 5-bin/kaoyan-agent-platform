@@ -36,8 +36,8 @@ def test_ai_receives_authorized_snapshot_and_followup_as_data():
             assert schema is TutorExplanation
             return TutorExplanation(explanation="逐步说明两者区别。", standardAnswer="B")
     with client(Capture(), enabled=True) as c:
-        result = post(c, tutor(messages=[{"role": "user", "content": "解释一下"},
-            {"role": "assistant", "content": "前一轮解释"}]))["result"]
+        result = post(c, tutor(messages=[{"role": "user", "content": "解释一下", "scopes": ["wrong"]},
+            {"role": "assistant", "content": "前一轮解释", "scopes": ["wrong"]}]))["result"]
         assert result["explanationMode"] == "ai"
         assert result["answer"] == "逐步说明两者区别。"
         assert result["standardAnswer"] == "B" and result["userAnswer"] == "A"
@@ -93,3 +93,32 @@ def test_tutor_budget_exhaustion_falls_back_without_opening_provider():
         result = post(c, tutor())["result"]
         assert result["explanationMode"] == "fallback" and "此版本原解析" in result["answer"]
         assert model.client is None
+
+
+@pytest.mark.parametrize("privacy", [
+    {"modelAllowed": False, "scopes": ["wrong"], "provider": "https://open.bigmodel.cn/api/paas/v4"},
+    {"modelAllowed": True, "scopes": ["stats"], "provider": "https://open.bigmodel.cn/api/paas/v4"},
+    {"modelAllowed": True, "scopes": ["wrong"], "provider": "https://different.example.test"},
+])
+def test_tutor_requires_current_provider_consent_and_wrong_scope(privacy):
+    model = FakeModel(error=True)
+    with client(model, enabled=True) as c:
+        result = post(c, tutor(privacy=privacy))["result"]
+        assert model.calls == 0
+        assert result["explanationMode"] == "rules"
+        assert "尚未授权" in result["notice"]
+        assert result["standardAnswer"] == "B"
+
+
+def test_tutor_filters_unknown_history_and_does_not_export_business_ids():
+    class Capture(FakeModel):
+        async def generate(self, instruction, payload, schema):
+            assert "id" not in payload["attempt"] and "recordId" not in payload["attempt"]
+            assert payload["messages"] == [{"role": "user", "content": "允许的错题历史"}]
+            return TutorExplanation(explanation="基于本次快照解释。", standardAnswer="B")
+    with client(Capture(), enabled=True) as c:
+        result = post(c, tutor(messages=[
+            {"role": "user", "content": "旧历史未分类"},
+            {"role": "assistant", "content": "未授权文档", "scopes": ["document"]},
+            {"role": "user", "content": "允许的错题历史", "scopes": ["wrong"]}]))["result"]
+        assert result["explanationMode"] == "ai"

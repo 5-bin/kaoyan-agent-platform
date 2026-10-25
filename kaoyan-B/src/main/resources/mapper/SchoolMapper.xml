@@ -3,6 +3,19 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kaoyan.mapper.SchoolMapper">
 
+    <select id="listProvinces" resultType="java.lang.String">
+        SELECT DISTINCT province FROM school
+        WHERE province IS NOT NULL AND TRIM(province) != ''
+        ORDER BY province
+    </select>
+
+    <select id="listMajorNames" resultType="java.lang.String">
+        SELECT DISTINCT d.major_name
+        FROM school_detail d INNER JOIN school s ON s.id = d.school_id
+        WHERE d.major_name IS NOT NULL AND TRIM(d.major_name) != ''
+        ORDER BY d.major_name
+    </select>
+
     <!-- 多条件搜索院校：province / level / majorName 任意组合，都不传才查全部 -->
     <select id="search" resultType="com.kaoyan.entity.School">
         SELECT DISTINCT s.*

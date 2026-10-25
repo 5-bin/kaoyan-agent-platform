@@ -8,7 +8,7 @@
       <h1 class="headline">智能刷题，<br/>上岸更近一步</h1>
       <p class="desc">AI 智能组卷 · 错题自动归集 · 择校推荐 · 学习数据看板</p>
       <div class="dots">
-        <span>✓ 历年真题</span>
+        <span>✓ 来源可查的课程习题</span>
         <span>✓ 实时解析</span>
         <span>✓ 个性化推荐</span>
       </div>

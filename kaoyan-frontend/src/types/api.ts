@@ -27,8 +27,9 @@ export interface Task {
   id: string
   userId: number
   taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND' | 'PRACTICE_SUMMARY' | 'CHAT' | 'WRONG_QUESTION_TUTOR'
-  status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED'
+  status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'CANCELLED'
   inputPayload?: Record<string, unknown>
+  tutoring?: { recordId: number; query: string; parentTaskId?: string | null; messages: { role: 'user' | 'assistant'; content: string }[] } | null
   resultPayload?: TaskResult
   releaseId?: string
   errorMessage?: string
@@ -38,10 +39,27 @@ export interface Task {
 export interface SourceReference {
   id: string; title: string; url: string; locator: string; version: string; retrievedAt: string; excerpt: string
 }
+export interface CitationSupport {
+  status: 'SUPPORTED' | 'PARTIAL' | 'UNSUPPORTED' | 'NOT_CHECKED'
+  checked: number; supported: number; ratio: number
+  unsupported: { text: string; reason: string; sourceIds?: string[] }[]
+  items?: { text: string; sourceIds: string[]; supported: boolean; reason?: string; ratio?: number }[]
+}
 export interface SchoolCandidate {
   programId: string; school: string; college: string; major: string; majorCode: string; year: number
   degreeType: 'academic' | 'professional'; region: string; studyMode: string; examSubjects: string[]
   matchedConditions: string[]; pendingChecks: string[]; sourceIds: string[]; explanation: string
+  citationSupport?: CitationSupport
+}
+export interface AssistantAction {
+  id: string; type: string; status: 'PENDING' | 'SUCCESS' | 'DISMISSED' | 'FAILED'; title: string
+  count: number; requiresConfirmation: boolean; result?: { sessionId?: string; actualCount?: number }
+  requestedCount?: number; targets?: { title: string; resource: AssistantEvidence['resource']; matchMethod?: 'LABEL' | 'SEMANTIC'; matchTopic?: string }[]
+}
+export interface AssistantEvidence {
+  ref: string; kind: string; title: string; locator?: string; version?: string
+  matchMethod?: 'LABEL' | 'SEMANTIC'; matchTopic?: string; summary?: string
+  resource?: { type: 'question' | 'document' | 'practice' | 'stats'; id?: string | number }
 }
 export interface TaskResult {
   outcome: 'COMPLETED' | 'NEEDS_INPUT' | 'UNSUPPORTED'; answer: string
@@ -49,6 +67,11 @@ export interface TaskResult {
   releaseId: string; references: SourceReference[]; followUp?: string[]; notice?: string
   candidates?: SchoolCandidate[]; coverage?: string; weakPoints?: string[]; accuracy?: number
   recordId?: number; standardAnswer?: string; userAnswer?: string; questionVersion?: number
+  evidence?: AssistantEvidence[]; actions?: AssistantAction[]
+  retrievalStatus?: 'READY' | 'BUILDING' | 'BUSY' | 'FAILED' | 'UNAVAILABLE'
+  citationSupport?: CitationSupport
+  conditions?: Record<string, unknown>
+  documentProposal?: { operation: 'create' | 'update'; documentId?: string; baseVersion?: number; title: string; content: string }
 }
 
 export interface Document {

@@ -5,6 +5,7 @@ import com.kaoyan.common.Result;
 import com.kaoyan.dto.query.PageQuery;
 import com.kaoyan.dto.request.TaskSubmitRequest;
 import com.kaoyan.entity.Task;
+import com.kaoyan.dto.response.TaskView;
 import com.kaoyan.security.UserContext;
 import com.kaoyan.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,8 +32,8 @@ public class TaskController {
      */
     @Operation(summary = "提交任务")
     @PostMapping
-    public Result<Task> submit(@Valid @RequestBody TaskSubmitRequest req) {
-        return Result.ok(taskService.submit(UserContext.currentUserId(), req.taskType(), req.input()));
+    public Result<TaskView> submit(@Valid @RequestBody TaskSubmitRequest req) {
+        return Result.ok(TaskView.of(taskService.submit(UserContext.currentUserId(), req.taskType(), req.input())));
     }
 
     /**
@@ -40,10 +41,11 @@ public class TaskController {
      */
     @Operation(summary = "任务历史")
     @GetMapping
-    public Result<PageResult<Task>> history(PageQuery query) {
+    public Result<PageResult<TaskView>> history(PageQuery query) {
         int page = query.pageNum();
         int size = query.pageSize();
-        return Result.ok(taskService.history(UserContext.currentUserId(), page, size));
+        var result=taskService.history(UserContext.currentUserId(), page, size);
+        return Result.ok(PageResult.of(result.getTotal(),result.getPage(),result.getSize(),result.getList().stream().map(TaskView::of).toList()));
     }
 
     /**
@@ -51,7 +53,7 @@ public class TaskController {
      */
     @Operation(summary = "任务详情")
     @GetMapping("/{taskId}")
-    public Result<Task> detail(@PathVariable String taskId) {
-        return Result.ok(taskService.detail(UserContext.currentUserId(), taskId));
+    public Result<TaskView> detail(@PathVariable String taskId) {
+        return Result.ok(TaskView.of(taskService.detail(UserContext.currentUserId(), taskId)));
     }
 }

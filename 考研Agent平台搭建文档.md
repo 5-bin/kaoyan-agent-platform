@@ -8,7 +8,15 @@
 
 文档职责：本文维护业务设计、当前契约与建设阶段；[README](README.md)维护可执行入口；[AGENTS.md](AGENTS.md)维护协作约定；[RAG契约](docs/rag.md)补充检索及快照字段；[框架适配历史](docs/当前框架适配.md)、[RAG历史验证](docs/validation-rag.md)及[本次合并审查](docs/merge-review-2026-10-14.md)分别记录实际范围。本次整合不重置日常业务库、不调用付费模型或发布公网。
 
+2026-10-23后续数据接入：按用户“合并”授权，将10校15专业、160道可练习原创测试题、12道审核样例及4份公共摘要补入日常`kaoyan_dev`，保留旧记录并补齐V12；日常Agent通过`RAG_DATA`加载10校语料。此为本机功能测试数据接入，不代表题目人工审核、完整刷题流程或全国招生覆盖；备份、正常启动及本轮验证见[日常库合并记录](docs/development-data-merge-2026-10-23.md)。
+
+2026-10-24日常数据替换：用户确认只保留真实内容后，完整备份并验证恢复，清理明确识别的演示公共数据及其关联练习／统计、未修改的合成任务与笔记。当前日常库保留10校15条2027专业，接入44道OpenDSA课程习题中文翻译、四科各4篇来源可追溯资料。课程习题仅覆盖数据结构，其他科目缺题返回实际空结果；来源和许可核对不等于教师人工审核。Agent日常语料为31条，已获用户授权启动Redis并重启Java／Agent。真实MySQL、Redis、Java、Agent、本地向量检索及隔离浏览器25项检查通过；数量与边界见[本轮接入记录](docs/real-data-import-2026-10-24.md)。上文2026-10-23数量保留为历史记录。
+
 ## 阅读导航
+
+2026-10-24引用来源修复契约：Java聊天及同步任务统一使用`config/reference-hosts.json`中的精确域名清单；Python加载语料时逐条校验，配置缺失、损坏或存在未授权来源时拒绝启动／导入。默认Java从同一配置源打包资源，Python读取仓库配置；可通过`RAG_SOURCE_POLICY_FILE`为两端指定同一个绝对路径文件，修改后须重新构建／加载对应服务。保留HTTPS、无凭证URL、引用字段、候选范围及版本校验；域名允许不等于引用支持结论。公开接口、任务状态及语料releaseId不变。
+
+学情主题提取支持“有关堆排序的题目”，完整主题优先，多主题仍澄清。命令类计划在本地记录及题目检索状态处理后直接返回，不调用知识资料检索或模型；Java继续负责预览、确认和执行。聊天失败日志只记录任务编号、固定失败码及异常类名，外部失败文案不变。全局lexical阈值本轮不调整，分析类请求仍可能召回弱相关资料。实现与本次实际验证另见修复记录，不将本契约当作验收结果。
 
 - [1. 项目定位、课程要求与交付物](#requirements)
 - [2. 参考资料与复用边界](#references)
@@ -31,7 +39,7 @@
 
 建设一个能够查证依据、保存练习、理解错误并比较报考条件的408备考平台。三个核心领域流程是专业知识问答、院校专业推荐、错题辅导；当前批次总结作为已有工作流继续保留，后续接入真实作答版本。模型负责受约束的解释，确定性判分、权限、记录与筛选依据由服务代码负责。
 
-首版目标为单 Java、单 Python 实例和同步任务，不建设多 Agent 调度、社区、商城、积分、硬件、自动网页抓取或自动出题发布。向量检索、消息队列和服务注册不是首版必要依赖；Redis 已是当前会话撤销的运行依赖。
+首版保持单Java、单Python实例；聊天采用后台生成与SSE订阅，院校和练习等原入口保留同步任务。不建设多Agent调度、社区、商城、积分、硬件、自动网页抓取或自动出题发布。消息队列和服务注册不是首版必要依赖；Redis是当前登录会话撤销的运行依赖。
 
 ### 1.2 课程要求映射
 
@@ -122,26 +130,27 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 | 模块 | 当前实现／已有证据边界 | P0目标或P1增强 |
 | --- | --- | --- |
 | 账号与档案 | STUDENT注册、JWT登录、Redis撤销；档案字段和接口存在；权限／会话有隔离测试记录 | P0：可持久、隔离的完整备考条件；管理员受控授权 |
-| 知识问答 | KNOWLEDGE_QA检索与任务页；默认离线摘要，可选模型解释，资料不足明确说明 | P0：四科目录、审核资料、引用、缺信息与缺资料区分 |
+| 知识问答 | KNOWLEDGE_QA检索与连续聊天；默认离线摘要，可选模型解释，资料不足明确说明 | P0：四科目录、审核资料、引用、缺信息与缺资料区分 |
 | 院校与推荐 | 院校查询与详情、条件推荐和来源历史；3校6专业静态副本，代码筛选，模型可选解释 | P0：当年核验候选、确定性筛选排序和推荐快照 |
-| 刷题 | 稳定顺序抽题、Java判分视图、学生答案隐藏及历史快照回顾；完整批次规则仍待建设 | P0：四模式、固定版本、答题卡、草稿、审核提示、幂等提交和结果页 |
-| 错题与收藏 | 本人标记、列表和错答归集存在；连续正确掌握规则未实现 | P0：可重练、保存历史、自动掌握状态和错题辅导 |
-| 统计与任务 | 作答累加、任务分页、失败保存和重启中断处理存在；统计口径待统一 | P0：有效／未答／撤回、辅助／独立口径；P1：覆盖率和90天练习日历 |
+| 刷题 | 普通／错题／收藏选题、1—50题、新批次创建快照、Java判分及未答答案隐藏；草稿与正式结束仍待建设 | P0：四模式、固定版本、答题卡、草稿、审核提示、幂等提交和结果页 |
+| 错题与收藏 | 本人列表、错答归集、助手分析、直接单题收藏及确认后操作；连续正确掌握规则未实现 | P0：可重练、保存历史、自动掌握状态和错题辅导 |
+| 统计与任务 | 按有效已提交作答统一今日／区间／总览／助手统计；任务隔离、失败保存、重启恢复及30天清理 | P0：有效／未答／撤回、辅助／独立口径；P1：覆盖率和90天练习日历 |
 | 管理与资料 | 资料和题目管理审核入口存在；不可变发布包和完整来源元数据未接入 | P0：录入、审核、版本发布与失败恢复 |
 | 薄弱点建议 | 模型总结字段可用，不等于正式掌握分析 | P1：真实样本量、规则解释和已审核练习推荐 |
 
 ### 4.2 当前页面与目标交互
 
-使用 Vue Router 的 history 模式；生产入口需处理路由刷新回退。当前路由包括登录、注册、首页、档案、资料、院校列表／详情、任务、刷题首页／批次、错题、收藏、统计、管理资料和管理题目。知识问答和其他文本任务位于任务页；没有把独立领域工作流页面当成已有成果。
+使用Vue Router的history模式；生产入口需处理路由刷新回退。当前路由包括登录、注册、首页、档案、资料、院校列表／详情、Agent助手、个人笔记、只读任务历史、刷题首页／批次、错题、收藏、统计、管理资料和管理题目。问答、择校及笔记建议位于Agent助手页；个人笔记在左侧“复习”分组独立管理，与公共审核资料分开。
 
 | 页面入口 | 当前角色 | 后续补齐 |
 | --- | --- | --- |
 | `/profile` | 保存当前档案 | 必填与可选条件、学位类型、地区软硬偏好、自评成绩口径 |
-| `/tasks` | 提交任务、分页查看结果及失败 | 扩大科目覆盖、改进多轮交互；引用、追问和版本结果已具备基础实现 |
-| `/schools`、`/schools/:id` | 院校筛选与详情 | 扩充院校资料与内容审核；当前已有专业／年份条件、来源及任务历史 |
+| `/tasks`、`/tasks/history` | 持久连续聊天、笔记建议预览保存、绑定来源回答的题目引用；只读任务历史 | 扩大审核资料覆盖；新增协议见连续聊天契约 |
+| `/notes` | 个人笔记手动创建／编辑、预览差异、历史版本及“让助手修改”；列表内部滚动，默认5份并逐批展开，切换笔记保留展开状态；沿用个人文档API与版本，无新迁移 | 导入导出与共享未实现 |
+| `/schools`、`/schools/:id` | 院校筛选与详情；省份、专业名单选支持搜索选项和清空，选项来自院校库，点击搜索按钮查询 | 扩充院校资料与内容审核；当前已有专业／年份条件、来源及任务历史 |
 | `/practice`、`/practice/session/:sessionId` | 抽题、逐题作答、回顾和AI总结 | 四模式、答题卡、持久草稿、提示及正式结束入口 |
-| `/wrong`、`/favorite` | 本人错题和收藏 | 重练批次、撤回提示、掌握状态与辅导入口 |
-| `/stat` | 学习统计 | 统一口径、样本量、独立正确率和覆盖范围 |
+| `/wrong`、`/favorite` | 本人错题／收藏、助手侧栏与确认后定向练习 | 完整撤回提示、自动掌握状态 |
+| `/stat` | 上海日期近30天有效作答、去重题数、小样本提示和助手分析 | 提示辅助／独立正确率和覆盖范围仍未记录 |
 | `/admin/documents`、`/admin/questions` | 资料管理、单选题录入／来源登记／审核及待审分页、JSON批量预览与送审 | 不可变题目新版本发布、整卷管理；招生管理待建设 |
 
 前端守卫与菜单不授予权限。localStorage 当前缓存令牌与用户展示信息，正式档案、任务和作答在后端保存；未来草稿也必须通过后端恢复。
@@ -164,15 +173,26 @@ P0是正式首版必须闭环，P1是增强项；优先级不表示已完成。
 - **结束**：所有有效项目提交后自动完成，也可提前结束；重复结束返回原结果，完成后不再接受新答案或草稿。未答不进入错题。放弃应保留记录并结束批次，不能删除已计入统计的作答。
 - **版本与撤回**：新发布版本不替换进行中的快照；错误旧版本明确撤回后不可继续作答，保留历史及纠错说明，相关作答不进入有效统计，错题状态按剩余有效记录重算。
 - **结果**：区分实际题数、有效已答、未答、撤回、正确、错误、辅助题数和独立正确率。正确率按有效已答计算，独立正确率仅含hintLevelUsed=0的有效作答，分母为0展示暂无数据。
-- **错题与增强统计**：错答进入reviewing；连续独立答对2次进入mastered，辅助答对不推进，之后答错恢复reviewing。少于3次知识点作答只显示样本不足。覆盖率基于明确资料版本的去重有效题数；90天日历按Asia/Shanghai自然日统计有效作答，不把批次起止间隔或草稿操作当成学习时长。
+- **错题与增强统计**：错答进入reviewing；连续独立答对2次进入mastered，辅助答对不推进，之后答错恢复reviewing。少于5次知识点有效作答只显示样本不足。覆盖率基于明确资料版本的去重有效题数；90天日历按Asia/Shanghai自然日统计有效作答，不把批次起止间隔或草稿操作当成学习时长。
 
-当前缺口：抽题按stable_order返回且上限100；没有上述mode、1—50约束、抽题时固定版本快照、草稿／revision、提示和批次状态。Issue #9已实现学生白名单DTO、服务端判分结果展示，以及回顾／收藏／错题按本人有效提交和历史快照展示；未答不算错，缺失快照不回退现行题表。重复或同一记录并发提交返回409且不重复计数，但完整请求重放、不同记录并发统计仍待建设。当前DELETE批次会删除记录，summary接口与批次列表统计分母仍需统一；回顾页面已按全部记录计算已答正确率，不随加载页数改变。本次范围和验证见[Issue #9验证记录](docs/practice-answer-safety-verification.md)。
+2026-10-23当前范围：按stable_order抽取，创建请求限制1—50题，支持source=NORMAL／WRONG／FAVORITE及明确所选集合；新批次创建时固定快照，判分读取该快照，旧缺失快照不补造。未答批次已纳入列表。章节树、随机抽样、草稿／revision、提示和正式批次状态仍未实现。Issue #9已实现学生白名单DTO、服务端判分结果展示，以及回顾／收藏／错题按本人有效提交和历史快照展示；未答不算错，缺失快照不回退现行题表。重复或同一记录并发提交返回409且不重复计数，但完整请求重放、不同记录并发统计仍待建设。当前DELETE批次仍会删除记录，本轮未接入助手；summary及批次列表的正确率已统一按有效已答计算；回顾页面已按全部记录计算已答正确率，不随加载页数改变。本次范围和验证见[Issue #9验证记录](docs/practice-answer-safety-verification.md)。
 
 PR #10审查修复（2026-10-21，基线`1bf60bc`）：首次加载、下一题和回顾后继续共用按原顺序选取未答题的流程。服务端标记不可用或题目详情404时提示并跳过；网络失败保留重试，提交404／409先刷新本人记录并核对题目，已答则显示服务器历史，配置冲突不自动跳过或重放提交。跳过只保存在当前页面内存中，不写判分、错题或统计，重新加载时核验；仍有有效未答项目时不声称完成或开放总结。回顾独立展示历史快照中的标准答案和本人选择，缺少选项不影响答案字母展示；未答／缺失／不可用快照继续隐藏答案。以上不等同于正式撤回、版本锁定、草稿或结束状态已实现，接口与数据库契约保持现状。
 
 <a id="architecture"></a>
 
 ## 5. 技术架构与模块职责
+
+2026-10-23学情助手增量：目标用户仍为408备考学生，助手通过Java业务工具读取本人错题、收藏、统计和已发布资料，支持页面侧栏、直接单题收藏及确认后练习等操作；新增分类外发授权、端点绑定和30天清除。主题操作区分来源集合与写入目的，支持大小写、协议别名及子主题筛选，多题操作先预览确认；请求不明确时说明缺失条件并给出可套用的推荐问法。完整新增接口、工具与隐私契约统一见[学情助手契约](docs/assistant-learning-contract.md)。新增V12仅提供迁移脚本，未应用日常库。学习效果和真实访谈仍需独立证据，本次不声称已验证学习能力提升。
+
+2026-10-24主题理解与题目语义检索增量：自然语言主题不再以固定词表为接受前提。Java确定本人错题／收藏或当前已发布全题库候选，将公开题目白名单快照交给Python独立本地Qdrant；标签与题干／选项语义结果合并，标准答案与个人作答不参与匹配，历史版本仅在内存匹配。题库变更生成新索引版本，未就绪不使用旧索引生成操作；主题操作（包括单题）先预览确认，确认复核账号、来源、版本与内容指纹。新增内部索引同步、状态及检索接口，沿用外部聊天／操作接口，仅扩展结果可选字段，无新增数据库迁移。详细协议与运行限制见[学情助手契约](docs/assistant-learning-contract.md)，真实验证和短主题漏检见[本次验证记录](docs/question-semantic-search-verification-2026-10-24.md)；不将工程案例当作完整领域效果。
+
+
+2026-10-23会话列表展开：桌面侧栏与手机抽屉默认显示最近5条，每次点击“展开更多”追加5条；加载中防止重复请求，失败可重试，全部加载后隐藏按钮。切换历史会话保留展开列表、分页和滚动位置，生成完成后的列表更新保留已加载页数；新建、删除或刷新页面后恢复前5条。详细规则见[连续聊天契约](docs/conversations.md#会话列表展开)。
+
+2026-10-23会话列表删除：桌面侧栏与手机抽屉提供常驻删除按钮和二次确认，复用已有本人会话删除接口。删除当前会话切换到剩余会话，最后一条删除后保留空聊天；已保存个人笔记独立保留。交互、分页与迟到响应规则见[连续聊天契约](docs/conversations.md#会话列表删除)。本次验证范围另见[删除会话验证记录](docs/conversation-delete-verification-2026-10-23.md)。
+
+2026-10-22连续聊天与个人文档改造：当前`/tasks`入口切换为多会话Agent助手，原任务历史位于`/tasks/history`。Python引入LangChain组织上下文解析、现有RAG与文档建议工具；Java继续独占业务持久化、权限、任务额度和文档确认保存。新增V10/V11增量脚本，未自动应用于日常库；需完成迁移并在授权范围更新服务后才能使用新版能力。新增接口、SSE、状态、上下文、文档版本及验收入口统一维护在[连续聊天契约](docs/conversations.md)，实际结果见[聊天验证记录](docs/chat-verification-2026-10-22.md)。本节其余“当前”描述保留原同步链路背景，流式链路以新增契约为准。
 
 ### 5.1 当前调用关系
 
@@ -182,7 +202,7 @@ flowchart LR
     F -->|统一API与Bearer令牌| J[Spring Boot业务后端]
     J --> D[(MySQL业务库)]
     J --> R[(Redis令牌撤销)]
-    J -->|OpenFeign与内部凭证| A[FastAPI Agent]
+    J -->|同步Feign / 流式HTTP与内部凭证| A[FastAPI / LangChain]
     A --> K[(版本化只读资料 / 独立Qdrant)]
     A --> M[OpenAI兼容模型接口]
     J --> O[可选OSS上传]
@@ -285,7 +305,7 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 | rank_programs | 已筛选候选及软偏好 | 稳定排序、匹配理由，不预测录取概率 |
 | recommend_questions | 已审核题目元数据、知识点与本人练习摘要 | 最多5个授权题目编号；不足说明实际数量 |
 
-确定性单选判分是Java业务函数，不属于模型工具。当前retrieve_knowledge、filter_programs、rank_programs在固定代码流程实现基础行为，尚无通用模型工具调度接口；recommend_questions未实现。
+确定性单选判分是Java业务函数，不属于模型工具。retrieve_knowledge、filter_programs、rank_programs仍在固定代码流程实现。新增学情读工具、受控收藏／错题／练习操作由Java执行，协议见学情助手契约；尚无任意工具调度接口，recommend_questions仍未实现。
 
 ### 6.5 知识问答
 
@@ -307,7 +327,7 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 ### 6.7 错题辅导与批次总结
 
-当前PRACTICE_SUMMARY要求本人批次valid项目全部已答，且每条question_snapshot非NULL、非空对象。快照缺失时Java返回409及历史依据缺失说明，不创建任务、不调用Agent、不消耗任务额度。快照完整时读取全部有效作答，代码计算正确题数与正确率，模型仅可解释；不能用新题目冒充旧依据。错题解释与追问见7.4.1；判分时快照不等于抽题时固定整个批次，提示与重练仍待建设。
+当前PRACTICE_SUMMARY要求本人批次valid项目全部已答，且每条question_snapshot非NULL、非空对象。快照缺失时Java返回409及历史依据缺失说明，不创建任务、不调用Agent、不消耗任务额度。快照完整时读取全部有效作答，代码计算正确题数与正确率，模型仅可解释；不能用新题目冒充旧依据。新批次已在创建时固定快照，旧批次保持原兼容方式。学情聊天已接本人快照、相关资料、证据与定向重练；正式审核提示、自动掌握规则和完整领域内容效果验收仍待建设。错题解释与追问见7.4.1。
 
 目标错题流程：Java验证本人attemptId → 读取题目版本与判分快照 → Python关联知识点并检索 → 解释选择错误的条件和正确解法 → 推荐已审核题目 → 检查与标准答案一致 → Java保存任务。答案与资料冲突时待管理员核查，保留既有判分，不静默改答案。
 
@@ -334,17 +354,19 @@ BM25根据查询词与资料的匹配程度排序，首版采用可解释的词�
 
 ### 7.1 当前表与实体
 
+聊天、个人文档及隐私操作增量表见V10—V12，不在V1中回填；新增assistant_privacy保存分类授权与端点版本，assistant_action保存可幂等确认的操作，详见学情契约。
+
 实体和初始化表定义见 [entity目录](kaoyan-B/src/main/java/com/kaoyan/entity/) 与 [V1__init.sql](kaoyan-B/src/main/resources/db/V1__init.sql)。该SQL含DROP TABLE，是破坏性初始化脚本，不等于安全的增量迁移机制，本文不执行它。
 
 | 当前表 | 主要字段／关系 | 不能据此声称的能力 |
 | --- | --- | --- |
 | user | 数字id、账号、密码哈希、role／status及目标院校／专业／年份／背景 | 完整专业资格、学位与成绩档案 |
-| task | 字符串id、userId、taskType、status、inputPayload、resultPayload、releaseId、错误与时间、内部deletedAt | 独立用量账本、用户可见的删除时间或自动数据清理 |
+| task | 字符串id、归属、类型、状态、输入／结果、版本及时间；聊天不重复存模型输入，公开响应隐藏输入；30天清理内容副本 | 独立用量账本、供应商及备份同步清除 |
 | document | 标题、科目、正文、sourceUrl、status及创建／审核人 | 来源定位、许可、不可变知识版本和检索索引 |
 | school、school_detail | 院校及专业代码／名称／年份／人数／分数线 | 学院、完整条件、来源核验及跨口径可比性 |
 | recommend_record | 旧占位推荐表，保留兼容 | 新推荐统一保存task，不读写占位推荐历史 |
 | question | 数字id、题干选项、answer／analysis、科目／知识点、difficulty、version、active及审核信息 | 单行version字段等于历史版本快照 |
-| practice_record | userId、sessionId、questionId、orderIndex、答案／判分／时间、gradingStatus | 独立批次状态、持久草稿、提示、请求幂等及历史题目依据 |
+| practice_record | 账号、批次、题目、顺序、判分、gradingStatus及question_snapshot；新批次创建固定版本 | 独立批次状态、持久草稿、提示及完整请求重放 |
 | user_question_mark | 本人题目收藏／错题标记、错次与时间 | 连续独立答对掌握机制或撤回重算 |
 | study_stat | 本人日期、题量、正确量、studyMinutes | 已测量的真实学习时长或正确撤回口径 |
 
@@ -368,6 +390,7 @@ Issue #9（本地适配契约，2026-10-21）：学生抽题及详情改用白�
 | GET／POST `/api/tasks`、GET `/api/tasks/{taskId}` | 分页历史、类型化输入、本人任务 | 同步调用并保存状态；历史及total排除已删除项，跨账号或已删除详情404 |
 | GET `/api/documents` | subject，可返回已发布资料列表 | 尚非Agent知识检索接口 |
 | GET `/api/schools`、POST `/api/schools/search`、GET `/api/schools/{schoolId}` | province／level／majorName，院校及专业详情 | 列表不是核验推荐，未提供完整当年专业条件筛选 |
+| GET `/api/schools/options` | `{provinces: string[], majorNames: string[]}`，沿用认证及统一响应包装 | 从院校库读取全部非空、去重、排序的省份和专业名；专业关联现存院校，不随筛选结果缩减；空库返回空数组，不代表招生资料已核验 |
 | POST `/api/recommends/generate`、GET `/api/recommends`、DELETE `/api/recommends/{taskId}` | `{query,preferences}`、本人近期Task历史／字符串taskId删除 | 与任务同一流程；仅隐藏本人SUCCESS／FAILED推荐并保留额度，重复删除404，未结束409 |
 | GET `/api/questions/practice`、GET `/api/questions/{id}` | subject／difficulty／knowledgePoint／limit，StudentQuestionVO | 抽题及详情仅审核启用题，不返回答案、解析或审核字段 |
 | POST `/api/practice/sessions` | subject、difficulty、count；返回sessionId | 固定stable_order及记录，上限100在Service截取；无正式状态与版本 |
@@ -392,7 +415,7 @@ Issue #9（本地适配契约，2026-10-21）：学生抽题及详情改用白�
 开发基线`28f7aec`，功能分支`feat/question-entry-review`。以下为本次实现契约，测试及部署状态另记验证报告。
 
 - ADMIN沿用`POST /api/questions/admin`录入、`PUT /api/questions/admin/{id}`完整修改未发布题、`GET /api/questions/admin/pending`分页及`POST /api/questions/admin/{id}/review`审核；新增`GET /api/questions/admin/{id}`完整详情。学生仍使用答案隐藏DTO，包装及数字ID不变。
-- 录题白名单字段：subject（408四科中文名称）、knowledgePoint、difficulty（EASY/MEDIUM/HARD）、content、optionA/B/C/D、answer（A—D，兼容小写归一）、analysis、sourceType（REAL_EXAM/MOCK/ORIGINAL）、sourceName、sourceLocator、sourceYear、sourceQuestionNo、permissionNote。题干／解析各限10000字符，选项各限2000，知识点／来源名称各255，来源定位1000，原题号64，权限说明2000。除年份及原题号外均非空；真题必须有1900—2100年份及原题号，其他题年份可空。
+- 录题白名单字段：subject（408四科中文名称）、knowledgePoint、difficulty（EASY/MEDIUM/HARD）、content、optionA/B/C/D、answer（A—D，兼容小写归一）、analysis、sourceType（REAL_EXAM/MOCK/ORIGINAL/COURSE_EXERCISE）、sourceName、sourceLocator、sourceYear、sourceQuestionNo、permissionNote。COURSE_EXERCISE展示为“课程习题”，保留课程原题标识及翻译说明，不表示408统考真题；沿用现有VARCHAR(20)，无需新迁移。题干／解析各限10000字符，选项各限2000，知识点／来源名称各255，来源定位1000，原题号64，权限说明2000。除年份及原题号外均非空；真题必须有1900—2100年份及原题号，其他题年份可空。
 - ID、questionType、stableOrder、审核身份／状态／时间由服务端控制，不接受额外字段。POST继续拒绝version和active；PUT使用独立的平铺修改DTO，录题字段之外必填正整数version，表示读取时的预期版本，不授予客户端设置下一版本的权限。新题version=1、active=1、SINGLE_CHOICE、PENDING_REVIEW；待审核不进入学生题池。修改仅允许PENDING_REVIEW或REJECTED，完整校验后重新待审核、清除旧审核信息并增加version；APPROVED返回409，正式新版本发布另做。POST／PUT成功均返回已保存的完整管理题目，页面不自行合成版本或审核记录。
 - 审核请求为`{status,comment,version}`，status仅APPROVED或REJECTED，version必填正整数；驳回原因非空、最多2000字。仅待审核题可审；行锁串行化修改及审核，版本过期或重复审核409。修改、审核和启停每次成功均将version加一；失败不更改数据。审核人来自认证，不接受客户端伪造。通过前重新校验题目与来源完整性；不完整旧题需先补充。历史已发布题不批量改状态。
 - `PUT /api/questions/admin/{id}/active`仅ADMIN可用，白名单请求`{active:0|1,version}`；version必填正整数。仅APPROVED题可切换，行锁内核对版本，重复状态或过期请求409，缺题404，非法入参400；成功返回保存后的完整管理题目。停用只修改active、version和updatedAt，保留来源、审核与历史作答；恢复校验单选题内容和答案，并校验来源。六个来源字段**全部为NULL**的历史题允许依据原APPROVED结果恢复，仍标注来源待补充；部分缺失或空字符串不享受此例外。无需新增迁移。此次启停不改变历史判分、快照、错题和统计，不等同于正式撤回及统计重算。
@@ -425,13 +448,13 @@ KNOWLEDGE_QA、SCHOOL_RECOMMEND和CHAT接受非空 `input.query`，最长8000字
 }
 ```
 
-任务数据包含id、userId、taskType、status、inputPayload、resultPayload、releaseId、errorMessage、createdAt、updatedAt。现行服务只形成RUNNING／SUCCESS／FAILED，非空结果对象检查不等于事实正确。新结果含由语料内容计算的rag-v1版本及outcome，旧任务按旧格式只读显示，不倒填新资料来源。
+任务实体内部保存归属及输入；对外TaskView仅包含id、taskType、status、resultPayload、releaseId、errorMessage、createdAt、updatedAt和可空tutoring，不返回userId或inputPayload。tutoring仅投影本人错题辅导的recordId、query、parentTaskId及最多六条role/content消息，不包含题目快照、档案或隐私配置。状态为RUNNING／SUCCESS／FAILED，连续聊天新增CANCELLED。非空结果对象检查不等于事实正确。新结果含由语料内容计算的rag-v1版本及outcome，旧任务保留其版本与来源。
 
 ### 7.4 当前 Java → Python 契约
 
 内部`POST /internal/rag/chat`使用X-Internal-Key；401表示凭证无效，422表示输入非法，处理异常返回status=FAILED并保存简短原因。main以`create_app`工厂启动，默认LLM_ENABLED=false，Python不需要数据库账号。
 
-Java发送taskId、userId、taskType，以及适用于该任务的userInput、sessionId、questions、attempt、messages、profile、preferences；questions为总结使用的本人已判分快照，attempt仅供错题辅导，旧correctQuestionIds／wrongQuestionIds不再接受。未知字段拒绝。messages和profile可将Java null归一为空容器，但不允许system消息或伪造归属。完整上限和筛选规则见[RAG契约](docs/rag.md)。
+Java发送taskId、userId、taskType，以及适用于该任务的userInput、sessionId、questions、attempt、messages、profile、preferences、quotaExempt和privacy；questions为总结使用的本人已判分快照，attempt仅供错题辅导，旧correctQuestionIds／wrongQuestionIds不再接受。privacy由Java构造，包含供应商身份、模型授权及分类范围；历史消息带scopes供Python按当前授权过滤。未知字段拒绝。messages和profile可将Java null归一为空容器，但不允许system消息或伪造归属。完整上限和筛选规则见[RAG契约](docs/rag.md)。
 
 ```json
 {
@@ -442,7 +465,7 @@ Java发送taskId、userId、taskType，以及适用于该任务的userInput、se
 
 响应含taskId、status、result、references、releaseId和可选errorMessage。result.outcome为大写COMPLETED／NEEDS_INPUT／UNSUPPORTED，三者均可对应SUCCESS；页面必须显示资料不足／补充条件，不能只看HTTP200或SUCCESS。新结果另含resolvedTaskType与explanationMode=rules／ai／fallback。引用包含id、title、url、locator、version、retrievedAt、excerpt，模型只能选择当前证据编号；Python补全元数据，Java核对任务身份、版本、来源及候选引用范围。
 
-Java不在远程调用时持有数据库事务。task表先保存RUNNING，再保存结果／失败；单实例重启保留记录并标记中断FAILED。错题辅导保存各轮任务并读取最近三轮历史，其余文本任务的messages仍由调用方提供，不代表通用长期记忆。
+Java不在远程调用时持有数据库事务。task表先保存RUNNING，再保存结果／失败；单实例重启保留记录并标记中断FAILED。V10/V11新增持久会话、生成尝试与个人文档版本，聊天上下文从本人数据库记录组装，最近3轮有效历史与会话条件不依赖浏览器长期缓存。
 
 #### 7.4.1 错题解释与追问
 
@@ -450,17 +473,17 @@ Java不在远程调用时持有数据库事务。task表先保存RUNNING，再�
 
 错题辅导通过 POST `/api/tasks` 提交 `{taskType:"WRONG_QUESTION_TUTOR",input:{recordId:123,query:"为什么我的选项不对？",parentTaskId:"可选的上一轮任务ID"}}`。recordId 必须为正整数，query 为1—2000字符；仅接受这三个输入字段。Java 校验本人作答、valid、已判错及完整历史快照（题号、版本、科目、题干、四个非空选项、标准答案）；未答、答对、撤回或依据缺失返回409，跨账号或不存在返回404，均在创建任务和扣额度之前拒绝，不读取现行题表补造。解析可为空，模型必须承认缺失。
 
-追问只能关联本人、同一作答、SUCCESS 的 WRONG_QUESTION_TUTOR 父任务。Java 从已保存任务构造最多最近三轮（六条消息）的对话；客户端不得上传 messages、答案、判分或题目。每轮仍重新检查原作答状态，继续复用任务限流与用量（默认每日30次、每分钟6次，所有类型共享）。完整各轮保存在任务表，页面显示最近三轮历史加当前一轮；刷新或退出后可在 Agent 助手的任务历史查看和继续追问。删除原作答后历史可只读，新追问404。
+追问只能关联本人、同一作答、SUCCESS 的 WRONG_QUESTION_TUTOR 父任务。Java 从已保存任务构造最多最近三轮（六条消息）的对话，为新生成消息标记wrong范围；客户端不得上传 messages、答案、判分或题目。每轮仍重新检查原作答状态，继续复用任务限流与用量（默认每日30次、每分钟6次，所有类型共享，受控豁免账号沿用现有规则）。各轮保存在任务表并遵守30天内容清理及主动清除规则；页面显示最近三轮历史加当前一轮。刷新或退出后可在`/tasks/history`查看和继续追问，`/tasks`保留连续聊天与隐私设置。删除原作答后历史可只读，新追问404；父任务已清除上下文时不能继续关联。
 
-内部 AgentRequest 新增可空 attempt，仅辅导任务接受：recordId、id、version、subject、knowledgePoint、content、optionA/B/C/D、answer、analysis、userAnswer。Java 将授权 attempt 及服务端 messages 保存到 inputPayload。Python 不访问业务库、不改判分；模型只返回 explanation（1—4000字符）及 standardAnswer，standardAnswer 必须等于快照，否则降级为已保存解析。结果包含 standardAnswer、userAnswer、questionVersion、recordId、explanationMode，Java再次核对这些字段；解释文字供辅助理解，以单独显示的服务端标准答案与判分为准。当前不新增检索引用，不把模型解释冒充已审核解析。
+内部 AgentRequest 新增可空 attempt，仅辅导任务接受：recordId、id、version、subject、knowledgePoint、content、optionA/B/C/D、answer、analysis、userAnswer。Java 将授权 attempt 及服务端 messages 保存到内部inputPayload，对外仅提供上述tutoring白名单。Python 不访问业务库、不改判分；发送模型前移除attempt中的id、recordId，并按当前授权过滤历史消息，未知或未授权scopes不会外发。模型只返回 explanation（1—4000字符）及 standardAnswer，standardAnswer 必须等于快照，否则降级为已保存解析。结果包含 standardAnswer、userAnswer、questionVersion、recordId、explanationMode，Java再次核对这些字段；解释文字供辅助理解，以单独显示的服务端标准答案与判分为准。当前不新增检索引用，不把模型解释冒充已审核解析。
 
-LLM_ENABLED 默认 false 时不请求模型，显示原题解析并提示未启用 AI，不能假称已回答个性化追问；启用后的超时、预算不足、模型异常或格式错误均保留原解析并标记 fallback。Agent 整体离线时任务 FAILED，判分与原解析不受影响，可重试。题目、历史和追问仅作为结构化用户数据，不能更改系统指令或触发工具。本功能无新数据库迁移，也不自动开启付费模型。正式批次固定快照、提示辅助标记及重练仍待建设。
+LLM_ENABLED 默认 false 时不请求模型，显示原题解析并提示未启用 AI，不能假称已回答个性化追问。启用模型后还必须满足用户授权、供应商身份一致及wrong类别授权；缺少授权仅返回规则解析和明确提示。启用后的超时、预算不足、模型异常或格式错误均保留原解析并标记 fallback。Agent 整体离线时任务 FAILED，判分与原解析不受影响，可重试。题目、历史和追问仅作为结构化用户数据，不能更改系统指令或触发工具。本功能无新数据库迁移，也不自动开启付费模型；合并后的连续聊天整站依赖已有V10—V12。创建批次固定快照及从错题／收藏创建练习沿用上游实现，持久草稿、结束状态和提示辅助标记仍待建设。
 
-DeepSeek 官方接入（2026-10-25核对）：base_url为`https://api.deepseek.com`，V4.1-Flash-1017当前API模型标识为`deepseek-flash`，不能将网页展示名直接填入model。LLM_MODEL_MAIN和LLM_MODEL_ROUTER均可配置该标识。客户端仅对主机名严格等于`api.deepseek.com`且选中模型为`deepseek-flash`的请求发送`thinking:{type:"disabled"}`，使用非思考模式适配现有响应时限；不向其他供应商发送此参数。保留JSON输出、结构校验、超时、预算和零自动重试。配置步骤集中于README；实际模型别名随官方发布可能变化，不承诺固定模型权重或真实讲解质量。依据：[官方接入](https://api-docs.deepseek.com/)、[模型说明](https://api-docs.deepseek.com/quick_start/pricing)、[思考模式](https://api-docs.deepseek.com/guides/thinking_mode)。
+DeepSeek 官方接入（2026-10-25核对）：base_url为`https://api.deepseek.com`，V4.1-Flash-1017当前API模型标识为`deepseek-flash`，不能将网页展示名直接填入model。LLM_MODEL_MAIN和LLM_MODEL_ROUTER均可配置该标识。`LLM_THINKING_MODE=default`时，仅对主机名严格等于`api.deepseek.com`且选中模型为`deepseek-flash`的请求发送`thinking:{type:"disabled"}`；其他供应商默认不发送。显式配置enabled／disabled优先，须自行确认供应商兼容。保留LangChain、JSON输出、结构校验、超时、预算和零自动重试。配置步骤集中于README；实际模型别名随官方发布可能变化，不承诺固定模型权重或真实讲解质量。依据：[官方接入](https://api-docs.deepseek.com/)、[模型说明](https://api-docs.deepseek.com/quick_start/pricing)、[思考模式](https://api-docs.deepseek.com/guides/thinking_mode)。
 
-### 7.5 目标数据与接口变化（未实现）
+### 7.5 后续完整目标与兼容方式
 
-保持当前公共路径和数字业务ID作为兼容基础，新增能力先更新契约与迁移方案再编码；以下名称为目标模型，不是现有SQL或可执行迁移。
+保持当前公共路径和数字业务ID作为兼容基础，新增能力先更新契约与迁移方案再编码；以下为完整目标模型，部分最小能力已按本次学情契约实现，不代表整个模型、SQL或迁移均存在。
 
 | 子系统 | 目标数据补充 | 兼容要求 |
 | --- | --- | --- |
@@ -480,7 +503,7 @@ DeepSeek 官方接入（2026-10-25核对）：base_url为`https://api.deepseek.c
 
 ### 7.6 判分、统计与错误兼容
 
-判分与统计遵守4.4节的目标规则。日期目标统一Asia/Shanghai且显式区间包含结束日；任务／模型日配额仍按UTC，两种口径在页面清楚标注。多知识点题分别计入相关知识点，不能把各点次数相加当总作答量；撤回作答需重算统计，而非只改显示。
+判分与统计遵守4.4节已实现与待建设边界。本次有效作答统计已统一Asia/Shanghai且显式区间包含结束日；任务／模型日配额仍按UTC，两种口径在页面清楚标注。多知识点题分别计入相关知识点，不能把各点次数相加当总作答量；撤回作答需重算统计，而非只改显示。
 
 | 情况 | 当前行为 | 正式建设目标 |
 | --- | --- | --- |
@@ -771,3 +794,13 @@ Issue #9已将练习回顾计数改为读取完整批次记录，不按已加载
 | 差异与保护 | git diff --check通过；与任务开始时文件摘要核对，原有文件仅README导航发生本轮变化 | 保留205份原有文件中的既有改动，不提交或推送 |
 
 业务测试、数据库脚本、服务、真实模型、外部网站核验与部署均未运行。本文记录的账号实体敏感字段、答案泄露、分页回顾和统计问题来自代码阅读，未在本轮运行环境复现或修复。历史25项Java、33项Python及链路记录仍只属于9.5节引用的适配验收。
+
+### 独立可操作测试数据交付（2026-10-23）
+
+本机独立库`kaoyan_feature_test_2027`已加入10校15条2027专业、160道可练习自编题、12道管理样例及4份既有短摘要测试副本。专用学生账号的8批次、30次实际接口提交、20次正确和6个收藏由Java保存；另有空学生与测试管理员。管理员角色、测试审核、数据和持久服务仅作用于独立环境，不更改日常库或混用授权。
+
+统一夹具生成业务库院校记录与`RAG_DATA`专用语料，使用现有三端契约，不增加公开接口；推荐覆盖文案从所加载资料生成，保留未知人数与分数线。来源、原文位置、版本和使用边界见[来源清单](docs/feature-test-sources-2027.md)。V1、V7—V12仅在本次独立库初始化并登记，未执行日常迁移或旧演示种子。
+
+脚本默认预览，写入及启动需`--apply`，重复运行不覆盖人工记录；同名库归属检查、私密备份、迁移校验和、失败停机与进程身份检查见[操作及验证说明](docs/feature-test-environment-2027.md)。本轮真实MySQL／接口与桌面、390宽度浏览器验证不等于正式领域题目审核、完整批次／草稿／提示能力、公网部署或真实手机验收。
+
+账号额度豁免：`QUOTA_EXEMPT_USERNAME` 默认精确匹配用户名 `robin`，由 Java 根据当前认证账号查询决定；该账号免每日／分钟任务额度及 Python 每日模型预算，其他账号保持原限制。内部新增默认 false 的 `quotaExempt` 字段，详见 [RAG契约](docs/rag.md#账号额度豁免)。

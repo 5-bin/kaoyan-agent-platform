@@ -200,7 +200,7 @@ class QuestionEntryReviewTest {
         assertFalse(visible.get(0).has("answer")); assertFalse(visible.get(0).has("permissionNote"));
         var publicDetail = call(get("/api/questions/" + id), student, null, 200);
         assertFalse(publicDetail.has("analysis")); assertFalse(publicDetail.has("sourceLocator"));
-        String session = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 100), 200).path("sessionId").asText();
+        String session = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 50), 200).path("sessionId").asText();
         var result = call(post("/api/practice/sessions/" + session + "/answer"), student, Map.of("questionId", id, "answer", "A"), 200);
         assertEquals(1, result.path("isCorrect").asInt());
         edit(admin, id, body, 2, 409);
@@ -235,6 +235,13 @@ class QuestionEntryReviewTest {
         assertEquals("第1题", q.path("sourceQuestionNo").asText());
         for (String key : List.of("sourceType", "sourceName", "sourceLocator", "permissionNote")) assertEquals(body.get(key), q.path(key).asText());
         var mock = entry(); mock.put("sourceType", "MOCK"); assertTrue(create(admin, mock) > 0);
+        var course = entry(); course.put("sourceType", "COURSE_EXERCISE");
+        course.put("sourceName", "OpenDSA");
+        long courseId = create(admin, course);
+        assertEquals("COURSE_EXERCISE", detail(admin, courseId).path("sourceType").asText());
+        course.put("version", 1);
+        call(put("/api/questions/admin/" + courseId), admin, course, 200);
+        assertEquals("COURSE_EXERCISE", detail(admin, courseId).path("sourceType").asText());
     }
 
     @Test void studentsCannotUseAnyManagementRouteOrForgeReviewerIdentity() throws Exception {
@@ -361,9 +368,9 @@ class QuestionEntryReviewTest {
     @Test void disablingAndRestoringPreservesAuditSourcesSnapshotsAndStatistics() throws Exception {
         String admin = account(true), student = account(false); var body = entry(); long id = create(admin, body);
         review(admin, id, "APPROVED", "保留审核依据", 1, 200);
-        String first = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 100), 200).path("sessionId").asText();
+        String first = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 50), 200).path("sessionId").asText();
         call(post("/api/practice/sessions/" + first + "/answer"), student, Map.of("questionId", id, "answer", "B"), 200);
-        String second = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 100), 200).path("sessionId").asText();
+        String second = call(post("/api/practice/sessions"), student, Map.of("subject", "数据结构", "count", 50), 200).path("sessionId").asText();
         var records = jdbc.queryForList("SELECT * FROM practice_record WHERE question_id=? ORDER BY id", id);
         var stats = jdbc.queryForList("SELECT * FROM study_stat");
         var marks = jdbc.queryForList("SELECT * FROM user_question_mark");

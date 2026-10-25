@@ -1,0 +1,279 @@
+{
+  "batch": "feature-test-v1-20261023",
+  "anchor_date": "2026-10-23",
+  "demo_username": "feature_demo_20261023",
+  "empty_username": "feature_empty_20261023",
+  "notice": "独立学生测试账号中的合成历史，用于页面与接口检查，不是实际作答、人工审核、学习效果或真实模型调用。",
+  "sessions": [
+    {
+      "id": "fixture-20261023-day-1",
+      "created_at": "2026-10-17 00:00:00",
+      "attempts": [
+        {
+          "code": "DS01",
+          "user_answer": "A",
+          "answered_at": "2026-10-17 00:00:01"
+        },
+        {
+          "code": "DS02",
+          "user_answer": "B",
+          "answered_at": "2026-10-17 00:00:02"
+        },
+        {
+          "code": "DS03",
+          "user_answer": "D",
+          "answered_at": "2026-10-17 00:00:03"
+        },
+        {
+          "code": "DS04",
+          "user_answer": "A",
+          "answered_at": "2026-10-17 00:00:04"
+        }
+      ]
+    },
+    {
+      "id": "fixture-20261023-day-2",
+      "created_at": "2026-10-18 00:00:00",
+      "attempts": [
+        {
+          "code": "OS01",
+          "user_answer": "A",
+          "answered_at": "2026-10-18 00:00:01"
+        },
+        {
+          "code": "OS02",
+          "user_answer": "B",
+          "answered_at": "2026-10-18 00:00:02"
+        },
+        {
+          "code": "OS03",
+          "user_answer": "C",
+          "answered_at": "2026-10-18 00:00:03"
+        },
+        {
+          "code": "OS04",
+          "user_answer": "A",
+          "answered_at": "2026-10-18 00:00:04"
+        }
+      ]
+    },
+    {
+      "id": "fixture-20261023-day-3",
+      "created_at": "2026-10-19 00:00:00",
+      "attempts": [
+        {
+          "code": "NET01",
+          "user_answer": "A",
+          "answered_at": "2026-10-19 00:00:01"
+        },
+        {
+          "code": "NET02",
+          "user_answer": "C",
+          "answered_at": "2026-10-19 00:00:02"
+        },
+        {
+          "code": "NET03",
+          "user_answer": "D",
+          "answered_at": "2026-10-19 00:00:03"
+        },
+        {
+          "code": "NET04",
+          "user_answer": "A",
+          "answered_at": "2026-10-19 00:00:04"
+        }
+      ]
+    },
+    {
+      "id": "fixture-20261023-day-4",
+      "created_at": "2026-10-20 00:00:00",
+      "attempts": [
+        {
+          "code": "CO01",
+          "user_answer": "A",
+          "answered_at": "2026-10-20 00:00:01"
+        },
+        {
+          "code": "CO02",
+          "user_answer": "B",
+          "answered_at": "2026-10-20 00:00:02"
+        },
+        {
+          "code": "CO03",
+          "user_answer": "C",
+          "answered_at": "2026-10-20 00:00:03"
+        },
+        {
+          "code": "CO04",
+          "user_answer": "D",
+          "answered_at": "2026-10-20 00:00:04"
+        }
+      ]
+    },
+    {
+      "id": "fixture-20261023-day-5",
+      "created_at": "2026-10-21 00:00:00",
+      "attempts": [
+        {
+          "code": "DS01",
+          "user_answer": "A",
+          "answered_at": "2026-10-21 00:00:01"
+        },
+        {
+          "code": "DS02",
+          "user_answer": "B",
+          "answered_at": "2026-10-21 00:00:02"
+        },
+        {
+          "code": "DS03",
+          "user_answer": "D",
+          "answered_at": "2026-10-21 00:00:03"
+        },
+        {
+          "code": "DS04",
+          "user_answer": "A",
+          "answered_at": "2026-10-21 00:00:04"
+        }
+      ]
+    },
+    {
+      "id": "fixture-20261023-day-6",
+      "created_at": "2026-10-22 00:00:00",
+      "attempts": [
+        {
+          "code": "OS01",
+          "user_answer": "A",
+          "answered_at": "2026-10-22 00:00:01"
+        },
+        {
+          "code": "OS02",
+          "user_answer": "B",
+          "answered_at": "2026-10-22 00:00:02"
+        },
+        {
+          "code": "OS03",
+          "user_answer": "C",
+          "answered_at": "2026-10-22 00:00:03"
+        },
+        {
+          "code": "OS04",
+          "user_answer": "A",
+          "answered_at": "2026-10-22 00:00:04"
+        }
+      ]
+    },
+    {
+      "id": "fixture-20261023-day-7",
+      "created_at": "2026-10-23 00:00:00",
+      "attempts": [
+        {
+          "code": "NET01",
+          "user_answer": "A",
+          "answered_at": "2026-10-23 00:00:01"
+        },
+        {
+          "code": "NET02",
+          "user_answer": "B",
+          "answered_at": "2026-10-23 00:00:02"
+        },
+        {
+          "code": "NET03",
+          "user_answer": "C",
+          "answered_at": "2026-10-23 00:00:03"
+        },
+        {
+          "code": "NET04",
+          "user_answer": "D",
+          "answered_at": "2026-10-23 00:00:04"
+        }
+      ]
+    },
+    {
+      "id": "fixture-20261023-partial",
+      "created_at": "2026-10-23 00:01:00",
+      "attempts": [
+        {
+          "code": "CO01",
+          "user_answer": "A",
+          "answered_at": "2026-10-23 00:01:01"
+        },
+        {
+          "code": "CO02",
+          "user_answer": "A",
+          "answered_at": "2026-10-23 00:01:02"
+        },
+        {
+          "code": "CO03",
+          "user_answer": null,
+          "answered_at": null
+        },
+        {
+          "code": "CO04",
+          "user_answer": null,
+          "answered_at": null
+        }
+      ]
+    }
+  ],
+  "favorite_codes": [
+    "DS01",
+    "DS04",
+    "OS01",
+    "OS04",
+    "NET03",
+    "CO02"
+  ],
+  "study_minutes": [
+    25,
+    40,
+    35,
+    50,
+    20,
+    60,
+    45
+  ],
+  "documents": [
+    {
+      "code": "outline",
+      "title": "【模拟测试】操作系统复习提纲",
+      "versions": [
+        "# 操作系统复习提纲\n\n> 模拟测试文档，不代表真实学习记录。\n\n- 进程与线程\n- 内存管理\n",
+        "# 操作系统复习提纲\n\n> 模拟测试文档，不代表真实学习记录。\n\n- 进程与线程：比较共享地址空间和独立执行状态\n- 内存管理：区分虚拟地址空间与物理内存\n- 并发同步：复盘共享可变数据的访问问题\n"
+      ]
+    },
+    {
+      "code": "plan",
+      "title": "【模拟测试】一周复习计划",
+      "versions": [
+        "# 一周复习计划\n\n> 版本展示夹具，无实际学习效果含义。\n\n每天复习30分钟。\n",
+        "# 一周复习计划\n\n> 版本展示夹具，无实际学习效果含义。\n\n每天复习30分钟。\n\n1. 数据结构\n2. 操作系统\n3. 计算机网络\n4. 计算机组成原理\n",
+        "# 一周复习计划\n\n> 版本展示夹具，无实际学习效果含义。\n\n每天复习30分钟。\n\n1. 数据结构\n2. 操作系统\n3. 计算机网络\n4. 计算机组成原理\n5. 汇总错题\n6. 复述知识点\n7. 自查遗漏\n"
+      ]
+    },
+    {
+      "code": "mistakes",
+      "title": "【模拟测试】错题复盘模板",
+      "versions": [
+        "# 错题复盘模板\n\n> 本文档是用于编辑、预览和历史版本测试的空白模板。\n\n## 题目与版本\n待填写。\n\n## 错误原因\n待填写。\n\n## 复查依据\n待填写，不编造出处。\n"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "code": "rules",
+      "status": "SUCCESS",
+      "query": "【模拟测试】旧任务成功展示夹具，不触发模型",
+      "answer": "【模拟测试】此记录用于测试任务历史的结果展示；并未实际执行模型生成。请选择要咨询的科目。"
+    },
+    {
+      "code": "failure",
+      "status": "FAILED",
+      "query": "【模拟测试】失败任务展示夹具",
+      "error": "【模拟测试】请求失败的展示样例，不代表真实服务故障。"
+    },
+    {
+      "code": "cancelled",
+      "status": "CANCELLED",
+      "query": "【模拟测试】停止任务展示夹具"
+    }
+  ]
+}

@@ -60,8 +60,8 @@ public class WrongQuestionTutorContext {
                 throw new ApiException(409, "父任务必须是同一次作答的成功辅导任务");
             // Previous context was generated here, not accepted from the browser.
             if (previous.get("messages") instanceof List<?> history) messages.addAll(history);
-            messages.add(Map.of("role", "user", "content", previous.get("query")));
-            messages.add(Map.of("role", "assistant", "content", parent.getResultPayload().get("answer")));
+            messages.add(Map.of("role", "user", "content", previous.get("query"), "scopes", List.of("wrong")));
+            messages.add(Map.of("role", "assistant", "content", parent.getResultPayload().get("answer"), "scopes", List.of("wrong")));
             if (messages.size() > 6) messages = new ArrayList<>(messages.subList(messages.size() - 6, messages.size()));
         }
         request.setMessages(messages);

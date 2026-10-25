@@ -2,13 +2,14 @@
   <div class="page">
     <div class="page-head">
       <h2 class="page-title">学习统计</h2>
-      <p class="page-sub">近 30 天学习情况</p>
+      <p class="page-sub">近30天（含今天，上海日期）有效已提交作答 · {{ stats?.from }} 至 {{ stats?.to }}</p>
     </div>
     <div class="stats">
-      <div class="card stat"><div class="num">{{ stats.questionCount }}</div><div class="lbl">累计做题</div></div>
-      <div class="card stat"><div class="num" style="color:var(--c-success)">{{ stats.correctCount }}</div><div class="lbl">累计正确</div></div>
-      <div class="card stat"><div class="num" style="color:var(--c-primary)">{{ accuracy }}<span class="unit">%</span></div><div class="lbl">正确率</div></div>
+      <div class="card stat"><div class="num">{{ stats?.questionCount ?? 0 }}</div><div class="lbl">有效作答次数</div></div>
+      <div class="card stat"><div class="num" style="color:var(--c-success)">{{ stats?.correctCount ?? 0 }}</div><div class="lbl">正确次数</div></div>
+      <div class="card stat"><div class="num" style="color:var(--c-primary)">{{ stats?.questionCount && stats.accuracy != null ? Math.round(stats.accuracy * 100) : '暂无作答' }}<span v-if="stats?.questionCount" class="unit">%</span></div><div class="lbl">正确率</div></div>
     </div>
+    <p>去重题数：{{ stats?.uniqueQuestions ?? 0 }} · 当前错题标记：{{ stats?.wrongCount ?? 0 }} · 学习时长、提示辅助与独立作答：未记录</p>
     <div class="card" style="padding:20px">
       <div ref="chartEl" style="height:340px"></div>
     </div>
@@ -16,41 +17,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import * as echarts from 'echarts'
-import { getRangeStat, getTodayStat } from '@/api/stat'
-
-const stats = reactive({ questionCount: 0, correctCount: 0 })
+import { getLearningStat, type LearningStat } from '@/api/stat'
+import { useAssistantPage } from '@/composables/assistant-page'
+const stats = ref<LearningStat>()
 const chartEl = ref<HTMLDivElement>()
-let chart: echarts.ECharts | null = null
-const accuracy = computed(() =>
-  stats.questionCount ? Math.round((stats.correctCount / stats.questionCount) * 100) : 0)
-
-onMounted(async () => {
-  const today: any = await getTodayStat().catch(() => null)
-  if (today) { stats.questionCount = today.questionCount; stats.correctCount = today.correctCount }
-  const to = new Date()
-  const from = new Date(Date.now() - 30 * 864e5)
-  const fmt = (d: Date) => d.toISOString().slice(0, 10)
-  const range: any[] = await getRangeStat({ from: fmt(from), to: fmt(to) }).catch(() => [])
-  if (chartEl.value) {
-    chart = echarts.init(chartEl.value)
-    chart.setOption({
-      tooltip: { trigger: 'axis' },
-      grid: { left: 30, right: 20, top: 20, bottom: 30 },
-      xAxis: { type: 'category', data: range.map((r: any) => r.statDate), axisLine: { lineStyle: { color: '#e5e8ee' } } },
-      yAxis: { type: 'value', splitLine: { lineStyle: { color: '#f0f2f5' } } },
-      series: [{
-        name: '做题数', type: 'line', smooth: true,
-        data: range.map((r: any) => r.questionCount),
-        lineStyle: { color: '#3b6cff', width: 3 },
-        itemStyle: { color: '#3b6cff' },
-        areaStyle: { color: 'rgba(59,108,255,.12)' }
-      }]
-    })
-  }
-})
-onUnmounted(() => chart?.dispose())
+let chart: echarts.ECharts | undefined
+async function load() {
+  stats.value = await getLearningStat()
+  if (!chartEl.value) return
+  chart ??= echarts.init(chartEl.value)
+  chart.setOption({ tooltip: { trigger: 'axis' }, grid: { left: 40, right: 20, top: 20, bottom: 30 },
+    xAxis: { type: 'category', data: stats.value.daily.map(day => day.statDate) },
+    yAxis: { type: 'value', minInterval: 1 }, series: [{ name: '有效作答次数', type: 'line', data: stats.value.daily.map(day => day.questionCount) }] })
+}
+useAssistantPage(() => ({ page: 'stat', from: stats.value?.from, to: stats.value?.to }), load)
+const resize = () => chart?.resize()
+onMounted(() => { void load(); window.addEventListener('resize', resize) })
+onUnmounted(() => { chart?.dispose(); window.removeEventListener('resize', resize) })
 </script>
 
 <style scoped>

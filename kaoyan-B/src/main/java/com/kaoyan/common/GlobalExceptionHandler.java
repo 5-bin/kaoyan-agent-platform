@@ -37,7 +37,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result<Void>> handleOther(Exception e, HttpServletRequest req) {
-        log.error("未处理异常 uri={}", req.getRequestURI(), e);
+        // Exception messages/stacks can contain SQL parameters and private document text.
+        log.error("未处理异常 type={}", e.getClass().getSimpleName());
         return ResponseEntity.status(500).body(Result.fail(500, "服务器内部错误"));
     }
 }

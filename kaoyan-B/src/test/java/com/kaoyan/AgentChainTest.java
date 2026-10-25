@@ -50,6 +50,8 @@ class AgentChainTest {
         builder.directory(agent.toFile());
         builder.environment().put("AGENT_INTERNAL_KEY", "test-only-internal-key-123456");
         builder.environment().put("LLM_ENABLED", "false"); builder.environment().put("RAG_BACKEND", "lexical");
+        // The chain contract uses its three-school baseline, independent of local RAG_DATA.
+        builder.environment().put("RAG_DATA", agent.resolve("knowledge/corpus.json").toString());
         builder.redirectErrorStream(true).redirectOutput(Path.of("target", "agent-chain.log").toFile());
         python = builder.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> { if (python != null) python.destroy(); }));
@@ -173,7 +175,7 @@ class AgentChainTest {
         assertEquals(1, task.path("resultPayload").path("correct").asInt());
         assertEquals(2, task.path("resultPayload").path("total").asInt());
         assertEquals(50.0, task.path("resultPayload").path("accuracy").asDouble());
-        assertEquals(2, task.path("inputPayload").path("questions").get(0).path("version").asInt());
+        assertFalse(task.has("inputPayload"),"公开任务不得返回模型上下文");
         mvc.perform(post("/api/tasks").header("Authorization", "Bearer " + other).contentType("application/json")
             .content("{\"taskType\":\"PRACTICE_SUMMARY\",\"input\":{\"sessionId\":\"snapshot-session\"}}"))
             .andExpect(status().isNotFound());
@@ -205,12 +207,17 @@ class AgentChainTest {
         assertTrue(task.path("resultPayload").path("notice").asText().contains("未启用 AI"));
         assertEquals("B", task.path("resultPayload").path("standardAnswer").asText());
         assertEquals(3, task.path("resultPayload").path("questionVersion").asInt());
-        assertEquals("历史选项A", task.path("inputPayload").path("attempt").path("optionA").asText());
+        assertFalse(task.has("inputPayload"));
+        assertEquals(r.getId().longValue(), task.path("tutoring").path("recordId").asLong());
+        assertEquals("我的选择错在哪里？", task.path("tutoring").path("query").asText());
+        assertFalse(task.path("tutoring").has("attempt"));
+        assertEquals("历史选项A", ((Map<?,?>)tasks.selectById(task.path("id").asText()).getInputPayload().get("attempt")).get("optionA"));
         for (int turn = 1; turn <= 4; turn++) {
             String parent = task.path("id").asText();
             task = submit(token, "WRONG_QUESTION_TUTOR", Map.of("recordId", r.getId(), "query", "追问" + turn, "parentTaskId", parent));
             assertEquals("SUCCESS", task.path("status").asText(), task.toString());
-            assertEquals(Math.min(turn * 2, 6), task.path("inputPayload").path("messages").size());
+            assertEquals(Math.min(turn * 2, 6), task.path("tutoring").path("messages").size());
+            assertFalse(task.path("tutoring").path("messages").get(0).has("scopes"));
         }
         Task persisted = tasks.selectById(task.path("id").asText());
         assertEquals("追问4", persisted.getInputPayload().get("query"));

@@ -116,7 +116,9 @@ class PracticeAnswerSafetyTest {
         assertEquals("B",review(token,session).path("answer").asText());
     }
     @Test void invalidForeignAndDuplicateAnswersDoNotAccumulate() throws Exception {
-        String token=login(),other=login(); var q=question(); String session=start(token,q);
+        String token=login(),other=login(); var q=question();
+        q.setOptionD(null); jdbc.update("UPDATE question SET option_d=NULL WHERE id=?",q.getId());
+        String session=start(token,q);
         for(String invalid:List.of("E","AB","","任意内容")) answer(token,session,q,invalid,400);
         q.setOptionD(null); jdbc.update("UPDATE question SET option_d=NULL WHERE id=?",q.getId());
         answer(token,session,q,"D",400);

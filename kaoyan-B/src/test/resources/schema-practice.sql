@@ -17,3 +17,8 @@ CREATE TABLE IF NOT EXISTS study_stat (
  correct_count INT, study_minutes INT, created_at TIMESTAMP, updated_at TIMESTAMP,
  UNIQUE(user_id, stat_date)
 );
+CREATE TABLE IF NOT EXISTS document (
+ id BIGINT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255), subject VARCHAR(50), content TEXT,
+ source_url VARCHAR(1000), status VARCHAR(30), creator_user_id BIGINT, reviewer_user_id BIGINT,
+ reviewed_at TIMESTAMP, created_at TIMESTAMP, updated_at TIMESTAMP
+);

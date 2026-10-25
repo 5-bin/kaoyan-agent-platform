@@ -110,7 +110,7 @@ const legacySource = (q: AdminQuestion) => [q.sourceType, q.sourceName, q.source
 const optionKeys = ['A', 'B', 'C', 'D'] as const
 const optionField = (key: typeof optionKeys[number]) => `option${key}` as 'optionA' | 'optionB' | 'optionC' | 'optionD'
 const statusName = (status: string) => ({ PENDING_REVIEW: '待审核', APPROVED: '审核通过', REJECTED: '已驳回' }[status] || status)
-const sourceName = (type?: string | null) => ({ REAL_EXAM: '真题', MOCK: '模拟题', ORIGINAL: '自编题' }[type || ''] || '待补充')
+const sourceName = (type?: string | null) => ({ REAL_EXAM: '真题', MOCK: '模拟题', ORIGINAL: '自编题', COURSE_EXERCISE: '课程习题' }[type || ''] || '待补充')
 
 async function load() {
   loading.value = true; listError.value = ''

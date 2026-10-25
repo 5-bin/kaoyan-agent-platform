@@ -1,8 +1,11 @@
+-c langchain-constraints.txt
 fastapi==0.115.6
 uvicorn[standard]==0.32.1
 pydantic==2.10.3
 pydantic-settings==2.7.0
-openai==1.57.4
+openai==2.45.0
+langchain==1.4.7
+langchain-openai==1.7.2
 httpx==0.28.1
 qdrant-client==1.19.1
 fastembed==0.9.0
