@@ -26,9 +26,10 @@ export interface User {
 export interface Task {
   id: string
   userId: number
-  taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND' | 'PRACTICE_SUMMARY' | 'CHAT'
+  taskType: 'KNOWLEDGE_QA' | 'SCHOOL_RECOMMEND' | 'PRACTICE_SUMMARY' | 'CHAT' | 'WRONG_QUESTION_TUTOR'
   status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'CANCELLED'
   inputPayload?: Record<string, unknown>
+  tutoring?: { recordId: number; query: string; parentTaskId?: string | null; messages: { role: 'user' | 'assistant'; content: string }[] } | null
   resultPayload?: TaskResult
   releaseId?: string
   errorMessage?: string
@@ -65,6 +66,7 @@ export interface TaskResult {
   resolvedTaskType: Task['taskType']; explanationMode: 'rules' | 'ai' | 'fallback'
   releaseId: string; references: SourceReference[]; followUp?: string[]; notice?: string
   candidates?: SchoolCandidate[]; coverage?: string; weakPoints?: string[]; accuracy?: number
+  recordId?: number; standardAnswer?: string; userAnswer?: string; questionVersion?: number
   evidence?: AssistantEvidence[]; actions?: AssistantAction[]
   retrievalStatus?: 'READY' | 'BUILDING' | 'BUSY' | 'FAILED' | 'UNAVAILABLE'
   citationSupport?: CitationSupport

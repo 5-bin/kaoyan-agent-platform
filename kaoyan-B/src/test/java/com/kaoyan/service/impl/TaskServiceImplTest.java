@@ -37,6 +37,7 @@ class TaskServiceImplTest {
         when(users.selectById(1L)).thenReturn(user);
         store = new TaskStore(tasks, new AgentProperties());
         service = spy(new TaskServiceImpl(agent, new AgentProperties(), users, records, mock(QuestionMapper.class), store,
+            new WrongQuestionTutorContext(records, tasks),
             new com.kaoyan.service.ReferenceSourcePolicy(new AgentProperties(), new com.fasterxml.jackson.databind.ObjectMapper())));
         ReflectionTestUtils.setField(service, "baseMapper", tasks);
         when(tasks.insert(any(Task.class))).thenReturn(1);

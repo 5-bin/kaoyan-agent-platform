@@ -50,6 +50,8 @@
           <b>解析：</b>{{ rec.analysis }}
         </div>
         <p v-if="historyNotice(rec.snapshotStatus)" class="analysis">{{ historyNotice(rec.snapshotStatus) }}</p>
+        <WrongQuestionTutor v-if="rec.isCorrect === 0 && rec.recordId && rec.snapshotStatus === 'AVAILABLE'"
+          :record-id="rec.recordId" />
       </div>
       <div v-if="reviewItems.length < reviewTotal" class="more">
         <el-button size="large" :loading="reviewLoading" @click="loadReviewMore">加载更多</el-button>
@@ -80,6 +82,8 @@
           {{ lastCorrect ? '回答正确' : `回答错误，正确答案：${feedback?.answer}` }}
           <p v-if="feedback?.analysis">解析：{{ feedback.analysis }}</p>
         </div>
+        <WrongQuestionTutor v-if="revealed && feedback?.isCorrect === 0 && feedback.recordId"
+          :key="feedback.recordId" :record-id="feedback.recordId" />
         <div class="actions">
           <el-button type="primary" size="large" :disabled="!answer || busy || !cur || !!loadError" :loading="answering" @click="submit">
             {{ !revealed ? '提交答案' : (idx === records.length - 1 ? '完成，查看结果' : '下一题') }}
@@ -115,6 +119,7 @@ import { getQuestionDetail } from '@/api/question'
 import type { StudentQuestion, PracticeRecord } from '@/types/api'
 import { historyNotice } from '@/utils/question-history'
 import { ArrowLeft } from '@element-plus/icons-vue'
+import WrongQuestionTutor from '@/components/WrongQuestionTutor.vue'
 
 const route = useRoute()
 const router = useRouter()

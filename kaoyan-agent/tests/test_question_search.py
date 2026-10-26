@@ -101,9 +101,6 @@ def test_immutable_index_authorization_union_and_ephemeral_overrides(tmp_path):
         result = index.search(SearchRequest(releaseId=release, query='二叉树', allowedIds=[2, 3], overrides=[private]))
         assert {r['id'] for r in result['matches']} == {2, 3}
         assert index.search(SearchRequest(releaseId=release, query='二叉树', allowedIds=[2], overrides=[question(2, content='队列')]))['matches'] == []
-        for path in tmp_path.rglob('*'):
-            if path.is_file():
-                assert b'PRIVATE_HISTORY_SENTINEL' not in path.read_bytes()
         replacement = [q.model_copy(update={'version': 2, 'content': '新题干'}) if q.id == 2 else q for q in rows]
         next_release = ready(index, replacement)
         assert next_release != release
@@ -111,6 +108,10 @@ def test_immutable_index_authorization_union_and_ephemeral_overrides(tmp_path):
         assert index.search(SearchRequest(releaseId=next_release, query='二叉树', allowedIds=[2]))['matches'] == []
     finally:
         index.close()
+    # Release Qdrant's exclusive Windows lock before inspecting every persisted file.
+    for path in tmp_path.rglob('*'):
+        if path.is_file():
+            assert b'PRIVATE_HISTORY_SENTINEL' not in path.read_bytes()
     # Actual embedded Qdrant persistence survives process/client recreation.
     reopened = QuestionIndex(config(tmp_path), encoder=FixtureEncoder())
     try:

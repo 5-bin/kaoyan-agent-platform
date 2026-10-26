@@ -6,7 +6,14 @@
       <div v-if="result.outcome !== 'COMPLETED'" class="meta">
         <el-tag>{{ result.retrievalStatus && retrievalLabels[result.retrievalStatus] || outcomeLabels[result.outcome] }}</el-tag>
       </div>
-      <SafeMarkdown :content="result.answer" :allowed-urls="result.references?.map(source => source.url).filter(url => !!safeUrl(url))" />
+      <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="tutor-mode">
+        {{ result.explanationMode === 'ai' ? 'AI解释' : result.explanationMode === 'fallback' ? 'AI降级 · 原题解析' : '原题解析' }}
+      </p>
+      <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="answer">{{ result.answer }}</p>
+      <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="saved-result">
+        已保存作答 · 题目版本 {{ result.questionVersion }} · 你的选择 {{ result.userAnswer }} · 标准答案 {{ result.standardAnswer }}
+      </p>
+      <SafeMarkdown v-if="result.resolvedTaskType !== 'WRONG_QUESTION_TUTOR'" :content="result.answer" :allowed-urls="result.references?.map(source => source.url).filter(url => !!safeUrl(url))" />
       <div v-if="citation?.checked" class="grounding">
         <el-tag size="small" :type="citationType(citation?.status)">{{ citationLabel(citation?.status) }}</el-tag>
         <span class="muted">引用支持度 {{ Math.round((citation?.ratio ?? 0) * 100) }}%（{{ citation?.supported ?? 0 }}/{{ citation?.checked ?? 0 }} 条结论）</span>

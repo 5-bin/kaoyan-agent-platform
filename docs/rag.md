@@ -10,7 +10,9 @@
 
 浏览器只访问Java `/api`；Java从认证会话读取账号、从数据库读取本人档案和作答，通过内部凭证调用Python。Python只读取版本化资料副本及Qdrant，不读取业务库、不接受模型生成SQL或修改业务数据。
 
-`POST /internal/rag/chat` 使用 `X-Internal-Key`。缺失或错误凭证401；任务/字段/长度不合法422。输入含 `taskId`、正整数 `userId`、`taskType`，任务类型只有 `KNOWLEDGE_QA`、`SCHOOL_RECOMMEND`、`PRACTICE_SUMMARY`、`CHAT`。未知字段拒绝，消息只允许user/assistant，最多6条、每条4000字符；问题最多8000字符。
+`POST /internal/rag/chat` 使用 `X-Internal-Key`。缺失或错误凭证401；任务/字段/长度不合法422。输入含 `taskId`、正整数 `userId`、`taskType`，任务类型为 `KNOWLEDGE_QA`、`SCHOOL_RECOMMEND`、`PRACTICE_SUMMARY`、`CHAT`、`WRONG_QUESTION_TUTOR`。未知字段拒绝，消息只允许user/assistant，最多6条、每条4000字符；问题最多8000字符，错题辅导最多2000字符。
+
+错题辅导的授权历史快照 `attempt`、父任务链、模型输出及降级规则以[搭建文档](../考研Agent平台搭建文档.md)为准。其余类型不接受非空 attempt。所有请求仅通过 Java 转发；Python 不以题号读取业务库。当前辅导只使用历史作答，不生成外部来源引用。
 
 Python响应保留 `status=SUCCESS|FAILED` 表示处理是否成功，领域终态在 `result.outcome=COMPLETED|NEEDS_INPUT|UNSUPPORTED`。不能把HTTP200或SUCCESS当成领域目标已完成。结果带 `resolvedTaskType`、`explanationMode=rules|ai|fallback`、`releaseId`、`references`；失败不回传供应商异常正文。
 

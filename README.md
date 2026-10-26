@@ -10,6 +10,7 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 
 ## 文档入口
 
+- [PR #15 合并验证](docs/pr15-merge-verification-2026-10-25.md)：批量录题、错题追问与上游聊天／隐私契约的兼容范围及本轮检查。下列“本机”数据和历史验证属于各记录作者的环境，不表示其他组员数据库或线上网站已同步。
 - [CI索引冷启动与浏览器检查修复](docs/ci-index-warmup-fix-2026-10-24.md)：等待索引就绪后仅重试一次，保留正式任务限额；浏览器测试使用生产预览，避免开发态重载。
 - [引用来源与收藏主题修复验证](docs/reference-policy-fix-verification-2026-10-24.md)：共享域名策略、堆排序解析、命令跳过知识检索及固定失败码，本轮隔离验证与生效边界。
 - [本机真实数据接入与清理](docs/real-data-import-2026-10-24.md)：当前日常库的10校15专业、44道真实课程习题、16篇四科资料，备份、清理范围与真实MySQL页面验收。
@@ -33,10 +34,11 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 - [PR #8修复验证](docs/pr8-fix-verification-2026-10-15.md)：删除后的配额、历史快照及页面联调修复。
 - [Issue #9验证记录](docs/practice-answer-safety-verification.md)：学生答案隐藏、服务端判分展示与历史回顾安全。
 - [Issue #11录题与审核验证](docs/question-entry-review-verification.md)：来源登记、审核流程及V9迁移边界。
+- [题库批量导入验证](docs/question-import-verification.md)：JSON预览、整批送审、重复检查和失败回滚。
 
 ## 当前能力
 
-- `/tasks` 为持久连续聊天助手，支持问答、择校、停止、最后一问重试和断线快照恢复；旧任务只读入口为`/tasks/history`。
+- `/tasks` 为持久连续聊天助手，支持问答、择校、停止、最后一问重试和断线快照恢复；`/tasks/history`展示普通历史任务，并支持继续错题追问。
 - 学情助手可读取本人错题、收藏、有效作答统计和平台已发布资料，支持页面侧栏、单题收藏及确认后移出错题／取消收藏／创建错题或收藏练习。统计按上海日期近30天统一，未记录指标不推算。
 - 外部模型默认未获用户授权；可在助手“隐私”中按类别开启并撤回，个人文档还需逐份选择。聊天及上下文30天清理，可主动清除；原始学习记录和已保存文档独立保留。V12未应用前不能运行新版Java。
 - 左侧“复习”分组的`/notes`管理个人Markdown笔记，支持手动创建／编辑、预览差异及历史版本。助手可基于获授权的错题／统计生成或修改笔记，预览确认后保存；沿用个人文档API及已有版本，不新增迁移。
@@ -48,9 +50,10 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 - 院校：3所学校的6条2027年普通全日制081200/085404资料。按年份、专业、学位、地区、学习方式与考试科目筛选，最多5个候选；不估计录取概率。
 - AI：默认关闭。启用后解释候选或回答资料覆盖的问题；模型异常时保留规则结果，来源编号经过程序校验。
 - 总结：Java只传本人已判分、带题目版本快照的有效作答，Python不连接业务数据库。
+- 错题辅导：答错后、回顾页或错题本点击“AI 解释与追问”，围绕同一次历史作答解释误区并连续追问；每轮保存在`/tasks/history`，可在那里继续。Java校验归属和快照并提供标准答案，模型不能更改判分。模型关闭或未授权错题外发时仅展示原题解析及明确提示；本功能无新增数据库迁移，合并后的整站仍需V10—V12。实现与验证范围见[错题辅导验证记录](docs/wrong-question-tutor-verification.md)。
 - 刷题：学生抽题／详情隐藏答案；提交后展示Java判分，回顾／错题／收藏仅显示本人有效作答快照。回顾可继续作答，旧快照无选项时仍展示已保存答案；明确不可用题目提示后跳过，网络失败可重试。跳过仅影响页面导航，不修改作答或统计；旧快照缺失不按当前题目补造。
 - 推荐与任务共享任务表保存快照、来源、版本和结果；历史推荐不随档案更改。
-- 管理员可在`/admin/questions`录入单选题、登记来源和使用权限、查看详情、补充未发布题并通过或驳回。新题先待审核；真题必须登记年份和原题号。支持对已审核题目停用和重新启用，保留题目与历史作答；编辑、审核及启停均校验版本，过期请求409。批量导入及完整题目版本发布后续建设。
+- 管理员可在`/admin/questions`录入单选题、登记来源和使用权限、查看详情、补充未发布题并通过或驳回；支持JSON批量预览和每批最多50题整批送审。新题先待审核；真题必须登记年份和原题号。支持对已审核题目停用和重新启用，保留题目与历史作答；编辑、审核及启停均校验版本，过期请求409。完整题目版本发布后续建设。
 
 旧院校列表的2025年估计值仍是演示数据，界面已标注，**不参与新推荐**。本轮未改造整个刷题/管理/认证系统，也不代表公网部署验收。
 
@@ -115,6 +118,18 @@ npm run dev
 
 Linux/macOS使用 `python3.13 -m venv .venv` 和 `.venv/bin/python`。Java启动前在可信的根目录执行 `set -a; . ./.env; set +a`，随后进入 `kaoyan-B` 运行 `bash mvnw -B -ntp package` 和 `java -jar target/kaoyan-backend-1.0.0.jar`。运行Java测试时，设置 `PYTHON_EXECUTABLE` 为该虚拟环境Python的绝对路径。
 
+## 扩充题库
+
+管理员登录本地页面后，进入“题目录入与审核”→“批量导入”：
+
+1. 下载JSON示例，或直接使用[四科8道自编题示例](kaoyan-frontend/src/assets/question-import-example.json)。这些是练习示例，不是历年真题。
+2. 按示例的`{"questions":[...]}`格式整理题目，保留每题来源、定位和使用权限；真题另外填写整数年份和原题号。每批1—50题，界面文件上限2MiB，使用UTF-8编码。
+3. 选择文件或粘贴JSON，点击“校验并预览”。展开题目核对答案与解析是否一致；发现错误先修改输入并重新校验。
+4. 点击“确认整批送审”。全部合格才写入；失败保留输入，重复题会提示序号及已有ID。请求超时或中断时，先刷新待审核列表核对，避免盲目重试。
+5. 关闭导入面板，在待审核列表逐题审核；只有通过且启用的题目才可被学生抽取。本地数据与线上服务器数据独立，导入本地不会自动更新线上。
+
+复用已有V9来源字段，无新增迁移，无需运行旧种子脚本。本功能不自动采集真题，也不支持Excel／PDF识别；查重为科目、题干和四个选项的完整匹配，不是模糊查重或并发幂等。详细边界见搭建文档7.2.2。
+
 ## 启用中文向量检索
 
 引用来源由共享文件[`config/reference-hosts.json`](config/reference-hosts.json)维护。默认Python直接读取，Java构建时将同一文件打包进JAR；新增来源先更新清单，再重建Java并加载两端新版配置。也可在两端设置`RAG_SOURCE_POLICY_FILE`为同一个绝对路径JSON文件；覆盖文件独立替换默认清单，不自动合并。配置缺失、格式错误或清单为空时拒绝启动，Python加载语料／导入索引前还会逐条检查来源。无需修改前端域名表；域名通过不代表资料内容或引用支持度已验收。详细规则见[RAG契约](docs/rag.md#引用来源策略)。
@@ -138,22 +153,23 @@ cd kaoyan-agent
 
 在根 `.env` 填写供应商 `LLM_API_KEY`、HTTPS `LLM_BASE_URL`、模型名称，再设置 `LLM_ENABLED=true`。这将产生外部请求与可能的费用。代码默认关闭SDK重试，单次20秒、全流程42秒；Java读45秒、浏览器55秒。
 
-每日模型次数是单Python进程内的限制，重启会重置，不能代替供应商预算。真实供应商和内容效果需另行验收。自动路由只对 `CHAT` 生效，不改变明确指定的任务；AI不负责判分或授予权限。
-
-DeepSeek官方API测试配置（2026-10-22核对[官方接入文档](https://api-docs.deepseek.com/)和[思考模式](https://api-docs.deepseek.com/guides/thinking_mode/)）：在本机根`.env`填写密钥，使用以下配置。当前模型名为`deepseek-flash`；关闭默认思考模式以适配本工程每次20秒、输出2200 token的测试预算。`LLM_THINKING_MODE=default`不发送供应商专用参数，其他供应商保持默认即可。
+使用 **DeepSeek 官方 V4.1 Flash** 时，在本机编辑根 `.env` 的以下已有项，不要覆盖数据库、JWT或内部凭证：
 
 ```dotenv
 LLM_ENABLED=true
-LLM_API_KEY=替换为你在本机填写的DeepSeek密钥
+LLM_API_KEY=在本机填入DeepSeek官方APIKey
 LLM_BASE_URL=https://api.deepseek.com
-LLM_MODEL_ROUTER=deepseek-flash
 LLM_MODEL_MAIN=deepseek-flash
-LLM_THINKING_MODE=disabled
-MAX_MODEL_CALLS_PER_DAY=20
-RAG_BACKEND=lexical
+LLM_MODEL_ROUTER=deepseek-flash
 ```
 
-填写后只测Python链路可从项目根目录运行`cd kaoyan-agent`，再运行`../.cache/chat-venv/bin/python -m uvicorn main:create_app --factory --host 127.0.0.1 --port 8001`（此路径为当前本机已安装新版依赖的环境；其他机器使用自行安装requirements的虚拟环境）。`GET /health`的`modelEnabled=true`仅代表配置开启，不代表供应商调用成功。整站`/tasks`测试还需要新版Java、Redis和已应用V10/V11/V12的数据库；不可通过重跑V1准备已有业务库。2026-10-22已完成两轮Python链路的DeepSeek真实请求，范围和整站待办见[接入验证记录](docs/deepseek-verification-2026-10-22.md)。
+API模型名`deepseek-flash`目前由V4.1-Flash-1017提供，详见[官方文档](https://api-docs.deepseek.com/)。Key应来自官方API平台，网页订阅不能代替API凭证。填好后重启Python Agent，若当前终端之前设置过同名`LLM_*`环境变量，应同步更新或清除这些旧覆盖项，因为环境变量优先于.env。不要把Key贴到聊天、截图或Git。`LLM_THINKING_MODE=default`时，仅对该官方主机上的`deepseek-flash`自动关闭思考模式，其他地址和模型不发送此参数；显式设置`enabled`或`disabled`优先，需确认供应商支持。保留JSON输出和校验。
+
+在`/tasks`的隐私设置中授权当前模型供应商与“错题”类别后，做错一道题，点击“AI 解释与追问”并生成解释：出现“AI解释”才表示本轮获得了经过结构校验的模型输出；“规则 / 来源摘要”表示模型关闭或未获授权，具体原因见解释提示；“AI降级”表示模型请求或结果校验失败。接着追问“能举个例子吗？”，并在`/tasks/history`确认结果已保存。真实调用成功和讲解质量仍需使用实际账号验证。
+
+每日模型次数是单Python进程内的限制，重启会重置，不能代替供应商预算。真实供应商和内容效果需另行验收。自动路由只对 `CHAT` 生效，不改变明确指定的任务；AI不负责判分或授予权限。
+
+模型预算可另设`MAX_MODEL_CALLS_PER_DAY=20`，离线资料检索保持`RAG_BACKEND=lexical`。使用上述“启动服务”的Python命令与安装了新版依赖的虚拟环境。`GET /health`的`modelEnabled=true`仅代表配置开启，不代表供应商调用成功或用户已授权。整站`/tasks`测试还需要新版Java、Redis和已应用V10/V11/V12的数据库；不可通过重跑V1准备已有业务库。上游2026-10-22的两轮Python真实请求是历史验证，范围见[接入验证记录](docs/deepseek-verification-2026-10-22.md)，不代表本次合并或当前账号已通过真实模型验收。
 
 ## 验证
 

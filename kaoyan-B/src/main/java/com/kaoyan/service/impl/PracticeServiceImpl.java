@@ -129,7 +129,7 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
             userQuestionMarkService.markWrong(userId, questionId);
         }
         studyStatService.accumulate(userId, 1, correct ? 1 : 0, 0);
-        return new AnswerVO(questionId, selected, correct ? 1 : 0, expected, grading.getAnalysis());
+        return new AnswerVO(questionId, selected, correct ? 1 : 0, expected, grading.getAnalysis(), r.getId());
     }
 
     private static Map<String, Object> snapshot(Question q) {
@@ -228,6 +228,7 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
         }
         List<ReviewRecordVO> views = result.getRecords().stream().map(r -> {
             ReviewRecordVO view = new ReviewRecordVO();
+            view.setRecordId(r.getId());
             view.setSessionId(r.getSessionId()); view.setQuestionId(r.getQuestionId()); view.setOrderIndex(r.getOrderIndex());
             view.setUserAnswer(r.getUserAnswer()); view.setIsCorrect(r.getIsCorrect());
             QuestionHistoryView.populate(view, r, r.getIsCorrect() == null ? questionService.getById(r.getQuestionId()) : null);

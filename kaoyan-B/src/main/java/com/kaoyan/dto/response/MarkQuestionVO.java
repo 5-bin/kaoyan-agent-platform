@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @lombok.EqualsAndHashCode(callSuper = true)
 public class MarkQuestionVO extends QuestionContentVO {
     private Long questionId;
+    private Long recordId;
+    private Integer isCorrect;
     private Integer wrongCount;
     private LocalDateTime lastWrongAt;
     private LocalDateTime updatedAt;

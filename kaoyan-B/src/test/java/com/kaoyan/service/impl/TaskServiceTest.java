@@ -21,6 +21,7 @@ class TaskServiceTest {
     QuestionMapper questions = mock(QuestionMapper.class);
     TaskStore store = mock(TaskStore.class);
     TaskServiceImpl service = new TaskServiceImpl(agent, new AgentProperties(), users, attempts, questions, store,
+        new WrongQuestionTutorContext(attempts, mock(TaskMapper.class)),
         new com.kaoyan.service.ReferenceSourcePolicy(new AgentProperties(), new com.fasterxml.jackson.databind.ObjectMapper()));
 
     @BeforeEach void setup() {
@@ -102,5 +103,41 @@ class TaskServiceTest {
         when(attempts.selectList(any())).thenReturn(List.of());
         assertThrows(ApiException.class, () -> service.submit(1L, "PRACTICE_SUMMARY", Map.of("sessionId", "foreign")));
         verifyNoInteractions(store, agent);
+    }
+
+    PracticeRecord wrongAttempt() {
+        PracticeRecord r = new PracticeRecord(); r.setId(7L); r.setUserId(1L); r.setQuestionId(3L);
+        r.setUserAnswer("A"); r.setIsCorrect(0); r.setAnsweredAt(java.time.LocalDateTime.now()); r.setGradingStatus("valid");
+        r.setQuestionSnapshot(Map.of("id", 3, "version", 2, "subject", "操作系统", "content", "旧题干",
+            "optionA", "甲", "optionB", "乙", "optionC", "丙", "optionD", "丁", "answer", "B", "analysis", "旧解析"));
+        when(attempts.selectById(7L)).thenReturn(r);
+        return r;
+    }
+    @Test void tutorRejectsModelOverrideAndLeavesGradeUntouched() {
+        var record = wrongAttempt();
+        doAnswer(call -> {
+            AgentRequest req = call.getArgument(1);
+            var response = response(req);
+            var result = new LinkedHashMap<String, Object>((Map<String, Object>) response.getResult());
+            result.putAll(Map.of("standardAnswer", "A", "userAnswer", "A", "questionVersion", 2, "recordId", 7L));
+            response.setResult(result); return response;
+        }).when(agent).chat(anyString(), any());
+        Task task = service.submit(1L, "WRONG_QUESTION_TUTOR", Map.of("recordId", 7, "query", "为什么"));
+        assertEquals("FAILED", task.getStatus()); assertNull(task.getResultPayload());
+        assertEquals(0, record.getIsCorrect()); assertEquals("B", record.getQuestionSnapshot().get("answer"));
+        verify(attempts, never()).updateById(any(PracticeRecord.class)); verifyNoInteractions(questions);
+    }
+    @Test void tutorOfflineFailureIsSavedAndSanitized() {
+        wrongAttempt();
+        doThrow(new RuntimeException("private-provider-key")).when(agent).chat(anyString(), any());
+        Task task = service.submit(1L, "WRONG_QUESTION_TUTOR", Map.of("recordId", 7, "query", "为什么"));
+        assertEquals("FAILED", task.getStatus()); assertFalse(task.getErrorMessage().contains("private-provider"));
+        verify(store).finish(task);
+    }
+    @Test void tutorQuotaRejectionNeverCallsAgent() {
+        wrongAttempt();
+        doThrow(new ApiException(429, "额度已用完")).when(store).begin(any(Task.class));
+        assertThrows(ApiException.class, () -> service.submit(1L, "WRONG_QUESTION_TUTOR", Map.of("recordId", 7, "query", "为什么")));
+        verifyNoInteractions(agent);
     }
 }
