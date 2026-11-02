@@ -1,7 +1,7 @@
 name: Platform checks
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
 permissions:
   contents: read
@@ -27,15 +27,17 @@ jobs:
           cache-dependency-path: |
             kaoyan-agent/requirements.txt
             kaoyan-agent/requirements-dev.txt
-            kaoyan-agent/langchain-constraints.txt
+            kaoyan-agent/helloagents-constraints.txt
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: kaoyan-frontend/package-lock.json
       - name: Install isolated Python dependencies
-        run: python -m pip install -r kaoyan-agent/requirements-dev.txt
-      - name: Test workflows and persistent Qdrant (mock embeddings/models)
+        run: |
+          python -m pip install -r kaoyan-agent/requirements-dev.txt
+          python -m pip check
+      - name: Test HelloAgents experts, frozen behavior and Qdrant (mock embeddings/models)
         working-directory: kaoyan-agent
         run: python -m pytest -q
       - name: Check current docs and contracts
@@ -63,6 +65,15 @@ jobs:
         run: python scripts/smoke-chat.py --output .cache/ci-chat-http.json --node node
       - name: Learning assistant privacy and controlled actions with real Java and Python
         run: python scripts/smoke-chat.py --learning --output .cache/ci-learning-http.json --node node
+      - name: Question retrieval and learning loop in isolated processes
+        run: |
+          python scripts/smoke-chat.py --questions --output .cache/ci-questions-http.json --node node
+          python scripts/smoke-learning.py --output .cache/ci-learning-loop.json
+      - name: Offline retrieval regression on the versioned fixture corpus
+        run: |
+          python scripts/eval-quality.py --backend lexical --data kaoyan-agent/knowledge/corpus.json --output .cache/ci-quality-lexical.json
+          python scripts/eval-quality.py --backend bm25 --data kaoyan-agent/knowledge/corpus.json --output .cache/ci-quality-bm25.json
+          python scripts/eval-quality.py --backend hybrid --data kaoyan-agent/knowledge/corpus.json --output .cache/ci-quality-hybrid.json
       - name: Question admin with real Java and isolated H2
         run: python scripts/smoke-question-admin.py --output .cache/ci-question-admin-browser.json
       - uses: actions/upload-artifact@v6

@@ -3,7 +3,6 @@ package com.kaoyan.controller;
 import com.kaoyan.common.PageResult;
 import com.kaoyan.common.Result;
 import com.kaoyan.dto.response.MarkQuestionVO;
-import com.kaoyan.entity.UserQuestionMark;
 import com.kaoyan.security.UserContext;
 import com.kaoyan.service.UserQuestionMarkService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 /**
  * 错题与收藏接口

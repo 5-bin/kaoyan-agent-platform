@@ -53,3 +53,10 @@ temp/
 .pytest_cache/
 playwright-report/
 test-results/
+
+# 本机参考图与未取得公开转载许可的采集正文、截图和原值清单
+/360.JPG
+/outputs/collection-import-20261028/
+/outputs/collection-review-20261028/
+/outputs/collection-review-20261029/
+/outputs/collection-all-20261029/
