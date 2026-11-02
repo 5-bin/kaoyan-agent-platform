@@ -13,6 +13,12 @@ public class PersonalDocumentService {
 
     public record Save(String title, String content, Integer baseVersion) {}
 
+    /** Returns the immutable version created by confirming this owned task, if any. */
+    public Integer appliedVersion(Long owner, String taskId) {
+        var rows = db.rows("SELECT version FROM personal_document_version WHERE user_id=? AND source_task_id=?", owner, taskId);
+        return rows.isEmpty() ? null : ((Number) rows.get(0).get("version")).intValue();
+    }
+
     public Map<String,Object> list(Long owner, int page, int size) {
         return db.page("SELECT id,title,version,created_at,updated_at FROM personal_document WHERE user_id=? ORDER BY updated_at DESC,id",
             "SELECT COUNT(*) FROM personal_document WHERE user_id=?", page, size, owner);

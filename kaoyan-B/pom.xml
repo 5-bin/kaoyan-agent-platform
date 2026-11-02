@@ -41,6 +41,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- Deterministic document export; no model or office process at runtime. -->
+        <dependency><groupId>org.commonmark</groupId><artifactId>commonmark</artifactId><version>0.24.0</version></dependency>
+        <dependency><groupId>org.commonmark</groupId><artifactId>commonmark-ext-gfm-tables</artifactId><version>0.24.0</version></dependency>
+        <dependency><groupId>org.apache.poi</groupId><artifactId>poi-ooxml</artifactId><version>5.4.1</version></dependency>
+        <dependency><groupId>io.github.openhtmltopdf</groupId><artifactId>openhtmltopdf-pdfbox</artifactId><version>1.1.37</version></dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -161,7 +166,7 @@
             </resource>
             <resource>
                 <directory>${project.basedir}/../config</directory>
-                <includes><include>reference-hosts.json</include></includes>
+                <includes><include>reference-hosts.json</include><include>admission-sources.json</include><include>assistant-navigation.json</include></includes>
                 <filtering>false</filtering>
             </resource>
         </resources>

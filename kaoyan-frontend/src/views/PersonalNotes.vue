@@ -12,7 +12,7 @@
         <el-button v-if="notes.length < total || listError || (listLoading && !notes.length)" :loading="listLoading" :disabled="listLoading" @click="notes.length ? loadMore() : loadList(true)">{{ listError ? '重试加载' : '展开更多' }}</el-button>
       </aside>
       <section v-if="editing" class="card note-content" aria-label="笔记编辑器">
-        <div class="note-toolbar"><strong>{{ original ? '编辑笔记 · v' + original.version : '新建笔记' }}</strong><el-button v-if="original" @click="askAssistant">让助手修改</el-button><el-button v-if="original" @click="loadHistory(true)">历史版本</el-button><el-button type="primary" :loading="saving" :disabled="loading || !title.trim()" @click="save">{{ original ? '保存新版本' : '创建笔记' }}</el-button></div>
+        <div class="note-toolbar"><strong>{{ original ? '编辑笔记 · v' + original.version : '新建笔记' }}</strong><el-button v-if="original" @click="askAssistant">让助手修改</el-button><el-button v-if="original" @click="loadHistory(true)">历史版本</el-button><ExportButton v-if="original" :source="{ source: 'NOTE', documentId: original.id, version: original.version }" :saved-warning="dirty ? '有未保存修改；当前导出已保存的 v' + original.version + '。' : undefined" @save="save" /><el-button type="primary" :loading="saving" :disabled="loading || !title.trim()" @click="save">{{ original ? '保存新版本' : '创建笔记' }}</el-button></div>
         <p v-if="dirty" class="muted" role="status">有尚未保存的修改。</p>
         <el-alert v-if="conflict" title="笔记已有新版本。你的编辑内容已保留，请重新读取并核对后再保存。" type="warning" :closable="false"><el-button @click="reloadNote">重新读取并核对</el-button></el-alert>
         <el-input v-model="title" maxlength="100" show-word-limit placeholder="笔记标题" aria-label="笔记标题" />
@@ -26,7 +26,7 @@
       <el-button v-if="versions.length < versionTotal" @click="loadHistory(false)">更多版本</el-button>
       <el-empty v-if="!versions.length" description="暂无历史版本" />
     </el-dialog>
-    <el-dialog v-model="versionOpen" title="历史版本（只读）" width="min(760px,94vw)"><h3>{{ historical?.title }} · v{{ historical?.version }}</h3><SafeMarkdown :content="historical?.content || ''" /></el-dialog>
+    <el-dialog v-model="versionOpen" title="历史版本（只读）" width="min(760px,94vw)"><h3>{{ historical?.title }} · v{{ historical?.version }}</h3><ExportButton v-if="historical" :source="{ source: 'NOTE', documentId: historical.id, version: historical.version }" /><SafeMarkdown :content="historical?.content || ''" /></el-dialog>
   </div>
 </template>
 
@@ -37,6 +37,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
 import { diffLines } from 'diff'
 import SafeMarkdown from '@/components/SafeMarkdown.vue'
+import ExportButton from '@/components/ExportButton.vue'
 import * as api from '@/api/conversation'
 import type { PersonalDocument, DocumentVersion } from '@/api/conversation'
 import { useUserStore } from '@/stores/user'
