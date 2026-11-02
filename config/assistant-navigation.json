@@ -1,0 +1,13 @@
+[
+  {"target":"HOME","label":"首页","path":"/","aliases":["首页"],"admin":false},
+  {"target":"PRACTICE","label":"刷题","path":"/practice","aliases":["刷题","刷题页","练习页"],"admin":false},
+  {"target":"ASSISTANT","label":"Agent 助手","path":"/tasks","aliases":["Agent 助手","Agent助手","考研助手"],"admin":false},
+  {"target":"NOTES","label":"个人笔记","path":"/notes","aliases":["个人笔记","笔记页"],"admin":false},
+  {"target":"WRONG","label":"错题本","path":"/wrong","aliases":["错题本"],"admin":false},
+  {"target":"FAVORITE","label":"我的收藏","path":"/favorite","aliases":["我的收藏","收藏夹","收藏列表"],"admin":false},
+  {"target":"STATS","label":"学习统计","path":"/stat","aliases":["学习统计","统计页"],"admin":false},
+  {"target":"SCHOOLS","label":"院校库","path":"/schools","aliases":["院校库"],"admin":false},
+  {"target":"DOCUMENTS","label":"备考资料","path":"/documents","aliases":["备考资料","资料页"],"admin":false},
+  {"target":"ADMIN_DOCUMENTS","label":"管理后台","path":"/admin/documents","aliases":["管理后台"],"admin":true},
+  {"target":"ADMIN_QUESTIONS","label":"题目录入与审核","path":"/admin/questions","aliases":["题目录入与审核","题目管理","题目审核"],"admin":true}
+]

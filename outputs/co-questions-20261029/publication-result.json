@@ -1,0 +1,31 @@
+{
+  "database": "kaoyan_dev",
+  "addedQuestions": 40,
+  "totalQuestions": 404,
+  "subjectCounts": {
+    "数据结构": 144,
+    "操作系统": 120,
+    "计算机网络": 100,
+    "计算机组成原理": 40
+  },
+  "difficultyCounts": {
+    "EASY": 11,
+    "MEDIUM": 19,
+    "HARD": 10
+  },
+  "sourceType": "COURSE_EXERCISE",
+  "reviewMethod": "AI-assisted source/answer-page review and deterministic checks; not teacher review",
+  "importMethod": "Java bulk preview/import and individual review",
+  "backupRestoredTables": 28,
+  "restoreDatabase": "kaoyan_realdata_verify_f1770c31d03e",
+  "failureRollbackVerified": true,
+  "explicitRollbackVerified": true,
+  "allOriginalQuestionRowsUnchanged": true,
+  "allOtherBusinessTablesUnchanged": true,
+  "studentAnswerHidingVerified": 40,
+  "localPracticePoolVerified": 40,
+  "paidModelCalls": 0,
+  "knowledgeRagChanged": false,
+  "backup": "/Users/bin/projects/ruanjiangongcheng/Projects/kaoyan-agent-platform-adaptation/.cache/co-questions-20261029/20261029-093418-publish/before.sql",
+  "auditDirectory": "/Users/bin/projects/ruanjiangongcheng/Projects/kaoyan-agent-platform-adaptation/.cache/co-questions-20261029/20261029-093418-publish"
+}

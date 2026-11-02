@@ -5,10 +5,8 @@ import com.kaoyan.common.Result;
 import com.kaoyan.dto.request.AnswerRequest;
 import com.kaoyan.dto.request.StartSessionRequest;
 import com.kaoyan.dto.response.ReviewRecordVO;
-import com.kaoyan.dto.response.AnswerVO;
 import com.kaoyan.dto.response.PracticeRecordVO;
 import com.kaoyan.dto.response.SessionSummaryVO;
-import com.kaoyan.entity.Task;
 import com.kaoyan.dto.response.TaskView;
 import com.kaoyan.security.UserContext;
 import com.kaoyan.service.PracticeService;
@@ -32,6 +30,7 @@ import java.util.Map;
 public class PracticeController {
 
     private final PracticeService practiceService;
+    private final org.springframework.beans.factory.ObjectProvider<com.kaoyan.learning.ManagedPracticeService> managed;
     private final TaskService taskService;
 
     /**
@@ -50,9 +49,13 @@ public class PracticeController {
      */
     @Operation(summary = "作答一题")
     @PostMapping("/sessions/{sessionId}/answer")
-    public Result<AnswerVO> answer(@PathVariable String sessionId,
+    public Result<?> answer(@PathVariable String sessionId,
                                @Valid @RequestBody AnswerRequest req) {
-        return Result.ok(practiceService.answer(UserContext.currentUserId(), sessionId, req.questionId(), req.answer()));
+        var service=managed.getIfAvailable();long owner=UserContext.currentUserId();
+        if(service==null && sessionId.startsWith("L-"))throw new com.kaoyan.common.ApiException(503,"该批次需要启用诊断与学情功能后继续");
+        if(service!=null && service.manages(owner,sessionId))
+            return Result.ok(service.submit(owner,sessionId,req.questionId(),req.itemId(),req.clientRequestId(),req.answer()));
+        return Result.ok(practiceService.answer(owner, sessionId, req.questionId(), req.answer()));
     }
 
     /**

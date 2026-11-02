@@ -16,13 +16,14 @@ export interface Generation {
   taskId: string; attemptNo: number; status: Task['status']; version: number; stage?: string
   errorMessage?: string; draft?: Record<string, string>; result?: TaskResult
 }
-export interface ChatMessage { id: string; sequenceNo: number; content: string; attempts: Generation[]; createdAt: string }
+export interface TutorSelection { recordId: number; parentTaskId?: string }
+export interface ChatMessage { tutoring?: TutorSelection; id: string; sequenceNo: number; content: string; attempts: Generation[]; createdAt: string }
 export interface PersonalDocument { id: string; title: string; content: string; version: number }
 export interface DocumentVersion extends PersonalDocument { documentId: string; sourceTaskId?: string; createdAt: string }
 export const createConversation = () => request.post<unknown, Conversation>('/conversations')
 export const listConversations = (pageNum = 1) => request.get<unknown, PageResult<Conversation>>('/conversations', { params: { pageNum, pageSize: 5 } })
 export const listMessages = (id: string, pageNum = 1) => request.get<unknown, PageResult<ChatMessage> & { conversation: Conversation }>(`/conversations/${id}/messages`, { params: { pageNum, pageSize: 20 } })
-export const sendMessage = (id: string, data: { query: string; clientRequestId: string; documentId?: string; documentVersion?: number; pageContext?: AssistantPageContext; referenceTaskId?: string }) =>
+export const sendMessage = (id: string, data: { query: string; clientRequestId: string; documentId?: string; documentVersion?: number; pageContext?: AssistantPageContext; referenceTaskId?: string; tutoring?: TutorSelection }) =>
   request.post<unknown, { taskId: string; messageId: string }>(`/conversations/${id}/messages`, data)
 export const retryMessage = (id: string, messageId: string, clientRequestId: string) =>
   request.post<unknown, { taskId: string; messageId: string }>(`/conversations/${id}/messages/${messageId}/retry`, { clientRequestId })

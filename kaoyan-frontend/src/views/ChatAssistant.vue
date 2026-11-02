@@ -20,9 +20,18 @@
         <strong>当前会话条件</strong><el-tag v-for="entry in conditionEntries" :key="entry[0]">{{ entry[0] }}：{{ entry[1] }}</el-tag>
         <small>仅用于本会话，不修改个人档案</small>
       </div>
+      <div v-if="tutoring" class="tutoring-focus" role="status">已选择一条已判分错题，后续问题将围绕这次作答。<el-button size="small" @click="clearTutoring">清除错题上下文</el-button></div>
       <div ref="scrollArea" class="messages" @scroll="trackScroll">
         <el-button v-if="messages.length < messageTotal" @click="olderMessages">加载更早消息</el-button>
-        <el-empty v-if="!messages.length" description="可以询问408知识、咨询择校，或创建和修改学习笔记" />
+        <template v-if="!messages.length">
+          <el-empty description="可以询问408知识、分析学情、安排复习和练习、咨询择校，或整理学习笔记" />
+          <DiagnosticEntry v-if="!compact" />
+          <div class="quick-prompts" aria-label="开始使用考研助手">
+            <el-button size="small" @click="input = '分析我的薄弱点，安排下周复习并比较院校'">分析学情并安排复习</el-button>
+            <el-button size="small" @click="input = '给我出5道有关排序的题'">安排题库练习</el-button>
+            <el-button size="small" @click="input = '我暂时跳过诊断，请介绍可以使用的功能'">先了解功能</el-button>
+          </div>
+        </template>
         <article v-for="message in messages" :key="message.id" class="turn">
           <div class="user-message">{{ message.content }}</div>
           <div v-for="attempt in message.attempts" :key="attempt.taskId" class="assistant-message">
@@ -34,13 +43,17 @@
               <el-button v-if="connectionFailed" @click="connect(attempt)">重新连接</el-button>
             </template>
             <TaskResultView v-else :task="asTask(attempt)" />
-            <div v-if="attempt.status === 'SUCCESS'" class="question-actions"><template v-for="item in attempt.result?.evidence" :key="item.ref"><el-button v-if="item.resource?.type === 'question'" size="small" @click="referenceQuestion(attempt, item.ref)">收藏 {{ item.ref }} · {{ item.title }}</el-button></template></div>
+            <div v-if="canClarify(message, attempt)" class="quick-prompts" aria-label="请选择处理方式">
+              <el-button v-for="option in attempt.result?.clarificationOptions" :key="option.label" size="small" :disabled="sending || !!activeGeneration || loadingDocument" @click="send(option.reply)">{{ option.label }}</el-button>
+            </div>
+            <component :is="attempt.result?.actions?.some(action => action.type === 'PRACTICE_CREATE') ? 'details' : 'div'" v-if="attempt.status === 'SUCCESS'" class="question-actions"><summary v-if="attempt.result?.actions?.some(action => action.type === 'PRACTICE_CREATE')">收藏题目</summary><template v-for="item in attempt.result?.evidence" :key="item.ref"><el-button v-if="item.resource?.type === 'question'" size="small" @click="referenceQuestion(attempt, item.ref)">收藏 {{ item.ref }} · {{ item.title }}</el-button></template></component>
             <div v-for="action in attempt.result?.actions" :key="action.id" class="action-card">
               <strong>{{ action.title }}</strong><p>涉及 {{ action.count }} 题 · {{ actionLabels[action.status] }}</p>
               <p v-if="action.requestedCount && action.requestedCount > action.count">请求 {{ action.requestedCount }} 题，当前可用 {{ action.count }} 题。</p>
-              <ul v-if="action.targets?.length"><li v-for="(target, index) in action.targets" :key="index"><router-link v-if="resourceRoute(target.resource)" :to="resourceRoute(target.resource)!">{{ target.title }}</router-link><span v-else>{{ target.title }}</span><br v-if="target.matchMethod"><span v-if="target.matchMethod" class="match-label">{{ target.matchMethod === 'LABEL' ? '知识点匹配' : '语义相关' }} · {{ target.matchTopic }}</span></li></ul>
-              <template v-if="action.status === 'PENDING'"><el-button type="primary" :loading="busyAction === action.id" @click="handleAction(action, true)">确认操作</el-button><el-button :disabled="!!busyAction" @click="handleAction(action, false)">放弃</el-button></template>
-              <router-link v-if="action.status === 'SUCCESS' && action.result?.sessionId" :to="'/practice/session/' + encodeURIComponent(action.result.sessionId)">打开练习（{{ action.result.actualCount ?? action.count }}题）</router-link>
+              <component :is="action.type === 'PRACTICE_CREATE' ? 'details' : 'div'" v-if="action.targets?.length"><summary v-if="action.type === 'PRACTICE_CREATE'">题目预览（{{ action.count }}）</summary><ul><li v-for="(target, index) in action.targets" :key="index"><router-link v-if="resourceRoute(target.resource)" :to="resourceRoute(target.resource)!">{{ target.title }}</router-link><span v-else>{{ target.title }}</span><br v-if="target.matchMethod"><span v-if="target.matchMethod" class="match-label">{{ target.matchMethod === 'LABEL' ? '知识点匹配' : '语义相关' }} · {{ target.matchTopic }}</span></li></ul></component>
+              <template v-if="action.status === 'PENDING'"><el-button type="primary" :loading="busyAction === action.id" :disabled="!!busyAction || invalidActions[action.id]" @click="handleAction(action, true)">{{ action.type === 'PRACTICE_CREATE' ? '开始练习' : '确认操作' }}</el-button><el-button :disabled="!!busyAction" @click="handleAction(action, false)">放弃</el-button></template>
+              <p v-if="actionErrors[action.id]" role="alert">{{ actionErrors[action.id] }}</p>
+              <router-link v-if="action.status === 'SUCCESS' && action.result?.sessionId && resourceRoute({ type: 'practice', id: action.result.sessionId })" :to="resourceRoute({ type: 'practice', id: action.result.sessionId })!">继续练习（{{ action.result.actualCount ?? action.count }}题）</router-link>
             </div>
             <el-button v-if="attempt.result?.documentProposal" @click="previewProposal(attempt)">预览笔记建议</el-button>
             <el-button v-if="canRetry(message, attempt)" :disabled="sending" @click="retry(message)">重试此问题</el-button>
@@ -59,7 +72,7 @@
         <el-input v-model="input" type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :maxlength="8000" show-word-limit
           placeholder="输入问题，或要求创建笔记、修改选中的笔记" aria-label="聊天输入"
           @keydown="onKeydown" @compositionstart="composing = true" @compositionend="composing = false" />
-        <div class="composer-actions"><small>Enter 发送 · Shift+Enter 换行</small><el-button type="primary" :loading="sending" :disabled="!input.trim() || !!activeGeneration || loadingDocument" @click="send">发送</el-button></div>
+        <div class="composer-actions"><small>Enter 发送 · Shift+Enter 换行</small><el-button type="primary" :loading="sending" :disabled="!input.trim() || !!activeGeneration || loadingDocument" @click="send()">发送</el-button></div>
       </footer>
     </section>
     <el-drawer v-model="drawer" title="会话" direction="ltr" size="min(300px,90vw)">
@@ -103,6 +116,7 @@ import type { ChatMessage, Conversation, Generation, PersonalDocument } from '@/
 import SafeMarkdown from '@/components/SafeMarkdown.vue'
 import ConversationListItem from '@/components/ConversationListItem.vue'
 import TaskResultView from '@/components/TaskResultView.vue'
+import DiagnosticEntry from '@/components/DiagnosticEntry.vue'
 
 defineProps<{ compact?: boolean }>()
 const route = useRoute(), router = useRouter(), user = useUserStore(), assistant = useAssistantStore()
@@ -129,10 +143,28 @@ async function clearChat(all: boolean) {
   stream?.abort(); messages.value = []; current.value = undefined; input.value = ''; editContent.value = ''; editTitle.value = ''; baseDocument.value = undefined; selectedDocument.value = undefined; selectedDocumentId.value = undefined; pending = undefined; retryPending = undefined; assistant.conversationId = ''; privacyDialog.value = false; await refreshConversations(true);
   if (route.path === '/tasks') await router.replace('/tasks')
 }
+const actionErrors = ref<Record<string, string>>({}), invalidActions = ref<Record<string, boolean>>({})
 async function handleAction(action: AssistantAction, confirm: boolean) {
   if (busyAction.value) return
-  const stamp = epoch; busyAction.value = action.id
-  try { const result = confirm ? await api.confirmAction(conversationId.value, action.id) : await api.dismissAction(conversationId.value, action.id); if (!guard(stamp)) return; Object.assign(action, result); if (result.status === 'SUCCESS') refreshSuccessfulActions() } finally { if (guard(stamp)) busyAction.value = '' }
+  const stamp = epoch, origin = conversationId.value; busyAction.value = action.id
+  delete actionErrors.value[action.id]
+  try {
+    const result = confirm ? await api.confirmAction(origin, action.id) : await api.dismissAction(origin, action.id)
+    if (!guard(stamp) || conversationId.value !== origin) return
+    Object.assign(action, result)
+    if (result.status === 'SUCCESS') {
+      refreshSuccessfulActions()
+      if (confirm && result.type === 'PRACTICE_CREATE' && result.result?.sessionId) {
+        const destination = resourceRoute({ type: 'practice', id: result.result.sessionId })
+        if (destination) { assistant.open = false; await router.push(destination) }
+      }
+    }
+  } catch (error) {
+    if (!guard(stamp) || conversationId.value !== origin) return
+    const response = (error as { response?: { status?: number; data?: { message?: string } } }).response
+    invalidActions.value[action.id] = response?.status === 409
+    actionErrors.value[action.id] = response?.status === 409 ? '题目或来源记录已变化，请重新发送组题请求。' : response?.data?.message || '操作未完成，请重试；已创建的练习会返回原批次。'
+  } finally { if (guard(stamp)) busyAction.value = '' }
 }
 const deletingConversation = ref('')
 const deletedConversations = new Set<string>()
@@ -141,8 +173,10 @@ const conversations = ref<Conversation[]>([]), current = ref<Conversation>(), me
 const loadingConversations = ref(false)
 const conversationPage = ref(1), conversationTotal = ref(0), messagePage = ref(1), messageTotal = ref(0)
 const documentPage = ref(1), documentTotal = ref(0), personalDocuments = ref<PersonalDocument[]>([])
-const input = ref(''), sending = ref(false), composing = ref(false), drawer = ref(false)
+const input = ref(typeof route.query.query === 'string' ? route.query.query.slice(0, 8000) : ''), sending = ref(false), composing = ref(false), drawer = ref(false)
 const referenceTaskId = ref<string>()
+const tutoring = ref<api.TutorSelection>()
+function clearTutoring() { tutoring.value = undefined; pending = undefined; const query = { ...route.query }; delete query.tutorRecordId; delete query.tutorParentTaskId; void router.replace({ path: route.path, query }) }
 const connectionNotice = ref(''), connectionFailed = ref(false), scrollArea = ref<HTMLElement>(), atBottom = ref(true)
 const selectedDocumentId = computed<string | undefined>({ get: () => assistant.selectedNoteId || undefined, set: id => { assistant.selectedNoteId = id || '' } }), selectedDocument = ref<PersonalDocument>(), loadingDocument = ref(false)
 const selectableDocuments = computed(() => selectedDocument.value && !personalDocuments.value.some(note => note.id === selectedDocument.value?.id) ? [selectedDocument.value, ...personalDocuments.value] : personalDocuments.value)
@@ -166,7 +200,12 @@ function trackScroll() { const node = scrollArea.value; if (node) atBottom.value
 async function scrollIfNeeded() { if (!atBottom.value) return; await nextTick(); if (scrollArea.value) scrollArea.value.scrollTop = scrollArea.value.scrollHeight }
 function draftText(attempt: Generation) { return Object.values(attempt.draft || {}).join('\n\n') }
 function asTask(attempt: Generation): Task { return { id: attempt.taskId, userId: 0, taskType: 'CHAT', status: attempt.status, resultPayload: attempt.result, errorMessage: attempt.errorMessage, createdAt: '' } }
-function canRetry(message: ChatMessage, attempt: Generation) { return !activeGeneration.value && message.id === messages.value.at(-1)?.id && attempt.taskId === message.attempts.at(-1)?.taskId && (['FAILED','CANCELLED'].includes(attempt.status) || attempt.status === 'SUCCESS' && attempt.result?.outcome === 'UNSUPPORTED' && ['BUILDING','BUSY','FAILED','UNAVAILABLE'].includes(attempt.result?.retrievalStatus || '')) }
+function canRetry(message: ChatMessage, attempt: Generation) {
+  const result = attempt.result
+  const pendingPractice = result?.partial && !result.actions?.length && result.sections?.some(item => item.agent === 'PRACTICE' && item.outcome === 'UNSUPPORTED')
+  const retrySearch = ['BUILDING','BUSY','FAILED','UNAVAILABLE'].includes(result?.retrievalStatus || '') && (result?.outcome === 'UNSUPPORTED' || pendingPractice)
+  return !activeGeneration.value && message.id === messages.value.at(-1)?.id && attempt.taskId === message.attempts.at(-1)?.taskId && (['FAILED','CANCELLED'].includes(attempt.status) || attempt.status === 'SUCCESS' && retrySearch)
+}
 function referenceQuestion(attempt: Generation, ref: string) { referenceTaskId.value = attempt.taskId; input.value = '收藏 ' + ref }
 // List requests belong to the account, not to the currently selected chat.
 function listGuard() {
@@ -263,7 +302,7 @@ async function loadMessages(stamp = epoch) {
   if (!id) return
   const data = await api.listMessages(id)
   if (!guard(stamp) || id !== conversationId.value || serial !== messageLoad) return
-  current.value = data.conversation; messages.value = data.list.reverse(); messageTotal.value = data.total; messagePage.value = 1; refreshSuccessfulActions()
+  current.value = data.conversation; messages.value = data.list.reverse(); if (data.list.length) { const selected = messages.value[messages.value.length - 1]?.tutoring; tutoring.value = selected ? { recordId: selected.recordId } : undefined }; messageTotal.value = data.total; messagePage.value = 1; refreshSuccessfulActions()
   await scrollIfNeeded()
   if (activeGeneration.value) void connect(activeGeneration.value)
 }
@@ -312,9 +351,13 @@ async function connect(attempt: Generation) {
   if (guard(stamp) && !controller.signal.aborted && attempt.status === 'RUNNING') { connectionNotice.value = '连接中断，生成可能仍在继续'; connectionFailed.value = true }
 }
 function onKeydown(event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && !composing.value && event.keyCode !== 229) { event.preventDefault(); void send() } }
-async function send() {
-  if (sending.value || creatingForSend || activeGeneration.value || !input.value.trim() || loadingDocument.value) return
-  const data = { query: input.value.trim(), documentId: selectedDocument.value?.id, documentVersion: selectedDocument.value?.version, referenceTaskId: referenceTaskId.value, pageContext: assistant.pageContext ? JSON.parse(JSON.stringify(assistant.pageContext)) as api.AssistantPageContext : undefined }
+function canClarify(message: ChatMessage, attempt: Generation) {
+  return attempt.status === 'SUCCESS' && message.id === messages.value.at(-1)?.id && attempt.taskId === message.attempts.at(-1)?.taskId && !!attempt.result?.clarificationOptions?.length
+}
+async function send(choice?: string) {
+  const query = (choice ?? input.value).trim()
+  if (sending.value || creatingForSend || activeGeneration.value || !query || loadingDocument.value) return
+  const data = { query, documentId: selectedDocument.value?.id, documentVersion: selectedDocument.value?.version, referenceTaskId: referenceTaskId.value, tutoring: tutoring.value ? { ...tutoring.value } : undefined, pageContext: assistant.pageContext ? JSON.parse(JSON.stringify(assistant.pageContext)) as api.AssistantPageContext : undefined }
   if (!conversationId.value) {
     creatingForSend = true
     const token = user.token
@@ -322,9 +365,9 @@ async function send() {
     finally { creatingForSend = false }
   }
   const stamp = epoch, id = conversationId.value
-  if (!pending || pending.query !== data.query || pending.documentId !== data.documentId || pending.documentVersion !== data.documentVersion || pending.referenceTaskId !== data.referenceTaskId || JSON.stringify(pending.pageContext) !== JSON.stringify(data.pageContext)) pending = { ...data, clientRequestId: crypto.randomUUID() }
+  if (!pending || pending.query !== data.query || pending.documentId !== data.documentId || pending.documentVersion !== data.documentVersion || pending.referenceTaskId !== data.referenceTaskId || JSON.stringify(pending.pageContext) !== JSON.stringify(data.pageContext) || JSON.stringify(pending.tutoring) !== JSON.stringify(data.tutoring)) pending = { ...data, clientRequestId: crypto.randomUUID() }
   sending.value = true; atBottom.value = true
-  try { await api.sendMessage(id, pending); if (guard(stamp)) { input.value = ''; referenceTaskId.value = undefined; pending = undefined; await loadMessages(stamp) } }
+  try { await api.sendMessage(id, pending); if (guard(stamp)) { if (choice === undefined) input.value = ''; referenceTaskId.value = undefined; pending = undefined; await loadMessages(stamp) } }
   catch { if (guard(stamp)) ElMessage.warning('发送未确认；可再次发送相同内容，或刷新查看记录') }
   finally { if (guard(stamp)) sending.value = false }
 }
@@ -364,7 +407,13 @@ async function saveDocument() {
     ElMessage.success('已保存'); editor.value = false; selectedDocumentId.value = document.id; selectedDocument.value = document; assistant.notesChanged(); await refreshDocuments(stamp)
   } finally { if (guard(stamp)) saving.value = false }
 }
-watch(() => route.path, async path => { drawer.value = false; editor.value = false; privacyDialog.value = false; if (path === '/tasks' && conversationId.value && !route.query.conversationId) await router.replace({ path, query: { conversationId: conversationId.value } }) })
+watch(() => route.path, async path => { drawer.value = false; editor.value = false; privacyDialog.value = false; if (path === '/tasks' && conversationId.value && !route.query.conversationId && !route.query.tutorRecordId) await router.replace({ path, query: { conversationId: conversationId.value } }) })
+watch([() => route.query.tutorRecordId, () => route.query.tutorParentTaskId], ([rawId, rawParent]) => {
+  if (typeof rawId !== 'string' || !/^[1-9]\d*$/.test(rawId) || !Number.isSafeInteger(Number(rawId))) return
+  tutoring.value = { recordId: Number(rawId), ...(typeof rawParent === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(rawParent) ? { parentTaskId: rawParent } : {}) }
+  input.value = '请解释这次错题，指出我的选择错在哪里，并给出复习建议。'
+  pending = undefined; referenceTaskId.value = undefined; assistant.conversationId = ''
+}, { immediate: true })
 watch(() => route.query.conversationId, value => { if (route.path === '/tasks' && typeof value === 'string' && !deletedConversations.has(value)) assistant.conversationId = value }, { immediate: true })
 watch([() => assistant.conversationId, () => user.token], async (values, previous) => {
   const initializeList = !previous.length || values[1] !== previous[1]
@@ -372,14 +421,14 @@ watch([() => assistant.conversationId, () => user.token], async (values, previou
   selectedDocument.value = undefined; loadingDocument.value = false; selectionEpoch++; referenceTaskId.value = undefined
   personalDocuments.value = []; sending.value = false; saving.value = false
   editor.value = false; busyAction.value = ''; privacyDialog.value = false; pending = undefined; retryPending = undefined; atBottom.value = true
-  if (previous.length && values[1] !== previous[1]) { sessionRevision++; deletingConversation.value = ''; deletedConversations.clear(); listRevision++; selectedDocumentId.value = undefined; observedActions.clear(); privacy.value = undefined; privacyDraft.value = { modelAllowed: false, scopes: [] }; input.value = ''; editContent.value = ''; editTitle.value = ''; baseDocument.value = undefined; }
+  if (previous.length && values[1] !== previous[1]) { sessionRevision++; deletingConversation.value = ''; deletedConversations.clear(); listRevision++; selectedDocumentId.value = undefined; observedActions.clear(); tutoring.value = undefined; privacy.value = undefined; privacyDraft.value = { modelAllowed: false, scopes: [] }; input.value = ''; editContent.value = ''; editTitle.value = ''; baseDocument.value = undefined; }
   if (initializeList) { listRequest++; conversations.value = []; conversationPage.value = 1; conversationTotal.value = 0; loadingConversations.value = false }
   if (!user.token) { input.value = ''; return }
   try {
     await Promise.all([...(initializeList ? [refreshConversations(true)] : []), refreshDocuments(stamp), refreshPrivacy(stamp).catch(() => { if (guard(stamp)) privacy.value = undefined })])
     if (!guard(stamp)) return
     if (selectedDocumentId.value) await selectDocument()
-    if (!conversationId.value && !loadingConversations.value && conversations.value[0]) await openConversation(conversations.value[0].id)
+    if (!conversationId.value && !loadingConversations.value && conversations.value[0] && !tutoring.value) await openConversation(conversations.value[0].id)
     else await loadMessages(stamp)
   } catch { /* Unified request layer shows authentication and network errors. */ }
 }, { immediate: true })

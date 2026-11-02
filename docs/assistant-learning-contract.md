@@ -2,6 +2,16 @@
 
 Java独占归属校验与业务写入。Python不访问业务库。以下新增字段可选，旧任务类型不变。
 
+2026-10-29增量：对话协调六类专家、内部计划版本2及可选学习计划结果见[搭建文档](../考研Agent平台搭建文档.md#阅读导航)。规则画像、判分、题库组题、操作确认及隐私边界沿用本页；多专家不直接写记录，规划不改变估分和权重。默认进入助手并提供可跳过诊断，旧页面和操作卡片保留。实际回归见[本轮记录](helloagents-multiagent-verification-2026-10-29.md)。
+
+## 助手组题与站内导航（2026-10-25）
+
+新正式练习和诊断编号为`L-`加32位无横线UUID，共34字符，兼容既有`practice_record.session_id VARCHAR(36)`。不改写已存在批次，读取仍兼容此前格式；无需执行字段扩容或新迁移。启用学情功能后的助手确认建卷须在真实36字符限制下验证。
+
+明确出题请求使用现有`PRACTICE_CREATE`，默认5题；Java固定候选与实际题量，返回待确认卡片。点击“开始练习”即调用现有confirm接口，成功后进入`/practice/session/:sessionId`；不增加确认弹窗，未点击不创建批次。重复或并发确认返回同一批次，后续卡片显示“继续练习”。缺题显示实际数量；零题、索引未就绪、题目变更冲突不创建练习。题干与学习依据默认折叠，不在回答正文重复展示。
+
+Java为聊天结果补充可选`navigation:[{target}]`，忽略上游同名字段。唯一固定映射为`config/assistant-navigation.json`，前端与Java构建共享；target仅为HOME/PRACTICE/ASSISTANT/NOTES/WRONG/FAVORITE/STATS/SCHOOLS/DOCUMENTS/ADMIN_DOCUMENTS/ADMIN_QUESTIONS。管理员项按当前账号角色过滤，路径由固定配置产生，模型不能生成导航URL。正文功能名可点击，下方列相关入口按钮；不自动替换代码块、已有链接或笔记草稿正文。旧结果在展示时补全，无需回写历史；旧客户端可忽略新字段。不新增任务类型、终态或数据库迁移。
+
 ## 输入
 
 ### 2026-10-23 个人笔记与题目引用修复
@@ -42,6 +52,8 @@ DELETE /api/conversations/{id}清除单会话；DELETE /api/conversations清除�
 
 统计接口新增`GET /api/stats/learning?from&to&subject`，返回questionCount/correctCount/uniqueQuestions/wrongCount/accuracy、daily、knowledgePoints、from/to；仅有效已提交作答。默认上海日期近30天（包含今天）。
 
+2026-11-02口径说明（Java接口不变）：统计及knowledgePoints的questionCount是所选区间内全部有效作答次数，同题重复作答分别计数，不区分提示辅助；learningProfile.groups的samples是全部历史中的独立作答，同一题7天内只计1次，不含提示辅助及未记录提示情况的作答，按难度分组且每组最多取最近50条。同一知识点因此可能同时出现“区间作答16次”和“某难度独立样本8条”，两者不能并列比较或相加。规则回答为知识点行标注“区间内有效作答（同题重复作答分别计数）”及正确次数，并在画像前说明口径差异；学习专家提示词写明两种口径。Python在发给模型的统计、每日及知识点行中按代码补充`wrongAttempts`（questionCount减correctCount），模型不再自行做减法，避免算出的错误次数被数字校验拒绝；超出所给数据的运算（如把两种口径相加）仍会降级为规则结果。
+
 创建练习请求扩展source=NORMAL|WRONG|FAVORITE和可选questionIds；保留原subject/difficulty/count，count上限50。新批次创建时固定快照，不能向未答DTO泄露答案。
 
 学习分析使用已授权的题目／聚合主题检索现有版本化408语料，最多5段公开资料；未授权私人主题不能间接用于模型检索上下文。模型LearningAnswer可返回evidenceRefs及sourceIds（最多5个），来源只能来自本次检索集合，非法编号回退本地摘要。平台已发布资料单独按Java正文定位和摘要哈希留证，不伪造教材页码。
@@ -78,3 +90,18 @@ DELETE /api/conversations/{id}清除单会话；DELETE /api/conversations清除�
 - result可含retrievalStatus=READY/BUILDING/BUSY/FAILED/UNAVAILABLE。未就绪／失败时outcome=UNSUPPORTED，不创建action；UI按检索状态显示，不标为资料未覆盖。最后一问处于这些检索状态时允许使用现有retry入口重试，沿用任务配额和新的授权检查；READY零匹配单独说明没有匹配题。
 - Java保存匹配版本、来源及题目／历史内容指纹，生成预览与确认前复核；来源标记变化或内容变化409，重复确认返回原结果。旧版待确认预览缺少新指纹时需重新生成。查询重试不会自动确认操作。
 - 旧索引只通过`scripts/maintain-question-index.py --keep <完整版本>`显式离线维护；默认预览，`--apply`才删除列出的旧题目集合及公开清单，知识资料索引和模型权重不在清理范围内。
+
+
+## 当前规则画像接入（2026-10-25）
+
+启用V13学情功能后，Java在本轮请求了stats时附加`statistics.learningProfile`。它是当前全局规则画像，与from/to区间统计分开。Python只投影版本、覆盖、参考分、独立/辅助/未知数量及最多200个知识点难度分组；不外发业务账号编号。派生内容继承stats类别；无stats外发授权时该画像只用于本地规则说明。模型可解释异常和给出补强建议，不修改正式判分、权重或参考分。画像算法与新批次协议统一在搭建文档维护。
+
+### 画像可视化展示（2026-10-31）
+
+`/stat` 的学情画像在保留原有文字摘要与完整数据表的基础上增加：参考分/覆盖/证据构成 KPI、知识点×难度热力图、证据散点、优先补强排行、科目证据卡和画像版本变化图。展示组件位于 `kaoyan-frontend/src/components/learning-profile/`，由[LearningProfilePanel](../kaoyan-frontend/src/components/LearningProfilePanel.vue)组合。
+
+- 只改变展示，不改变画像算法、权重、参考分、数据库或 `/learning/profile` 接口；`masteryIndex` 仍为`(correct+1)/(samples+2)`，`samples`是独立证据，辅助/未知单列。
+- `samples < 5` 的单元格和条目只显示“样本不足/待验证”，不以颜色或百分比给出掌握结论；热力图用灰色虚框，散点仍显示但 tooltip 说明。
+- `referenceScore` 为空时显示“证据不足”；非空时标“实验性·未经整卷校准”，不使用仪表盘暗示精度。`coverage` 是蓝图权重覆盖，不是学习进度。
+- 画像累计与`/stats/learning`近30天区间统计分开展示，分母不同；科目汇总、优先排序、证据分档属于前端派生展示，不写回画像。
+- 图表均有文字摘要，完整数据表保留为无障碍/回退入口；移动端使用单列或横向滚动，不新增第三方渲染服务、模型调用或个人数据字段。

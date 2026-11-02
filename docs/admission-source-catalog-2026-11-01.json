@@ -1,0 +1,1594 @@
+{
+  "reviewedAt": "2026-11-01",
+  "catalogSource": "outputs/school-enrichment-20261101/final/school-levels.csv",
+  "schoolCount": 121,
+  "newSchoolCount": 111,
+  "universityNavigationCount": 3,
+  "permission": "仅登记公开机构名称与官网链接；不复制招生正文、名单或题库，不作为审核RAG发布。",
+  "schools": [
+    {
+      "schoolId": 7,
+      "schoolCode": "nau",
+      "schoolName": "南京审计大学",
+      "entryUrls": [
+        "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+        "https://gs.nau.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生院",
+      "evidenceUrl": "https://gs.nau.edu.cn/",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 8,
+      "schoolCode": "ucas",
+      "schoolName": "中国科学院大学",
+      "entryUrls": [
+        "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+        "https://admission.ucas.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国科学院大学招生信息网",
+      "evidenceUrl": "https://admission.ucas.ac.cn/",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 9,
+      "schoolCode": "cuc",
+      "schoolName": "中国传媒大学",
+      "entryUrls": [
+        "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+        "https://yz.cuc.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生网",
+      "evidenceUrl": "https://yz.cuc.edu.cn/",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 10,
+      "schoolCode": "buaa",
+      "schoolName": "北京航空航天大学",
+      "entryUrls": [
+        "https://yzb.buaa.edu.cn/xlss/zymlcx.htm",
+        "https://yzb.buaa.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生信息网-北京航空航天大学研究生招生网",
+      "evidenceUrl": "https://yzb.buaa.edu.cn/",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 11,
+      "schoolCode": "scu",
+      "schoolName": "四川大学",
+      "entryUrls": [
+        "https://yz.scu.edu.cn/sszyml",
+        "https://yz.scu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "首页_四川大学研究生招生信息网",
+      "evidenceUrl": "https://yz.scu.edu.cn/",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 12,
+      "schoolCode": "scnu",
+      "schoolName": "华南师范大学",
+      "entryUrls": [
+        "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx",
+        "https://yanzhao.scnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "华南师范大学研究生招生信息网",
+      "evidenceUrl": "https://yz.scnu.edu.cn/",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 13,
+      "schoolCode": "ysu",
+      "schoolName": "燕山大学",
+      "entryUrls": [
+        "https://zsc.ysu.edu.cn/info/1255/7088.htm",
+        "https://yz.chsi.com.cn/zsml/yjfxdetail?id=496dc291f5c9567f22e7fd845324df20",
+        "https://zsc.ysu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "网站首页-招生网",
+      "evidenceUrl": "http://zsjyc.ysu.edu.cn/yjsxwz/yzsy.htm",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 14,
+      "schoolCode": "zua",
+      "schoolName": "郑州航空工业管理学院",
+      "entryUrls": [
+        "https://yjsc.zua.edu.cn/ssyjszszy/a008jsjxy/a085404jsjjs.htm",
+        "https://yjsc.zua.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "招生工作-郑州航院党委研究生工作部（研究生处、学科办）",
+      "evidenceUrl": "https://yjsc.zua.edu.cn/zsgz.htm",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 15,
+      "schoolCode": "zust",
+      "schoolName": "浙江科技大学",
+      "entryUrls": [
+        "https://itee.zust.edu.cn/zsgz/yjszs/zsxx/zsml.htm",
+        "https://itee.zust.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "浙江科技大学研究生招生网",
+      "evidenceUrl": "https://yzw.zust.edu.cn/",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 16,
+      "schoolCode": "ahnu",
+      "schoolName": "安徽师范大学",
+      "entryUrls": [
+        "https://yz.ahnu.edu.cn/info/1006/10276.htm",
+        "https://yz.ahnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生信息网-安徽师范大学",
+      "evidenceUrl": "https://yz.ahnu.edu.cn/",
+      "note": "原10校登记保持不变；本轮重新核对院校官网归属，原年度深链接未逐条重新取证。"
+    },
+    {
+      "schoolId": 17,
+      "schoolCode": "imu",
+      "schoolName": "内蒙古大学",
+      "entryUrls": [
+        "https://gs.imu.edu.cn/zsgz/ssszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士生招生-内蒙古大学研究生院",
+      "evidenceUrl": "https://gs.imu.edu.cn/zsgz/ssszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 18,
+      "schoolCode": "cqu",
+      "schoolName": "重庆大学",
+      "entryUrls": [
+        "https://yz.cqu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "重庆大学研究生招生信息网（测试版）",
+      "evidenceUrl": "https://yz.cqu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 19,
+      "schoolCode": "bnu",
+      "schoolName": "北京师范大学",
+      "entryUrls": [
+        "https://yz.bnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "北京师范大学研究生招生网",
+      "evidenceUrl": "https://yz.bnu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 20,
+      "schoolCode": "muc",
+      "schoolName": "中央民族大学",
+      "entryUrls": [
+        "https://grs.muc.edu.cn/yjsyzsw/index.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中央民族大学研究生招生网",
+      "evidenceUrl": "https://grs.muc.edu.cn/yjsyzsw/index.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 21,
+      "schoolCode": "neu",
+      "schoolName": "东北大学",
+      "entryUrls": [
+        "https://yz.neu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生信息网",
+      "evidenceUrl": "https://yz.neu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 22,
+      "schoolCode": "sjtu",
+      "schoolName": "上海交通大学",
+      "entryUrls": [
+        "https://yzb.sjtu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "首页 - 上海交通大学研究生招生网",
+      "evidenceUrl": "https://yzb.sjtu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 23,
+      "schoolCode": "fzu",
+      "schoolName": "福州大学",
+      "entryUrls": [
+        "https://yjsy.fzu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "福州大学研究生院",
+      "evidenceUrl": "https://yjsy.fzu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 24,
+      "schoolCode": "bjut",
+      "schoolName": "北京工业大学",
+      "entryUrls": [
+        "https://yanzhao.bjut.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "北京工业大学研究生招生网",
+      "evidenceUrl": "https://yanzhao.bjut.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 25,
+      "schoolCode": "dhu",
+      "schoolName": "东华大学",
+      "entryUrls": [
+        "https://yjszs.dhu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "东华大学研究生招生网",
+      "evidenceUrl": "https://yjszs.dhu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 26,
+      "schoolCode": "suda",
+      "schoolName": "苏州大学",
+      "entryUrls": [
+        "https://yjs.suda.edu.cn/8386/list.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生",
+      "evidenceUrl": "https://yjs.suda.edu.cn/8386/list.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 27,
+      "schoolCode": "njust",
+      "schoolName": "南京理工大学",
+      "entryUrls": [
+        "https://gs.njust.edu.cn/zsw/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生网",
+      "evidenceUrl": "https://gs.njust.edu.cn/zsw/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 28,
+      "schoolCode": "gzu",
+      "schoolName": "贵州大学",
+      "entryUrls": [
+        "https://gs.gzu.edu.cn/sszs/list.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生",
+      "evidenceUrl": "https://gs.gzu.edu.cn/sszs/list.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 29,
+      "schoolCode": "pku",
+      "schoolName": "北京大学",
+      "entryUrls": [
+        "https://admission.pku.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "北京大学研究生招生网",
+      "evidenceUrl": "https://admission.pku.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 30,
+      "schoolCode": "ruc",
+      "schoolName": "中国人民大学",
+      "entryUrls": [
+        "https://pgs.ruc.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "人大研招网 - 中国人民大学",
+      "evidenceUrl": "https://pgs.ruc.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 31,
+      "schoolCode": "thu",
+      "schoolName": "清华大学",
+      "entryUrls": [
+        "https://yz.tsinghua.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "清华研究生招生网",
+      "evidenceUrl": "https://yz.tsinghua.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 32,
+      "schoolCode": "bit",
+      "schoolName": "北京理工大学",
+      "entryUrls": [
+        "https://grd.bit.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "北京理工大学研究生院",
+      "evidenceUrl": "https://grd.bit.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 33,
+      "schoolCode": "cau",
+      "schoolName": "中国农业大学",
+      "entryUrls": [
+        "https://yz.cau.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国农业大学研究生院招生",
+      "evidenceUrl": "https://yz.cau.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 34,
+      "schoolCode": "nku",
+      "schoolName": "南开大学",
+      "entryUrls": [
+        "https://yzb.nankai.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "南开大学研究生招生网",
+      "evidenceUrl": "https://yzb.nankai.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 35,
+      "schoolCode": "tju",
+      "schoolName": "天津大学",
+      "entryUrls": [
+        "https://yzb.tju.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "天津大学研究生招生网",
+      "evidenceUrl": "https://yzb.tju.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 36,
+      "schoolCode": "dlut",
+      "schoolName": "大连理工大学",
+      "entryUrls": [
+        "https://gs.dlut.edu.cn/yjszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生-大连理工大学研究生院（新）",
+      "evidenceUrl": "https://gs.dlut.edu.cn/yjszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 37,
+      "schoolCode": "jlu",
+      "schoolName": "吉林大学",
+      "entryUrls": [
+        "https://yzb.jlu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "吉林大学研究生招生信息网",
+      "evidenceUrl": "https://yzb.jlu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 38,
+      "schoolCode": "hit",
+      "schoolName": "哈尔滨工业大学",
+      "entryUrls": [
+        "https://yzb.hit.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "哈尔滨工业大学-研究生招生网",
+      "evidenceUrl": "https://yzb.hit.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 39,
+      "schoolCode": "fudan",
+      "schoolName": "复旦大学",
+      "entryUrls": [
+        "https://gsao.fudan.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "复旦大学研究生招生网",
+      "evidenceUrl": "https://gsao.fudan.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 40,
+      "schoolCode": "tongji",
+      "schoolName": "同济大学",
+      "entryUrls": [
+        "https://yz.tongji.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "同济大学研究生招生网",
+      "evidenceUrl": "https://yz.tongji.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 41,
+      "schoolCode": "ecnu",
+      "schoolName": "华东师范大学",
+      "entryUrls": [
+        "https://yjszs.ecnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "华东师范大学研究生招生信息网",
+      "evidenceUrl": "https://yjszs.ecnu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 42,
+      "schoolCode": "nju",
+      "schoolName": "南京大学",
+      "entryUrls": [
+        "https://yzb.nju.edu.cn/main.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生网",
+      "evidenceUrl": "https://yzb.nju.edu.cn/main.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 43,
+      "schoolCode": "seu",
+      "schoolName": "东南大学",
+      "entryUrls": [
+        "https://yzb.seu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生网",
+      "evidenceUrl": "https://yzb.seu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 44,
+      "schoolCode": "zju",
+      "schoolName": "浙江大学",
+      "entryUrls": [
+        "https://www.zju.edu.cn/"
+      ],
+      "entryKind": "UNIVERSITY_NAVIGATION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "浙江大学学校官网（研究生招生导航）",
+      "evidenceUrl": "https://www.zju.edu.cn/",
+      "note": "研究生专站HTTPS本次连接或证书失败；登记可读取的校方HTTPS主页，需从主页进入研究生招生栏目。未改写HTTP协议或关闭证书校验。"
+    },
+    {
+      "schoolId": 45,
+      "schoolCode": "ustc",
+      "schoolName": "中国科学技术大学",
+      "entryUrls": [
+        "https://yz.ustc.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国科学技术大学-研究生招生在线",
+      "evidenceUrl": "https://yz.ustc.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 46,
+      "schoolCode": "xmu",
+      "schoolName": "厦门大学",
+      "entryUrls": [
+        "https://gs.xmu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "厦门大学研究生院",
+      "evidenceUrl": "https://gs.xmu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 47,
+      "schoolCode": "sdu",
+      "schoolName": "山东大学",
+      "entryUrls": [
+        "https://yz.sdu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "山东大学研究生招生信息网",
+      "evidenceUrl": "https://yz.sdu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 48,
+      "schoolCode": "ouc",
+      "schoolName": "中国海洋大学",
+      "entryUrls": [
+        "https://yz.ouc.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国海洋大学官方研究生招生入口",
+      "evidenceUrl": "https://yz.ouc.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 49,
+      "schoolCode": "whu",
+      "schoolName": "武汉大学",
+      "entryUrls": [
+        "https://gs.whu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "武汉大学研究生院",
+      "evidenceUrl": "https://gs.whu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 50,
+      "schoolCode": "hust",
+      "schoolName": "华中科技大学",
+      "entryUrls": [
+        "https://gszs.hust.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "华中科技大学研究生招生信息网",
+      "evidenceUrl": "https://gszs.hust.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 51,
+      "schoolCode": "hnu",
+      "schoolName": "湖南大学",
+      "entryUrls": [
+        "https://gra.hnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "湖南大学研究生院",
+      "evidenceUrl": "https://gra.hnu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 52,
+      "schoolCode": "csu",
+      "schoolName": "中南大学",
+      "entryUrls": [
+        "https://yz.csu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中南大学研究生招生网站",
+      "evidenceUrl": "https://yz.csu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 53,
+      "schoolCode": "nudt",
+      "schoolName": "国防科技大学",
+      "entryUrls": [
+        "https://yjszs.nudt.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "国防科技大学-研究生招生信息网",
+      "evidenceUrl": "https://yjszs.nudt.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 54,
+      "schoolCode": "sysu",
+      "schoolName": "中山大学",
+      "entryUrls": [
+        "https://graduate.sysu.edu.cn/zsw/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "首页 | 中山大学研究生招生网",
+      "evidenceUrl": "https://graduate.sysu.edu.cn/zsw/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 55,
+      "schoolCode": "scut",
+      "schoolName": "华南理工大学",
+      "entryUrls": [
+        "https://yz.scut.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "华南理工大学研究生招生网",
+      "evidenceUrl": "https://yz.scut.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 56,
+      "schoolCode": "uestc",
+      "schoolName": "电子科技大学",
+      "entryUrls": [
+        "https://yz.uestc.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "电子科技大学研究生招生网",
+      "evidenceUrl": "https://yz.uestc.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 57,
+      "schoolCode": "xjtu",
+      "schoolName": "西安交通大学",
+      "entryUrls": [
+        "https://yz.xjtu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "西安交通大学研究生招生信息网",
+      "evidenceUrl": "https://yz.xjtu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 58,
+      "schoolCode": "nwpu",
+      "schoolName": "西北工业大学",
+      "entryUrls": [
+        "https://yzb.nwpu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生信息网",
+      "evidenceUrl": "https://yzb.nwpu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 59,
+      "schoolCode": "nwafu",
+      "schoolName": "西北农林科技大学",
+      "entryUrls": [
+        "https://yz.nwafu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "西北农林科技大学研究生招生信息网",
+      "evidenceUrl": "https://yz.nwafu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 60,
+      "schoolCode": "lzu",
+      "schoolName": "兰州大学",
+      "entryUrls": [
+        "https://ge.lzu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "兰州大学学位与研究生教育网（研究生院、党委研工部）",
+      "evidenceUrl": "https://ge.lzu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 61,
+      "schoolCode": "bjtu",
+      "schoolName": "北京交通大学",
+      "entryUrls": [
+        "https://yzb.bjtu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生院招生专题 - 北京交通大学",
+      "evidenceUrl": "https://yzb.bjtu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 62,
+      "schoolCode": "swufe",
+      "schoolName": "西南财经大学",
+      "entryUrls": [
+        "https://yz.swufe.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生网",
+      "evidenceUrl": "https://yz.swufe.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 63,
+      "schoolCode": "ustb",
+      "schoolName": "北京科技大学",
+      "entryUrls": [
+        "https://yzxc.ustb.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生信息网",
+      "evidenceUrl": "https://yzxc.ustb.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 64,
+      "schoolCode": "buct",
+      "schoolName": "北京化工大学",
+      "entryUrls": [
+        "https://graduate.buct.edu.cn/14026/list.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生",
+      "evidenceUrl": "https://graduate.buct.edu.cn/14026/list.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 65,
+      "schoolCode": "ncepu",
+      "schoolName": "华北电力大学",
+      "entryUrls": [
+        "https://yjsy.ncepu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "华北电力大学研究生院",
+      "evidenceUrl": "https://yjsy.ncepu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 66,
+      "schoolCode": "hebut",
+      "schoolName": "河北工业大学",
+      "entryUrls": [
+        "https://yjs.hebut.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "河北工业大学研究生院",
+      "evidenceUrl": "https://yjs.hebut.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 67,
+      "schoolCode": "upc",
+      "schoolName": "中国石油大学（华东）",
+      "entryUrls": [
+        "https://yz.upc.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生信息网 - 中国石油大学（华东）",
+      "evidenceUrl": "https://yz.upc.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 68,
+      "schoolCode": "hrbeu",
+      "schoolName": "哈尔滨工程大学",
+      "entryUrls": [
+        "https://yzb.hrbeu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "哈尔滨工程大学官方研究生招生入口",
+      "evidenceUrl": "https://yzb.hrbeu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 69,
+      "schoolCode": "cumtb",
+      "schoolName": "中国矿业大学（北京）",
+      "entryUrls": [
+        "https://yz.cumtb.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国矿业大学（北京）研招网",
+      "evidenceUrl": "https://yz.cumtb.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 70,
+      "schoolCode": "ecust",
+      "schoolName": "华东理工大学",
+      "entryUrls": [
+        "https://gschool.ecust.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生院",
+      "evidenceUrl": "https://gschool.ecust.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 71,
+      "schoolCode": "nuaa",
+      "schoolName": "南京航空航天大学",
+      "entryUrls": [
+        "https://www.graduate.nuaa.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "南京航空航天大学研究生院",
+      "evidenceUrl": "https://www.graduate.nuaa.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 72,
+      "schoolCode": "hhu",
+      "schoolName": "河海大学",
+      "entryUrls": [
+        "https://gs.hhu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "河海大学研究生院",
+      "evidenceUrl": "https://gs.hhu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 73,
+      "schoolCode": "jiangnan",
+      "schoolName": "江南大学",
+      "entryUrls": [
+        "https://yz.jiangnan.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "江南大学研究生招生信息网",
+      "evidenceUrl": "https://yz.jiangnan.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 74,
+      "schoolCode": "hfut",
+      "schoolName": "合肥工业大学",
+      "entryUrls": [
+        "https://yjszs.hfut.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "合肥工业大学研究生招生网",
+      "evidenceUrl": "https://yjszs.hfut.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 75,
+      "schoolCode": "nwu",
+      "schoolName": "西北大学",
+      "entryUrls": [
+        "https://yzb.nwu.edu.cn/zsdt/sszs/zsdt/3.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "招生动态-西北大学研究生招生信息网",
+      "evidenceUrl": "https://yzb.nwu.edu.cn/zsdt/sszs/zsdt/3.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 76,
+      "schoolCode": "ncu",
+      "schoolName": "南昌大学",
+      "entryUrls": [
+        "https://yjsy.ncu.edu.cn/zsgz/sszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "南昌大学官方研究生招生入口",
+      "evidenceUrl": "https://yjsy.ncu.edu.cn/zsgz/sszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 77,
+      "schoolCode": "zzu",
+      "schoolName": "郑州大学",
+      "entryUrls": [
+        "https://yz.zzu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "郑州大学研究生招生网",
+      "evidenceUrl": "https://yz.zzu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 78,
+      "schoolCode": "swjtu",
+      "schoolName": "西南交通大学",
+      "entryUrls": [
+        "https://yz.swjtu.edu.cn/web/index.html"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "西南交通大学研究生招生网-首页",
+      "evidenceUrl": "https://yz.swjtu.edu.cn/web/index.html",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 79,
+      "schoolCode": "xidian",
+      "schoolName": "西安电子科技大学",
+      "entryUrls": [
+        "https://gr.xidian.edu.cn/yjsy/yjszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士研究生招生-研究生院-西安电子科技大学",
+      "evidenceUrl": "https://gr.xidian.edu.cn/yjsy/yjszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 80,
+      "schoolCode": "bupt",
+      "schoolName": "北京邮电大学",
+      "entryUrls": [
+        "https://yzb.bupt.edu.cn/tz/ssyjs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士研究生-北邮研究生招生网",
+      "evidenceUrl": "https://yzb.bupt.edu.cn/tz/ssyjs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 81,
+      "schoolCode": "bjfu",
+      "schoolName": "北京林业大学",
+      "entryUrls": [
+        "https://graduate.bjfu.edu.cn/zsgl/sszs/index.html"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "北京林业大学官方研究生招生入口",
+      "evidenceUrl": "https://graduate.bjfu.edu.cn/zsgl/sszs/index.html",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 82,
+      "schoolCode": "bucm",
+      "schoolName": "北京中医药大学",
+      "entryUrls": [
+        "https://yanjiusheng.bucm.edu.cn/zsjy/sszs/index.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生_北京中医药大学研究生院",
+      "evidenceUrl": "https://yanjiusheng.bucm.edu.cn/zsjy/sszs/index.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 83,
+      "schoolCode": "bfsu",
+      "schoolName": "北京外国语大学",
+      "entryUrls": [
+        "https://graduate.bfsu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生院",
+      "evidenceUrl": "https://graduate.bfsu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 84,
+      "schoolCode": "cufe",
+      "schoolName": "中央财经大学",
+      "entryUrls": [
+        "https://gs.cufe.edu.cn/zsgz/sszs_sz_.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生（双证）-研究生工作部、研究生院(新）",
+      "evidenceUrl": "https://gs.cufe.edu.cn/zsgz/sszs_sz_.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 85,
+      "schoolCode": "uibe",
+      "schoolName": "对外经济贸易大学",
+      "entryUrls": [
+        "https://yjsy.uibe.edu.cn/cms/info.do?columnId=400"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "对外经济贸易大学研究生招生办公室",
+      "evidenceUrl": "https://yjsy.uibe.edu.cn/cms/info.do?columnId=400",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 86,
+      "schoolCode": "bsu",
+      "schoolName": "北京体育大学",
+      "entryUrls": [
+        "https://zs.bsu.edu.cn/yjszsw/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "北京体育大学研究生招生网",
+      "evidenceUrl": "https://zs.bsu.edu.cn/yjszsw/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 87,
+      "schoolCode": "ccom",
+      "schoolName": "中央音乐学院",
+      "entryUrls": [
+        "https://www.ccom.edu.cn/jgk/jxkygldw/ysjb/zxxx/sszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生-中央音乐学院",
+      "evidenceUrl": "https://www.ccom.edu.cn/jgk/jxkygldw/ysjb/zxxx/sszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 88,
+      "schoolCode": "cupl",
+      "schoolName": "中国政法大学",
+      "entryUrls": [
+        "https://yjsy.cupl.edu.cn/yjszs/3.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生-中国政法大学研究生院",
+      "evidenceUrl": "https://yjsy.cupl.edu.cn/yjszs/3.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 89,
+      "schoolCode": "cup",
+      "schoolName": "中国石油大学（北京）",
+      "entryUrls": [
+        "https://grs.cup.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国石油大学(北京)研究生院",
+      "evidenceUrl": "https://grs.cup.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 90,
+      "schoolCode": "cugb",
+      "schoolName": "中国地质大学（北京）",
+      "entryUrls": [
+        "https://bm.cugb.edu.cn/yjsyzsb/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生院招生办 - 中国地质大学",
+      "evidenceUrl": "https://bm.cugb.edu.cn/yjsyzsb/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 91,
+      "schoolCode": "tmu",
+      "schoolName": "天津医科大学",
+      "entryUrls": [
+        "https://gs.tmu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "天津医科大学研究生院",
+      "evidenceUrl": "https://gs.tmu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 92,
+      "schoolCode": "tyut",
+      "schoolName": "太原理工大学",
+      "entryUrls": [
+        "https://www.gs.tyut.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "太原理工大学官方研究生招生入口",
+      "evidenceUrl": "https://www.gs.tyut.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 93,
+      "schoolCode": "lnu",
+      "schoolName": "辽宁大学",
+      "entryUrls": [
+        "https://grs.lnu.edu.cn/zsgz/sszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生-辽宁大学研究生院",
+      "evidenceUrl": "https://grs.lnu.edu.cn/zsgz/sszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 94,
+      "schoolCode": "dlmu",
+      "schoolName": "大连海事大学",
+      "entryUrls": [
+        "https://grs.dlmu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "大连海事大学研究生院",
+      "evidenceUrl": "https://grs.dlmu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 95,
+      "schoolCode": "ybu",
+      "schoolName": "延边大学",
+      "entryUrls": [
+        "https://grad.ybu.edu.cn/zsgz/sszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生-研究生院",
+      "evidenceUrl": "https://grad.ybu.edu.cn/zsgz/sszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 96,
+      "schoolCode": "nenu",
+      "schoolName": "东北师范大学",
+      "entryUrls": [
+        "https://yjsy.nenu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "东北师范大学研究生院",
+      "evidenceUrl": "https://yjsy.nenu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 97,
+      "schoolCode": "neau",
+      "schoolName": "东北农业大学",
+      "entryUrls": [
+        "https://graduate.neau.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "东北农业大学研究生院",
+      "evidenceUrl": "https://graduate.neau.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 98,
+      "schoolCode": "nefu",
+      "schoolName": "东北林业大学",
+      "entryUrls": [
+        "https://yz.nefu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "东林研究生招生信息网",
+      "evidenceUrl": "https://yz.nefu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 99,
+      "schoolCode": "shisu",
+      "schoolName": "上海外国语大学",
+      "entryUrls": [
+        "https://yz.shisu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生信息网 - 上海外国语大学",
+      "evidenceUrl": "https://yz.shisu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 100,
+      "schoolCode": "sufe",
+      "schoolName": "上海财经大学",
+      "entryUrls": [
+        "https://yz.sufe.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生报考服务系统 - 上海财经大学",
+      "evidenceUrl": "https://yz.sufe.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 101,
+      "schoolCode": "shu",
+      "schoolName": "上海大学",
+      "entryUrls": [
+        "https://yjszs.shu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "上海大学研究生招生网",
+      "evidenceUrl": "https://yjszs.shu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 102,
+      "schoolCode": "smmu",
+      "schoolName": "海军军医大学",
+      "entryUrls": [
+        "https://www.smmu.edu.cn/zsjz/list.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "招生简章",
+      "evidenceUrl": "https://www.smmu.edu.cn/zsjz/list.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 103,
+      "schoolCode": "cumt",
+      "schoolName": "中国矿业大学",
+      "entryUrls": [
+        "https://yz.cumt.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国矿业大学研究生招生网",
+      "evidenceUrl": "https://yz.cumt.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 104,
+      "schoolCode": "njau",
+      "schoolName": "南京农业大学",
+      "entryUrls": [
+        "https://zsgz.njau.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "南京农业大学研究生招生网",
+      "evidenceUrl": "https://zsgz.njau.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 105,
+      "schoolCode": "cpu",
+      "schoolName": "中国药科大学",
+      "entryUrls": [
+        "https://yjszs.cpu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国药科大学-研究生招生网",
+      "evidenceUrl": "https://yjszs.cpu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 106,
+      "schoolCode": "njnu",
+      "schoolName": "南京师范大学",
+      "entryUrls": [
+        "https://yjszs.njnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "南京师范大学旧研招站迁站提示",
+      "evidenceUrl": "https://yz.njnu.edu.cn/",
+      "note": "旧官网明确指向新站，研招网学校联系方式亦确认；新站本次读取受412限制。"
+    },
+    {
+      "schoolId": 107,
+      "schoolCode": "ahu",
+      "schoolName": "安徽大学",
+      "entryUrls": [
+        "https://graschool.ahu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "安徽大学研究生院官方发布域名",
+      "evidenceUrl": "https://graschool.ahu.edu.cn/_upload/article/files/70/b5/0a8b42a941e38da43dcc1d0949b2/cce0103e-1edf-4c45-8407-45de686de5a2.pdf",
+      "note": "由官方研究生院发布文件及原采集来源核对域名；门户本次读取受412限制，不复制名单内容。"
+    },
+    {
+      "schoolId": 108,
+      "schoolCode": "cug",
+      "schoolName": "中国地质大学（武汉）",
+      "entryUrls": [
+        "https://yz.cug.edu.cn/cugyz"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中国地质大学（武汉）官方研究生招生入口",
+      "evidenceUrl": "https://yz.cug.edu.cn/cugyz",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 109,
+      "schoolCode": "whut",
+      "schoolName": "武汉理工大学",
+      "entryUrls": [
+        "https://www.whut.edu.cn/"
+      ],
+      "entryKind": "UNIVERSITY_NAVIGATION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "武汉理工大学学校官网（研究生招生导航）",
+      "evidenceUrl": "https://www.whut.edu.cn/",
+      "note": "研究生专站HTTPS本次连接或证书失败；登记可读取的校方HTTPS主页，需从主页进入研究生招生栏目。未改写HTTP协议或关闭证书校验。"
+    },
+    {
+      "schoolId": 110,
+      "schoolCode": "hzau",
+      "schoolName": "华中农业大学",
+      "entryUrls": [
+        "https://yjs.hzau.edu.cn/zsgz/sszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招生-华中农业大学研究生院",
+      "evidenceUrl": "https://yjs.hzau.edu.cn/zsgz/sszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 111,
+      "schoolCode": "ccnu",
+      "schoolName": "华中师范大学",
+      "entryUrls": [
+        "https://gs.ccnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "华中师范大学研究生院（专业学位管理中心）",
+      "evidenceUrl": "https://gs.ccnu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 112,
+      "schoolCode": "zuel",
+      "schoolName": "中南财经政法大学",
+      "entryUrls": [
+        "https://yzb.zuel.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "中南财经政法大学研究生招生网",
+      "evidenceUrl": "https://yzb.zuel.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 113,
+      "schoolCode": "hunnu",
+      "schoolName": "湖南师范大学",
+      "entryUrls": [
+        "https://yjsc.hunnu.edu.cn/zsks/sszk1.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士招考-研究生院",
+      "evidenceUrl": "https://yjsc.hunnu.edu.cn/zsks/sszk1.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 114,
+      "schoolCode": "jnu",
+      "schoolName": "暨南大学",
+      "entryUrls": [
+        "https://yz.jnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研招网",
+      "evidenceUrl": "https://yz.jnu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 115,
+      "schoolCode": "gxu",
+      "schoolName": "广西大学",
+      "entryUrls": [
+        "https://yjsc.gxu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "广西大学研究生院",
+      "evidenceUrl": "https://yjsc.gxu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 116,
+      "schoolCode": "hainanu",
+      "schoolName": "海南大学",
+      "entryUrls": [
+        "https://gs.hainanu.edu.cn/yjszs/ssszs.htm"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "硕士生招生-研究生院",
+      "evidenceUrl": "https://gs.hainanu.edu.cn/yjszs/ssszs.htm",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 117,
+      "schoolCode": "swu",
+      "schoolName": "西南大学",
+      "entryUrls": [
+        "https://yz.swu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "西南大学研究生招生网",
+      "evidenceUrl": "https://yz.swu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 118,
+      "schoolCode": "sicau",
+      "schoolName": "四川农业大学",
+      "entryUrls": [
+        "https://yan.sicau.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "四川农业大学研究生院",
+      "evidenceUrl": "https://yan.sicau.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 119,
+      "schoolCode": "ynu",
+      "schoolName": "云南大学",
+      "entryUrls": [
+        "https://www.ynu.edu.cn/"
+      ],
+      "entryKind": "UNIVERSITY_NAVIGATION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "云南大学学校官网（研究生招生导航）",
+      "evidenceUrl": "https://www.ynu.edu.cn/",
+      "note": "研究生专站HTTPS本次连接或证书失败；登记可读取的校方HTTPS主页，需从主页进入研究生招生栏目。未改写HTTP协议或关闭证书校验。"
+    },
+    {
+      "schoolId": 120,
+      "schoolCode": "utibet",
+      "schoolName": "西藏大学",
+      "entryUrls": [
+        "https://yjszs.utibet.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生网站",
+      "evidenceUrl": "https://yjszs.utibet.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 121,
+      "schoolCode": "chd",
+      "schoolName": "长安大学",
+      "entryUrls": [
+        "https://yzb.chd.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "研究生招生网",
+      "evidenceUrl": "https://yzb.chd.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 122,
+      "schoolCode": "snnu",
+      "schoolName": "陕西师范大学",
+      "entryUrls": [
+        "https://yz.snnu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "陕西师范大学研究生招生信息网",
+      "evidenceUrl": "https://yz.snnu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 123,
+      "schoolCode": "fmmu",
+      "schoolName": "空军军医大学",
+      "entryUrls": [
+        "https://www.fmmu.edu.cn/yjsy/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "空军军医大学研究生院",
+      "evidenceUrl": "https://www.fmmu.edu.cn/yjsy/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 124,
+      "schoolCode": "qhu",
+      "schoolName": "青海大学",
+      "entryUrls": [
+        "https://yjs.qhu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "青海大学研究生院",
+      "evidenceUrl": "https://yjs.qhu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 125,
+      "schoolCode": "nxu",
+      "schoolName": "宁夏大学",
+      "entryUrls": [
+        "https://graduate.nxu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "宁夏大学研究生院",
+      "evidenceUrl": "https://graduate.nxu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 126,
+      "schoolCode": "xju",
+      "schoolName": "新疆大学",
+      "entryUrls": [
+        "https://yz.xju.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "新疆大学研究生招生信息网",
+      "evidenceUrl": "https://yz.xju.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    },
+    {
+      "schoolId": 127,
+      "schoolCode": "shzu",
+      "schoolName": "石河子大学",
+      "entryUrls": [
+        "https://yz.shzu.edu.cn/"
+      ],
+      "entryKind": "GRADUATE_ADMISSION",
+      "reviewedAt": "2026-11-01",
+      "evidenceTitle": "石河子大学研究生招生信息网",
+      "evidenceUrl": "https://yz.shzu.edu.cn/",
+      "note": "核对校方域名、页面标题及研究生招生用途；登记链接，不审核年度招生事实。"
+    }
+  ]
+}

@@ -22,6 +22,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class AssistantLearningService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.beans.factory.ObjectProvider<com.kaoyan.learning.LearningProfiles> learningProfiles;
     private final PracticeRecordMapper attempts;
     private final QuestionMapper questions;
     private final DocumentMapper documents;
@@ -155,6 +157,10 @@ public class AssistantLearningService {
         result.put("scope",scopes);
         if (reads.contains("stats")) {
             Map<String,Object> stats = statistics.learning(owner,date(plan,page,"from"),date(plan,page,"to"),subject);
+            if(learningProfiles.getIfAvailable()!=null) {
+                var profile=learningProfiles.getObject().profile(owner);
+                stats.put("learningProfile",profile);
+            }
             result.put("statistics",stats);evidence.add(Map.of("ref","S1","kind","stats","title","有效作答统计","locator",stats.get("from")+"至"+stats.get("to"),"version","computed","resource",Map.of("type","stats","id","learning")));
         }
         if (reads.contains("documents")) {
@@ -257,7 +263,7 @@ public class AssistantLearningService {
             return display;
         }).toList());
         payload.put("source", "wrong".equals(target)?"WRONG":"favorite".equals(target)?"FAVORITE":"NORMAL");
-        payload.put("subject",subject);payload.put("difficulty",difficulty);payload.put("count",count);
+        payload.put("subject",subject);payload.put("difficulty",difficulty);payload.put("count",count);payload.put("knowledgePoint",knowledgePoint);
         String id=UUID.randomUUID().toString();
         boolean direct=knowledgePoint==null&&"FAVORITE_ADD".equals(operation)&&unique.size()==1&&(!requested.isEmpty()||ordinal!=null||"selected".equals(target));
         jdbc.update("INSERT INTO assistant_action(id,user_id,conversation_id,task_id,operation,status,payload_json,result_json,created_at,updated_at) VALUES (?,?,?,?,?,'PENDING',?,'{}',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)",id,owner,conversationId,taskId,operation,encode(payload));
@@ -316,7 +322,10 @@ public class AssistantLearningService {
         result.put("title",switch(operation){case "FAVORITE_ADD"->"收藏题目";case "FAVORITE_REMOVE"->"取消收藏";case "WRONG_REMOVE"->"移出错题";case "PRACTICE_CREATE"->"创建练习";default->"学习操作";});
         result.put("count",ids(payload.get("questionIds")).size());result.put("requiresConfirmation","PENDING".equals(row.get("status")));
         result.put("targets",payload.getOrDefault("targets",List.of()));
-        if("PRACTICE_CREATE".equals(operation)) result.put("requestedCount",payload.getOrDefault("count",result.get("count")));
+        if("PRACTICE_CREATE".equals(operation)) {
+            result.put("requestedCount",payload.getOrDefault("count",result.get("count")));
+            result.put("title",Objects.toString(payload.get("knowledgePoint"),"题库")+"专项练习");
+        }
         result.put("result",decode(row.get("result_json")));return result;
     }
     private void checkPageMembership(Long owner,Map<String,Object> page,Long id){

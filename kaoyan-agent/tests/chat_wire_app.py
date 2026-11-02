@@ -1,4 +1,4 @@
-"""Real LangChain/OpenAI SDK over a controlled in-process provider transport.
+"""Real HelloAgents/OpenAI SDK over a controlled in-process provider transport.
 
 Only the provider is replaced. Each response is authored as independent wire
 chunks, with a pause before the tail; no completed answer is split for playback.
@@ -47,7 +47,8 @@ def provider(request):
     return httpx.Response(200, headers={"Content-Type": "text/event-stream"}, stream=ProviderStream(chunks, 120 if "等待停止" in text else 0.6))
 
 
-settings = Settings(_env_file=None, LLM_ENABLED=True, LLM_API_KEY="test-only", RAG_BACKEND="lexical")
+settings = Settings(_env_file=None, LLM_ENABLED=True, LLM_API_KEY="test-only", RAG_BACKEND="lexical",
+                    ADMISSION_MCP_ENABLED=os.environ.get("ADMISSION_TEST_ENABLED") == "true")
 model = ModelClient(settings)
 model.client = AsyncOpenAI(api_key="test-only", base_url="https://provider.invalid/v1", max_retries=0,
     http_client=httpx.AsyncClient(transport=httpx.MockTransport(provider)))

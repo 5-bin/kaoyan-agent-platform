@@ -1,0 +1,935 @@
+{
+  "format": "collection-v3",
+  "createdAt": "2026-10-24",
+  "xlsxDataStartRow": 3,
+  "csvEncoding": "UTF-8",
+  "multiValueSeparator": ";",
+  "inputRows": 500,
+  "referenceSheets": [
+    "分工与说明",
+    "题库配额",
+    "字段字典"
+  ],
+  "schoolScope": "全部985／211院校并集去重；基线名单待逐校编制复核",
+  "questionTarget": {
+    "acceptedPerSubject": {
+      "EASY": 30,
+      "MEDIUM": 40,
+      "HARD": 30
+    },
+    "acceptedTotal": 400,
+    "collectPerSubject": {
+      "EASY": 36,
+      "MEDIUM": 48,
+      "HARD": 36
+    },
+    "collectTotal": 480,
+    "existingQuestionsCountTowardTarget": false,
+    "replacementPlan": "先完整收集并审核新题，再替换现有44题；保留历史依据；当前不执行数据库操作"
+  },
+  "sheets": [
+    {
+      "name": "来源",
+      "file": "sources",
+      "fields": [
+        {
+          "key": "sourceId",
+          "label": "来源编号",
+          "required": "是",
+          "type": "text",
+          "rule": "SRC-成员前缀-序号；稳定且全包唯一"
+        },
+        {
+          "key": "sourceKind",
+          "label": "来源类型",
+          "required": "是",
+          "type": "text",
+          "rule": "来源性质，与题目来源类别分别填写",
+          "values": [
+            "OFFICIAL_ADMISSION",
+            "TEXTBOOK",
+            "COURSE",
+            "OPEN_RESOURCE",
+            "ORIGINAL_RECORD"
+          ]
+        },
+        {
+          "key": "title",
+          "label": "来源标题",
+          "required": "是",
+          "type": "text",
+          "rule": "准确书名／公告／讲义名称；题目转换来源名最多255字符"
+        },
+        {
+          "key": "author",
+          "label": "作者或机构",
+          "required": "是",
+          "type": "text",
+          "rule": "按原文署名，不编造原创作者"
+        },
+        {
+          "key": "url",
+          "label": "具体原文链接",
+          "required": "条件",
+          "type": "text",
+          "rule": "无凭证HTTPS具体页；url与filePath至少一项；Agent目前必须有可引用HTTPS链接"
+        },
+        {
+          "key": "locator",
+          "label": "原文定位",
+          "required": "是",
+          "type": "text",
+          "rule": "章节／页码／表格行／原题号／动态查询条件"
+        },
+        {
+          "key": "sourceVersion",
+          "label": "原文版本",
+          "required": "是",
+          "type": "text",
+          "rule": "官方文件版本、教材版次或明确标注的采集快照版本"
+        },
+        {
+          "key": "publishedAt",
+          "label": "原文发布日期",
+          "required": "否",
+          "type": "date",
+          "rule": "查不到留空，不以获取日期替代"
+        },
+        {
+          "key": "retrievedAt",
+          "label": "实际获取日期",
+          "required": "是",
+          "type": "date",
+          "rule": "YYYY-MM-DD，不填未来日期"
+        },
+        {
+          "key": "permissionStatus",
+          "label": "权限状态",
+          "required": "是",
+          "type": "text",
+          "rule": "只表示拟用方式，权限未知不可发布",
+          "values": [
+            "PENDING",
+            "ALLOWED",
+            "LINK_ONLY",
+            "PROHIBITED"
+          ]
+        },
+        {
+          "key": "permissionNote",
+          "label": "允许用途及署名",
+          "required": "是",
+          "type": "text",
+          "rule": "具体拟用方式、署名与限制；非空不等于许可已核验"
+        },
+        {
+          "key": "permissionEvidence",
+          "label": "权限证据",
+          "required": "通过时",
+          "type": "text",
+          "rule": "许可页HTTPS或包内授权记录路径；不得填写秘密凭证"
+        },
+        {
+          "key": "filePath",
+          "label": "原文证据文件",
+          "required": "条件",
+          "type": "path",
+          "rule": "包内普通文件相对路径；与url至少一项；按许可留存"
+        },
+        {
+          "key": "fileSha256",
+          "label": "证据SHA-256",
+          "required": "否",
+          "type": "text",
+          "rule": "合并负责人针对filePath实际文件计算64位十六进制值"
+        },
+        {
+          "key": "recordVersion",
+          "label": "采集版本",
+          "required": "是",
+          "type": "integer",
+          "rule": "从1开始；内容修订增加；不是数据库题目version"
+        },
+        {
+          "key": "collectedBy",
+          "label": "收集人",
+          "required": "是",
+          "type": "text",
+          "rule": "真实成员姓名或团队可识别代号"
+        },
+        {
+          "key": "reviewStatus",
+          "label": "收集审核状态",
+          "required": "是",
+          "type": "text",
+          "rule": "收集流程状态，不直接设置数据库发布状态",
+          "values": [
+            "DRAFT",
+            "PENDING_REVIEW",
+            "APPROVED",
+            "REJECTED",
+            "CONFLICT"
+          ]
+        },
+        {
+          "key": "reviewer",
+          "label": "复核人",
+          "required": "审核后",
+          "type": "text",
+          "rule": "真实复核人；未复核留空"
+        },
+        {
+          "key": "reviewedAt",
+          "label": "复核日期",
+          "required": "审核后",
+          "type": "date",
+          "rule": "实际复核日期；YYYY-MM-DD"
+        },
+        {
+          "key": "reviewNote",
+          "label": "审核说明",
+          "required": "审核后",
+          "type": "text",
+          "rule": "说明复核范围、依据及问题；驳回／冲突须具体原因"
+        }
+      ]
+    },
+    {
+      "name": "院校",
+      "file": "schools",
+      "fields": [
+        {
+          "key": "schoolCode",
+          "label": "院校采集编号",
+          "required": "是",
+          "type": "text",
+          "rule": "SCH-成员前缀-序号；不是教育部院校代码"
+        },
+        {
+          "key": "name",
+          "label": "学校全称",
+          "required": "是",
+          "type": "text",
+          "rule": "对应school.name；最多255字符"
+        },
+        {
+          "key": "province",
+          "label": "省份或直辖市",
+          "required": "是",
+          "type": "text",
+          "rule": "与现有库地区选项统一，例如江苏、北京"
+        },
+        {
+          "key": "level",
+          "label": "已核实层次",
+          "required": "否",
+          "type": "text",
+          "rule": "对应school.level；未知空；可核实时只填适用的最高展示分类",
+          "values": [
+            "985",
+            "211",
+            "双一流",
+            "普通高校"
+          ]
+        },
+        {
+          "key": "sourceIds",
+          "label": "来源编号",
+          "required": "是",
+          "type": "list",
+          "rule": "关联来源页；多个编号用英文分号分隔，第一项为主来源"
+        },
+        {
+          "key": "locator",
+          "label": "逐字段来源定位",
+          "required": "是",
+          "type": "text",
+          "rule": "具体页码／章节／表格行；多来源写 字段=来源编号@位置"
+        },
+        {
+          "key": "baselineName",
+          "label": "官方基线原名",
+          "required": "是",
+          "type": "text",
+          "rule": "保留官方985／211名单中的原名称，以便核查映射"
+        },
+        {
+          "key": "is985",
+          "label": "985归属",
+          "required": "是",
+          "type": "text",
+          "rule": "须按官方分类名单核对；UNKNOWN表示待核实",
+          "values": [
+            "YES",
+            "NO",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "key": "is211",
+          "label": "211归属",
+          "required": "是",
+          "type": "text",
+          "rule": "不把双一流自动当211；UNKNOWN表示待核实",
+          "values": [
+            "YES",
+            "NO",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "key": "baselineUrl",
+          "label": "基线名单链接",
+          "required": "是",
+          "type": "text",
+          "rule": "教育部官方985／211分类名单具体页；多链接用英文分号"
+        },
+        {
+          "key": "unitNote",
+          "label": "校区及招生单位区分",
+          "required": "条件",
+          "type": "text",
+          "rule": "记录更名／合并／校区与独立招生单位映射及其证据，不预设学校计数"
+        },
+        {
+          "key": "coverageYear",
+          "label": "覆盖招生年份",
+          "required": "是",
+          "type": "integer",
+          "rule": "默认2027；对应逐校当年目录"
+        },
+        {
+          "key": "programScope",
+          "label": "本校目标专业范围",
+          "required": "是",
+          "type": "text",
+          "rule": "首轮081200／085404；如扩充其他计算机专业须明确代码，不偷换无专业含义"
+        },
+        {
+          "key": "coverageStatus",
+          "label": "覆盖进度",
+          "required": "是",
+          "type": "text",
+          "rule": "学校查全后才可记录VERIFIED_FOUND或VERIFIED_NONE；访问受限不是无专业",
+          "values": [
+            "NOT_STARTED",
+            "IN_PROGRESS",
+            "PENDING_REVIEW",
+            "VERIFIED_FOUND",
+            "VERIFIED_NONE",
+            "BLOCKED"
+          ]
+        },
+        {
+          "key": "programIds",
+          "label": "本校目标专业条目",
+          "required": "找到时",
+          "type": "list",
+          "rule": "关联招生专业页；多个PRG编号用英文分号；须覆盖全部目标学院／方向"
+        },
+        {
+          "key": "evidenceSourceIds",
+          "label": "覆盖核验来源编号",
+          "required": "完成时",
+          "type": "list",
+          "rule": "关联来源页，特别是无目标专业的完整目录检索证据"
+        },
+        {
+          "key": "coverageLocator",
+          "label": "检索范围及证据定位",
+          "required": "完成时",
+          "type": "text",
+          "rule": "遍历的学院／招生单位／年份／目录行及条件，不只写未搜到"
+        },
+        {
+          "key": "coverageNote",
+          "label": "缺口及补充说明",
+          "required": "条件",
+          "type": "text",
+          "rule": "未公布／访问受限／更名歧义写明；未解决不能算全量完成"
+        },
+        {
+          "key": "recordVersion",
+          "label": "采集版本",
+          "required": "是",
+          "type": "integer",
+          "rule": "从1开始；内容修订增加；不是数据库题目version"
+        },
+        {
+          "key": "collectedBy",
+          "label": "收集人",
+          "required": "是",
+          "type": "text",
+          "rule": "真实成员姓名或团队可识别代号"
+        },
+        {
+          "key": "reviewStatus",
+          "label": "收集审核状态",
+          "required": "是",
+          "type": "text",
+          "rule": "收集流程状态，不直接设置数据库发布状态",
+          "values": [
+            "DRAFT",
+            "PENDING_REVIEW",
+            "APPROVED",
+            "REJECTED",
+            "CONFLICT"
+          ]
+        },
+        {
+          "key": "reviewer",
+          "label": "复核人",
+          "required": "审核后",
+          "type": "text",
+          "rule": "真实复核人；未复核留空"
+        },
+        {
+          "key": "reviewedAt",
+          "label": "复核日期",
+          "required": "审核后",
+          "type": "date",
+          "rule": "实际复核日期；YYYY-MM-DD"
+        },
+        {
+          "key": "reviewNote",
+          "label": "审核说明",
+          "required": "审核后",
+          "type": "text",
+          "rule": "说明复核范围、依据及问题；驳回／冲突须具体原因"
+        }
+      ]
+    },
+    {
+      "name": "招生专业",
+      "file": "programs",
+      "fields": [
+        {
+          "key": "programId",
+          "label": "招生条目编号",
+          "required": "是",
+          "type": "text",
+          "rule": "PRG-成员前缀-序号；稳定标识具体招生组合"
+        },
+        {
+          "key": "schoolCode",
+          "label": "关联院校编号",
+          "required": "是",
+          "type": "text",
+          "rule": "必须存在于院校页；负责人合并时统一映射"
+        },
+        {
+          "key": "college",
+          "label": "学院全称",
+          "required": "是",
+          "type": "text",
+          "rule": "不同学院必须拆行，不只填学校名"
+        },
+        {
+          "key": "majorCode",
+          "label": "六位专业代码",
+          "required": "是",
+          "type": "text",
+          "rule": "6位文本，保留前导0；例如081200"
+        },
+        {
+          "key": "major",
+          "label": "专业名称",
+          "required": "是",
+          "type": "text",
+          "rule": "目录原文全称；对应school_detail.major_name"
+        },
+        {
+          "key": "year",
+          "label": "入学招生年份",
+          "required": "是",
+          "type": "integer",
+          "rule": "2000—2100；例如2027；不是公告年份"
+        },
+        {
+          "key": "degreeType",
+          "label": "学位类型",
+          "required": "是",
+          "type": "text",
+          "rule": "academic=学硕；professional=专硕",
+          "values": [
+            "academic",
+            "professional"
+          ]
+        },
+        {
+          "key": "studyMode",
+          "label": "学习方式",
+          "required": "是",
+          "type": "text",
+          "rule": "full_time=全日制；part_time=非全日制",
+          "values": [
+            "full_time",
+            "part_time"
+          ]
+        },
+        {
+          "key": "admissionCategory",
+          "label": "招考类别",
+          "required": "是",
+          "type": "text",
+          "rule": "ordinary普通统考；recommended推免；special专项；后两者当前不进推荐副本",
+          "values": [
+            "ordinary",
+            "recommended",
+            "special"
+          ]
+        },
+        {
+          "key": "track",
+          "label": "方向及科目组合",
+          "required": "条件",
+          "type": "text",
+          "rule": "无方向差异时空；不同方向或任选科目组合必须拆行并注明"
+        },
+        {
+          "key": "examSubjects",
+          "label": "初试科目代码",
+          "required": "是",
+          "type": "list",
+          "rule": "三位文本代码，英文分号分隔；每个统考组合通常4项，不合并互斥选项"
+        },
+        {
+          "key": "examSubjectNames",
+          "label": "初试科目名称",
+          "required": "是",
+          "type": "list",
+          "rule": "与代码按顺序一一对应；分隔符英文分号"
+        },
+        {
+          "key": "eligibility",
+          "label": "报考及加试条件",
+          "required": "条件",
+          "type": "text",
+          "rule": "有官方依据才填；缺失时在note标待核实，不推断无条件限制"
+        },
+        {
+          "key": "note",
+          "label": "条件缺口及备注",
+          "required": "条件",
+          "type": "text",
+          "rule": "查不到资格／动态页面失效／特殊限制等如实记录；不填录取概率"
+        },
+        {
+          "key": "sourceIds",
+          "label": "来源编号",
+          "required": "是",
+          "type": "list",
+          "rule": "关联来源页；多个编号用英文分号分隔，第一项为主来源"
+        },
+        {
+          "key": "locator",
+          "label": "逐字段来源定位",
+          "required": "是",
+          "type": "text",
+          "rule": "具体页码／章节／表格行；多来源写 字段=来源编号@位置"
+        },
+        {
+          "key": "recordVersion",
+          "label": "采集版本",
+          "required": "是",
+          "type": "integer",
+          "rule": "从1开始；内容修订增加；不是数据库题目version"
+        },
+        {
+          "key": "collectedBy",
+          "label": "收集人",
+          "required": "是",
+          "type": "text",
+          "rule": "真实成员姓名或团队可识别代号"
+        },
+        {
+          "key": "reviewStatus",
+          "label": "收集审核状态",
+          "required": "是",
+          "type": "text",
+          "rule": "收集流程状态，不直接设置数据库发布状态",
+          "values": [
+            "DRAFT",
+            "PENDING_REVIEW",
+            "APPROVED",
+            "REJECTED",
+            "CONFLICT"
+          ]
+        },
+        {
+          "key": "reviewer",
+          "label": "复核人",
+          "required": "审核后",
+          "type": "text",
+          "rule": "真实复核人；未复核留空"
+        },
+        {
+          "key": "reviewedAt",
+          "label": "复核日期",
+          "required": "审核后",
+          "type": "date",
+          "rule": "实际复核日期；YYYY-MM-DD"
+        },
+        {
+          "key": "reviewNote",
+          "label": "审核说明",
+          "required": "审核后",
+          "type": "text",
+          "rule": "说明复核范围、依据及问题；驳回／冲突须具体原因"
+        }
+      ]
+    },
+    {
+      "name": "知识资料",
+      "file": "knowledge",
+      "fields": [
+        {
+          "key": "knowledgeId",
+          "label": "知识资料编号",
+          "required": "是",
+          "type": "text",
+          "rule": "KN-成员前缀-序号；关联正文文件"
+        },
+        {
+          "key": "title",
+          "label": "资料标题",
+          "required": "是",
+          "type": "text",
+          "rule": "一个明确主题，最多255字符"
+        },
+        {
+          "key": "subject",
+          "label": "408科目",
+          "required": "是",
+          "type": "text",
+          "rule": "四科中文标准名",
+          "values": [
+            "数据结构",
+            "操作系统",
+            "计算机组成原理",
+            "计算机网络"
+          ]
+        },
+        {
+          "key": "chapter",
+          "label": "章节",
+          "required": "是",
+          "type": "text",
+          "rule": "使用分工主题的统一名称；不是当前知识点树ID"
+        },
+        {
+          "key": "knowledgePoint",
+          "label": "主要知识点",
+          "required": "是",
+          "type": "text",
+          "rule": "一个主知识点，避免堆入多个无关主题"
+        },
+        {
+          "key": "keywords",
+          "label": "检索关键词",
+          "required": "是",
+          "type": "list",
+          "rule": "建议3—8个，英文分号分隔；发布时不超过30个"
+        },
+        {
+          "key": "contentFile",
+          "label": "Markdown正文路径",
+          "required": "是",
+          "type": "path",
+          "rule": "包内相对路径，例如content/KN-AB-001.md；UTF-8；当前RAG最多50000字符"
+        },
+        {
+          "key": "adaptation",
+          "label": "整理方式说明",
+          "required": "是",
+          "type": "text",
+          "rule": "翻译／中文摘要／节选／改编／自编讲义及变更范围"
+        },
+        {
+          "key": "scope",
+          "label": "适用前提与范围",
+          "required": "是",
+          "type": "text",
+          "rule": "指出机制、公式、教材语境或协议版本条件"
+        },
+        {
+          "key": "sourceIds",
+          "label": "来源编号",
+          "required": "是",
+          "type": "list",
+          "rule": "关联来源页；多个编号用英文分号分隔，第一项为主来源"
+        },
+        {
+          "key": "locator",
+          "label": "逐字段来源定位",
+          "required": "是",
+          "type": "text",
+          "rule": "具体页码／章节／表格行；多来源写 字段=来源编号@位置"
+        },
+        {
+          "key": "recordVersion",
+          "label": "采集版本",
+          "required": "是",
+          "type": "integer",
+          "rule": "从1开始；内容修订增加；不是数据库题目version"
+        },
+        {
+          "key": "collectedBy",
+          "label": "收集人",
+          "required": "是",
+          "type": "text",
+          "rule": "真实成员姓名或团队可识别代号"
+        },
+        {
+          "key": "reviewStatus",
+          "label": "收集审核状态",
+          "required": "是",
+          "type": "text",
+          "rule": "收集流程状态，不直接设置数据库发布状态",
+          "values": [
+            "DRAFT",
+            "PENDING_REVIEW",
+            "APPROVED",
+            "REJECTED",
+            "CONFLICT"
+          ]
+        },
+        {
+          "key": "reviewer",
+          "label": "复核人",
+          "required": "审核后",
+          "type": "text",
+          "rule": "真实复核人；未复核留空"
+        },
+        {
+          "key": "reviewedAt",
+          "label": "复核日期",
+          "required": "审核后",
+          "type": "date",
+          "rule": "实际复核日期；YYYY-MM-DD"
+        },
+        {
+          "key": "reviewNote",
+          "label": "审核说明",
+          "required": "审核后",
+          "type": "text",
+          "rule": "说明复核范围、依据及问题；驳回／冲突须具体原因"
+        }
+      ]
+    },
+    {
+      "name": "题目",
+      "file": "questions",
+      "fields": [
+        {
+          "key": "questionId",
+          "label": "题目采集编号",
+          "required": "是",
+          "type": "text",
+          "rule": "Q-成员前缀-序号；不是数据库数字ID"
+        },
+        {
+          "key": "subject",
+          "label": "408科目",
+          "required": "是",
+          "type": "text",
+          "rule": "四科中文标准名",
+          "values": [
+            "数据结构",
+            "操作系统",
+            "计算机组成原理",
+            "计算机网络"
+          ]
+        },
+        {
+          "key": "knowledgePoint",
+          "label": "主要知识点",
+          "required": "是",
+          "type": "text",
+          "rule": "最多255字符"
+        },
+        {
+          "key": "difficulty",
+          "label": "初评难度",
+          "required": "是",
+          "type": "text",
+          "rule": "EASY简单／MEDIUM中等／HARD困难",
+          "values": [
+            "EASY",
+            "MEDIUM",
+            "HARD"
+          ]
+        },
+        {
+          "key": "questionType",
+          "label": "题型",
+          "required": "是",
+          "type": "text",
+          "rule": "当前只收四选一单选",
+          "values": [
+            "SINGLE_CHOICE"
+          ]
+        },
+        {
+          "key": "content",
+          "label": "完整题干",
+          "required": "是",
+          "type": "text",
+          "rule": "最多10000字符；依赖图片的题先待处理"
+        },
+        {
+          "key": "optionA",
+          "label": "选项A",
+          "required": "是",
+          "type": "text",
+          "rule": "最多2000字符；四个选项不重复"
+        },
+        {
+          "key": "optionB",
+          "label": "选项B",
+          "required": "是",
+          "type": "text",
+          "rule": "最多2000字符"
+        },
+        {
+          "key": "optionC",
+          "label": "选项C",
+          "required": "是",
+          "type": "text",
+          "rule": "最多2000字符"
+        },
+        {
+          "key": "optionD",
+          "label": "选项D",
+          "required": "是",
+          "type": "text",
+          "rule": "最多2000字符"
+        },
+        {
+          "key": "answer",
+          "label": "标准答案",
+          "required": "是",
+          "type": "text",
+          "rule": "唯一大写字母",
+          "values": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        {
+          "key": "analysis",
+          "label": "完整解析",
+          "required": "是",
+          "type": "text",
+          "rule": "最多10000字符；推理、条件和答案须相符"
+        },
+        {
+          "key": "sourceType",
+          "label": "题目来源类别",
+          "required": "是",
+          "type": "text",
+          "rule": "真题／模拟／原创／课程习题，不因考研风格改成真题",
+          "values": [
+            "REAL_EXAM",
+            "MOCK",
+            "ORIGINAL",
+            "COURSE_EXERCISE"
+          ]
+        },
+        {
+          "key": "sourceYear",
+          "label": "原题年份",
+          "required": "真题必填",
+          "type": "integer",
+          "rule": "1900—2100；其他题查不到空"
+        },
+        {
+          "key": "sourceQuestionNo",
+          "label": "原题号",
+          "required": "真题必填",
+          "type": "text",
+          "rule": "最多64字符；课程习题也建议保留原标识"
+        },
+        {
+          "key": "adaptation",
+          "label": "翻译或改动说明",
+          "required": "条件",
+          "type": "text",
+          "rule": "变更条件、翻译、选项顺序等注明；未改动可填原样整理"
+        },
+        {
+          "key": "permissionNote",
+          "label": "本题使用依据",
+          "required": "是",
+          "type": "text",
+          "rule": "最多2000字符；分别覆盖题干、解析及翻译／改编用途"
+        },
+        {
+          "key": "sourceIds",
+          "label": "来源编号",
+          "required": "是",
+          "type": "list",
+          "rule": "关联来源页；多个编号用英文分号分隔，第一项为主来源"
+        },
+        {
+          "key": "locator",
+          "label": "逐字段来源定位",
+          "required": "是",
+          "type": "text",
+          "rule": "具体页码／章节／表格行；多来源写 字段=来源编号@位置"
+        },
+        {
+          "key": "recordVersion",
+          "label": "采集版本",
+          "required": "是",
+          "type": "integer",
+          "rule": "从1开始；内容修订增加；不是数据库题目version"
+        },
+        {
+          "key": "collectedBy",
+          "label": "收集人",
+          "required": "是",
+          "type": "text",
+          "rule": "真实成员姓名或团队可识别代号"
+        },
+        {
+          "key": "reviewStatus",
+          "label": "收集审核状态",
+          "required": "是",
+          "type": "text",
+          "rule": "收集流程状态，不直接设置数据库发布状态",
+          "values": [
+            "DRAFT",
+            "PENDING_REVIEW",
+            "APPROVED",
+            "REJECTED",
+            "CONFLICT"
+          ]
+        },
+        {
+          "key": "reviewer",
+          "label": "复核人",
+          "required": "审核后",
+          "type": "text",
+          "rule": "真实复核人；未复核留空"
+        },
+        {
+          "key": "reviewedAt",
+          "label": "复核日期",
+          "required": "审核后",
+          "type": "date",
+          "rule": "实际复核日期；YYYY-MM-DD"
+        },
+        {
+          "key": "reviewNote",
+          "label": "审核说明",
+          "required": "审核后",
+          "type": "text",
+          "rule": "说明复核范围、依据及问题；驳回／冲突须具体原因"
+        }
+      ]
+    }
+  ]
+}

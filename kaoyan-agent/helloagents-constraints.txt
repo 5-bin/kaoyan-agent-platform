@@ -1,0 +1,21 @@
+# HelloAgents 0.2.8 base imports require huggingface-hub (also used by FastEmbed).
+# Keep the already verified non-framework dependencies; no machine-wide freeze.
+requests==2.34.2
+python-dotenv==1.2.4
+beautifulsoup4==4.15.0
+networkx==3.7
+tiktoken==0.14.0
+numpy==2.5.4
+# FastEmbed image code may import Pillow; keep the verified pin.
+Pillow==12.3.0
+onnxruntime==1.31.0
+huggingface-hub==1.33.0
+# MCP 1.12.4 supports the existing Pydantic 2.10 / FastAPI 0.115 baseline.
+httpx-sse==0.4.3
+jsonschema==4.26.0
+attrs==26.1.0
+jsonschema-specifications==2025.9.1
+python-multipart==0.0.32
+referencing==0.37.0
+rpds-py==2026.9.1
+sse-starlette==3.0.3

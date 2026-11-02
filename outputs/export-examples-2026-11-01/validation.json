@@ -1,0 +1,6 @@
+{
+  "environment": "isolated H2 + actual Redis + Java + Vue production preview",
+  "downloads": 32,
+  "modelCalls": 0,
+  "fixture": "synthetic export_student_1/2 only"
+}

@@ -1,10 +1,10 @@
 """Quality-focused tests: BM25/hybrid retrieval, subject hints, citation support."""
-import json
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
+from core.errors import ModelUnavailable
 from config import Settings
 from grounding import aggregate, verify
 from main import create_app
@@ -25,7 +25,7 @@ class FakeModel:
     async def generate(self, *args, **kwargs):
         self.calls += 1
         if self.error:
-            raise RuntimeError("provider detail must not escape")
+            raise ModelUnavailable("provider detail must not escape")
         return self.response
 
     async def close(self):
@@ -65,7 +65,10 @@ def test_bm25_ranks_the_matching_subject_and_can_filter():
     ("栈和队列有什么区别", "数据结构"),
     ("进程和线程的区别", "操作系统"),
     ("TCP如何保证可靠传输", "计算机网络"),
-    ("主存和虚拟内存", "计算机组成原理"),
+    # 2026-11-02: hints spanning two subjects no longer pick the first listed one.
+    ("主存和虚拟内存", None),
+    ("解释计算机网络中的TCP协议栈", "计算机网络"),
+    ("TCP协议栈", "计算机网络"),
     ("海水观赏鱼繁育", None),
 ])
 def test_subject_hint_is_conservative(text, expected):
@@ -117,6 +120,31 @@ def test_qa_downgrades_an_ungrounded_model_answer():
     assert result["answer"].startswith("以下为来源摘要")
 
 
+def test_short_sentences_are_merged_instead_of_skipped():
+    corpus = Corpus(BASE_CORPUS)
+    chunk = corpus.chunk_by_id["cn-tcp#0"]
+    support = verify("TCP需四次握手。端口号为99。", ["cn-tcp#0"], {"cn-tcp#0": chunk})
+    assert support["checked"] == 1
+    assert support["status"] == "UNSUPPORTED"
+
+
+def test_qa_downgrades_an_answer_without_checkable_conclusions():
+    model = FakeModel(response=Answer(answer="TCP需握手。", sourceIds=["cn-tcp#0"]))
+    with TestClient(create_app(settings(LLM_ENABLED=True, LLM_API_KEY="test-only"), model=model)) as client:
+        result = post(client, qa_request("TCP如何保证可靠传输"))
+    assert result["citationSupport"]["status"] == "UNSUPPORTED"
+    assert result["explanationMode"] == "fallback"
+    assert result["answer"].startswith("以下为来源摘要")
+
+
+def test_qa_downgrades_short_fabricated_sentences():
+    model = FakeModel(response=Answer(answer="TCP需四次握手。端口号为99。", sourceIds=["cn-tcp#0"]))
+    with TestClient(create_app(settings(LLM_ENABLED=True, LLM_API_KEY="test-only"), model=model)) as client:
+        result = post(client, qa_request("TCP如何保证可靠传输"))
+    assert result["explanationMode"] == "fallback"
+    assert "四次握手" not in result["answer"]
+
+
 def test_qa_keeps_a_grounded_model_answer_with_support_metadata():
     model = FakeModel(response=Answer(answer="TCP通过序号、确认和重传恢复丢失。", sourceIds=["cn-tcp#0"]))
     with TestClient(create_app(settings(LLM_ENABLED=True, LLM_API_KEY="test-only"), model=model)) as client:
@@ -137,7 +165,8 @@ def test_qa_verifies_each_claim_against_its_own_source():
     with TestClient(create_app(settings(LLM_ENABLED=True, LLM_API_KEY="test-only"), model=model)) as client:
         result = post(client, qa_request("TCP如何保证可靠传输"))
     support = result["citationSupport"]
-    assert result["explanationMode"] == "ai"
+    assert result["explanationMode"] == "fallback"
+    assert "三次握手" not in result["answer"]
     assert support["checked"] == 2 and support["supported"] == 1
     assert support["status"] == "PARTIAL"
     assert support["items"][0]["supported"] is True

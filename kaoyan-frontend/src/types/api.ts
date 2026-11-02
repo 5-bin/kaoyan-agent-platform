@@ -1,9 +1,3 @@
-export interface Result<T = unknown> {
-  code: number
-  message: string
-  data: T
-}
-
 export interface PageResult<T = unknown> {
   total: number
   page: number
@@ -61,13 +55,47 @@ export interface AssistantEvidence {
   matchMethod?: 'LABEL' | 'SEMANTIC'; matchTopic?: string; summary?: string
   resource?: { type: 'question' | 'document' | 'practice' | 'stats'; id?: string | number }
 }
+export interface HistoricalComparison {
+  programId: string; status: string; year?: number; score?: number; gap?: number; notice: string
+  source?: { title: string; url: string; locator: string; version: string; retrievedAt: string }
+}
+export interface AdmissionLinks {
+  schoolCode: string; schoolName: string; registeredYear: number; entryUrls: string[]
+}
+/** Legacy records are read only for their registered school code. */
+export interface LegacyAdmissionCheck {
+  query?: { schoolCode?: string }
+}
+
+/** Present only when the same layer's explanationMode is fallback. */
+export type FallbackReason = 'TIMEOUT' | 'UNAVAILABLE' | 'BUDGET_EXHAUSTED' | 'INPUT_TOO_LONG' | 'INVALID_OUTPUT' | 'EVIDENCE_MISMATCH' | 'NUMBER_MISMATCH'
+
 export interface TaskResult {
+  clarificationOptions?: { label: string; reply: string }[]
+  sections?: { agent: 'LEARNING' | 'SCHOOL' | 'KNOWLEDGE' | 'PRACTICE' | 'NOTE' | 'STUDY_PLAN'; outcome: 'COMPLETED' | 'NEEDS_INPUT' | 'UNSUPPORTED'; explanationMode: 'rules' | 'ai' | 'fallback'; fallbackReason?: FallbackReason; notice?: string }[]
+  partial?: boolean
+  operation?: string
+  questionRefs?: string[]
+  count?: number
+  target?: 'selected' | 'visible' | 'wrong' | 'favorite' | 'normal'
+  total?: number
+  readCount?: number
+  admissionLinks?: AdmissionLinks
+  schoolCatalog?: SchoolCatalog
+  admissionCheck?: LegacyAdmissionCheck
+  studyPlan?: { days: { day: number; topic: string; tasks: string[] }[]; basis: string[] }
+  resultSchemaVersion?: number
+  learningSnapshot?: { profileRevision: number; referenceScore: number | null; coverage: number; blueprintVersion: string; calibrated: false }
+  triggerReason?: string
+  historicalComparisons?: HistoricalComparison[]
   outcome: 'COMPLETED' | 'NEEDS_INPUT' | 'UNSUPPORTED'; answer: string
-  resolvedTaskType: Task['taskType']; explanationMode: 'rules' | 'ai' | 'fallback'
+  resolvedTaskType: Task['taskType']; explanationMode: 'rules' | 'ai' | 'fallback'; fallbackReason?: FallbackReason
   releaseId: string; references: SourceReference[]; followUp?: string[]; notice?: string
   candidates?: SchoolCandidate[]; coverage?: string; weakPoints?: string[]; accuracy?: number
   recordId?: number; standardAnswer?: string; userAnswer?: string; questionVersion?: number
   evidence?: AssistantEvidence[]; actions?: AssistantAction[]
+  navigation?: { target: string }[]
+  readScope?: string[]
   retrievalStatus?: 'READY' | 'BUILDING' | 'BUSY' | 'FAILED' | 'UNAVAILABLE'
   citationSupport?: CitationSupport
   conditions?: Record<string, unknown>
@@ -100,15 +128,51 @@ export interface SchoolDetail {
   enrollmentCount?: number
   scoreLine?: number
   remark?: string
+  admissionMetrics?: AdmissionMetrics
 }
 
-export interface RecommendRecord {
-  id: number
-  userId: number
-  schoolId: number
-  reason?: string
-  score?: number
-  createdAt: string
+export interface SchoolWarning {
+  code: string
+  detailId?: number | null
+  metricType?: string | null
+  message: string
+}
+
+export interface SchoolCatalog {
+  school: School | null
+  targetYear: number | null
+  availableYears: number[]
+  details: SchoolDetail[]
+  total: number
+  warnings: SchoolWarning[]
+}
+
+export interface AdmissionMetricSource {
+  title: string
+  url: string
+  locator: string
+  retrievedAt: string
+  sourceType: 'OFFICIAL' | 'THIRD_PARTY'
+}
+
+export interface AdmissionMetric {
+  year: number | null
+  value: number | null
+  status: 'OFFICIAL' | 'UNVERIFIED' | 'NOT_PUBLISHED' | 'NOT_FOUND' | 'SCOPE_MISMATCH' | 'CONFLICT'
+  scopeKey: string
+  scopeLabel: string
+  basis: 'ORDINARY_EXAM' | 'TOTAL_INCLUDING_RECOMMENDED' | 'TOTAL_UNSPECIFIED' | 'NOT_APPLICABLE'
+  notice: string
+  sources: AdmissionMetricSource[]
+}
+
+export interface AdmissionMetrics {
+  college: string
+  track: string
+  studyMode: string
+  admissionCategory: string
+  enrollment: AdmissionMetric | null
+  cutoffReference: AdmissionMetric | null
 }
 
 export interface Question {
@@ -140,16 +204,6 @@ export interface PracticeRecord {
   isCorrect?: number | null
   gradingStatus?: string
   answeredAt?: string
-}
-
-export interface UserQuestionMark {
-  id: number
-  userId: number
-  questionId: number
-  isFavorite: number
-  isWrong: number
-  wrongCount: number
-  lastWrongAt?: string
 }
 
 export interface StudyStat {

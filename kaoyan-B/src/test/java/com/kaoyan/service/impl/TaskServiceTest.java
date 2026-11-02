@@ -18,9 +18,8 @@ class TaskServiceTest {
     AgentFeignClient agent = mock(AgentFeignClient.class);
     UserMapper users = mock(UserMapper.class);
     PracticeRecordMapper attempts = mock(PracticeRecordMapper.class);
-    QuestionMapper questions = mock(QuestionMapper.class);
     TaskStore store = mock(TaskStore.class);
-    TaskServiceImpl service = new TaskServiceImpl(agent, new AgentProperties(), users, attempts, questions, store,
+    TaskServiceImpl service = new TaskServiceImpl(agent, new AgentProperties(), users, attempts, store,
         new WrongQuestionTutorContext(attempts, mock(TaskMapper.class)),
         new com.kaoyan.service.ReferenceSourcePolicy(new AgentProperties(), new com.fasterxml.jackson.databind.ObjectMapper()));
 
@@ -97,12 +96,14 @@ class TaskServiceTest {
         verify(agent).chat(anyString(), captured.capture());
         assertEquals(2, captured.getValue().getQuestions().get(0).get("version"));
         assertEquals(false, captured.getValue().getQuestions().get(0).get("correct"));
-        verifyNoInteractions(questions);
     }
     @Test void inaccessibleSessionRejectedBeforeCreatingTask() {
         when(attempts.selectList(any())).thenReturn(List.of());
         assertThrows(ApiException.class, () -> service.submit(1L, "PRACTICE_SUMMARY", Map.of("sessionId", "foreign")));
-        verifyNoInteractions(store, agent);
+        verifyNoInteractions(agent);
+        verify(store).lockAccount(1L);
+        verify(store, never()).begin(any());
+        verify(store, never()).finish(any());
     }
 
     PracticeRecord wrongAttempt() {
@@ -125,7 +126,7 @@ class TaskServiceTest {
         Task task = service.submit(1L, "WRONG_QUESTION_TUTOR", Map.of("recordId", 7, "query", "为什么"));
         assertEquals("FAILED", task.getStatus()); assertNull(task.getResultPayload());
         assertEquals(0, record.getIsCorrect()); assertEquals("B", record.getQuestionSnapshot().get("answer"));
-        verify(attempts, never()).updateById(any(PracticeRecord.class)); verifyNoInteractions(questions);
+        verify(attempts, never()).updateById(any(PracticeRecord.class));
     }
     @Test void tutorOfflineFailureIsSavedAndSanitized() {
         wrongAttempt();

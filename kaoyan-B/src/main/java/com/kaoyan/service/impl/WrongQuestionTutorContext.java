@@ -17,6 +17,8 @@ public class WrongQuestionTutorContext {
     private final PracticeRecordMapper records;
     private final TaskMapper tasks;
 
+    private java.time.Clock clock=java.time.Clock.systemDefaultZone();
+
     public void populate(AgentRequest request, Long userId, Map<String, Object> input) {
         long recordId = positiveInteger(input.get("recordId"), 400);
         if (!(input.get("query") instanceof String query) || query.isBlank() || query.strip().length() > 2000)
@@ -46,25 +48,47 @@ public class WrongQuestionTutorContext {
         attempt.put("userAnswer", record.getUserAnswer());
         request.setAttempt(attempt);
         request.setUserInput(query.strip());
-        List<Object> messages = new ArrayList<>();
-        if (input.containsKey("parentTaskId")) {
-            if (!(input.get("parentTaskId") instanceof String parentId) || !parentId.matches("[A-Za-z0-9_-]{1,64}"))
-                throw new ApiException(400, "父任务编号不合法");
-            Task parent = tasks.selectById(parentId);
-            if (parent == null || !userId.equals(parent.getUserId()) || parent.getDeletedAt() != null)
-                throw new ApiException(404, "父任务不存在或无权访问");
-            Map<String, Object> previous = parent.getInputPayload();
-            if (!"WRONG_QUESTION_TUTOR".equals(parent.getTaskType()) || !"SUCCESS".equals(parent.getStatus())
-                    || previous == null || positiveInteger(previous.get("recordId"), 409) != recordId
-                    || !sameAttempt(attempt, previous.get("attempt")))
-                throw new ApiException(409, "父任务必须是同一次作答的成功辅导任务");
-            // Previous context was generated here, not accepted from the browser.
-            if (previous.get("messages") instanceof List<?> history) messages.addAll(history);
-            messages.add(Map.of("role", "user", "content", previous.get("query"), "scopes", List.of("wrong")));
-            messages.add(Map.of("role", "assistant", "content", parent.getResultPayload().get("answer"), "scopes", List.of("wrong")));
-            if (messages.size() > 6) messages = new ArrayList<>(messages.subList(messages.size() - 6, messages.size()));
+        Object raw=input.get("parentTaskId");
+        if(raw!=null && (!(raw instanceof String id)||!id.matches("[A-Za-z0-9_-]{1,64}")))
+            throw new ApiException(400,"父任务编号不合法");
+        request.setMessages(history(userId,recordId,attempt,(String)raw,true));
+    }
+
+    /** Reconstruct at most three original turns. Embedded legacy messages are ignored. */
+    private List<Object> history(Long owner,long recordId,Map<String,Object> attempt,String parentId,boolean strictFirst) {
+        List<List<Object>> turns=new ArrayList<>();Set<String> visited=new HashSet<>();
+        var cutoff=java.time.LocalDateTime.now(clock).minusDays(30);
+        while(parentId!=null && turns.size()<3 && visited.add(parentId)) {
+            Task parent=tasks.selectById(parentId);
+            boolean visible=parent!=null && owner.equals(parent.getUserId()) && parent.getDeletedAt()==null;
+            var input=visible?parent.getInputPayload():null;
+            boolean eligible=visible && parent.getCreatedAt()!=null && !parent.getCreatedAt().isBefore(cutoff)
+                && "WRONG_QUESTION_TUTOR".equals(parent.getTaskType()) && "SUCCESS".equals(parent.getStatus())
+                && input!=null && input.get("recordId") instanceof Number n && n.longValue()==recordId
+                && sameAttempt(attempt,input.get("attempt")) && input.get("query") instanceof String query && !query.isBlank() && query.length()<=2000
+                && parent.getResultPayload()!=null && parent.getResultPayload().get("answer") instanceof String answer && !answer.isBlank() && answer.length()<=4000;
+            if(!eligible) {
+                if(strictFirst && turns.isEmpty())throw new ApiException(visible?409:404,visible?"父任务已过期或不是同一次作答的成功辅导":"父任务不存在或无权访问");
+                break;
+            }
+            turns.add(List.of(Map.of("role","user","content",input.get("query"),"scopes",List.of("wrong")),
+                Map.of("role","assistant","content",parent.getResultPayload().get("answer"),"scopes",List.of("wrong"))));
+            parentId=input.get("parentTaskId") instanceof String next?next:null;
         }
-        request.setMessages(messages);
+        Collections.reverse(turns);List<Object> messages=new ArrayList<>();turns.forEach(messages::addAll);return messages;
+    }
+
+    /** Public history uses exactly the same source filtering as model history. */
+    public com.kaoyan.dto.response.TaskView.TutorTurn turn(Task task) {
+        var input=task.getInputPayload();
+        if(!"WRONG_QUESTION_TUTOR".equals(task.getTaskType()) || task.getDeletedAt()!=null || input==null
+            || !(input.get("recordId") instanceof Number id) || !(input.get("query") instanceof String query))return null;
+        String parent=input.get("parentTaskId") instanceof String value?value:null;
+        Map<String,Object> attempt=input.get("attempt") instanceof Map<?,?> value?(Map<String,Object>)value:Map.of();
+        var messages=history(task.getUserId(),id.longValue(),attempt,parent,false).stream().map(value -> {
+            var row=(Map<?,?>)value;return Map.of("role",row.get("role").toString(),"content",row.get("content").toString());
+        }).toList();
+        return new com.kaoyan.dto.response.TaskView.TutorTurn(id.longValue(),query,parent,messages);
     }
 
     private static long positiveInteger(Object value, int code) {

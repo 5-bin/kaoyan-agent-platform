@@ -1,7 +1,6 @@
 """Qdrant contract tests use explicit vectors; model quality is tested separately."""
 import json
 import time
-from pathlib import Path
 from unittest.mock import AsyncMock
 import pytest
 from fastapi.testclient import TestClient

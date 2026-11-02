@@ -36,7 +36,7 @@ class TaskServiceImplTest {
         var user = new com.kaoyan.entity.User(); user.setId(1L);
         when(users.selectById(1L)).thenReturn(user);
         store = new TaskStore(tasks, new AgentProperties());
-        service = spy(new TaskServiceImpl(agent, new AgentProperties(), users, records, mock(QuestionMapper.class), store,
+        service = spy(new TaskServiceImpl(agent, new AgentProperties(), users, records, store,
             new WrongQuestionTutorContext(records, tasks),
             new com.kaoyan.service.ReferenceSourcePolicy(new AgentProperties(), new com.fasterxml.jackson.databind.ObjectMapper())));
         ReflectionTestUtils.setField(service, "baseMapper", tasks);
@@ -77,6 +77,28 @@ class TaskServiceImplTest {
         verify(tasks).updateById(saved);
         doReturn(response("someone-else", Map.of("answer", "mock"))).when(agent).chat(anyString(), any());
         assertEquals("FAILED", service.submit(1L, "KNOWLEDGE_QA", Map.of("query", "q")).getStatus());
+    }
+
+    @Test void rejectsMalformedClarificationOptions() {
+        var task = new Task(); task.setId("test"); task.setTaskType("KNOWLEDGE_QA");
+        var valid = response("test", Map.of("answer", "补充", "clarificationOptions", List.of(Map.of("label", "选择", "reply", "补充说明"))));
+        assertDoesNotThrow(() -> TaskServiceImpl.validateResponse(task, valid));
+        var invalid = response("test", Map.of("answer", "补充", "clarificationOptions", List.of(Map.of("label", "选择", "reply", " "))));
+        assertThrows(IllegalStateException.class, () -> TaskServiceImpl.validateResponse(task, invalid));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test void fallbackReasonMustBeKnownAndOnlyOnDowngradedResults() {
+        var task = new Task(); task.setId("test"); task.setTaskType("KNOWLEDGE_QA");
+        var fallback = response("test", Map.of("answer", "来源摘要", "fallbackReason", "TIMEOUT"));
+        ((Map<String, Object>) fallback.getResult()).put("explanationMode", "fallback");
+        assertDoesNotThrow(() -> TaskServiceImpl.validateResponse(task, fallback));
+        ((Map<String, Object>) fallback.getResult()).put("fallbackReason", "provider said: quota");
+        assertThrows(IllegalStateException.class, () -> TaskServiceImpl.validateResponse(task, fallback));
+        // The helper's explanationMode is rules: a reason there is inconsistent.
+        var rules = response("test", Map.of("answer", "规则", "fallbackReason", "TIMEOUT"));
+        assertThrows(IllegalStateException.class, () -> TaskServiceImpl.validateResponse(task, rules));
+        assertDoesNotThrow(() -> TaskServiceImpl.validateResponse(task, response("test", Map.of("answer", "旧结果"))));
     }
 
     @Test void invalidResultAndExceptionsBecomeSanitizedSavedFailures() {

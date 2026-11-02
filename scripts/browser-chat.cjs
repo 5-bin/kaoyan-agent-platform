@@ -1,4 +1,4 @@
-// Real Java/Python/LangChain with a controlled provider; no browser API interception.
+// Real Java/Python/HelloAgents with a controlled provider; no browser API interception.
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const fs = require('node:fs');
@@ -42,6 +42,15 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
         await page.reload();
         await answers.nth(1).waitFor();
         checks.push(width + ': continuous_followup_and_refresh');
+        stage = 'compound_sections';
+        await input.fill('分析薄弱点，安排3天复习计划，并推荐院校');
+        await page.getByRole('button', { name: '发送', exact: true }).click();
+        const sections = page.getByRole('region', { name: '分项处理结果' });
+        await sections.getByText('部分事项已完成，其他事项请查看下方提示。', { exact: true }).waitFor();
+        assert.ok((await sections.innerText()).includes('院校比较 · 需补充条件'));
+        await page.reload();
+        await sections.getByText('部分事项已完成，其他事项请查看下方提示。', { exact: true }).waitFor();
+        checks.push(width + ': real_compound_sections_and_partial_survive_reload');
         stage = 'document_proposals';
         await input.fill('创建线程学习笔记');
         await page.getByRole('button', { name: '发送', exact: true }).click();
@@ -118,6 +127,6 @@ assert.equal(new URL(base).hostname, '127.0.0.1');
         throw new Error(`${width}:${stage}: ${error.message}`);
       } finally { await context.close(); }
     }
-    console.log(JSON.stringify({ scope: 'real Java/Python/LangChain; H2, Redis and provider doubles; desktop and simulated390', checks }));
+    console.log(JSON.stringify({ scope: 'real Java/Python/HelloAgents; H2, Redis and provider doubles; desktop and simulated390', checks }));
   } finally { await browser.close(); }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

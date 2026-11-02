@@ -1,0 +1,242 @@
+[
+  {
+    "externalId": "CO-CS-20261029-001",
+    "id": 553,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.A"
+  },
+  {
+    "externalId": "CO-CS-20261029-002",
+    "id": 554,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.B"
+  },
+  {
+    "externalId": "CO-CS-20261029-003",
+    "id": 555,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.C"
+  },
+  {
+    "externalId": "CO-CS-20261029-004",
+    "id": 556,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.D"
+  },
+  {
+    "externalId": "CO-CS-20261029-005",
+    "id": 557,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.E"
+  },
+  {
+    "externalId": "CO-CS-20261029-006",
+    "id": 558,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.F"
+  },
+  {
+    "externalId": "CO-CS-20261029-007",
+    "id": 559,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.G"
+  },
+  {
+    "externalId": "CO-CS-20261029-008",
+    "id": 560,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.H"
+  },
+  {
+    "externalId": "CO-CS-20261029-009",
+    "id": 561,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.I-first"
+  },
+  {
+    "externalId": "CO-CS-20261029-010",
+    "id": 562,
+    "version": 2,
+    "sourceQuestionNo": "L01-2.K"
+  },
+  {
+    "externalId": "CO-CS-20261029-011",
+    "id": 563,
+    "version": 2,
+    "sourceQuestionNo": "L04-7.A"
+  },
+  {
+    "externalId": "CO-CS-20261029-012",
+    "id": 564,
+    "version": 2,
+    "sourceQuestionNo": "L04-7.B"
+  },
+  {
+    "externalId": "CO-CS-20261029-013",
+    "id": 565,
+    "version": 2,
+    "sourceQuestionNo": "L04-9.A"
+  },
+  {
+    "externalId": "CO-CS-20261029-014",
+    "id": 566,
+    "version": 2,
+    "sourceQuestionNo": "L04-9.C"
+  },
+  {
+    "externalId": "CO-CS-20261029-015",
+    "id": 567,
+    "version": 2,
+    "sourceQuestionNo": "L07-1.A"
+  },
+  {
+    "externalId": "CO-CS-20261029-016",
+    "id": 568,
+    "version": 2,
+    "sourceQuestionNo": "L07-1.B"
+  },
+  {
+    "externalId": "CO-CS-20261029-017",
+    "id": 569,
+    "version": 2,
+    "sourceQuestionNo": "L07-1.C"
+  },
+  {
+    "externalId": "CO-CS-20261029-018",
+    "id": 570,
+    "version": 2,
+    "sourceQuestionNo": "L07-1.D"
+  },
+  {
+    "externalId": "CO-CS-20261029-019",
+    "id": 571,
+    "version": 2,
+    "sourceQuestionNo": "L09-2.A"
+  },
+  {
+    "externalId": "CO-CS-20261029-020",
+    "id": 572,
+    "version": 2,
+    "sourceQuestionNo": "L09-2.B1"
+  },
+  {
+    "externalId": "CO-CS-20261029-021",
+    "id": 573,
+    "version": 2,
+    "sourceQuestionNo": "L09-2.B2"
+  },
+  {
+    "externalId": "CO-CS-20261029-022",
+    "id": 574,
+    "version": 2,
+    "sourceQuestionNo": "L09-2.B3"
+  },
+  {
+    "externalId": "CO-CS-20261029-023",
+    "id": 575,
+    "version": 2,
+    "sourceQuestionNo": "L09-2.B4"
+  },
+  {
+    "externalId": "CO-CS-20261029-024",
+    "id": 576,
+    "version": 2,
+    "sourceQuestionNo": "L09-2.D"
+  },
+  {
+    "externalId": "CO-CS-20261029-025",
+    "id": 577,
+    "version": 2,
+    "sourceQuestionNo": "L13-1.SHLC"
+  },
+  {
+    "externalId": "CO-CS-20261029-026",
+    "id": 578,
+    "version": 2,
+    "sourceQuestionNo": "L13-1.SUB"
+  },
+  {
+    "externalId": "CO-CS-20261029-027",
+    "id": 579,
+    "version": 2,
+    "sourceQuestionNo": "L13-1.LD"
+  },
+  {
+    "externalId": "CO-CS-20261029-028",
+    "id": 580,
+    "version": 2,
+    "sourceQuestionNo": "L13-1.ST"
+  },
+  {
+    "externalId": "CO-CS-20261029-029",
+    "id": 581,
+    "version": 2,
+    "sourceQuestionNo": "L14-1.A"
+  },
+  {
+    "externalId": "CO-CS-20261029-030",
+    "id": 582,
+    "version": 2,
+    "sourceQuestionNo": "L14-1.B-offset"
+  },
+  {
+    "externalId": "CO-CS-20261029-031",
+    "id": 583,
+    "version": 2,
+    "sourceQuestionNo": "L14-1.B-tag"
+  },
+  {
+    "externalId": "CO-CS-20261029-032",
+    "id": 584,
+    "version": 2,
+    "sourceQuestionNo": "L14-1.B-lines"
+  },
+  {
+    "externalId": "CO-CS-20261029-033",
+    "id": 585,
+    "version": 2,
+    "sourceQuestionNo": "L14-2.A"
+  },
+  {
+    "externalId": "CO-CS-20261029-034",
+    "id": 586,
+    "version": 2,
+    "sourceQuestionNo": "L14-2.B"
+  },
+  {
+    "externalId": "CO-CS-20261029-035",
+    "id": 587,
+    "version": 2,
+    "sourceQuestionNo": "L14-2.C"
+  },
+  {
+    "externalId": "CO-CS-20261029-036",
+    "id": 588,
+    "version": 2,
+    "sourceQuestionNo": "L14-2.D"
+  },
+  {
+    "externalId": "CO-CS-20261029-037",
+    "id": 589,
+    "version": 2,
+    "sourceQuestionNo": "L18-2.A"
+  },
+  {
+    "externalId": "CO-CS-20261029-038",
+    "id": 590,
+    "version": 2,
+    "sourceQuestionNo": "L18-2.B"
+  },
+  {
+    "externalId": "CO-CS-20261029-039",
+    "id": 591,
+    "version": 2,
+    "sourceQuestionNo": "L18-2.C"
+  },
+  {
+    "externalId": "CO-CS-20261029-040",
+    "id": 592,
+    "version": 2,
+    "sourceQuestionNo": "L18-4.A"
+  }
+]

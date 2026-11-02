@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kaoyan.dto.response.AdmissionMetricsVO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,11 @@ public class SchoolDetail {
 
     /** 备注 */
     private String remark;
+
+    /** Optional read-only projection; legacy columns retain their original year semantics. */
+    @TableField(exist = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private AdmissionMetricsVO admissionMetrics;
 
     /** 创建时间 */
     @TableField(fill = FieldFill.INSERT)

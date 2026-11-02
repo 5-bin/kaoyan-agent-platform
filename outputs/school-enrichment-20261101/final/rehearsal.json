@@ -1,0 +1,34 @@
+{
+  "applied": false,
+  "preview": {
+    "database": "kaoyan_dev",
+    "schoolsChecked": 121,
+    "programsChecked": 797,
+    "schoolLevelsToChange": 115,
+    "metricsToInsert": 1594,
+    "metricStatuses": {
+      "NOT_FOUND": 1215,
+      "UNVERIFIED": 67,
+      "OFFICIAL": 200,
+      "SCOPE_MISMATCH": 112
+    },
+    "requiresV14": true,
+    "manifestSha256": "7c7a735a784174013e42ddb61f38a5b8bc2280035bd02c2d75b4a659367d78ec"
+  },
+  "restoreDatabase": "kaoyan_realdata_verify_e19e6388aaaa",
+  "backup": "/Users/bin/projects/ruanjiangongcheng/Projects/kaoyan-agent-platform-adaptation/.cache/school-enrichment-20261101/operations/20261101-180020-866598/before.sql",
+  "backupRestoredTables": 28,
+  "failureRollbackVerified": true,
+  "explicitRollbackVerified": true,
+  "repeatUnchanged": true,
+  "manualRevisionProtected": true,
+  "validation": {
+    "allMetricsReadBack": 1594,
+    "allSchoolsReadBack": 121,
+    "nonTargetTableHashesUnchanged": true,
+    "schoolOtherFieldsUnchanged": true,
+    "legacyScoresUnchanged": true
+  },
+  "migrationSha256": "596e85784221eeab3cd1561b5205b61763cba4e9b4b1391d5fd4cce56bc9e1ea",
+  "reportPath": "/Users/bin/projects/ruanjiangongcheng/Projects/kaoyan-agent-platform-adaptation/.cache/school-enrichment-20261101/operations/20261101-180020-866598/report.json"
+}

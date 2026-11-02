@@ -6,7 +6,7 @@
         <el-select v-model="q.province" placeholder="省份" aria-label="省份" filterable clearable :loading="optionsLoading" no-data-text="暂无选项">
           <el-option v-for="province in options.provinces" :key="province" :label="province" :value="province" />
         </el-select>
-        <el-select v-model="q.level" placeholder="层次" clearable><el-option v-for="level in ['985','211','双一流']" :key="level" :label="level" :value="level" /></el-select>
+        <el-select v-model="q.level" placeholder="层次" aria-label="层次" clearable><el-option v-for="level in ['985','211','双一流','普通本科']" :key="level" :label="level" :value="level" /></el-select>
         <el-select v-model="q.majorName" placeholder="专业名" aria-label="专业名" filterable clearable :loading="optionsLoading" no-data-text="暂无选项">
           <el-option v-for="major in options.majorNames" :key="major" :label="major" :value="major" />
         </el-select>
@@ -17,7 +17,8 @@
         筛选选项加载失败 <el-button size="small" :loading="optionsLoading" @click="loadOptions">重试</el-button>
       </div>
     </div>
-    <el-alert title="请核对专业详情中的招生年份、来源与适用条件。历史演示或估计数据不能作为报考依据；条件推荐使用独立核验资料。" type="warning" :closable="false" />
+    <el-alert title="院校库包含已核对资料与“采集待核实”记录，请查看专业备注中的状态、年份和来源。待核实内容不能直接作为报考依据；条件推荐仅使用独立核验资料。" type="warning" :closable="false" />
+    <LearningRecommendationPanel />
     <div class="rows" v-loading="loading">
       <router-link v-for="school in list" :key="school.id" :to="`/schools/${school.id}`" class="school-row">
         <strong>{{ school.name }}</strong><span>{{ school.province }} · {{ school.level || '层次未登记' }}</span>
@@ -55,6 +56,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import LearningRecommendationPanel from '@/components/LearningRecommendationPanel.vue'
 import { onMounted, reactive, ref } from 'vue'
 import { getSchoolOptions, searchSchools, type SchoolOptions } from '@/api/school'
 import { generateRecommend, getRecommendList } from '@/api/recommend'

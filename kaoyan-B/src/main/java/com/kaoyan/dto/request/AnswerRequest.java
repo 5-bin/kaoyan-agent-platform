@@ -15,6 +15,9 @@ public record AnswerRequest(
 
         @Schema(description = "用户答案", example = "B")
         @NotBlank(message = "answer 不能为空")
-        String answer
+        String answer,
+        @jakarta.validation.constraints.Positive Long itemId,
+        @jakarta.validation.constraints.Size(max=64) String clientRequestId
 ) {
+    public AnswerRequest(Long questionId,String answer) {this(questionId,answer,null,null);}
 }

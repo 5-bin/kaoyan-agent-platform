@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', name: 'dashboard', component: () => import('@/views/Dashboard.vue') },
       { path: 'practice', name: 'practice', component: () => import('@/views/PracticeHome.vue') },
-      { path: 'practice/session/:sessionId', name: 'session', component: () => import('@/views/PracticeSession.vue') },
+      { path: 'practice/session/:sessionId', name: 'session', component: () => import('@/views/PracticeSessionEntry.vue') },
       { path: 'wrong', name: 'wrong', component: () => import('@/views/WrongBook.vue') },
       { path: 'notes', name: 'notes', component: () => import('@/views/PersonalNotes.vue') },
       { path: 'favorite', name: 'favorite', component: () => import('@/views/Favorite.vue') },

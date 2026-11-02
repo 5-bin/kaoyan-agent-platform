@@ -22,9 +22,6 @@ export const answerQuestion = (
 export const getSessionDetail = (sessionId: string) =>
   request.get<unknown, PracticeRecord[]>(`/practice/sessions/${sessionId}`)
 
-export const getSessionSummary = (sessionId: string) =>
-  request.get(`/practice/sessions/${sessionId}/summary`)
-
 export interface SessionSummary {
   sessionId: string
   total: number
@@ -62,6 +59,3 @@ export const getReviewPage = (sessionId: string, params: { pageNum: number; page
 
 export const triggerAiSummary = (sessionId: string) =>
   request.post<unknown, any>(`/practice/sessions/${sessionId}/ai-summary`)
-
-export const abandonSession = (sessionId: string) =>
-  request.delete(`/practice/sessions/${sessionId}`)

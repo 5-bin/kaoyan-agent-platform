@@ -1,8 +1,14 @@
 <template>
   <div class="page">
+    <DiagnosticEntry />
     <div class="page-head">
       <h2 class="page-title">开始刷题</h2>
       <p class="page-sub">选择题型、难度和题量，开始一次新的练习</p>
+      <p v-if="cfg.subject === '计算机组成原理' || linkedQuestion?.subject === '计算机组成原理'" class="page-sub">
+        2026-10-29新增40道Chris Terman课程习题中文改编，非408统考真题。
+        <a href="/licenses/computation-structures-mit.txt" target="_blank" rel="noopener noreferrer">完整MIT许可</a> ·
+        <a href="/question-sources/co-20261029.json" target="_blank" rel="noopener noreferrer">逐题出处与改编说明</a>
+      </p>
     </div>
 
     <el-dialog v-model="questionPreview" title="题目（未作答不展示答案）" width="min(800px,94vw)"><p>此处展示当前可练习版本；历史作答以助手列出的版本及原练习回顾为准。</p><p>{{ linkedQuestion?.content }}</p><p v-for="key in ['A','B','C','D'] as const" :key="key">{{ key }}. {{ linkedQuestion?.[('option' + key) as 'optionA'] }}</p></el-dialog>
@@ -83,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import DiagnosticEntry from '@/components/DiagnosticEntry.vue'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useAssistantPage } from '@/composables/assistant-page'
 import { getQuestionDetail } from '@/api/question'

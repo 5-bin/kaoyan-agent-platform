@@ -20,9 +20,6 @@ export interface MarkItem {
   version?: number
 }
 
-export const addWrong = (questionId: number) =>
-  request.post(`/marks/wrong/${questionId}`)
-
 export const removeWrong = (questionId: number) =>
   request.delete(`/marks/wrong/${questionId}`)
 

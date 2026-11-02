@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>任务历史</h2><p>可回顾历史结果或继续错题追问；独立任务不会自动转换为会话。</p>
+    <h2>任务历史</h2><p>可回顾历史结果或继续错题追问；可选择在主助手中继续，点击入口不会自动发送。</p>
     <router-link to="/tasks">返回 Agent 助手</router-link>
     <el-table :data="rows" v-loading="loading">
       <el-table-column prop="taskType" label="类型" />

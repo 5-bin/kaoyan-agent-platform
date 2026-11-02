@@ -118,6 +118,7 @@ import { getSessionDetail, answerQuestion, getReviewPage, triggerAiSummary, type
 import { getQuestionDetail } from '@/api/question'
 import type { StudentQuestion, PracticeRecord } from '@/types/api'
 import { historyNotice } from '@/utils/question-history'
+import { fallbackReasonLabel } from '@/utils/fallback-reason'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import WrongQuestionTutor from '@/components/WrongQuestionTutor.vue'
 
@@ -329,7 +330,7 @@ const doAiSummary = async () => {
     const t: any = await triggerAiSummary(sessionId)
     if (t.status === 'SUCCESS' && t.resultPayload) {
       const r = t.resultPayload
-      aiResult.value = `${r.answer || '无总结内容'}\n${r.weakPoints?.length ? '本次错题涉及：' + r.weakPoints.join('、') : ''}\n${r.explanationMode === 'ai' ? 'AI解释' : '规则总结'}`
+      aiResult.value = `${r.answer || '无总结内容'}\n${r.weakPoints?.length ? '本次错题涉及：' + r.weakPoints.join('、') : ''}\n${r.explanationMode === 'ai' ? 'AI解释' : fallbackReasonLabel(r.fallbackReason) ? `规则总结（AI未采用：${fallbackReasonLabel(r.fallbackReason)}）` : '规则总结'}`
     } else {
       aiResult.value = 'AI 总结失败：' + (t.errorMessage || '未知错误')
     }

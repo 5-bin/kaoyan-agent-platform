@@ -1,0 +1,340 @@
+{
+  "checked": 40,
+  "allPassed": true,
+  "method": "arithmetic, exhaustive truth tables, cache geometry and fixed-priority response-time iteration",
+  "results": [
+    {
+      "externalId": "CO-CS-20261029-001",
+      "passed": true,
+      "computedAnswer": "101011",
+      "evidence": 43
+    },
+    {
+      "externalId": "CO-CS-20261029-002",
+      "passed": true,
+      "computedAnswer": "0xCD",
+      "evidence": 205
+    },
+    {
+      "externalId": "CO-CS-20261029-003",
+      "passed": true,
+      "computedAnswer": "−42",
+      "evidence": -42
+    },
+    {
+      "externalId": "CO-CS-20261029-004",
+      "passed": true,
+      "computedAnswer": "9位",
+      "evidence": 9
+    },
+    {
+      "externalId": "CO-CS-20261029-005",
+      "passed": true,
+      "computedAnswer": "0xFA，不溢出",
+      "evidence": {
+        "sum": -6,
+        "overflow": false
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-006",
+      "passed": true,
+      "computedAnswer": "精确和为−156，发生有符号溢出",
+      "evidence": {
+        "sum": -156,
+        "overflow": true
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-007",
+      "passed": true,
+      "computedAnswer": "−77",
+      "evidence": -77
+    },
+    {
+      "externalId": "CO-CS-20261029-008",
+      "passed": true,
+      "computedAnswer": "−128",
+      "evidence": -128
+    },
+    {
+      "externalId": "CO-CS-20261029-009",
+      "passed": true,
+      "computedAnswer": "0x24",
+      "evidence": 36
+    },
+    {
+      "externalId": "CO-CS-20261029-010",
+      "passed": true,
+      "computedAnswer": "−14",
+      "evidence": -14
+    },
+    {
+      "externalId": "CO-CS-20261029-011",
+      "passed": true,
+      "computedAnswer": "¬A·¬B+¬A·¬C+¬B·¬C",
+      "evidence": {
+        "rowsChecked": 8,
+        "output": [
+          true,
+          true,
+          true,
+          false,
+          true,
+          false,
+          false,
+          false
+        ],
+        "matchingOptions": 1
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-012",
+      "passed": true,
+      "computedAnswer": "能，因为M(A,B,0)=¬(A·B)，可构成通用的与非门",
+      "evidence": {
+        "nandTruthRowsChecked": 4
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-013",
+      "passed": true,
+      "computedAnswer": "¬X·Y+¬X·Bin+Y·Bin",
+      "evidence": {
+        "rowsChecked": 8,
+        "output": [
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          true
+        ],
+        "matchingOptions": 1
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-014",
+      "passed": true,
+      "computedAnswer": "(Bin,1,0,Bin)",
+      "evidence": [
+        "Bin",
+        "1",
+        "0",
+        "Bin"
+      ]
+    },
+    {
+      "externalId": "CO-CS-20261029-015",
+      "passed": true,
+      "computedAnswer": "12 ns；1/12 ns⁻¹",
+      "evidence": {
+        "periodNs": 12,
+        "latencyNs": 12
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-016",
+      "passed": true,
+      "computedAnswer": "12 ns；1/6 ns⁻¹",
+      "evidence": {
+        "periodNs": 6,
+        "latencyNs": 12
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-017",
+      "passed": true,
+      "computedAnswer": "18 ns；1/6 ns⁻¹",
+      "evidence": {
+        "periodNs": 6,
+        "latencyNs": 18
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-018",
+      "passed": true,
+      "computedAnswer": "16 ns；1/4 ns⁻¹",
+      "evidence": {
+        "periodNs": 4,
+        "latencyNs": 16
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-019",
+      "passed": true,
+      "computedAnswer": "SHLC(R0,3,R1)",
+      "evidence": 3
+    },
+    {
+      "externalId": "CO-CS-20261029-020",
+      "passed": true,
+      "computedAnswer": "0x34000000",
+      "evidence": 872415232
+    },
+    {
+      "externalId": "CO-CS-20261029-021",
+      "passed": true,
+      "computedAnswer": "22",
+      "evidence": 22
+    },
+    {
+      "externalId": "CO-CS-20261029-022",
+      "passed": true,
+      "computedAnswer": "20",
+      "evidence": 20
+    },
+    {
+      "externalId": "CO-CS-20261029-023",
+      "passed": true,
+      "computedAnswer": "在0x1238地址存入10",
+      "evidence": {
+        "address": 4664,
+        "data": 10
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-024",
+      "passed": true,
+      "computedAnswer": "0x2400",
+      "evidence": {
+        "encodedDisplacement": 1023,
+        "target": 9216
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-025",
+      "passed": true,
+      "computedAnswer": "0x001E0000",
+      "evidence": 1966080
+    },
+    {
+      "externalId": "CO-CS-20261029-026",
+      "passed": true,
+      "computedAnswer": "0x00000200",
+      "evidence": 512
+    },
+    {
+      "externalId": "CO-CS-20261029-027",
+      "passed": true,
+      "computedAnswer": "0x00000100",
+      "evidence": 256
+    },
+    {
+      "externalId": "CO-CS-20261029-028",
+      "passed": true,
+      "computedAnswer": "地址0x00000500，值0x00000300",
+      "evidence": {
+        "address": 1280,
+        "data": 768
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-029",
+      "passed": true,
+      "computedAnswer": "96%",
+      "evidence": 0.96
+    },
+    {
+      "externalId": "CO-CS-20261029-030",
+      "passed": true,
+      "computedAnswer": "增加1位",
+      "evidence": 1
+    },
+    {
+      "externalId": "CO-CS-20261029-031",
+      "passed": true,
+      "computedAnswer": "保持不变",
+      "evidence": {
+        "before": 20,
+        "after": 20
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-032",
+      "passed": true,
+      "computedAnswer": "1/2",
+      "evidence": {
+        "before": 512,
+        "after": 256
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-033",
+      "passed": true,
+      "computedAnswer": "256行，20位",
+      "evidence": {
+        "lines": 256,
+        "offsetBits": 4,
+        "indexBits": 8,
+        "tagBits": 20
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-034",
+      "passed": true,
+      "computedAnswer": "4周期",
+      "evidence": 3.9999999999999996
+    },
+    {
+      "externalId": "CO-CS-20261029-035",
+      "passed": true,
+      "computedAnswer": "A[10:4]",
+      "evidence": {
+        "lines": 256,
+        "offsetBits": 4,
+        "indexBits": 7,
+        "tagBits": 21
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-036",
+      "passed": true,
+      "computedAnswer": "1位",
+      "evidence": 1
+    },
+    {
+      "externalId": "CO-CS-20261029-037",
+      "passed": true,
+      "computedAnswer": "17.5%",
+      "evidence": 0.17500000000000004
+    },
+    {
+      "externalId": "CO-CS-20261029-038",
+      "passed": true,
+      "computedAnswer": "不能，A可能被正在运行的B和随后执行的C延迟而超时",
+      "evidence": {
+        "responseUpperLimit": 25,
+        "deadline": 20
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-039",
+      "passed": true,
+      "computedAnswer": "(15,40,5) ms",
+      "evidence": {
+        "priorityOrderResponse": [
+          5,
+          15,
+          40
+        ],
+        "questionOrderResponse": [
+          15,
+          40,
+          5
+        ]
+      }
+    },
+    {
+      "externalId": "CO-CS-20261029-040",
+      "passed": true,
+      "computedAnswer": "800 s",
+      "evidence": {
+        "interruptUtilization": 0.875,
+        "elapsed": 800.0
+      }
+    }
+  ]
+}

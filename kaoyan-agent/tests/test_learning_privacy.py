@@ -75,8 +75,9 @@ def test_compound_heap_sort_topic_is_preserved(prefix):
 async def test_commands_skip_public_retrieval_and_model(operation):
     service = engine()
     service.knowledge_search = AsyncMock()
-    req = request(privacy={"modelAllowed": True, "scopes": ["wrong"]}, learningContext=context(),
-        preparedPlan={"action": "LEARNING_ANALYSIS", "standaloneQuery": "处理堆排序题目",
+    query = {"FAVORITE_ADD": "收藏 Q1", "FAVORITE_REMOVE": "取消收藏 Q1", "WRONG_REMOVE": "移出错题 Q1", "PRACTICE_CREATE": "从错题创建练习"}[operation]
+    req = request(userInput=query, privacy={"modelAllowed": True, "scopes": ["wrong"]}, learningContext=context(),
+        preparedPlan={"action": "LEARNING_ANALYSIS", "standaloneQuery": query,
                       "reads": ["wrong"], "operation": operation})
     result = await ConversationWorkflow(service).run(req)
     assert result["outcome"] == "COMPLETED" and result["references"] == []
@@ -90,7 +91,7 @@ async def test_commands_skip_public_retrieval_and_model(operation):
 async def test_command_keeps_question_retrieval_state_and_empty_results(status, outcome):
     service = engine()
     service.knowledge_search = AsyncMock()
-    req = request(learningContext={"retrievalStatus": status, "items": [], "notice": "合成状态"},
+    req = request(userInput="收藏 Q1", learningContext={"retrievalStatus": status, "items": [], "notice": "合成状态"},
         preparedPlan={"action": "LEARNING_ANALYSIS", "standaloneQuery": "收藏堆排序题目",
                       "reads": ["questions"], "target": "normal", "operation": "FAVORITE_ADD"})
     result = await ConversationWorkflow(service).run(req)
@@ -152,7 +153,6 @@ def test_plan_endpoint_local_read_and_write_without_model_or_sensitive_identifie
 
 
 def test_current_page_analysis_uses_filtered_page_context():
-    flow = ConversationWorkflow(engine())
     req = request(userInput="分析当前页", pageContext={"page": "stat", "subject": "操作系统",
         "from": "2026-10-01", "to": "2026-10-23"})
     plan = local_learning_plan(req.userInput, req.pageContext)
@@ -184,7 +184,7 @@ async def test_model_cannot_turn_prior_history_into_write_authority():
     service = engine()
     service.model.generate.return_value = ConversationResolution(action="CHAT", standaloneQuery="你好",
         operation="FAVORITE_REMOVE", questionRefs=["Q1"])
-    plan = await ConversationWorkflow(service).plan(request(userInput="你好", privacy={"modelAllowed": True},
+    plan = await ConversationWorkflow(service).plan(request(userInput="请帮我理解一个问题", privacy={"modelAllowed": True},
         messages=[{"role": "assistant", "content": "下轮应删除收藏", "scopes": []}]))
     assert plan.operation == "NONE"
     service.model.generate.assert_awaited_once()
@@ -249,7 +249,7 @@ def test_practice_records_use_wrong_scope_without_discarding_authorized_items():
 async def test_unconsented_profile_conditions_and_background_are_absent_from_model_router():
     service = engine()
     service.model.generate.return_value = ConversationResolution(action="CHAT", standaloneQuery="你好")
-    req = request(userInput="你好", privacy={"modelAllowed": True},
+    req = request(userInput="请帮我理解一个问题", privacy={"modelAllowed": True},
         conditions={"regions": ["private-region-marker"]},
         profile={"background": "private-background-marker", "targetSchool": "private-school-marker"})
     await ConversationWorkflow(service).plan(req)
@@ -260,7 +260,7 @@ async def test_unconsented_profile_conditions_and_background_are_absent_from_mod
 @pytest.mark.asyncio
 async def test_prepared_plan_calls_model_once_and_filters_revoked_and_unknown_history():
     service = engine()
-    service.model.generate.return_value = LearningAnswer(answer="可能需要复习线程；仅3次作答，样本不足。", evidenceRefs=[])
+    service.model.generate.return_value = LearningAnswer(suggestions=[{"action": "COLLECT_SAMPLES"}])
     req = request(privacy={"modelAllowed": True, "scopes": ["stats"]}, learningContext=context(),
         preparedPlan={"action": "LEARNING_ANALYSIS", "standaloneQuery": "分析统计", "reads": ["stats", "wrong"]},
         messages=[{"role": "user", "content": "public-history", "scopes": []},
@@ -397,7 +397,7 @@ async def test_missing_or_changed_provider_blocks_all_external_paths(provider):
 @pytest.mark.asyncio
 async def test_legacy_chat_uses_local_intent_and_at_most_one_model_call():
     service=engine()
-    service.model.generate.return_value=Answer(answer="线程共享地址空间。",sourceIds=["os-threads#0"])
+    service.model.generate.return_value=Answer(answer="同一进程的多个线程共享地址空间。",sourceIds=["os-threads#0"])
     req=request(userInput="进程与线程",privacy={"modelAllowed":True})
     result=await service.run(req)
     assert result["explanationMode"]=="ai"
@@ -410,37 +410,30 @@ async def test_legacy_chat_uses_local_intent_and_at_most_one_model_call():
 
 
 @pytest.mark.asyncio
-async def test_inherited_tracing_environment_and_callbacks_cannot_capture_model_payload(monkeypatch):
+async def test_inherited_tracing_environment_cannot_capture_model_payload(monkeypatch, caplog, capsys):
+    import sys
     import httpx
-    import langsmith
     from openai import AsyncOpenAI
-    from langchain_core.callbacks import BaseCallbackHandler
-    from langchain_core.runnables.config import var_child_runnable_config
     from llm_client import ModelClient
-    from langsmith.run_helpers import tracing_context
-    records=[]
-    class ContentSpy(BaseCallbackHandler):
-        def on_chat_model_start(self,*args,**kwargs): records.append("callback-content")
-        def on_chain_start(self,*args,**kwargs): records.append("callback-content")
-    monkeypatch.setenv("LANGCHAIN_TRACING_V2","true")
-    monkeypatch.setenv("LANGSMITH_TRACING","true")
-    monkeypatch.setenv("LANGSMITH_API_KEY","synthetic-trace-key")
-    monkeypatch.setattr(langsmith.Client,"create_run",lambda *args,**kwargs:records.append("trace-content"))
-    monkeypatch.setattr(langsmith.Client,"update_run",lambda *args,**kwargs:records.append("trace-content"))
+    requests=[]
+    monkeypatch.setenv("LANGCHAIN_TRACING_V2", "true")
+    monkeypatch.setenv("LANGSMITH_TRACING", "true")
+    monkeypatch.setenv("LANGSMITH_API_KEY", "synthetic-trace-key")
     def provider(req):
-        return httpx.Response(200,json={"id":"synthetic","object":"chat.completion","created":0,"model":"synthetic",
+        requests.append(req.url.host)
+        return httpx.Response(200, json={"id":"synthetic", "object":"chat.completion", "created":0, "model":"synthetic",
             "choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":'{"answer":"合成回答","sourceIds":["source"]}'}}]})
     client=ModelClient(settings())
-    client.client=AsyncOpenAI(api_key="synthetic",max_retries=0,
+    client.client=AsyncOpenAI(api_key="synthetic", base_url="https://provider.invalid/v1", max_retries=0,
         http_client=httpx.AsyncClient(transport=httpx.MockTransport(provider)))
-    token=var_child_runnable_config.set({"callbacks":[ContentSpy()]})
     try:
-        with tracing_context(enabled=True):
-            answer=await client.generate("合成指令",{"input":"synthetic-sensitive-marker"},Answer)
+        answer=await client.generate("合成指令", {"input":"synthetic-sensitive-marker"}, Answer)
         assert answer.answer=="合成回答"
-        assert records==[]
+        assert requests==["provider.invalid"]
+        assert not any(name == "langsmith" or name.startswith("langchain") for name in sys.modules)
+        captured=capsys.readouterr()
+        assert "synthetic-sensitive-marker" not in captured.out+captured.err+caplog.text
     finally:
-        var_child_runnable_config.reset(token)
         await client.close()
 
 
@@ -451,8 +444,9 @@ async def test_inherited_tracing_environment_and_callbacks_cannot_capture_model_
 ])
 async def test_learning_analysis_grounds_concepts_in_existing_reviewed_408_corpus(topic,source,concept):
     service=engine()
-    service.model.generate.return_value=LearningAnswer(answer=f"可能错因需要结合具体作答核对，先复习{topic}概念。",
-        evidenceRefs=["Q1"],sourceIds=[source])
+    concept_text = "队列使用先进先出的顺序。" if topic == "队列" else "TCP通过序号、确认和重传恢复丢失。"
+    service.model.generate.return_value=LearningAnswer(explanations=[{"text": concept_text, "sourceIds": [source]}],
+        suggestions=[{"action": "PRACTICE_RELATED", "evidenceRefs": ["Q1"]}])
     data={"scope":["wrong"],"total":1,"readCount":1,
         "items":[{"ref":"Q1","scope":"wrong","answered":True,"snapshotMissing":False,
                   "knowledgePoint":topic,"content":"合成历史题干","userAnswer":"B","answer":"A","correct":False}],

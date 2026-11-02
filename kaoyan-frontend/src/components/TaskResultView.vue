@@ -3,17 +3,38 @@
     <el-alert v-if="task.status === 'FAILED'" type="error" :closable="false" :title="task.errorMessage || '任务失败，请稍后重试'" />
     <el-alert v-else-if="task.status === 'CANCELLED'" type="info" :closable="false" title="已停止生成" />
     <template v-else-if="result">
-      <div v-if="result.outcome !== 'COMPLETED'" class="meta">
+      <div v-if="task.status === 'SUCCESS'" class="export-actions">
+        <ExportButton :source="{ source: 'TASK_RESULT', taskId: task.id, part: 'ANSWER' }" label="导出回答" />
+        <ExportButton v-if="result.studyPlan" :source="{ source: 'TASK_RESULT', taskId: task.id, part: 'STUDY_PLAN' }" label="导出复习计划" />
+        <ExportButton v-if="result.documentProposal" :source="{ source: 'TASK_RESULT', taskId: task.id, part: 'NOTE_PROPOSAL' }" label="导出笔记建议" />
+      </div>
+      <section v-if="result.sections?.length" class="expert-sections" aria-label="分项处理结果">
+        <p v-if="result.partial">部分事项已完成，其他事项请查看下方提示。</p>
+        <ul>
+          <li v-for="item in result.sections" :key="item.agent">
+            <strong>{{ expertLabels[item.agent] }}</strong> · {{ sectionOutcomeLabels[item.outcome] }} · {{ modeLabels[item.explanationMode] }}<template v-if="fallbackReasonLabel(item.fallbackReason)">（{{ fallbackReasonLabel(item.fallbackReason) }}）</template>
+            <p v-if="item.notice">{{ item.notice }}</p>
+          </li>
+        </ul>
+      </section>
+      <div v-if="!legacyAdmission && result.outcome !== 'COMPLETED'" class="meta">
         <el-tag>{{ result.retrievalStatus && retrievalLabels[result.retrievalStatus] || outcomeLabels[result.outcome] }}</el-tag>
       </div>
-      <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="tutor-mode">
-        {{ result.explanationMode === 'ai' ? 'AI解释' : result.explanationMode === 'fallback' ? 'AI降级 · 原题解析' : '原题解析' }}
-      </p>
+      <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="tutor-mode">{{ result.explanationMode === 'ai' ? 'AI解释' : result.explanationMode === 'fallback' ? 'AI降级 · 原题解析' : '原题解析' }}</p>
       <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="answer">{{ result.answer }}</p>
-      <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="saved-result">
-        已保存作答 · 题目版本 {{ result.questionVersion }} · 你的选择 {{ result.userAnswer }} · 标准答案 {{ result.standardAnswer }}
-      </p>
-      <SafeMarkdown v-if="result.resolvedTaskType !== 'WRONG_QUESTION_TUTOR'" :content="result.answer" :allowed-urls="result.references?.map(source => source.url).filter(url => !!safeUrl(url))" />
+      <p v-if="result.resolvedTaskType === 'WRONG_QUESTION_TUTOR'" class="saved-result">已保存作答 · 题目版本 {{ result.questionVersion }} · 你的选择 {{ result.userAnswer }} · 标准答案 {{ result.standardAnswer }}</p>
+      <SafeMarkdown v-if="result.resolvedTaskType !== 'WRONG_QUESTION_TUTOR'" :navigation="navigation" :content="displayAnswer" :allowed-urls="answerUrls" />
+      <SchoolCatalogView v-if="!legacyAdmission && result.schoolCatalog" :catalog="result.schoolCatalog" />
+      <AdmissionLinksView v-if="links" :links="links" />
+      <section v-if="result.studyPlan" class="study-plan" aria-label="复习安排">
+        <h3>每日安排（{{ result.studyPlan.days.length }}天）</h3>
+        <p v-for="(basis, index) in result.studyPlan.basis" :key="`basis-${index}`">{{ basis }}</p>
+        <details v-for="day in result.studyPlan.days" :key="day.day" :open="result.studyPlan.days.length <= 7 || day.day === 1">
+          <summary>第 {{ day.day }} 天 · {{ day.topic }}</summary>
+          <ul><li v-for="(item, index) in day.tasks" :key="index">{{ item }}</li></ul>
+        </details>
+        <p class="muted">这是可调整的学习建议，不会自动创建练习或保存笔记。</p>
+      </section>
       <div v-if="citation?.checked" class="grounding">
         <el-tag size="small" :type="citationType(citation?.status)">{{ citationLabel(citation?.status) }}</el-tag>
         <span class="muted">引用支持度 {{ Math.round((citation?.ratio ?? 0) * 100) }}%（{{ citation?.supported ?? 0 }}/{{ citation?.checked ?? 0 }} 条结论）</span>
@@ -33,9 +54,10 @@
           <ul><li v-for="(item, index) in citation?.unsupported ?? []" :key="index">{{ item.text }}<span class="muted">（{{ reasonLabel(item.reason) }}）</span></li></ul>
         </details>
       </div>
-      <div v-if="result.evidence?.length" class="source"><strong>学习依据</strong><p v-for="item in result.evidence" :key="item.ref"><router-link v-if="resourceRoute(item.resource)" :to="resourceRoute(item.resource)!">{{ item.ref }} · {{ item.title }}</router-link><span v-else>{{ item.ref }} · {{ item.title }}</span> · {{ item.locator || '原文位置未记录' }} · {{ item.version || '版本未记录' }}<template v-if="item.matchMethod"><br><span class="match-label">{{ item.matchMethod === 'LABEL' ? '知识点匹配' : '语义相关' }} · {{ item.matchTopic }}</span><br>{{ item.summary }}</template></p></div>
-      <el-alert v-if="result.notice || result.explanationMode === 'fallback'" type="warning" :closable="false" :title="result.notice || 'AI解释暂不可用，已保留资料与规则结果。'" />
-      <ul v-if="result.followUp?.length"><li v-for="item in result.followUp" :key="item">{{ item }}</li></ul>
+      <component :is="practice ? 'details' : 'div'" v-if="result.evidence?.length" class="source"><summary v-if="practice">学习依据（{{ result.evidence.length }}）</summary><strong v-else>学习依据</strong><p v-for="item in result.evidence" :key="item.ref"><router-link v-if="resourceRoute(item.resource)" :to="resourceRoute(item.resource)!">{{ item.ref }} · {{ item.title }}</router-link><span v-else>{{ item.ref }} · {{ item.title }}</span> · {{ item.locator || '原文位置未记录' }} · {{ item.version || '版本未记录' }}<template v-if="item.matchMethod"><br><span class="match-label">{{ item.matchMethod === 'LABEL' ? '知识点匹配' : '语义相关' }} · {{ item.matchTopic }}</span><br>{{ item.summary }}</template></p></component>
+      <nav v-if="navigation.length" class="navigation-links" aria-label="相关功能入口"><router-link v-for="item in navigation" :key="item.target" :to="item.path" class="navigation-link">前往{{ item.label }}</router-link></nav>
+      <el-alert v-if="!legacyAdmission && (result.notice || result.explanationMode === 'fallback')" type="warning" :closable="false" :title="result.notice || 'AI解释暂不可用，已保留资料与规则结果。'" :description="fallbackReasonLabel(result.fallbackReason) && `原因：${fallbackReasonLabel(result.fallbackReason)}`" />
+      <ul v-if="!legacyAdmission && result.followUp?.length"><li v-for="item in result.followUp" :key="item">{{ item }}</li></ul>
       <article v-for="(candidate, index) in result.candidates" :key="candidate.programId" class="candidate">
         <h3>{{ index + 1 }}. {{ candidate.school }} · {{ candidate.major }}</h3>
         <p>{{ candidate.college }} · {{ candidate.year }}年 · {{ candidate.degreeType === 'academic' ? '学硕' : '专硕' }} · {{ candidate.region }}</p>
@@ -44,7 +66,16 @@
         <p class="answer">{{ candidate.explanation }}</p>
         <p v-for="check in candidate.pendingChecks" :key="check" class="muted">待确认：{{ check }}</p>
       </article>
-      <p v-if="result.coverage" class="muted">资料覆盖：{{ result.coverage }}</p>
+      <div v-if="result.learningSnapshot" class="source">
+        <p>推荐依据画像版本：{{ result.learningSnapshot.profileRevision }} · 蓝图覆盖 {{ Math.round(result.learningSnapshot.coverage * 100) }}% · {{ result.triggerReason === 'MANUAL' ? '手动生成' : '随学情或条件更新' }}</p>
+        <p>408实验性参考分：{{ result.learningSnapshot.referenceScore ?? '证据不足' }}，未经整卷校准。</p>
+      </div>
+      <div v-for="comparison in result.historicalComparisons" :key="comparison.programId" class="source">
+        <p>{{ comparison.programId }} · {{ comparison.year ? `${comparison.year}年408单科线：${comparison.score}` : '暂无可比资料' }}<span v-if="comparison.gap != null"> · 实验性参考差值 {{ comparison.gap }}</span></p>
+        <p>{{ comparison.notice }}</p>
+        <a v-if="comparison.source && safeUrl(comparison.source.url)" :href="safeUrl(comparison.source.url)" target="_blank" rel="noopener noreferrer">{{ comparison.source.title }} · {{ comparison.source.locator }}</a>
+      </div>
+      <p v-if="result.coverage" class="muted">资料库范围：{{ result.coverage }}</p>
       <p v-if="result.accuracy !== undefined">本次有效作答正确率：{{ result.accuracy }}%（不代表考试能力）</p>
       <p v-if="result.weakPoints?.length">本次错题涉及：{{ result.weakPoints.join('、') }}</p>
       <details v-if="result.references?.length" open>
@@ -65,16 +96,42 @@
   </section>
 </template>
 <script setup lang="ts">
+import ExportButton from './ExportButton.vue'
+import AdmissionLinksView from './AdmissionLinksView.vue'
+import SchoolCatalogView from './SchoolCatalogView.vue'
 import { computed } from 'vue'
+import { resultNavigation } from '@/utils/assistant-navigation'
+import { useUserStore } from '@/stores/user'
 import type { Task } from '@/types/api'
 import SafeMarkdown from '@/components/SafeMarkdown.vue'
 import { resourceRoute, safeSourceUrl } from '@/utils/assistant-resource'
+import { fallbackReasonLabel } from '@/utils/fallback-reason'
+import { ADMISSION_LEGACY_NO_LINK, ADMISSION_SAFE_ANSWER, ADMISSION_LINK_UNVERIFIED, legacyLinks, projectLinks, registeredAdmissionUrls } from '@/utils/admission-links'
 const props = defineProps<{ task: Task }>()
 const result = computed(() => {
   const value = props.task.resultPayload
-  return value?.outcome && value.explanationMode ? value : null
+  return value && ((value.outcome && value.explanationMode) || value.admissionLinks || value.admissionCheck) ? value : null
 })
+const legacyAdmission = computed(() => Boolean(props.task.resultPayload?.admissionCheck))
+const links = computed(() => projectLinks(result.value?.admissionLinks) ?? legacyLinks(result.value?.admissionCheck))
+const displayAnswer = computed(() => {
+  if (!result.value) return ''
+  if (legacyAdmission.value) return links.value ? ADMISSION_SAFE_ANSWER : ADMISSION_LEGACY_NO_LINK
+  if (result.value.admissionLinks && !links.value) return ADMISSION_LINK_UNVERIFIED
+  if (result.value.admissionLinks && !result.value.candidates?.length && !result.value.schoolCatalog) return ADMISSION_SAFE_ANSWER
+  return result.value.answer
+})
+const answerUrls = computed(() => [
+  ...(result.value?.references ?? []).map(source => source.url).filter(url => Boolean(safeUrl(url))),
+  ...registeredAdmissionUrls(),
+])
+const user = useUserStore()
+const navigation = computed(() => result.value ? resultNavigation(result.value, user.isAdmin) : [])
+const practice = computed(() => result.value?.actions?.some(action => action.type === 'PRACTICE_CREATE'))
 const outcomeLabels = { COMPLETED: '已完成', NEEDS_INPUT: '需补充条件', UNSUPPORTED: '资料未覆盖' }
+const expertLabels = { LEARNING: '学情分析', SCHOOL: '院校比较', KNOWLEDGE: '知识辅导', PRACTICE: '练习建议', NOTE: '笔记建议', STUDY_PLAN: '复习安排' }
+const sectionOutcomeLabels = { COMPLETED: '已完成', NEEDS_INPUT: '需补充条件', UNSUPPORTED: '未完成' }
+const modeLabels = { rules: '规则结果', ai: 'AI解释', fallback: '已降级' }
 const retrievalLabels = { READY: '', BUILDING: '题目索引准备中', BUSY: '题目索引准备中', FAILED: '题目索引构建失败', UNAVAILABLE: '题目检索暂不可用' }
 const citation = computed(() => result.value?.citationSupport)
 const sourceLabels = computed(() => {
@@ -98,6 +155,10 @@ function sourceLabel(id: string) { return sourceLabels.value[id] || id }
 function safeUrl(value: string) { return safeSourceUrl(value) }
 </script>
 <style scoped>
+.export-actions { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 }.export-actions :deep(.el-button) { margin:0 }
+.navigation-links { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 }
+.navigation-link { border:1px solid var(--c-line); border-radius:6px; padding:4px 10px; text-decoration:none }
+summary { cursor:pointer }
 .match-label { display:inline-block; margin:4px 0; padding:2px 6px; border:1px solid var(--c-line); border-radius:4px; color:var(--c-primary); background:var(--c-primary-light); font-size:12px; white-space:normal }
 .task-result { overflow-wrap: anywhere; }
 .meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

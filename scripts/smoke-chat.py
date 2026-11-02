@@ -23,10 +23,15 @@ def main():
     parser.add_argument("--node",default="node")
     parser.add_argument("--skip-browser",action="store_true")
     parser.add_argument("--timeout-check",action="store_true")
+    parser.add_argument("--admission",action="store_true",help="Exercise the real local admission-links MCP with private H2")
+    admission_sources = json.loads((ROOT / "config/admission-sources.json").read_text("utf-8"))
+    parser.add_argument("--admission-school", default="nau", choices=[source["code"] for source in admission_sources],
+                        help="Registered school for the isolated admission lookup and restart check")
     parser.add_argument("--learning",action="store_true",help="Run actual learning assistant UI with disposable synthetic fixtures")
     parser.add_argument("--questions",action="store_true",help="Run question semantic-search UI with a real embedded Qdrant and explicit test vectors")
     args=parser.parse_args()
     if args.output.exists(): parser.error("报告已存在，请使用新路径")
+    admission_school = next(source for source in admission_sources if source["code"] == args.admission_school)
     checks=[]
     with tempfile.TemporaryDirectory(prefix="kaoyan-chat-chain-") as folder:
         temp=Path(folder)
@@ -39,13 +44,14 @@ def main():
             "AGENT_BASE_URL":py_base,"LLM_API_KEY":"","DB_PASSWORD":"","LLM_ENABLED":"false","RAG_BACKEND":"lexical",
             "LANGCHAIN_TRACING_V2":"false","LANGSMITH_TRACING":"false","MAX_MODEL_CALLS_PER_DAY":"200",
             "MINUTE_TASK_LIMIT":"30","NODE_PATH":str(ROOT/"kaoyan-frontend/node_modules")}
+        env["ADMISSION_TEST_ENABLED"]="true" if args.admission else "false"
         cp=(ROOT/"kaoyan-B/target/test-classpath.txt").read_text().strip()
         classpath=os.pathsep.join([str(ROOT/"kaoyan-B/target/test-classes"),str(ROOT/"kaoyan-B/target/classes"),cp])
         handles=[(temp/name).open("w") for name in ("python.log","java.log","frontend.log")]
         try:
             python=subprocess.Popen([sys.executable,"-m","uvicorn","tests.chat_wire_app:app","--host","127.0.0.1","--port",str(py_port)],cwd=ROOT/"kaoyan-agent",env=env,stdout=handles[0],stderr=subprocess.STDOUT)
             helpers.wait_ready(python,py_base,"/health")
-            command=["java","-cp",classpath,"com.kaoyan.AssistantSmokeServer" if args.learning or args.questions else "com.kaoyan.FrameworkSmokeServer","--server.address=127.0.0.1",f"--server.port={java_port}",
+            command=["java","-cp",classpath,"com.kaoyan.AssistantSmokeServer" if args.learning or args.questions or args.admission else "com.kaoyan.FrameworkSmokeServer","--server.address=127.0.0.1",f"--server.port={java_port}",
                 "--spring.datasource.driver-class-name=org.h2.Driver",f"--spring.datasource.url=jdbc:h2:file:{temp}/chat;MODE=MySQL;NON_KEYWORDS=USER;WRITE_DELAY=0",
                 "--spring.datasource.username=sa","--spring.datasource.password=","--spring.sql.init.mode=always","--spring.sql.init.schema-locations=classpath:schema-chain.sql,classpath:schema-practice.sql"]
             if args.questions: command.append("--kaoyan.smoke.questions=true")
@@ -57,9 +63,11 @@ def main():
                 frontend=subprocess.Popen([args.node,"node_modules/vite/bin/vite.js","preview","--outDir",str(temp/"frontend-dist"),"--host","127.0.0.1","--port",str(front_port),"--strictPort"],
                     cwd=ROOT/"kaoyan-frontend",env={**env,"API_PROXY_TARGET":java_base},stdout=handles[2],stderr=subprocess.STDOUT)
                 helpers.wait_ready(frontend,front_base,"/")
-                browser_args=[args.node,str(ROOT/("scripts/browser-question-search.cjs" if args.questions else "scripts/browser-learning.cjs" if args.learning else "scripts/browser-chat.cjs")),front_base]
-                diagnostics=ROOT/".cache"/(("learning-browser-" if args.learning else "chat-browser-")+str(time.time_ns()))
+                browser_args=[args.node,str(ROOT/("scripts/browser-admission.cjs" if args.admission else "scripts/browser-question-search.cjs" if args.questions else "scripts/browser-learning.cjs" if args.learning else "scripts/browser-chat.cjs")),front_base]
+                diagnostics=ROOT/".cache"/(("admission-browser-" if args.admission else "learning-browser-" if args.learning else "chat-browser-")+str(time.time_ns()))
                 browser_args.append(str(diagnostics))
+                if args.admission:
+                    browser_args.append(args.admission_school)
                 browser=subprocess.run(browser_args,cwd=ROOT,env=env,capture_output=True,text=True,timeout=180)
                 if browser.returncode: raise RuntimeError("隔离浏览器失败："+browser.stderr[-1200:])
                 checks.extend(json.loads(browser.stdout.strip())["checks"])
@@ -83,6 +91,22 @@ def main():
                     time.sleep(.5)
                 assert timed["status"]=="FAILED" and timed["draft"]=={}
                 checks.append("actual_flow_timeout_persists_failure_and_clears_draft")
+            if args.admission:
+                admission_id=call("/conversations","POST",token=token)["id"]
+                call(f"/conversations/{admission_id}/messages","POST",{"query":f"查询{admission_school['name']}招生官网链接","clientRequestId":"admission-restart"},token)
+                deadline=time.monotonic()+15
+                while True:
+                    admission_saved=call(f"/conversations/{admission_id}/messages",token=token)["list"][0]["attempts"][0]
+                    if admission_saved["status"]!="RUNNING": break
+                    if time.monotonic()>deadline: raise AssertionError("admission save timeout")
+                    time.sleep(.1)
+                assert admission_saved["status"]=="SUCCESS"
+                links=admission_saved["result"]["admissionLinks"]
+                assert links["schoolCode"]==admission_school["code"] and links["schoolName"]==admission_school["name"]
+                assert links["registeredYear"]==admission_school["year"] and links["entryUrls"]==admission_school["entries"]
+                assert "admissionCheck" not in admission_saved["result"]
+                assert "schoolCatalog" not in admission_saved["result"]
+                checks.append("admission_links_saved_before_restart")
             conversation=call("/conversations","POST",token=token)["id"]
             attempt=call(f"/conversations/{conversation}/messages","POST",{"query":"进程与线程，等待停止","clientRequestId":"restart-check"},token)
             helpers.stop(java)
@@ -97,6 +121,10 @@ def main():
                 time.sleep(.1)
             assert saved["taskId"]==attempt["taskId"] and saved["draft"]=={}
             checks.append("actual_java_restart_preserves_conversation_and_interrupts_generation")
+            if args.admission:
+                restored=call(f"/conversations/{admission_id}/messages",token=token)["list"][0]["attempts"][0]
+                assert restored["result"]["admissionLinks"]==admission_saved["result"]["admissionLinks"]
+                checks.append("actual_java_restart_preserves_admission_links")
         except Exception:
             debug=ROOT/".cache"/("chat-debug-"+str(time.time_ns())); debug.mkdir(parents=True)
             for handle in handles: handle.flush()
@@ -107,7 +135,8 @@ def main():
             for process in (frontend,java,python): helpers.stop(process)
             for handle in handles: handle.close()
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    args.output.write_text(json.dumps({"scope":"actual Java/Python/LangChain; provider and Redis doubles; isolated H2", "checks":checks},ensure_ascii=False,indent=2))
+    scope="actual Vue/Java/Python/HelloAgents/local stdio MCP; provider and Redis doubles; isolated H2" if args.admission else "actual Java/Python/HelloAgents; provider and Redis doubles; isolated H2"
+    args.output.write_text(json.dumps({"scope":scope, "checks":checks},ensure_ascii=False,indent=2))
     print(f"通过{len(checks)}项真实聊天链路检查：{args.output}")
 
 

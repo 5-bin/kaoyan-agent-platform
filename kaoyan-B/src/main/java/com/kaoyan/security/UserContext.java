@@ -22,15 +22,6 @@ public final class UserContext {
     }
 
     /**
-     * 当前登录用户名
-     *
-     * @return 用户名
-     */
-    public static String currentUsername() {
-        return current().username();
-    }
-
-    /**
      * 当前登录用户角色
      *
      * @return 角色

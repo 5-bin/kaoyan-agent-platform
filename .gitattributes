@@ -1,0 +1,2 @@
+# CSV writers use CRLF; preserve the recorded files while checking other whitespace.
+*.csv whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

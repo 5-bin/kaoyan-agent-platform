@@ -25,8 +25,9 @@ import java.util.*;
 import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Actual browser-facing HTTP -> Java -> FastAPI -> LangChain -> controlled SDK wire. */
+/** Actual browser-facing HTTP -> Java -> FastAPI -> HelloAgents -> controlled SDK wire. */
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={
+    "server.address=127.0.0.1",
     "spring.datasource.url=jdbc:h2:mem:conversation;MODE=MySQL;DB_CLOSE_DELAY=-1;NON_KEYWORDS=USER",
     "spring.datasource.driver-class-name=org.h2.Driver","spring.datasource.username=sa","spring.datasource.password=",
     "spring.sql.init.mode=always","spring.sql.init.schema-locations=classpath:schema-chain.sql,classpath:schema-practice.sql",
@@ -52,6 +53,7 @@ class ConversationIntegrationTest {
         builder.environment().put("AGENT_INTERNAL_KEY","test-only-internal-key-123456");
         builder.environment().put("LANGCHAIN_TRACING_V2","false");
         builder.environment().put("QUESTION_TEST_SLOW_INDEX","true");
+        builder.environment().put("ADMISSION_TEST_ENABLED","true");
         builder.redirectErrorStream(true).redirectOutput(Path.of("target","chat-python.log").toFile());
         python=builder.start();
         String base="http://127.0.0.1:"+port;
@@ -152,7 +154,32 @@ class ConversationIntegrationTest {
         assertEquals(6,agentProperties.getMinuteTaskLimit());
     }
 
-    @Test void actualStreamHasIncrementBeforeCompletionAndReconnectDoesNotGenerateAgain() throws Exception {
+    @Test void localAdmissionLinksPersistWithoutPublishingAndAreAccountIsolated() throws Exception {
+        String token=privateAccount(),id=conversation(token);
+        int publicDocs=jdbc.queryForObject("SELECT COUNT(*) FROM document",Integer.class);
+        String task=send(token,id,"查官网南京审计大学","admission-links").path("taskId").asText();
+        var completed=finish(token,id);
+        assertEquals("SUCCESS",completed.path("status").asText(),completed.toString());
+        var links=completed.path("result").path("admissionLinks");
+        assertEquals("nau",links.path("schoolCode").asText());
+        assertEquals("南京审计大学",links.path("schoolName").asText());
+        assertEquals(2027,links.path("registeredYear").asInt());
+        assertEquals(2,links.path("entryUrls").size());
+        assertEquals("https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",links.path("entryUrls").get(0).asText());
+        assertTrue(completed.path("result").path("references").isEmpty());
+        assertTrue(completed.path("result").path("admissionCheck").isMissingNode());
+        var restored=latest(token,id);
+        assertEquals(links,restored.path("result").path("admissionLinks"));
+        String persisted=jdbc.queryForObject("SELECT result_payload FROM task WHERE id=?",String.class,task);
+        assertTrue(persisted.contains("admissionLinks"));
+        assertTrue(!persisted.contains("admissionCheck"));
+        assertEquals(publicDocs,jdbc.queryForObject("SELECT COUNT(*) FROM document",Integer.class));
+        String other=privateAccount();
+        call(other,"GET","/conversations/"+id+"/messages",null,404);
+        call(other,"GET","/tasks/"+task,null,404);
+    }
+
+    @Test void knowledgeStreamWithholdsUnvalidatedProseAndReconnectDoesNotGenerateAgain() throws Exception {
         String token=account(), id=conversation(token);
         String task=send(token,id,"进程与线程","stream").path("taskId").asText();
         var response=HTTP.send(request(token,"/conversations/"+id+"/generations/"+task+"/stream").GET().build(),HttpResponse.BodyHandlers.ofInputStream());
@@ -168,7 +195,7 @@ class ConversationIntegrationTest {
                 if(line.equals("event:completed")) completed=true;
             }
         }
-        assertTrue(delta,"结束前必须收到真实SDK流增量"); assertTrue(completed);
+        assertFalse(delta,"知识正文校验前不得转发SDK增量"); assertTrue(completed);
         var saved=finish(token,id);
         assertEquals("SUCCESS",saved.path("status").asText());
         assertEquals("线程共享地址空间，保留各自的栈。",saved.path("result").path("answer").asText());
@@ -351,6 +378,52 @@ class ConversationIntegrationTest {
         assertNull(jdbc.queryForObject("SELECT result_payload FROM task WHERE id=?",String.class,task));
     }
 
+    @Test void explicitSortingRequestCreatesOnlyFiveQuestionsAfterConfirmation() throws Exception {
+        String token=privateAccount(),id=conversation(token);
+        long owner=call(token,"GET","/users/me",null,200).path("id").asLong();
+        for(int i=0;i<6;i++)jdbc.update("INSERT INTO question(subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES('数据结构','排序',?,'甲','乙','丙','丁','A','排序测试解析','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')","隔离排序题"+i);
+        send(token,id,"给我出几道有关排序的题","sorting-practice");
+        var proposal=finish(token,id);assertEquals("SUCCESS",proposal.path("status").asText(),proposal.toString());
+        var result=proposal.path("result");
+        assertTrue(result.path("answer").asText().contains("排序专项练习 · 5 题"));
+        assertFalse(result.path("answer").asText().contains("隔离排序题"));
+        assertEquals("rules",result.path("explanationMode").asText());
+        assertEquals("PRACTICE",result.path("navigation").get(0).path("target").asText());
+        var action=result.path("actions").get(0);assertEquals(5,action.path("count").asInt());
+        assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM practice_record WHERE user_id=?",Integer.class,owner));
+        String path="/conversations/"+id+"/actions/"+action.path("id").asText()+"/confirm";
+        var confirmed=call(token,"POST",path,null,200);
+        assertEquals(confirmed,call(token,"POST",path,null,200));
+        assertEquals(5,jdbc.queryForObject("SELECT COUNT(*) FROM practice_record WHERE user_id=?",Integer.class,owner));
+        var review=call(token,"GET","/practice/sessions/"+confirmed.path("result").path("sessionId").asText()+"/review",null,200);
+        for(var item:review.path("list")) {assertEquals("排序",item.path("knowledgePoint").asText());assertFalse(item.has("answer"));assertFalse(item.has("analysis"));}
+    }
+
+    @Test void compoundPracticeKeepsKnowledgeProseSectionsAndConfirmedActions() throws Exception {
+        String token=privateAccount(),id=conversation(token);
+        long owner=call(token,"GET","/users/me",null,200).path("id").asLong();
+        for(int i=0;i<2;i++)jdbc.update("INSERT INTO question(subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES('操作系统','进程与线程',?,'甲','乙','丙','丁','A','PRIVATE_COMPOUND_ANSWER','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')","合成线程题"+i);
+        send(token,id,"解释进程与线程，并安排5道练习","compound-practice");
+        var saved=finish(token,id);
+        assertEquals("SUCCESS",saved.path("status").asText(),saved.toString());
+        var result=saved.path("result");
+        assertTrue(result.path("answer").asText().contains("知识辅导"),result.toString());
+        assertTrue(result.path("answer").asText().contains("共享地址空间"));
+        assertFalse(result.path("answer").asText().contains("PRIVATE_COMPOUND_ANSWER"));
+        assertEquals("KNOWLEDGE",result.path("sections").get(0).path("agent").asText());
+        assertEquals("PRACTICE",result.path("sections").get(1).path("agent").asText());
+        assertEquals("PRACTICE_CREATE",result.path("operation").asText());
+        assertEquals(5,result.path("count").asInt());
+        assertEquals(result,latest(token,id).path("result"));
+        assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM practice_record WHERE user_id=?",Integer.class,owner));
+        var action=result.path("actions").get(0);
+        assertNotNull(action,result.toString());
+        String path="/conversations/"+id+"/actions/"+action.path("id").asText()+"/confirm";
+        var confirmed=call(token,"POST",path,null,200);
+        assertEquals(confirmed,call(token,"POST",path,null,200));
+        assertEquals(action.path("count").asInt(),jdbc.queryForObject("SELECT COUNT(*) FROM practice_record WHERE user_id=?",Integer.class,owner));
+    }
+
     @Test void localFavoriteAndConfirmedPracticeSurviveRefreshWithoutSendingPrivateDataToModel() throws Exception {
         String token=privateAccount(),id=conversation(token);
         Long owner=call(token,"GET","/users/me",null,200).path("id").asLong();
@@ -498,6 +571,19 @@ class ConversationIntegrationTest {
         var confirmed=call(token,"POST","/conversations/"+id+"/actions/"+action.path("id").asText()+"/confirm",null,200);
         assertEquals(2,confirmed.path("result").path("actualCount").asInt());
         assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM practice_record WHERE user_id=? AND session_id=?",Integer.class,owner,confirmed.path("result").path("sessionId").asText()));
+    }
+
+    @Test void privateCompoundChatProducesStudyPlanWithoutExternalConsent() throws Exception {
+        String token=privateAccount(), id=conversation(token);
+        send(token,id,"分析我的薄弱点，安排7天复习计划，并比较院校","multi-agent-plan");
+        var done=finish(token,id);
+        assertEquals("SUCCESS",done.path("status").asText());
+        var result=done.path("result");
+        assertEquals(7,result.path("studyPlan").path("days").size());
+        assertTrue(result.path("answer").asText().contains("复习安排"));
+        assertFalse(result.has("documentProposal"));
+        var stored=call(token,"GET","/conversations/"+id+"/messages",null,200).path("list").get(0).path("attempts").get(0).path("result");
+        assertEquals(result.path("studyPlan"),stored.path("studyPlan"));
     }
 
 }

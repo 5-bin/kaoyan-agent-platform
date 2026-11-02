@@ -39,6 +39,7 @@ request.interceptors.response.use(
     if (response.config.sessionToken !== useUserStore().token) {
       return Promise.reject(new axios.CanceledError('账号已切换，忽略旧请求'))
     }
+    if (response.config.responseType === 'blob') return response.data
     const res = response.data
     if (res.code === 0) {
       return res.data
@@ -46,15 +47,29 @@ request.interceptors.response.use(
     ElMessage.error(res.message || '请求失败')
     return Promise.reject(new Error(res.message || 'Error'))
   },
-  (error) => {
+  async (error) => {
     if (error.config && error.config.sessionToken !== useUserStore().token) {
       return Promise.reject(new axios.CanceledError('账号已切换，忽略旧请求'))
+    }
+    if (axios.isCancel(error)) return Promise.reject(error)
+    if (error.response?.data instanceof Blob && error.response.data.type.includes('json')) {
+      try {
+        const body: unknown = JSON.parse(await error.response.data.text())
+        if (body && typeof body === 'object' && 'message' in body && typeof body.message === 'string') {
+          error.response.data = { message: body.message }
+        }
+      } catch { /* Keep the existing generic failure message for malformed error bodies. */ }
+      if (error.config?.sessionToken !== useUserStore().token) {
+        return Promise.reject(new axios.CanceledError('账号已切换，忽略旧请求'))
+      }
     }
     const status = error.response?.status
     if (handleAuthFailure(status, error.config?.sessionToken ?? useUserStore().token)) {
       return Promise.reject(error)
     } else if (error.code === 'ECONNABORTED') {
-      ElMessage.error('等待超时，任务可能仍在处理，请先查看任务记录，避免重复提交')
+      ElMessage.error(error.config?.url?.startsWith('/schools/')
+        ? '院校信息加载超时，请重试'
+        : '等待超时，任务可能仍在处理，请先查看任务记录，避免重复提交')
     } else {
       ElMessage.error(error.response?.data?.message || '网络异常')
     }

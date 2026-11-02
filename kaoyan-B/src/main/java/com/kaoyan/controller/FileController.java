@@ -1,7 +1,10 @@
 package com.kaoyan.controller;
 
+import com.kaoyan.common.ApiException;
 import com.kaoyan.common.Result;
+import com.kaoyan.entity.User;
 import com.kaoyan.security.UserContext;
+import com.kaoyan.service.UserService;
 import com.kaoyan.util.OssUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +24,7 @@ import java.util.Map;
 public class FileController {
 
     private final OssUtil ossUtil;
+    private final UserService userService;
 
     /**
      * 上传文件
@@ -33,8 +37,8 @@ public class FileController {
     @PostMapping("/upload")
     public Result<Map<String, String>> upload(@RequestParam("file") MultipartFile file,
                                                @RequestParam(value = "module", required = false, defaultValue = "common") String module) {
-        UserContext.currentUserId();
-        String objectKey = ossUtil.upload(file, module);
+        Long userId = UserContext.currentUserId();
+        String objectKey = ossUtil.upload(file, module, userId);
         return Result.ok(Map.of("url", ossUtil.buildUrl(objectKey), "objectKey", objectKey));
     }
 
@@ -43,11 +47,13 @@ public class FileController {
      *
      * @param objectKey 对象键
      */
-    @Operation(summary = "删除文件", description = "按 objectKey 删除")
+    @Operation(summary = "删除文件", description = "仅可删除本人上传且未作为当前头像的对象")
     @DeleteMapping
     public Result<Void> delete(@RequestParam("objectKey") String objectKey) {
-        UserContext.currentUserId();
-        ossUtil.delete(objectKey);
+        Long userId = UserContext.currentUserId();
+        User user = userService.getById(userId);
+        if (user == null) throw new ApiException(404, 404, "用户不存在");
+        ossUtil.delete(objectKey, userId, user.getAvatarUrl());
         return Result.ok();
     }
 }

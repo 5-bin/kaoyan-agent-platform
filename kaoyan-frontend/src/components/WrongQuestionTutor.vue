@@ -1,5 +1,6 @@
 <template>
   <section class="tutor" aria-label="错题 AI 辅导">
+    <el-button @click="continueInAssistant">到助手继续辅导</el-button>
     <el-button v-if="!opened" type="primary" plain @click="opened = true">AI 解释与追问</el-button>
     <template v-else>
       <h4>错题 AI 辅导</h4>
@@ -23,21 +24,32 @@
 </template>
 <script setup lang="ts">
 import { onBeforeUnmount, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import { submitTask } from '@/api/task'
 import type { Task } from '@/types/api'
 import TaskResultView from './TaskResultView.vue'
 
 const props = defineProps<{ recordId: number; initialTask?: Task }>()
 type Message = { role: 'user' | 'assistant'; content: string }
+const user = useUserStore()
 const opened = ref(false), pending = ref(false), query = ref(''), error = ref('')
 const messages = ref<Message[]>([])
 const lastTask = ref<Task>()
+const router = useRouter()
+function continueInAssistant() {
+  const parent = lastTask.value?.status === 'SUCCESS' ? lastTask.value.id : parentTaskId
+  void router.push({ path: '/tasks', query: { tutorRecordId: String(props.recordId), ...(parent ? { tutorParentTaskId: parent } : {}) } })
+}
 let parentTaskId: string | undefined
 let generation = 0
 
-watch(() => [props.recordId, props.initialTask] as const, () => {
+watch(() => [props.recordId, props.initialTask, user.token] as const, (value, previous) => {
   generation++
   pending.value = false
+  if (previous && value[2] !== previous[2]) {
+    opened.value = false; lastTask.value = undefined; messages.value = []; query.value = ''; error.value = ''; parentTaskId = undefined; return
+  }
   opened.value = !!props.initialTask
   lastTask.value = props.initialTask
   error.value = ''

@@ -12,26 +12,26 @@
       <el-menu :default-active="activeMenu" router class="menu">
         <div class="menu-group">
           <div class="group-label">学习</div>
-          <el-menu-item index="/"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
-          <el-menu-item index="/practice"><el-icon><EditPen /></el-icon><span>刷题</span></el-menu-item>
-          <el-menu-item index="/tasks"><el-icon><Notebook /></el-icon><span>Agent 助手</span></el-menu-item>
+          <el-menu-item :index="navigationPath('HOME')"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
+          <el-menu-item :index="navigationPath('PRACTICE')"><el-icon><EditPen /></el-icon><span>刷题</span></el-menu-item>
+          <el-menu-item :index="navigationPath('ASSISTANT')"><el-icon><Notebook /></el-icon><span>Agent 助手</span></el-menu-item>
         </div>
         <div class="menu-group">
           <div class="group-label">复习</div>
-          <el-menu-item index="/notes"><el-icon><Document /></el-icon><span>个人笔记</span></el-menu-item>
-          <el-menu-item index="/wrong"><el-icon><Notebook /></el-icon><span>错题本</span></el-menu-item>
-          <el-menu-item index="/favorite"><el-icon><Star /></el-icon><span>我的收藏</span></el-menu-item>
-          <el-menu-item index="/stat"><el-icon><TrendCharts /></el-icon><span>学习统计</span></el-menu-item>
+          <el-menu-item :index="navigationPath('NOTES')"><el-icon><Document /></el-icon><span>个人笔记</span></el-menu-item>
+          <el-menu-item :index="navigationPath('WRONG')"><el-icon><Notebook /></el-icon><span>错题本</span></el-menu-item>
+          <el-menu-item :index="navigationPath('FAVORITE')"><el-icon><Star /></el-icon><span>我的收藏</span></el-menu-item>
+          <el-menu-item :index="navigationPath('STATS')"><el-icon><TrendCharts /></el-icon><span>学习统计</span></el-menu-item>
         </div>
         <div class="menu-group">
           <div class="group-label">资源</div>
-          <el-menu-item index="/schools"><el-icon><School /></el-icon><span>院校库</span></el-menu-item>
-          <el-menu-item index="/documents"><el-icon><Folder /></el-icon><span>备考资料</span></el-menu-item>
+          <el-menu-item :index="navigationPath('SCHOOLS')"><el-icon><School /></el-icon><span>院校库</span></el-menu-item>
+          <el-menu-item :index="navigationPath('DOCUMENTS')"><el-icon><Folder /></el-icon><span>备考资料</span></el-menu-item>
         </div>
         <div v-if="userStore.isAdmin" class="menu-group">
           <div class="group-label">管理</div>
-          <el-menu-item index="/admin/documents"><el-icon><Setting /></el-icon><span>管理后台</span></el-menu-item>
-          <el-menu-item index="/admin/questions"><el-icon><EditPen /></el-icon><span>题目录入与审核</span></el-menu-item>
+          <el-menu-item :index="navigationPath('ADMIN_DOCUMENTS')"><el-icon><Setting /></el-icon><span>管理后台</span></el-menu-item>
+          <el-menu-item :index="navigationPath('ADMIN_QUESTIONS')"><el-icon><EditPen /></el-icon><span>题目录入与审核</span></el-menu-item>
         </div>
       </el-menu>
     </aside>
@@ -41,7 +41,7 @@
         <div class="crumb">{{ crumbName }}</div>
         <el-dropdown trigger="click">
           <div class="user">
-            <el-avatar :size="32" :src="userStore.userInfo?.avatarUrl" class="avatar">
+            <el-avatar :size="32" :src="userStore.avatarDisplayUrl" class="avatar">
               {{ userStore.userInfo?.username?.[0]?.toUpperCase() }}
             </el-avatar>
             <span class="uname">{{ userStore.userInfo?.username }}</span>
@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import ChatAssistant from '@/views/ChatAssistant.vue'
+import { navigationPath } from '@/utils/assistant-navigation'
 import { useAssistantStore } from '@/stores/assistant'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'

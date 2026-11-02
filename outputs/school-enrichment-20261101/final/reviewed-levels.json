@@ -1,0 +1,2120 @@
+[
+  {
+    "schoolId": 7,
+    "name": "南京审计大学",
+    "oldLevel": null,
+    "level": "普通本科",
+    "evidenceNote": "未列入所核对教育部985／211及2022年国家双一流高校名单；普通本科仅为本平台展示分类，不代表学科评价或省级建设项目。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南京审计大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南京审计大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南京审计大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 8,
+    "name": "中国科学院大学",
+    "oldLevel": "双一流",
+    "level": "双一流",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国科学院大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 9,
+    "name": "中国传媒大学",
+    "oldLevel": "211",
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国传媒大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 10,
+    "name": "北京航空航天大学",
+    "oldLevel": "985",
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京航空航天大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 11,
+    "name": "四川大学",
+    "oldLevel": "985",
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：四川大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 12,
+    "name": "华南师范大学",
+    "oldLevel": "211",
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：华南师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 13,
+    "name": "燕山大学",
+    "oldLevel": null,
+    "level": "普通本科",
+    "evidenceNote": "未列入所核对教育部985／211及2022年国家双一流高校名单；普通本科仅为本平台展示分类，不代表学科评价或省级建设项目。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：燕山大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：燕山大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：燕山大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 14,
+    "name": "郑州航空工业管理学院",
+    "oldLevel": null,
+    "level": "普通本科",
+    "evidenceNote": "未列入所核对教育部985／211及2022年国家双一流高校名单；普通本科仅为本平台展示分类，不代表学科评价或省级建设项目。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：郑州航空工业管理学院",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：郑州航空工业管理学院",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：郑州航空工业管理学院",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 15,
+    "name": "浙江科技大学",
+    "oldLevel": null,
+    "level": "普通本科",
+    "evidenceNote": "未列入所核对教育部985／211及2022年国家双一流高校名单；普通本科仅为本平台展示分类，不代表学科评价或省级建设项目。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：浙江科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：浙江科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：浙江科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 16,
+    "name": "安徽师范大学",
+    "oldLevel": null,
+    "level": "普通本科",
+    "evidenceNote": "未列入所核对教育部985／211及2022年国家双一流高校名单；普通本科仅为本平台展示分类，不代表学科评价或省级建设项目。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：安徽师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：安徽师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：安徽师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 17,
+    "name": "内蒙古大学",
+    "oldLevel": "211",
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：内蒙古大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 18,
+    "name": "重庆大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：重庆大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 19,
+    "name": "北京师范大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 20,
+    "name": "中央民族大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中央民族大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 21,
+    "name": "东北大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：东北大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 22,
+    "name": "上海交通大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：上海交通大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 23,
+    "name": "福州大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：福州大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 24,
+    "name": "北京工业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京工业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 25,
+    "name": "东华大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：东华大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 26,
+    "name": "苏州大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：苏州大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 27,
+    "name": "南京理工大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南京理工大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 28,
+    "name": "贵州大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：贵州大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 29,
+    "name": "北京大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 30,
+    "name": "中国人民大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国人民大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 31,
+    "name": "清华大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：清华大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 32,
+    "name": "北京理工大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京理工大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 33,
+    "name": "中国农业大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国农业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 34,
+    "name": "南开大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南开大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 35,
+    "name": "天津大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：天津大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 36,
+    "name": "大连理工大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：大连理工大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 37,
+    "name": "吉林大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：吉林大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 38,
+    "name": "哈尔滨工业大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：哈尔滨工业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 39,
+    "name": "复旦大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：复旦大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 40,
+    "name": "同济大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：同济大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 41,
+    "name": "华东师范大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：华东师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 42,
+    "name": "南京大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南京大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 43,
+    "name": "东南大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：东南大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 44,
+    "name": "浙江大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：浙江大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 45,
+    "name": "中国科学技术大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国科学技术大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 46,
+    "name": "厦门大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：厦门大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 47,
+    "name": "山东大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：山东大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 48,
+    "name": "中国海洋大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国海洋大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 49,
+    "name": "武汉大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：武汉大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 50,
+    "name": "华中科技大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：华中科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 51,
+    "name": "湖南大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：湖南大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 52,
+    "name": "中南大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中南大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 53,
+    "name": "国防科技大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "教育部985／211名单原名国防科学技术大学；2022国家双一流名单使用国防科技大学。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：国防科学技术大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部第二轮国家双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "名单中当前名称：国防科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 54,
+    "name": "中山大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中山大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 55,
+    "name": "华南理工大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：华南理工大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 56,
+    "name": "电子科技大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：电子科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 57,
+    "name": "西安交通大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西安交通大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 58,
+    "name": "西北工业大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西北工业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 59,
+    "name": "西北农林科技大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西北农林科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 60,
+    "name": "兰州大学",
+    "oldLevel": null,
+    "level": "985",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部985高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200612/t20061206_128833.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：兰州大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 61,
+    "name": "北京交通大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京交通大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 62,
+    "name": "西南财经大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西南财经大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 63,
+    "name": "北京科技大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 64,
+    "name": "北京化工大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京化工大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 65,
+    "name": "华北电力大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：华北电力大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 66,
+    "name": "河北工业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：河北工业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 67,
+    "name": "中国石油大学（华东）",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国石油大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部第二轮国家双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "名单中当前名称：中国石油大学（华东）",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部关于地矿油高校办学实体的答复",
+        "url": "https://www.moe.gov.cn/moe_879/moe_1252/s8447/201412/t20141204_180158.html",
+        "locator": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 68,
+    "name": "哈尔滨工程大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：哈尔滨工程大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 69,
+    "name": "中国矿业大学（北京）",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国矿业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部第二轮国家双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "名单中当前名称：中国矿业大学（北京）",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部关于地矿油高校办学实体的答复",
+        "url": "https://www.moe.gov.cn/moe_879/moe_1252/s8447/201412/t20141204_180158.html",
+        "locator": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 70,
+    "name": "华东理工大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：华东理工大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 71,
+    "name": "南京航空航天大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南京航空航天大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 72,
+    "name": "河海大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：河海大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 73,
+    "name": "江南大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：江南大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 74,
+    "name": "合肥工业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：合肥工业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 75,
+    "name": "西北大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西北大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 76,
+    "name": "南昌大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南昌大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 77,
+    "name": "郑州大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：郑州大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 78,
+    "name": "西南交通大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西南交通大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 79,
+    "name": "西安电子科技大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西安电子科技大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 80,
+    "name": "北京邮电大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京邮电大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 81,
+    "name": "北京林业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京林业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 82,
+    "name": "北京中医药大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京中医药大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 83,
+    "name": "北京外国语大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京外国语大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 84,
+    "name": "中央财经大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中央财经大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 85,
+    "name": "对外经济贸易大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：对外经济贸易大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 86,
+    "name": "北京体育大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：北京体育大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 87,
+    "name": "中央音乐学院",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中央音乐学院",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 88,
+    "name": "中国政法大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国政法大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 89,
+    "name": "中国石油大学（北京）",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国石油大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部第二轮国家双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "名单中当前名称：中国石油大学（北京）",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部关于地矿油高校办学实体的答复",
+        "url": "https://www.moe.gov.cn/moe_879/moe_1252/s8447/201412/t20141204_180158.html",
+        "locator": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 90,
+    "name": "中国地质大学（北京）",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国地质大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部第二轮国家双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "名单中当前名称：中国地质大学（北京）",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部关于地矿油高校办学实体的答复",
+        "url": "https://www.moe.gov.cn/moe_879/moe_1252/s8447/201412/t20141204_180158.html",
+        "locator": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 91,
+    "name": "天津医科大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：天津医科大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 92,
+    "name": "太原理工大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：太原理工大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 93,
+    "name": "辽宁大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：辽宁大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 94,
+    "name": "大连海事大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：大连海事大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 95,
+    "name": "延边大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：延边大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 96,
+    "name": "东北师范大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：东北师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 97,
+    "name": "东北农业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：东北农业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 98,
+    "name": "东北林业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：东北林业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 99,
+    "name": "上海外国语大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：上海外国语大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 100,
+    "name": "上海财经大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：上海财经大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 101,
+    "name": "上海大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：上海大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 102,
+    "name": "海军军医大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "教育部211原名第二军医大学；学校简介明确2017年组建海军军医大学，对外可称第二军医大学。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：第二军医大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部第二轮国家双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "名单中当前名称：海军军医大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "海军军医大学学校简介",
+        "url": "https://www.smmu.edu.cn/2019/0422/c423a4396/page.htm",
+        "locator": "教育部211原名第二军医大学；学校简介明确2017年组建海军军医大学，对外可称第二军医大学。",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 103,
+    "name": "中国矿业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国矿业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 104,
+    "name": "南京农业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南京农业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 105,
+    "name": "中国药科大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国药科大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 106,
+    "name": "南京师范大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：南京师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 107,
+    "name": "安徽大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：安徽大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "安徽大学学校简介",
+        "url": "https://www.ahu.edu.cn/42/list.htm",
+        "locator": "学校简介：1996年入选国家211工程建设高校；教育部页面文本提取未出现该校，另以学校原站明确陈述交叉核对。",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 108,
+    "name": "中国地质大学（武汉）",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中国地质大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部第二轮国家双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "名单中当前名称：中国地质大学（武汉）",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部关于地矿油高校办学实体的答复",
+        "url": "https://www.moe.gov.cn/moe_879/moe_1252/s8447/201412/t20141204_180158.html",
+        "locator": "教育部答复明确地矿油独立办学实体的211建设原则上按一校对待；2022名单单列当前招生主体。",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 109,
+    "name": "武汉理工大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：武汉理工大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 110,
+    "name": "华中农业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：华中农业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 111,
+    "name": "华中师范大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：华中师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 112,
+    "name": "中南财经政法大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：中南财经政法大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 113,
+    "name": "湖南师范大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：湖南师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 114,
+    "name": "暨南大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：暨南大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 115,
+    "name": "广西大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：广西大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 116,
+    "name": "海南大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：海南大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 117,
+    "name": "西南大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西南大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 118,
+    "name": "四川农业大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：四川农业大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 119,
+    "name": "云南大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：云南大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 120,
+    "name": "西藏大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：西藏大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 121,
+    "name": "长安大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：长安大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 122,
+    "name": "陕西师范大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：陕西师范大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 123,
+    "name": "空军军医大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "教育部211原名第四军医大学；学校简介明确更名及211身份。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：第四军医大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "教育部第二轮国家双一流高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/202202/W020220214318455516037.pdf",
+        "locator": "名单中当前名称：空军军医大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      },
+      {
+        "title": "空军军医大学学校简介",
+        "url": "https://www.fmmu.edu.cn/xxgk/xxjj.htm",
+        "locator": "教育部211原名第四军医大学；学校简介明确更名及211身份。",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 124,
+    "name": "青海大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：青海大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 125,
+    "name": "宁夏大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：宁夏大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 126,
+    "name": "新疆大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：新疆大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  },
+  {
+    "schoolId": 127,
+    "name": "石河子大学",
+    "oldLevel": null,
+    "level": "211",
+    "evidenceNote": "按教育部完整名单核对当前学校招生主体；展示分类按985、211、国家双一流、普通本科顺序取值。",
+    "sources": [
+      {
+        "title": "教育部211高校名单",
+        "url": "https://www.moe.gov.cn/srcsite/A22/s7065/200512/t20051223_82762.html",
+        "locator": "985／211为教育部2008-04-25公开名单；国家双一流为2022年第二轮名单。逐校定位：石河子大学",
+        "retrievedAt": "2026-11-01",
+        "sourceType": "OFFICIAL"
+      }
+    ]
+  }
+]

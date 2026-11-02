@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS task (
  error_message VARCHAR(1000), created_at TIMESTAMP, updated_at TIMESTAMP, deleted_at TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS practice_record (
- id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT, session_id VARCHAR(64),
+ id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT, session_id VARCHAR(36),
  question_id BIGINT, order_index INT, user_answer VARCHAR(10), is_correct INT,
  grading_status VARCHAR(20), question_snapshot VARCHAR(50000), answered_at TIMESTAMP, created_at TIMESTAMP
 );

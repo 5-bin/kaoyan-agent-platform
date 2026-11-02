@@ -24,4 +24,6 @@ public class AgentRequest {
     private List<Object> messages;
     private Map<String, Object> profile;
     private Map<String, Object> privacy;
+    /** Java-owned, optional learning aggregate; never accepted from the public client. */
+    private Map<String, Object> learningSnapshot;
 }

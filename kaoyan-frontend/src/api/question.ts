@@ -2,12 +2,6 @@
 import type { StudentQuestion, PageResult } from '@/types/api'
 import type { QuestionEntry, QuestionUpdate, AdminQuestion, QuestionImportResult, QuestionImportPreview } from '@/types/question-entry'
 
-export const getPracticeQuestions = (params: {
-  subject?: string
-  difficulty?: string
-  limit?: number
-}) => request.get<unknown, StudentQuestion[]>('/questions/practice', { params })
-
 export const getQuestionDetail = (id: number) =>
   request.get<unknown, StudentQuestion>(`/questions/${id}`)
 

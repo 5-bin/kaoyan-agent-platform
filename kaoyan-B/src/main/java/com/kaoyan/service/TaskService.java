@@ -10,6 +10,7 @@ import java.util.Map;
  * Agent 任务 Service
  */
 public interface TaskService extends IService<Task> {
+    default com.kaoyan.dto.response.TaskView view(Task task) { return com.kaoyan.dto.response.TaskView.of(task); }
 
     /**
      * 提交任务

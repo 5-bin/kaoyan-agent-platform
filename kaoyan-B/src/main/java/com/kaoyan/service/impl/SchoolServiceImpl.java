@@ -8,6 +8,7 @@ import com.kaoyan.entity.SchoolDetail;
 import com.kaoyan.mapper.SchoolMapper;
 import com.kaoyan.service.SchoolDetailService;
 import com.kaoyan.service.SchoolService;
+import com.kaoyan.service.SchoolAdmissionMetrics;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import java.util.Map;
 public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> implements SchoolService {
 
     private final SchoolDetailService schoolDetailService;
+    private final SchoolAdmissionMetrics admissionMetrics;
 
     @Override
     public SchoolOptionsVO options() {
@@ -48,9 +50,11 @@ public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> impleme
             throw new ApiException(404, 404, "院校不存在");
         }
         List<SchoolDetail> details = schoolDetailService.listBySchool(schoolId);
+        var warnings = admissionMetrics.enrich(details);
         Map<String, Object> map = new HashMap<>();
         map.put("school", school);
         map.put("details", details);
+        if (!warnings.isEmpty()) map.put("warnings", warnings);
         return map;
     }
 
