@@ -6,7 +6,7 @@
     </div>
 
     <div class="card head">
-      <el-avatar :size="64" :src="userStore.userInfo?.avatarUrl" class="big">
+      <el-avatar :size="64" :src="userStore.avatarDisplayUrl" class="big">
         {{ userStore.userInfo?.username?.[0]?.toUpperCase() }}
       </el-avatar>
       <div class="head-info">
@@ -69,7 +69,8 @@ const upload = async (opt: any) => {
   const r = await uploadFile(opt.file, 'avatar')
   await updateAvatar({ avatarUrl: r.url })
   await userStore.refreshUserInfo()
-  ElMessage.success('头像已更新')
+  if (userStore.avatarDisplayUrl) ElMessage.success('头像已更新')
+  else ElMessage.warning('头像已保存，但暂时无法显示，请稍后重试')
 }
 </script>
 

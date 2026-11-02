@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
+import com.aliyun.oss.model.OSSObject;
 
 /**
  * 阿里云 OSS 上传 / 删除 / 生成 URL
@@ -59,6 +60,11 @@ public class OssUtil {
      * @return objectKey
      */
     public String upload(MultipartFile file, String module) {
+        return upload(file, module, null);
+    }
+
+    /** 上传时将对象路径绑定到当前账号，删除据此校验归属。 */
+    public String upload(MultipartFile file, String module, Long userId) {
         requireConfigured();
         if (file == null || file.isEmpty()) {
             throw new ApiException(400, 400, "文件不能为空");
@@ -76,7 +82,8 @@ public class OssUtil {
         }
         String safeModule = (module == null || module.isBlank())
                 ? "common" : module.replaceAll("[^a-zA-Z0-9_-]", "");
-        String objectKey = safeModule + "/" + LocalDate.now().format(DATE_FMT)
+        String ownerPath = userId != null ? userId + "/" : "";
+        String objectKey = safeModule + "/" + ownerPath + LocalDate.now().format(DATE_FMT)
                 + "/" + IdUtil.uuid() + "." + ext;
         try {
             ossClient.putObject(props.getBucketName(), objectKey, file.getInputStream());
@@ -87,12 +94,22 @@ public class OssUtil {
     }
 
     /**
-     * 按 objectKey 删除文件
+     * 删除本人上传的文件。只接受带本账号路径的对象键；旧版无归属路径或他人对象
+     * 统一返回404且不访问OSS，当前绑定的头像需先更换才能删除。
      *
-     * @param objectKey 对象键
+     * @param objectKey        对象键
+     * @param userId           当前账号
+     * @param currentAvatarUrl 当前账号已绑定的头像地址
      */
-    public void delete(String objectKey) {
+    public void delete(String objectKey, Long userId, String currentAvatarUrl) {
         requireConfigured();
+        if (objectKey == null || userId == null || !objectKey.matches(
+                "[a-zA-Z0-9_-]+/" + userId + "/[0-9]{8}/[a-zA-Z0-9-]+\\.(?:jpg|jpeg|png|gif|webp)")) {
+            throw new ApiException(404, 404, "文件不存在");
+        }
+        if (buildUrl(objectKey).equals(currentAvatarUrl)) {
+            throw new ApiException(409, 409, "当前头像不能删除，请先更换头像");
+        }
         try {
             ossClient.deleteObject(props.getBucketName(), objectKey);
         } catch (Exception e) {
@@ -108,6 +125,33 @@ public class OssUtil {
      */
     private void requireConfigured() {
         if (ossClient == null) throw new ApiException(503, 503, "文件上传服务尚未配置");
+    }
+
+    /** 只读取已保存的合法头像对象，限制返回大小。 */
+    public byte[] readAvatar(String url) {
+        requireConfigured();
+        String prefix = buildUrl("avatar/");
+        if (url == null || !url.startsWith(prefix)) throw new ApiException(404, 404, "头像不存在");
+        String key = "avatar/" + url.substring(prefix.length());
+        if (!key.matches("avatar/(?:[0-9]+/)?[0-9]{8}/[a-zA-Z0-9-]+\\.(?:jpg|jpeg|png|gif|webp)")) {
+            throw new ApiException(404, 404, "头像不存在");
+        }
+        try (OSSObject object = ossClient.getObject(props.getBucketName(), key)) {
+            byte[] bytes = object.getObjectContent().readNBytes((int) MAX_SIZE + 1);
+            if (bytes.length > MAX_SIZE) throw new ApiException(400, 400, "头像文件过大");
+            return bytes;
+        } catch (IOException e) {
+            throw new ApiException(503, 503, "头像读取失败");
+        }
+    }
+
+    /** 仅允许绑定本账号新上传的头像，或保留本人已有头像。 */
+    public boolean isAllowedAvatar(String url, Long userId, String currentUrl) {
+        if (url == null || url.isBlank() || url.equals(currentUrl)) return true;
+        if (ossClient == null || userId == null) return false;
+        String prefix = buildUrl("avatar/" + userId + "/");
+        if (!url.startsWith(prefix)) return false;
+        return url.substring(prefix.length()).matches("[0-9]{8}/[a-zA-Z0-9-]+\\.(?:jpg|jpeg|png|gif|webp)");
     }
 
     public String buildUrl(String objectKey) {

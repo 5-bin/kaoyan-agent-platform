@@ -1,6 +1,8 @@
 ﻿import request from './request'
 import type { User } from '@/types/api'
 
+export const getAvatarContent = () => request.get<unknown, Blob>('/users/avatar/content', { responseType: 'blob' })
+
 export const getCurrentUser = () => request.get<unknown, User>('/users/me')
 
 export const updateAvatar = (data: { avatarUrl: string }) =>
