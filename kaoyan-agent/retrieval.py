@@ -1,6 +1,7 @@
 """Independent, versioned replica corpus. Never connects to the business database."""
 import hashlib
 import json
+import logging
 import math
 import os
 import re
@@ -10,8 +11,11 @@ from pathlib import Path
 from urllib.parse import urlparse
 from uuid import NAMESPACE_URL, uuid5
 from pydantic import Field, model_validator
+from core.errors import ToolUnavailable
 from schemas import Reference, StrictModel
 from source_policy import ReferenceSourcePolicy
+
+log = logging.getLogger(__name__)
 
 
 class Document(StrictModel):
@@ -101,21 +105,63 @@ class BM25Index:
         return [chunk for _, chunk in ranked[:limit]]
 
 
+SUBJECT_NAMES = {
+    "数据结构": ("数据结构",),
+    "计算机组成原理": ("计算机组成原理", "组成原理"),
+    "操作系统": ("操作系统",),
+    "计算机网络": ("计算机网络",),
+}
 SUBJECT_HINTS = (
-    ("数据结构", ("数据结构", "栈", "队列", "链表", "二叉树", "图", "排序", "查找", "散列", "哈希")),
-    ("计算机组成原理", ("计算机组成原理", "组成原理", "主存", "存储层次", "指令", "总线", "浮点", "cache", "缓存")),
-    ("操作系统", ("操作系统", "进程", "线程", "死锁", "调度", "虚拟内存", "文件系统", "信号量")),
-    ("计算机网络", ("计算机网络", "tcp", "udp", "ip", "路由", "拥塞", "http", "dns", "以太网")),
+    ("数据结构", ("栈", "队列", "链表", "二叉树", "图", "排序", "查找", "散列", "哈希")),
+    ("计算机组成原理", ("主存", "存储层次", "指令", "总线", "浮点", "cache", "缓存")),
+    ("操作系统", ("进程", "线程", "死锁", "调度", "虚拟内存", "文件系统", "信号量")),
+    ("计算机网络", ("协议栈", "tcp/ip", "tcp", "udp", "ip", "路由", "拥塞", "http", "dns", "以太网")),
 )
+
+
+def _term_pattern(term):
+    """ASCII terms match whole words ("ip" not in "pipeline"); Chinese terms match as written."""
+    escaped = re.escape(term.lower())
+    return rf"(?<![a-z0-9]){escaped}(?![a-z0-9])" if re.fullmatch(r"[a-z0-9/]+", term.lower()) else escaped
+
+
+def mentions(text, term):
+    """Whether text contains a subject term; "tcp/ip" is mentioned by either part."""
+    parts = term.split("/") if "/" in term else [term]
+    return any(re.search(_term_pattern(part), (text or "").lower()) for part in parts if part)
+
+
+def subject_terms(text):
+    """Return (subject, anchor terms) from non-overlapping hints, longest first.
+
+    An explicit subject name wins. Otherwise longer hints consume the shorter
+    ones they contain, so "协议栈" is network and its "栈" no longer counts for
+    data structures; hints still spanning several subjects ("主存和虚拟内存")
+    return no subject and the caller searches unfiltered. Anchors are the topical
+    terms a relevant chunk must mention; subject names are not anchors.
+    """
+    lowered = (text or "").lower()
+    spans = []
+    for subject, hints in [*SUBJECT_NAMES.items(), *SUBJECT_HINTS]:
+        for hint in hints:
+            for match in re.finditer(_term_pattern(hint), lowered):
+                spans.append((match.start(), match.end(), subject, hint.lower()))
+    spans.sort(key=lambda span: (span[0] - span[1], span[0]))
+    taken, kept = set(), []
+    for start, end, subject, hint in spans:
+        if taken.isdisjoint(range(start, end)):
+            taken.update(range(start, end))
+            kept.append((subject, hint, end - start))
+    names = {name for name, values in SUBJECT_NAMES.items() for value in values}
+    anchors = tuple(dict.fromkeys(hint for _, hint, _ in kept if hint not in names))
+    named = {subject for subject, hint, _ in kept if hint in names}
+    subjects = named or {subject for subject, _, _ in kept}
+    return (next(iter(subjects)) if len(subjects) == 1 else None), anchors
 
 
 def detect_subject(text):
     """Best-effort subject hint. Callers must fall back to unfiltered search."""
-    lowered = (text or "").lower()
-    for subject, hints in SUBJECT_HINTS:
-        if any(hint.lower() in lowered for hint in hints):
-            return subject
-    return None
+    return subject_terms(text)[0]
 
 
 class Corpus:
@@ -163,27 +209,44 @@ class Corpus:
 class FastEmbedEncoder:
     def __init__(self, model, cache_dir=None, threads=None, local_files_only=False):
         from fastembed import TextEmbedding
-        self.model = TextEmbedding(model_name=model, cache_dir=cache_dir, threads=threads, local_files_only=local_files_only)
+        try:
+            self.model = TextEmbedding(model_name=model, cache_dir=cache_dir, threads=threads, local_files_only=local_files_only)
+        except ValueError as error:
+            if not local_files_only:
+                raise
+            # fastembed reports a missing local cache as ValueError; it is an
+            # expected availability failure that hybrid search can fall back from.
+            raise ToolUnavailable("嵌入模型权重缓存缺失，请先运行 ingest.py 准备") from error
 
     def encode(self, texts):
         return [v.tolist() for v in self.model.embed(texts)]
 
 
 class VectorIndex:
-    def __init__(self, settings, corpus, encoder=None, client=None):
+    def __init__(self, settings, corpus, encoder=None, client=None, local_files_only=False):
         from qdrant_client import QdrantClient
         self.settings, self.corpus, self.encoder = settings, corpus, encoder
+        self.local_files_only = local_files_only
+        fingerprint = hashlib.sha256((corpus.checksum + settings.EMBEDDING_MODEL).encode()).hexdigest()[:24]
+        self.collection = "kaoyan_" + fingerprint
+        self.marker = settings.RAG_INDEX / (self.collection + ".ready.json")
+        if local_files_only and not self.marker.is_file():
+            raise ToolUnavailable("向量索引尚未构建，请先执行 ingest.py")
+        if local_files_only and not settings.QDRANT_URL and not (settings.RAG_INDEX / "qdrant").is_dir():
+            raise ToolUnavailable("向量索引存储缺失，请检查现有索引")
         settings.RAG_INDEX.mkdir(parents=True, exist_ok=True)
         self.client = client or (QdrantClient(url=settings.QDRANT_URL,
             api_key=settings.QDRANT_API_KEY or None, timeout=10) if settings.QDRANT_URL
             else QdrantClient(path=str(settings.RAG_INDEX / "qdrant"), force_disable_check_same_thread=True))
-        fingerprint = hashlib.sha256((corpus.checksum + settings.EMBEDDING_MODEL).encode()).hexdigest()[:24]
-        self.collection = "kaoyan_" + fingerprint
-        self.marker = settings.RAG_INDEX / (self.collection + ".ready.json")
 
     def encode(self, texts):
         if self.encoder is None:
-            self.encoder = FastEmbedEncoder(self.settings.EMBEDDING_MODEL)
+            # Share the project embedding cache with question search; the library
+            # default lives in the OS temp dir and can be wiped, forcing a
+            # download inside a request.
+            self.encoder = FastEmbedEncoder(self.settings.EMBEDDING_MODEL,
+                cache_dir=str(self.settings.QUESTION_MODEL_CACHE),
+                local_files_only=self.local_files_only)
         return self.encoder.encode(texts)
 
     def build(self):
@@ -194,7 +257,7 @@ class VectorIndex:
                 json.dump(self.corpus.records, out, ensure_ascii=False, indent=2)
         if self.marker.exists():
             if not self.client.collection_exists(self.collection):
-                raise RuntimeError("集合缺失，请使用新索引目录重建")
+                raise ToolUnavailable("集合缺失，请使用新索引目录重建")
             return
         if self.client.collection_exists(self.collection):
             self.client.delete_collection(self.collection)
@@ -213,7 +276,7 @@ class VectorIndex:
     def search(self, query, domain, limit=5, subject=None):
         from qdrant_client import models as m
         if not self.marker.exists():
-            raise RuntimeError("向量索引尚未构建，请先执行 ingest.py")
+            raise ToolUnavailable("向量索引尚未构建，请先执行 ingest.py")
         conditions = [m.FieldCondition(key="domain", match=m.MatchValue(value=domain)),
                       m.FieldCondition(key="releaseId", match=m.MatchValue(value=self.corpus.release_id))]
         if subject:
@@ -228,14 +291,16 @@ class VectorIndex:
 
 
 class Retriever:
-    def __init__(self, settings, corpus):
+    def __init__(self, settings, corpus, local_files_only=False):
         self.settings, self.corpus, self.vector = settings, corpus, None
+        self.local_files_only = local_files_only
         self.lock = Lock()
 
     def _vector_index(self):
         with self.lock:
             if self.vector is None:
-                self.vector = VectorIndex(self.settings, self.corpus)
+                self.vector = VectorIndex(self.settings, self.corpus,
+                    local_files_only=self.local_files_only)
             return self.vector
 
     def search(self, query, domain="knowledge", limit=5, subject=None):
@@ -253,8 +318,9 @@ class Retriever:
             vector = []
             try:
                 vector = self._vector_index().search(query, domain, 20, subject)
-            except (RuntimeError, ImportError):
-                pass
+            except (RuntimeError, ImportError, OSError, *_vector_failures()) as error:
+                # Remote Qdrant/connection errors are not RuntimeError subclasses.
+                log.warning("hybridVectorFailure=%s", type(error).__name__)
             fused = {}
             for rank, doc in enumerate(lexical):
                 fused[doc.id] = fused.get(doc.id, 0.0) + 1 / (60 + rank + 1)
@@ -267,6 +333,15 @@ class Retriever:
     def close(self):
         if self.vector:
             self.vector.close()
+
+
+def _vector_failures():
+    """Expected Qdrant client failures; empty when the optional client is absent."""
+    try:
+        from qdrant_client.http.exceptions import ApiException
+    except ImportError:
+        return ()
+    return (ApiException,)
 
 
 def _dedupe(chunks):

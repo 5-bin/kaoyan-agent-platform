@@ -1,15 +1,21 @@
 """Bounded request planning and model projections. Never executes business tools."""
 import re
-from datetime import date, timedelta
-from zoneinfo import ZoneInfo
-from datetime import datetime
-from schemas import ConversationResolution, StrictModel
-from pydantic import Field
+from typing import Literal
+from schemas import StrictModel
+from intents import chinese_number, local_document_plan, local_learning_plan, requested_knowledge_point
+from pydantic import Field, GetJsonSchemaHandler
+from pydantic.json_schema import JsonSchemaValue
+from pydantic_core import CoreSchema
 from config import provider_identifier
+from core.runtime import step_model_allowed
+
+__all__ = ["chinese_number", "requested_knowledge_point", "local_document_plan", "local_learning_plan",
+           "model_allowed", "has_scope", "model_messages", "clarification_with_example",
+           "safe_learning_context", "LearningAnswer", "rule_learning_answer", "weak_point_topics"]
 
 
 def model_allowed(req, settings):
-    return (settings.LLM_ENABLED and req.privacy.modelAllowed
+    return (step_model_allowed.get() and settings.LLM_ENABLED and req.privacy.modelAllowed
             and req.privacy.provider == provider_identifier(settings.LLM_BASE_URL)
             and req.privacy.provider != "unconfigured")
 
@@ -24,210 +30,23 @@ def model_messages(req):
             if m.scopes is not None and set(m.scopes) <= set(req.privacy.scopes)]
 
 
-def chinese_number(text):
-    if text.isdigit():
-        return int(text)
-    values = {"零": 0, "一": 1, "二": 2, "两": 2, "三": 3, "四": 4,
-              "五": 5, "六": 6, "七": 7, "八": 8, "九": 9}
-    if "十" in text:
-        left, right = text.split("十", 1)
-        return values.get(left, 1) * 10 + values.get(right, 0)
-    return values.get(text, 0)
-
-
-def requested_knowledge_point(text):
-    def normalize(value):
-        value = re.sub(r"\s+", "", value).strip('“”"\'：:')
-        value = re.sub(r"tcp", "TCP", value, flags=re.I)
-        value = re.sub(r"udp", "UDP", value, flags=re.I)
-        return value.replace("传输控制协议", "TCP").replace("用户数据报协议", "UDP").replace("TCP协议", "TCP").replace("UDP协议", "UDP")
-
-    # Accept new topics without consulting a dictionary. Stop before commands.
-    end = r"(?:内容|有关|相关|的(?:题|错题|部分)|[，。；\n”\"]|$)"
-    # In “堆有关错题”, 有关 follows the topic; do not treat 错题 as a new topic.
-    topic_prefix = r"(?:涉及|关于|有关(?!的|错题|题目|试题|题)|跟|(?<!进程)与)"
-    explicit = re.search(r"知识点\s*(?:为|是|[:：])\s*[“\"]?(.{1,255}?)" + end, text)
-    topic = re.search(topic_prefix + r"\s*(.{0,255}?)" + end, text)
-    if explicit is None:
-        topics = {normalize(m[1]) for m in re.finditer(topic_prefix + r"\s*(.{0,255}?)" + end, text) if normalize(m[1])}
-        if len(topics) > 1:
-            return None
-    else:
-        explicit_topics = {normalize(m[1]) for m in re.finditer(r"知识点\s*(?:为|是|[:：])\s*[“\"]?(.{1,255}?)" + end, text)}
-        if len(explicit_topics) > 1:
-            return None
-    direct = re.search(r"(?:搜索|查找|找|查)(?:出|一些|几道|\d+道)?\s*([^，。；\n]{1,100}?)(?:相关的?|的)?(?:题目|试题|题)(?:[，。；\n]|$)", text)
-    match = explicit or topic or direct
-    if match:
-        value = normalize(match[1])
-        value = re.sub(r"^(?:一些|几道|[0-9一二两三四五六七八九十]+道)", "", value)
-        if (not value or value in {"这", "这个", "那个", "它", "上述", "未知主题", "某个知识点"}
-                or (value != "进程与线程" and re.search(r"和|以及|或者|或|、|与|并且|同时|加入|收藏|移出|取消|创建|生成", value))):
-            return None
-        return value
-    # Known labels are read filters, never executable expressions or write targets.
-    labels = ("线性表", "栈", "队列", "树的遍历", "AVL树", "拓扑排序", "最小生成树",
-              "最短路径", "堆", "散列表", "排序", "查找", "图", "进程与线程",
-              "内存管理", "虚拟内存", "进程调度", "死锁", "TCP", "TCP拥塞控制", "TCP序号",
-              "UDP", "路由选择", "存储层次")
-    normalized = re.sub(r"\s+", "", text).upper().replace("传输控制协议", "TCP").replace("用户数据报协议", "UDP")
-    found = [label for label in labels if re.search(
-        (r"(?<![A-Z0-9])" if label[0].isascii() else "") + re.escape(label.upper())
-        + (r"(?![A-Z0-9])" if label[-1].isascii() else ""), normalized)]
-    found = [label for label in found if not any(label != other and label in other for other in found)]
-    if len(found) != 1:
-        return None
-    # Preserve a requested subtopic instead of silently widening it to its parent.
-    topic = re.search(r"(?:涉及|关于|跟|与)\s*(.{1,50}?)(?:内容|有关|相关|的(?:题|错题|部分)|[，。；]|$)", text)
-    if topic:
-        value = re.sub(r"\s+", "", topic[1]).upper().replace("传输控制协议", "TCP").replace("用户数据报协议", "UDP")
-        value = value.replace("TCP协议", "TCP").replace("UDP协议", "UDP")
-        if found[0].upper() in value:
-            return value
-    return found[0]
-
-
 def clarification_with_example(message, plan):
-    if "推荐问法" in message:
-        return message
-    if plan.action.startswith("DOCUMENT_"):
-        example = "请创建一份关于 TCP 拥塞控制的复习笔记。修改已有笔记时请先选择笔记。"
-    elif plan.action == "SCHOOL_RECOMMEND":
-        example = "请推荐2027年计算机专业的学硕院校，地区限定为上海。"
-    elif plan.action == "LEARNING_ANALYSIS":
-        example = "请分析我的错题本中涉及 TCP 的题目。若要操作，可说：将我的错题本中涉及 TCP 的题目加入收藏；引用上次回答可说：收藏 Q1 和 Q2。"
-    else:
-        example = "请解释 TCP 拥塞控制的过程，并举例说明。"
-    return message[:750] + "\n推荐问法：" + example
+    """Compatibility entrypoint; scenario examples live in agents.guidance."""
+    from agents.guidance import clarification_with_example as with_example
 
-
-def local_document_plan(text, page_context=None, selected=False):
-    """A note can use learning reads without being routed into pure analysis."""
-    if re.search(r"不要|不需要|别帮|如何|怎么|这句话|示例|例如|假设", text):
-        return None
-    note = bool(re.search(r"笔记|文档|计划|清单", text))
-    update = bool(re.search(r"修改|改写|润色|改进|调整|补充|改成|改为", text)) and (note or selected)
-    create = note and bool(re.search(r"新建|创建|生成|写一份|整理成|汇总成", text))
-    if not update and not create:
-        return None
-    learning = local_learning_plan(text, page_context)
-    return ConversationResolution(action="DOCUMENT_UPDATE" if update else "DOCUMENT_CREATE",
-        standaloneQuery=text, reads=learning.reads if learning else [],
-        subject=learning.subject if learning else None,
-        knowledgePoint=learning.knowledgePoint if learning else None,
-        **({"from": learning.from_, "to": learning.to} if learning else {}))
-
-
-def local_learning_plan(text, page_context=None):
-    """Parse only the current user's instruction; data/history cannot authorize writes."""
-    reads = []
-    for kind, terms in (("wrong", ("错题", "答错", "错因")),
-                        ("favorite", ("收藏",)), ("stats", ("统计", "正确率", "学习情况", "学情", "薄弱", "掌握情况")),
-                        ("practice", ("作答记录", "练习记录", "练习情况", "批次")),
-                        ("documents", ("备考资料", "学习资料", "资料正文", "推荐资料", "复习资料"))):
-        if any(term in text for term in terms):
-            reads.append(kind)
-    operation = "NONE"
-    # Questions about how to use a button and negated requests are not commands.
-    command = not re.search(r"不要|别帮|不需要|如何|怎么|能否介绍|说明.*功能|是什么意思|这句话|这个指令|示例|例如|假设", text)
-    if re.search(r"分析|统计|查看|查询|介绍|解释|了解", text) and not re.search(r"(?:并|然后|同时|顺便)(?:帮我)?(?:把|将)?.{0,12}(?:收藏|取消|移出|移除|创建|生成|安排)", text):
-        command = False
-    if command:
-        if re.search(r"(?:取消|移除|移出|删除).{0,12}收藏|收藏.{0,12}(?:取消|移除|移出|删除)", text):
-            operation = "FAVORITE_REMOVE"
-        elif re.search(r"(?:移出|移除|取消|删除).{0,12}错题|错题.{0,12}(?:移出|移除|取消|删除)", text):
-            operation = "WRONG_REMOVE"
-        elif re.search(r"(?:帮我|请|并|顺便)\s*收藏|(?:把|将).{0,12}收藏(?:一下|起来)?[。！!]?\s*$|收藏\s*(?:这|第|Q\d|题号|题目|#|选中|当前|某|全部)|(?:加入|添加)(?:到)?(?:我的)?收藏", text):
-            operation = "FAVORITE_ADD"
-        elif (re.search(r"(?:安排|创建|生成|开始|来|出).{0,18}(?:练习|刷题|道题)|(?:用|从).{0,10}(?:错题|收藏).{0,12}(?:练习|刷题)", text)
-              or re.search(r"(?:练|刷)(?:一遍|习)?(?:我)?的?(?:错题|收藏)", text)):
-            operation = "PRACTICE_CREATE"
-    target = "selected"
-    if operation == "PRACTICE_CREATE":
-        target = ("wrong" if "错题" in text else "favorite" if "收藏" in text else
-                  "selected" if "选中" in text else "visible" if re.search(r"这些题|当前题|这道题", text) else "normal")
-    elif any(term in text for term in ("这些", "全部", "当前页", "本页", "所有")):
-        target = "visible"
-    subject = next((s for s in ("数据结构", "计算机组成原理", "操作系统", "计算机网络") if s in text), None)
-    if page_context is not None:
-        if not subject:
-            subject = page_context.subject
-        if not reads and any(term in text for term in ("当前页", "这个页面", "这些题", "这些记录", "这道题", "分析", "总结")):
-            kind = {"stat": "stats"}.get(page_context.page, page_context.page)
-            if kind in {"wrong", "favorite", "stats", "practice", "documents"}:
-                reads = [kind]
-    difficulty = next((value for term, value in (("简单", "EASY"), ("中等", "MEDIUM"), ("困难", "HARD")) if term in text), None)
-    count = 5
-    match = re.search(r"([0-9一二两三四五六七八九十百千]+)\s*道(?:题)?", text)
-    clarification = None
-    if match:
-        count = chinese_number(match[1])
-        if not 1 <= count <= 50:
-            clarification = "每次练习支持1至50题，请调整题目数量。"
-            count = 5
-    ordinal = None
-    match = re.search(r"第\s*([0-9一二两三四五六七八九十百千]+)\s*(?:道|个)?题", text)
-    if match:
-        ordinal = chinese_number(match[1])
-        if not 1 <= ordinal <= 50:
-            clarification, ordinal = "请指定当前可见列表1至50范围内的题目。", None
-    refs = list(dict.fromkeys(re.findall(r"\bQ[1-9]\d{0,2}\b", text)))[:50]
-    point = requested_knowledge_point(text)
-    public_questions = ("题库" in text or (not any(k in reads for k in ("wrong", "practice"))
-                        and not re.search(r"收藏(?:夹|本|列表|中|里|内|的)", text)
-                        and bool(re.search(r"找.{0,80}题|搜索.{0,80}题|查找.{0,80}题", text))))
-    if public_questions and not refs and ordinal is None:
-        reads = ["questions"]
-        target = "normal"
-        subject = next((s for s in ("数据结构", "计算机组成原理", "操作系统", "计算机网络") if s in text), None)
-    if operation == "PRACTICE_CREATE" and target == "normal" and not reads:
-        reads = ["questions"]
-    # The collection being read is distinct from the destination of a write.
-    # Explicit references still bind to the prior answer instead of a fresh list.
-    source = None
-    if re.search(r"错题(?:本)?(?:中|里|内|的)|从.{0,5}错题", text):
-        source = "wrong"
-    elif re.search(r"收藏(?:夹|本|列表)?(?:中|里|内|的)|从.{0,5}收藏", text):
-        source = "favorite"
-    elif operation == "FAVORITE_REMOVE" and "收藏" in text:
-        source = "favorite"
-    elif operation == "WRONG_REMOVE" and "错题" in text:
-        source = "wrong"
-    if source and (operation != "NONE" or point is not None) and not refs and ordinal is None and not re.search(r"选中|当前页|本页|这些|将其|把其|刚才|上一|上述|找到的|那道|该题", text):
-        target = source
-        reads = [kind for kind in reads if kind not in {"wrong", "favorite"} or kind == source]
-        subject = next((s for s in ("数据结构", "计算机组成原理", "操作系统", "计算机网络") if s in text), None)
-    if point is None and re.search(r"涉及|有关|相关|知识点|关于", text) and not re.search(r"同知识点|(?:相关|有关).{0,4}(?:练习|资料|概念|解释)", text):
-        clarification = "未能确定你要筛选的知识点，请补充一个明确主题；可使用“知识点：主题名称”指定。"
-    if not reads and operation == "NONE":
-        return None
-    if not reads and operation in {"FAVORITE_ADD", "FAVORITE_REMOVE", "WRONG_REMOVE"}:
-        reads = ["favorite" if operation != "WRONG_REMOVE" else "wrong"]
-    dates = re.findall(r"(?<!\d)(\d{4}-\d{2}-\d{2})(?!\d)", text)
-    interval = {}
-    if dates:
-        try:
-            values = [date.fromisoformat(value) for value in dates[:2]]
-            if len(values) == 2 and values[0] > values[1]:
-                raise ValueError("order")
-            interval = {"from": str(values[0]), "to": str(values[-1])}
-        except ValueError:
-            clarification = "请提供有效且开始不晚于结束的日期范围。"
-    elif (match := re.search(r"近\s*(\d{1,3})\s*天", text)):
-        today = datetime.now(ZoneInfo("Asia/Shanghai")).date()
-        days = int(match[1])
-        if days:
-            interval = {"from": str(today - timedelta(days=days - 1)), "to": str(today)}
-    elif page_context is not None:
-        interval = {key: value for key, value in (("from", page_context.from_), ("to", page_context.to)) if value}
-    return ConversationResolution(action="LEARNING_ANALYSIS", standaloneQuery=text, reads=reads,
-        operation="NONE" if clarification else operation, target=target, count=count, ordinal=ordinal, subject=subject,
-        questionRefs=refs, clarification=clarification, difficulty=difficulty,
-        knowledgePoint=point, **interval)
+    return with_example(message, plan)
 
 
 def _fields(value, keys):
     return {key: value[key] for key in keys if key in value and isinstance(value[key], (str, int, float, bool, type(None)))}
+
+
+def _with_wrong_attempts(row):
+    """Derive wrong attempts in code so the model never has to subtract counts itself."""
+    total, correct = row.get("questionCount"), row.get("correctCount")
+    if type(total) is int and type(correct) is int and 0 <= correct <= total:
+        row["wrongAttempts"] = total - correct
+    return row
 
 
 def safe_learning_context(req, *, external=True, plan=None):
@@ -240,10 +59,18 @@ def safe_learning_context(req, *, external=True, plan=None):
     result = {}
     if isinstance(source.get("statistics"), dict) and "stats" in reads and (not external or "stats" in scopes):
         stats = source["statistics"]
-        clean = _fields(stats, ("questionCount", "correctCount", "uniqueQuestions", "wrongCount", "accuracy", "from", "to", "subject"))
+        clean = _with_wrong_attempts(_fields(stats, ("questionCount", "correctCount", "uniqueQuestions", "wrongCount", "accuracy", "from", "to", "subject")))
         for name in ("daily", "knowledgePoints"):
-            clean[name] = [_fields(row, ("date", "statDate", "knowledgePoint", "name", "questionCount", "correctCount", "accuracy", "count", "correct"))
+            clean[name] = [_with_wrong_attempts(_fields(row, ("date", "statDate", "knowledgePoint", "name", "questionCount", "correctCount", "accuracy", "count", "correct")))
                            for row in stats.get(name, [])[:366] if isinstance(row, dict)]
+        profile = stats.get("learningProfile")
+        if isinstance(profile, dict):
+            safe_profile = _fields(profile, ("revision", "algorithmVersion", "blueprintVersion", "referenceScore", "coverage",
+                                             "independentSamples", "assistedSamples", "unknownSamples", "sufficient", "status", "updatedAt"))
+            safe_profile["groups"] = [_fields(row, ("subject", "knowledgePoint", "difficulty", "samples", "correct",
+                "assisted", "unknown", "masteryIndex", "sampleStatus", "weight", "priority", "anomaly"))
+                for row in profile.get("groups", [])[:200] if isinstance(row, dict)]
+            clean["learningProfile"] = safe_profile
         result["statistics"] = clean
     items = []
     for item in source.get("items", [])[:20]:
@@ -305,13 +132,47 @@ def safe_learning_context(req, *, external=True, plan=None):
     return result
 
 
-class LearningAnswer(StrictModel):
-    answer: str = Field(min_length=1, max_length=12000)
-    evidenceRefs: list[str] = Field(default_factory=list, max_length=30)
+class LearningExplanation(StrictModel):
+    """One public concept explanation with its own reviewed sources."""
+
+    text: str = Field(min_length=1, max_length=1000)
+    sourceIds: list[str] = Field(min_length=1, max_length=5)
+
+
+class LearningSuggestion(StrictModel):
+    """A bounded suggestion selection; the service authors all displayed prose."""
+
+    action: Literal["REVIEW_CONCEPT", "REVIEW_ATTEMPT", "COLLECT_SAMPLES", "PRACTICE_RELATED"]
+    evidenceRefs: list[str] = Field(default_factory=list, max_length=5)
     sourceIds: list[str] = Field(default_factory=list, max_length=5)
 
 
+class LearningAnswer(StrictModel):
+    """Structured enrichment; legacy prose is parsed only to reject it safely."""
+
+    explanations: list[LearningExplanation] = Field(default_factory=list, max_length=5)
+    suggestions: list[LearningSuggestion] = Field(default_factory=list, max_length=5)
+    answer: str | None = Field(default=None, min_length=1, max_length=12000)
+    evidenceRefs: list[str] = Field(default_factory=list, max_length=30)
+    sourceIds: list[str] = Field(default_factory=list, max_length=5)
+
+    @classmethod
+    def __get_pydantic_json_schema__(cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler) -> JsonSchemaValue:
+        """Do not invite new providers to populate legacy free-form fields."""
+        schema = handler.resolve_ref_schema(handler(core_schema))
+        for name in ("answer", "evidenceRefs", "sourceIds"):
+            schema["properties"].pop(name, None)
+        return schema
+
+
+# Mirrors LearningProfileEngine: the profile is not the interval statistics above.
+PROFILE_BASIS = ("以下规则画像与上面的区间统计口径不同：统计全部历史中的独立作答，同一题7天内只计1次，"
+                 "不含提示辅助及未记录提示情况的作答，按难度分组且每组最多取最近50条；两组次数不能直接比较。")
+
+
 def rule_learning_answer(context, plan):
+    if plan.operation == "PRACTICE_CREATE":
+        return "已识别组题请求，可练习题目与实际题量由业务后端核对。请通过练习卡片进入刷题页面作答。"
     lines = []
     if context.get("notice"):
         lines.append(context["notice"])
@@ -324,11 +185,18 @@ def rule_learning_answer(context, plan):
             lines.append("所选区间暂无有效已提交作答，不能据此判断掌握程度。")
         else:
             lines.append(f"记录事实：{stats.get('from', '')}至{stats.get('to', '')}有效作答{count}次，正确{stats.get('correctCount', 0)}次，去重题数{stats.get('uniqueQuestions', '未记录')}。")
-        for point in stats.get("knowledgePoints", []):
-            name = point.get("knowledgePoint", point.get("name", "未标注知识点"))
-            n = point.get("questionCount", point.get("count", 0))
-            lines.append(f"{name}：有效作答{n}次" + ("，样本不足5次，暂不判断掌握程度。" if n < 5 else "；可结合具体错题分析可能错因。"))
-        lines.append("学习时长、提示辅助与独立作答：未记录。")
+            if "wrongAttempts" in stats:
+                lines.append(f"区间内错误作答{stats['wrongAttempts']}次；与当前错题本题数分别统计。")
+            accuracy = stats.get("accuracy")
+            if type(accuracy) in (int, float) and 0 <= accuracy <= 1:
+                lines.append(f"区间正确率{accuracy * 100:.1f}%，口径为全部有效已提交作答。")
+        lines.extend(_knowledge_point_lines(stats.get("knowledgePoints", [])))
+        lines.append("学习时长与提示辅助：未记录；区间作答次数不区分是否独立完成。")
+        profile = stats.get("learningProfile", {})
+        if profile:
+            lines.append(PROFILE_BASIS)
+            lines.append(f"当前规则画像版本{profile.get('revision', 0)}，独立证据{profile.get('independentSamples', 0)}条；408实验性参考分：{profile.get('referenceScore') if profile.get('referenceScore') is not None else '证据或审核蓝图不足'}。未经完整试卷校准。")
+            lines.extend(_profile_group_lines(profile.get("groups", [])[:10]))
     items = context.get("items", [])
     if items:
         lines.append(f"本次读取{len(items)}条记录，总量{context.get('total', len(items))}；列表节选不代表全部学习情况。")
@@ -342,10 +210,116 @@ def rule_learning_answer(context, plan):
                             "已提交作答，可据该版本回顾。"))
     for doc in context.get("documents", []):
         lines.append(f"[{doc['ref']}] {doc.get('title', '备考资料')}：{(doc.get('content') or doc.get('excerpt') or '')[:1500]}")
+    tail = []
     if plan.operation != "NONE":
-        lines.append("已识别操作意图，是否执行以及执行结果由业务后端核验；需要确认的操作请先查看预览。")
-    if not lines:
+        tail.append("已识别操作意图，是否执行以及执行结果由业务后端核验；需要确认的操作请先查看预览。")
+    if not lines and not tail:
         lines.append("没有读取到本次请求所需记录。请明确对象或筛选范围；未授权外发时仍可使用本地页面功能。")
     if context.get("retrievalStatus") == "READY" and not items:
-        lines.append("没有找到符合该主题的题目，未修改记录。")
-    return "\n".join(lines)
+        tail.append("没有找到符合该主题的题目，未修改记录。")
+    return bounded_lines(lines, tail)
+
+
+SMALL_SAMPLE = 5
+# Keeps the merged small-sample line well inside one bounded answer line.
+MERGED_NAME_LIMIT = 30
+DIFFICULTY_LABELS = {"EASY": "简单", "MEDIUM": "中等", "HARD": "困难"}
+
+
+def _point_counts(point: dict) -> tuple[str, int, int | None]:
+    """Return the name, interval attempts and correct attempts of one statistics row."""
+    name = point.get("knowledgePoint", point.get("name", "未标注知识点"))
+    count = point.get("questionCount", point.get("count", 0))
+    return name, count, point.get("correctCount", point.get("correct"))
+
+
+def _error_rate(point: dict) -> float:
+    """Sort key only; rows without a correct count rank after known error rates."""
+    _, count, correct = _point_counts(point)
+    return (count - correct) / count if count and correct is not None else -1.0
+
+
+def _merged_names(items: list[str]) -> str:
+    """Join at most MERGED_NAME_LIMIT names and state how many were left out."""
+    shown = "、".join(items[:MERGED_NAME_LIMIT])
+    return shown + (f"等{len(items)}个，其余{len(items) - MERGED_NAME_LIMIT}个未在文字中展示，请在学习统计页面查看"
+                    if len(items) > MERGED_NAME_LIMIT else "")
+
+
+def _knowledge_point_lines(points: list[dict]) -> list[str]:
+    """List judgeable points by error rate first and merge small samples into one line."""
+    lines: list[str] = []
+    enough = [p for p in points if _point_counts(p)[1] >= SMALL_SAMPLE]
+    small = [p for p in points if _point_counts(p)[1] < SMALL_SAMPLE]
+    for point in sorted(enough, key=lambda p: (-_error_rate(p), -_point_counts(p)[1])):
+        name, count, correct = _point_counts(point)
+        lines.append(f"{name}：区间内有效作答{count}次（同题重复作答分别计数）"
+                     + (f"，正确{correct}次" if correct is not None else "") + "；可结合具体错题分析可能错因。")
+        if "wrongAttempts" in point:
+            lines.append(f"{name}：区间内错误作答{point['wrongAttempts']}次。")
+    if small:
+        small.sort(key=lambda p: -_point_counts(p)[1])
+        names = []
+        for point in small:
+            name, count, correct = _point_counts(point)
+            wrong = point.get("wrongAttempts")
+            detail = f"，错误{wrong}次" if wrong is not None else f"，正确{correct}次" if correct is not None else ""
+            names.append(f"{name}（{count}次{detail}）")
+        lines.append(f"以下{len(small)}个知识点区间内有效作答均样本不足5次，暂不判断掌握程度，可作为补练候选："
+                     + _merged_names(names) + "。")
+    return lines
+
+
+def weak_point_topics(points: list[dict], limit: int = 5) -> list[str]:
+    """Rank interval points for retrieval: judgeable high error rates first, then most wrong attempts.
+
+    Small samples only fill remaining slots; ranking never becomes a mastery conclusion.
+    """
+    def wrong(point: dict) -> int | None:
+        _, count, correct = _point_counts(point)
+        return point.get("wrongAttempts", count - correct if correct is not None else None)
+
+    enough = sorted((p for p in points if _point_counts(p)[1] >= SMALL_SAMPLE),
+                    key=lambda p: (-_error_rate(p), -_point_counts(p)[1]))
+    # Points known to have no wrong attempt are dropped; unknown correctness is kept.
+    small = sorted((p for p in points if _point_counts(p)[1] < SMALL_SAMPLE and wrong(p) != 0),
+                   key=lambda p: (-(wrong(p) or 0), -_point_counts(p)[1]))
+    names = [_point_counts(p)[0] for p in enough + small]
+    return list(dict.fromkeys(str(name)[:100] for name in names if name))[:limit]
+
+
+def _profile_group_lines(groups: list[dict]) -> list[str]:
+    """Keep anomalies and sufficient groups apart; merge groups that only need more samples."""
+    lines: list[str] = []
+    small = []
+    for group in groups:
+        name = group.get("knowledgePoint", "知识点")
+        difficulty = DIFFICULTY_LABELS.get(group.get("difficulty", ""), group.get("difficulty", "") or "未分难度")
+        samples = group.get("samples", 0)
+        if group.get("anomaly"):
+            lines.append(f"{name}（{difficulty}）：独立样本{samples}条，近期表现异常，可核对是否猜题、概念混淆或操作失误。")
+        elif samples < SMALL_SAMPLE:
+            small.append(f"{name}（{difficulty}，{samples}条）")
+        else:
+            lines.append(f"{name}（{difficulty}）：独立样本{samples}条，按复习优先级安排巩固与进阶练习。")
+    if small:
+        lines.append("以下画像分组独立样本不足5条，建议补充独立样本：" + _merged_names(small) + "。")
+    return lines
+
+
+# Leaves room for appended reviewed excerpts within the 20000-character result.
+RULE_ANSWER_LIMIT = 16000
+
+
+def bounded_lines(lines, tail):
+    """Keep whole lines within the limit and state how many were not shown."""
+    budget = RULE_ANSWER_LIMIT - sum(len(line) + 1 for line in tail) - 60
+    shown = []
+    for line in lines:
+        if len(line) + 1 > budget:
+            break
+        shown.append(line)
+        budget -= len(line) + 1
+    if len(shown) < len(lines):
+        shown.append(f"……另有{len(lines) - len(shown)}条记录未在文字中展示，请在对应页面查看完整内容。")
+    return "\n".join(shown + tail)

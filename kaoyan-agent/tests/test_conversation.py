@@ -1,5 +1,4 @@
 import asyncio
-import json
 from unittest.mock import AsyncMock
 import pytest
 import httpx
@@ -69,7 +68,7 @@ async def test_ambiguous_reference_and_missing_document_ask_for_input():
 
 @pytest.mark.asyncio
 async def test_disabled_model_does_not_fake_document_generation():
-    req=request(); req.userInput="创建一份学习计划"
+    req=request(); req.userInput="创建一份学习笔记"
     result=await workflow().run(req)
     assert result["outcome"] == "UNSUPPORTED" and "documentProposal" not in result
 
@@ -86,12 +85,40 @@ async def test_bad_resolution_is_rejected_without_model_retry():
 async def test_unresolved_chat_asks_without_another_router_call():
     flow=workflow(enabled=True)
     flow.engine.model.generate.return_value=ConversationResolution(action="CHAT",standaloneQuery="不明确的请求")
-    assert (await flow.run(request(privacy={"modelAllowed":True,"provider":"https://open.bigmodel.cn/api/paas/v4"})))["outcome"] == "NEEDS_INPUT"
+    result = await flow.run(request(privacy={"modelAllowed":True,"provider":"https://open.bigmodel.cn/api/paas/v4"}))
+    assert result["outcome"] == "NEEDS_INPUT"
+    assert [item["label"] for item in result["clarificationOptions"]] == ["知识辅导", "分析学情", "院校推荐"]
     flow.engine.model.generate.assert_awaited_once()
 
 
 @pytest.mark.asyncio
-async def test_real_langchain_sdk_projects_before_provider_stream_finishes():
+async def test_compound_clarification_choices_are_resolvable_without_inventing_facts():
+    flow = workflow()
+    req = request()
+    req.userInput = "给我安排5道排序题并整理成笔记"
+    result = await flow.run(req)
+    choices = result["clarificationOptions"]
+    assert [item["label"] for item in choices] == ["知识讲解", "练习题目", "已完成作答"]
+    for item in choices:
+        chosen = request()
+        chosen.userInput = item["reply"]
+        plan = await flow.plan(chosen)
+        assert plan.clarification is None
+    missing = request()
+    missing.userInput = "查官网招生目录"
+    assert "clarificationOptions" not in await flow.run(missing)
+
+
+def test_options_for_partial_and_degree_conditions():
+    from agents.clarification import clarification_options
+    plan = ConversationResolution(action="SCHOOL_RECOMMEND", standaloneQuery="推荐院校")
+    result = {"outcome": "COMPLETED", "sections": [{"outcome": "NEEDS_INPUT"}], "followUp": ["请选择学硕或专硕"]}
+    assert [item["reply"] for item in clarification_options(result, plan)] == ["推荐院校；报考学硕", "推荐院校；报考专硕"]
+    assert not clarification_options({"outcome": "COMPLETED"}, plan)
+
+
+@pytest.mark.asyncio
+async def test_real_helloagents_sdk_projects_before_provider_stream_finishes():
     settings=Settings(_env_file=None,AGENT_INTERNAL_KEY=KEY,LLM_ENABLED=True,LLM_API_KEY="test-only")
     model=ModelClient(settings)
     model.client=AsyncOpenAI(api_key="test-only",max_retries=0,http_client=httpx.AsyncClient(transport=httpx.MockTransport(provider)))

@@ -2,7 +2,6 @@ from unittest.mock import AsyncMock
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
-import main
 from config import Settings
 from main import create_app
 from llm_client import ModelClient, ModelBudget
@@ -167,7 +166,6 @@ async def test_model_daily_budget_blocks_before_opening_vendor_client(monkeypatc
 
 def test_model_budget_changes_at_utc_date_boundary():
     from datetime import date
-    from llm_client import ModelBudget
     day = [date(2026, 10, 14)]
     limited = ModelBudget(today=lambda: day[0])
     limited.consume(1)
@@ -180,7 +178,6 @@ def test_model_budget_changes_at_utc_date_boundary():
 
 def test_concurrent_model_attempts_cannot_exceed_budget():
     from concurrent.futures import ThreadPoolExecutor
-    from llm_client import ModelBudget
     limited = ModelBudget()
     def attempt(_):
         try:

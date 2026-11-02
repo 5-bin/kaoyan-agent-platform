@@ -1,0 +1,1345 @@
+[
+  {
+    "code": "nau",
+    "name": "南京审计大学",
+    "hosts": [
+      "gs.nau.edu.cn"
+    ],
+    "entries": [
+      "https://gs.nau.edu.cn/2026/0920/c4397a161925/page.htm",
+      "https://gs.nau.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ucas",
+    "name": "中国科学院大学",
+    "hosts": [
+      "admission.ucas.edu.cn"
+    ],
+    "entries": [
+      "https://admission.ucas.edu.cn/info/ZhaoshengDanweiDetail/9e780c52-baf5-4020-b453-bc4510579559/8008612027",
+      "https://admission.ucas.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cuc",
+    "name": "中国传媒大学",
+    "hosts": [
+      "yz.cuc.edu.cn"
+    ],
+    "entries": [
+      "https://yz.cuc.edu.cn/2026/0930/c8550a274510/page.htm",
+      "https://yz.cuc.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "buaa",
+    "name": "北京航空航天大学",
+    "hosts": [
+      "yzb.buaa.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.buaa.edu.cn/xlss/zymlcx.htm",
+      "https://yzb.buaa.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "scu",
+    "name": "四川大学",
+    "hosts": [
+      "yz.scu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.scu.edu.cn/sszyml",
+      "https://yz.scu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "scnu",
+    "name": "华南师范大学",
+    "hosts": [
+      "yanzhao.scnu.edu.cn"
+    ],
+    "entries": [
+      "https://yanzhao.scnu.edu.cn/Master/Zsml_View.aspx",
+      "https://yanzhao.scnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ysu",
+    "name": "燕山大学",
+    "hosts": [
+      "yz.chsi.com.cn",
+      "zsc.ysu.edu.cn"
+    ],
+    "entries": [
+      "https://zsc.ysu.edu.cn/info/1255/7088.htm",
+      "https://yz.chsi.com.cn/zsml/yjfxdetail?id=496dc291f5c9567f22e7fd845324df20",
+      "https://zsc.ysu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "zua",
+    "name": "郑州航空工业管理学院",
+    "hosts": [
+      "yjsc.zua.edu.cn"
+    ],
+    "entries": [
+      "https://yjsc.zua.edu.cn/ssyjszszy/a008jsjxy/a085404jsjjs.htm",
+      "https://yjsc.zua.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "zust",
+    "name": "浙江科技大学",
+    "hosts": [
+      "itee.zust.edu.cn"
+    ],
+    "entries": [
+      "https://itee.zust.edu.cn/zsgz/yjszs/zsxx/zsml.htm",
+      "https://itee.zust.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ahnu",
+    "name": "安徽师范大学",
+    "hosts": [
+      "yz.ahnu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.ahnu.edu.cn/info/1006/10276.htm",
+      "https://yz.ahnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "imu",
+    "name": "内蒙古大学",
+    "hosts": [
+      "gs.imu.edu.cn"
+    ],
+    "entries": [
+      "https://gs.imu.edu.cn/zsgz/ssszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cqu",
+    "name": "重庆大学",
+    "hosts": [
+      "yz.cqu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.cqu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bnu",
+    "name": "北京师范大学",
+    "hosts": [
+      "yz.bnu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.bnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "muc",
+    "name": "中央民族大学",
+    "hosts": [
+      "grs.muc.edu.cn"
+    ],
+    "entries": [
+      "https://grs.muc.edu.cn/yjsyzsw/index.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "neu",
+    "name": "东北大学",
+    "hosts": [
+      "yz.neu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.neu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "sjtu",
+    "name": "上海交通大学",
+    "hosts": [
+      "yzb.sjtu.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.sjtu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "fzu",
+    "name": "福州大学",
+    "hosts": [
+      "yjsy.fzu.edu.cn"
+    ],
+    "entries": [
+      "https://yjsy.fzu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bjut",
+    "name": "北京工业大学",
+    "hosts": [
+      "yanzhao.bjut.edu.cn"
+    ],
+    "entries": [
+      "https://yanzhao.bjut.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "dhu",
+    "name": "东华大学",
+    "hosts": [
+      "yjszs.dhu.edu.cn"
+    ],
+    "entries": [
+      "https://yjszs.dhu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "suda",
+    "name": "苏州大学",
+    "hosts": [
+      "yjs.suda.edu.cn"
+    ],
+    "entries": [
+      "https://yjs.suda.edu.cn/8386/list.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "njust",
+    "name": "南京理工大学",
+    "hosts": [
+      "gs.njust.edu.cn"
+    ],
+    "entries": [
+      "https://gs.njust.edu.cn/zsw/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "gzu",
+    "name": "贵州大学",
+    "hosts": [
+      "gs.gzu.edu.cn"
+    ],
+    "entries": [
+      "https://gs.gzu.edu.cn/sszs/list.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "pku",
+    "name": "北京大学",
+    "hosts": [
+      "admission.pku.edu.cn"
+    ],
+    "entries": [
+      "https://admission.pku.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ruc",
+    "name": "中国人民大学",
+    "hosts": [
+      "pgs.ruc.edu.cn"
+    ],
+    "entries": [
+      "https://pgs.ruc.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "thu",
+    "name": "清华大学",
+    "hosts": [
+      "yz.tsinghua.edu.cn"
+    ],
+    "entries": [
+      "https://yz.tsinghua.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bit",
+    "name": "北京理工大学",
+    "hosts": [
+      "grd.bit.edu.cn"
+    ],
+    "entries": [
+      "https://grd.bit.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cau",
+    "name": "中国农业大学",
+    "hosts": [
+      "yz.cau.edu.cn"
+    ],
+    "entries": [
+      "https://yz.cau.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nku",
+    "name": "南开大学",
+    "hosts": [
+      "yzb.nankai.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.nankai.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "tju",
+    "name": "天津大学",
+    "hosts": [
+      "yzb.tju.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.tju.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "dlut",
+    "name": "大连理工大学",
+    "hosts": [
+      "gs.dlut.edu.cn"
+    ],
+    "entries": [
+      "https://gs.dlut.edu.cn/yjszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "jlu",
+    "name": "吉林大学",
+    "hosts": [
+      "yzb.jlu.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.jlu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hit",
+    "name": "哈尔滨工业大学",
+    "hosts": [
+      "yzb.hit.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.hit.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "fudan",
+    "name": "复旦大学",
+    "hosts": [
+      "gsao.fudan.edu.cn"
+    ],
+    "entries": [
+      "https://gsao.fudan.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "tongji",
+    "name": "同济大学",
+    "hosts": [
+      "yz.tongji.edu.cn"
+    ],
+    "entries": [
+      "https://yz.tongji.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ecnu",
+    "name": "华东师范大学",
+    "hosts": [
+      "yjszs.ecnu.edu.cn"
+    ],
+    "entries": [
+      "https://yjszs.ecnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nju",
+    "name": "南京大学",
+    "hosts": [
+      "yzb.nju.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.nju.edu.cn/main.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "seu",
+    "name": "东南大学",
+    "hosts": [
+      "yzb.seu.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.seu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "zju",
+    "name": "浙江大学",
+    "hosts": [
+      "www.zju.edu.cn"
+    ],
+    "entries": [
+      "https://www.zju.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ustc",
+    "name": "中国科学技术大学",
+    "hosts": [
+      "yz.ustc.edu.cn"
+    ],
+    "entries": [
+      "https://yz.ustc.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "xmu",
+    "name": "厦门大学",
+    "hosts": [
+      "gs.xmu.edu.cn"
+    ],
+    "entries": [
+      "https://gs.xmu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "sdu",
+    "name": "山东大学",
+    "hosts": [
+      "yz.sdu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.sdu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ouc",
+    "name": "中国海洋大学",
+    "hosts": [
+      "yz.ouc.edu.cn"
+    ],
+    "entries": [
+      "https://yz.ouc.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "whu",
+    "name": "武汉大学",
+    "hosts": [
+      "gs.whu.edu.cn"
+    ],
+    "entries": [
+      "https://gs.whu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hust",
+    "name": "华中科技大学",
+    "hosts": [
+      "gszs.hust.edu.cn"
+    ],
+    "entries": [
+      "https://gszs.hust.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hnu",
+    "name": "湖南大学",
+    "hosts": [
+      "gra.hnu.edu.cn"
+    ],
+    "entries": [
+      "https://gra.hnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "csu",
+    "name": "中南大学",
+    "hosts": [
+      "yz.csu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.csu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nudt",
+    "name": "国防科技大学",
+    "hosts": [
+      "yjszs.nudt.edu.cn"
+    ],
+    "entries": [
+      "https://yjszs.nudt.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "sysu",
+    "name": "中山大学",
+    "hosts": [
+      "graduate.sysu.edu.cn"
+    ],
+    "entries": [
+      "https://graduate.sysu.edu.cn/zsw/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "scut",
+    "name": "华南理工大学",
+    "hosts": [
+      "yz.scut.edu.cn"
+    ],
+    "entries": [
+      "https://yz.scut.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "uestc",
+    "name": "电子科技大学",
+    "hosts": [
+      "yz.uestc.edu.cn"
+    ],
+    "entries": [
+      "https://yz.uestc.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "xjtu",
+    "name": "西安交通大学",
+    "hosts": [
+      "yz.xjtu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.xjtu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nwpu",
+    "name": "西北工业大学",
+    "hosts": [
+      "yzb.nwpu.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.nwpu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nwafu",
+    "name": "西北农林科技大学",
+    "hosts": [
+      "yz.nwafu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.nwafu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "lzu",
+    "name": "兰州大学",
+    "hosts": [
+      "ge.lzu.edu.cn"
+    ],
+    "entries": [
+      "https://ge.lzu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bjtu",
+    "name": "北京交通大学",
+    "hosts": [
+      "yzb.bjtu.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.bjtu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "swufe",
+    "name": "西南财经大学",
+    "hosts": [
+      "yz.swufe.edu.cn"
+    ],
+    "entries": [
+      "https://yz.swufe.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ustb",
+    "name": "北京科技大学",
+    "hosts": [
+      "yzxc.ustb.edu.cn"
+    ],
+    "entries": [
+      "https://yzxc.ustb.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "buct",
+    "name": "北京化工大学",
+    "hosts": [
+      "graduate.buct.edu.cn"
+    ],
+    "entries": [
+      "https://graduate.buct.edu.cn/14026/list.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ncepu",
+    "name": "华北电力大学",
+    "hosts": [
+      "yjsy.ncepu.edu.cn"
+    ],
+    "entries": [
+      "https://yjsy.ncepu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hebut",
+    "name": "河北工业大学",
+    "hosts": [
+      "yjs.hebut.edu.cn"
+    ],
+    "entries": [
+      "https://yjs.hebut.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "upc",
+    "name": "中国石油大学（华东）",
+    "hosts": [
+      "yz.upc.edu.cn"
+    ],
+    "entries": [
+      "https://yz.upc.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hrbeu",
+    "name": "哈尔滨工程大学",
+    "hosts": [
+      "yzb.hrbeu.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.hrbeu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cumtb",
+    "name": "中国矿业大学（北京）",
+    "hosts": [
+      "yz.cumtb.edu.cn"
+    ],
+    "entries": [
+      "https://yz.cumtb.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ecust",
+    "name": "华东理工大学",
+    "hosts": [
+      "gschool.ecust.edu.cn"
+    ],
+    "entries": [
+      "https://gschool.ecust.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nuaa",
+    "name": "南京航空航天大学",
+    "hosts": [
+      "www.graduate.nuaa.edu.cn"
+    ],
+    "entries": [
+      "https://www.graduate.nuaa.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hhu",
+    "name": "河海大学",
+    "hosts": [
+      "gs.hhu.edu.cn"
+    ],
+    "entries": [
+      "https://gs.hhu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "jiangnan",
+    "name": "江南大学",
+    "hosts": [
+      "yz.jiangnan.edu.cn"
+    ],
+    "entries": [
+      "https://yz.jiangnan.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hfut",
+    "name": "合肥工业大学",
+    "hosts": [
+      "yjszs.hfut.edu.cn"
+    ],
+    "entries": [
+      "https://yjszs.hfut.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nwu",
+    "name": "西北大学",
+    "hosts": [
+      "yzb.nwu.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.nwu.edu.cn/zsdt/sszs/zsdt/3.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ncu",
+    "name": "南昌大学",
+    "hosts": [
+      "yjsy.ncu.edu.cn"
+    ],
+    "entries": [
+      "https://yjsy.ncu.edu.cn/zsgz/sszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "zzu",
+    "name": "郑州大学",
+    "hosts": [
+      "yz.zzu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.zzu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "swjtu",
+    "name": "西南交通大学",
+    "hosts": [
+      "yz.swjtu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.swjtu.edu.cn/web/index.html"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "xidian",
+    "name": "西安电子科技大学",
+    "hosts": [
+      "gr.xidian.edu.cn"
+    ],
+    "entries": [
+      "https://gr.xidian.edu.cn/yjsy/yjszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bupt",
+    "name": "北京邮电大学",
+    "hosts": [
+      "yzb.bupt.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.bupt.edu.cn/tz/ssyjs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bjfu",
+    "name": "北京林业大学",
+    "hosts": [
+      "graduate.bjfu.edu.cn"
+    ],
+    "entries": [
+      "https://graduate.bjfu.edu.cn/zsgl/sszs/index.html"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bucm",
+    "name": "北京中医药大学",
+    "hosts": [
+      "yanjiusheng.bucm.edu.cn"
+    ],
+    "entries": [
+      "https://yanjiusheng.bucm.edu.cn/zsjy/sszs/index.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bfsu",
+    "name": "北京外国语大学",
+    "hosts": [
+      "graduate.bfsu.edu.cn"
+    ],
+    "entries": [
+      "https://graduate.bfsu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cufe",
+    "name": "中央财经大学",
+    "hosts": [
+      "gs.cufe.edu.cn"
+    ],
+    "entries": [
+      "https://gs.cufe.edu.cn/zsgz/sszs_sz_.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "uibe",
+    "name": "对外经济贸易大学",
+    "hosts": [
+      "yjsy.uibe.edu.cn"
+    ],
+    "entries": [
+      "https://yjsy.uibe.edu.cn/cms/info.do?columnId=400"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "bsu",
+    "name": "北京体育大学",
+    "hosts": [
+      "zs.bsu.edu.cn"
+    ],
+    "entries": [
+      "https://zs.bsu.edu.cn/yjszsw/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ccom",
+    "name": "中央音乐学院",
+    "hosts": [
+      "www.ccom.edu.cn"
+    ],
+    "entries": [
+      "https://www.ccom.edu.cn/jgk/jxkygldw/ysjb/zxxx/sszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cupl",
+    "name": "中国政法大学",
+    "hosts": [
+      "yjsy.cupl.edu.cn"
+    ],
+    "entries": [
+      "https://yjsy.cupl.edu.cn/yjszs/3.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cup",
+    "name": "中国石油大学（北京）",
+    "hosts": [
+      "grs.cup.edu.cn"
+    ],
+    "entries": [
+      "https://grs.cup.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cugb",
+    "name": "中国地质大学（北京）",
+    "hosts": [
+      "bm.cugb.edu.cn"
+    ],
+    "entries": [
+      "https://bm.cugb.edu.cn/yjsyzsb/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "tmu",
+    "name": "天津医科大学",
+    "hosts": [
+      "gs.tmu.edu.cn"
+    ],
+    "entries": [
+      "https://gs.tmu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "tyut",
+    "name": "太原理工大学",
+    "hosts": [
+      "www.gs.tyut.edu.cn"
+    ],
+    "entries": [
+      "https://www.gs.tyut.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "lnu",
+    "name": "辽宁大学",
+    "hosts": [
+      "grs.lnu.edu.cn"
+    ],
+    "entries": [
+      "https://grs.lnu.edu.cn/zsgz/sszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "dlmu",
+    "name": "大连海事大学",
+    "hosts": [
+      "grs.dlmu.edu.cn"
+    ],
+    "entries": [
+      "https://grs.dlmu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ybu",
+    "name": "延边大学",
+    "hosts": [
+      "grad.ybu.edu.cn"
+    ],
+    "entries": [
+      "https://grad.ybu.edu.cn/zsgz/sszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nenu",
+    "name": "东北师范大学",
+    "hosts": [
+      "yjsy.nenu.edu.cn"
+    ],
+    "entries": [
+      "https://yjsy.nenu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "neau",
+    "name": "东北农业大学",
+    "hosts": [
+      "graduate.neau.edu.cn"
+    ],
+    "entries": [
+      "https://graduate.neau.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nefu",
+    "name": "东北林业大学",
+    "hosts": [
+      "yz.nefu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.nefu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "shisu",
+    "name": "上海外国语大学",
+    "hosts": [
+      "yz.shisu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.shisu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "sufe",
+    "name": "上海财经大学",
+    "hosts": [
+      "yz.sufe.edu.cn"
+    ],
+    "entries": [
+      "https://yz.sufe.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "shu",
+    "name": "上海大学",
+    "hosts": [
+      "yjszs.shu.edu.cn"
+    ],
+    "entries": [
+      "https://yjszs.shu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "smmu",
+    "name": "海军军医大学",
+    "hosts": [
+      "www.smmu.edu.cn"
+    ],
+    "entries": [
+      "https://www.smmu.edu.cn/zsjz/list.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cumt",
+    "name": "中国矿业大学",
+    "hosts": [
+      "yz.cumt.edu.cn"
+    ],
+    "entries": [
+      "https://yz.cumt.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "njau",
+    "name": "南京农业大学",
+    "hosts": [
+      "zsgz.njau.edu.cn"
+    ],
+    "entries": [
+      "https://zsgz.njau.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cpu",
+    "name": "中国药科大学",
+    "hosts": [
+      "yjszs.cpu.edu.cn"
+    ],
+    "entries": [
+      "https://yjszs.cpu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "njnu",
+    "name": "南京师范大学",
+    "hosts": [
+      "yjszs.njnu.edu.cn"
+    ],
+    "entries": [
+      "https://yjszs.njnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ahu",
+    "name": "安徽大学",
+    "hosts": [
+      "graschool.ahu.edu.cn"
+    ],
+    "entries": [
+      "https://graschool.ahu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "cug",
+    "name": "中国地质大学（武汉）",
+    "hosts": [
+      "yz.cug.edu.cn"
+    ],
+    "entries": [
+      "https://yz.cug.edu.cn/cugyz"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "whut",
+    "name": "武汉理工大学",
+    "hosts": [
+      "www.whut.edu.cn"
+    ],
+    "entries": [
+      "https://www.whut.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hzau",
+    "name": "华中农业大学",
+    "hosts": [
+      "yjs.hzau.edu.cn"
+    ],
+    "entries": [
+      "https://yjs.hzau.edu.cn/zsgz/sszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ccnu",
+    "name": "华中师范大学",
+    "hosts": [
+      "gs.ccnu.edu.cn"
+    ],
+    "entries": [
+      "https://gs.ccnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "zuel",
+    "name": "中南财经政法大学",
+    "hosts": [
+      "yzb.zuel.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.zuel.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hunnu",
+    "name": "湖南师范大学",
+    "hosts": [
+      "yjsc.hunnu.edu.cn"
+    ],
+    "entries": [
+      "https://yjsc.hunnu.edu.cn/zsks/sszk1.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "jnu",
+    "name": "暨南大学",
+    "hosts": [
+      "yz.jnu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.jnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "gxu",
+    "name": "广西大学",
+    "hosts": [
+      "yjsc.gxu.edu.cn"
+    ],
+    "entries": [
+      "https://yjsc.gxu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "hainanu",
+    "name": "海南大学",
+    "hosts": [
+      "gs.hainanu.edu.cn"
+    ],
+    "entries": [
+      "https://gs.hainanu.edu.cn/yjszs/ssszs.htm"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "swu",
+    "name": "西南大学",
+    "hosts": [
+      "yz.swu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.swu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "sicau",
+    "name": "四川农业大学",
+    "hosts": [
+      "yan.sicau.edu.cn"
+    ],
+    "entries": [
+      "https://yan.sicau.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "ynu",
+    "name": "云南大学",
+    "hosts": [
+      "www.ynu.edu.cn"
+    ],
+    "entries": [
+      "https://www.ynu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "utibet",
+    "name": "西藏大学",
+    "hosts": [
+      "yjszs.utibet.edu.cn"
+    ],
+    "entries": [
+      "https://yjszs.utibet.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "chd",
+    "name": "长安大学",
+    "hosts": [
+      "yzb.chd.edu.cn"
+    ],
+    "entries": [
+      "https://yzb.chd.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "snnu",
+    "name": "陕西师范大学",
+    "hosts": [
+      "yz.snnu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.snnu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "fmmu",
+    "name": "空军军医大学",
+    "hosts": [
+      "www.fmmu.edu.cn"
+    ],
+    "entries": [
+      "https://www.fmmu.edu.cn/yjsy/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "qhu",
+    "name": "青海大学",
+    "hosts": [
+      "yjs.qhu.edu.cn"
+    ],
+    "entries": [
+      "https://yjs.qhu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "nxu",
+    "name": "宁夏大学",
+    "hosts": [
+      "graduate.nxu.edu.cn"
+    ],
+    "entries": [
+      "https://graduate.nxu.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "xju",
+    "name": "新疆大学",
+    "hosts": [
+      "yz.xju.edu.cn"
+    ],
+    "entries": [
+      "https://yz.xju.edu.cn/"
+    ],
+    "year": 2027
+  },
+  {
+    "code": "shzu",
+    "name": "石河子大学",
+    "hosts": [
+      "yz.shzu.edu.cn"
+    ],
+    "entries": [
+      "https://yz.shzu.edu.cn/"
+    ],
+    "year": 2027
+  }
+]
