@@ -34,6 +34,9 @@ import java.util.Map;
 public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, PracticeRecord>
         implements PracticeService {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.beans.factory.ObjectProvider<com.kaoyan.learning.ManagedPracticeService> managed;
+
     private final QuestionService questionService;
     private final com.kaoyan.mapper.QuestionMapper questionMapper;
     private final UserQuestionMarkService userQuestionMarkService;
@@ -69,7 +72,7 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
         if (questions.isEmpty()) {
             throw new ApiException(404, 404, "没有符合条件的题目");
         }
-        String sessionId = IdUtil.sessionId();
+        String sessionId = managed.getIfAvailable()!=null ? IdUtil.managedSessionId() : IdUtil.sessionId();
         int order = 0;
         for (Question q : questions) {
             PracticeRecord r = new PracticeRecord();
@@ -83,6 +86,7 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
             r.setQuestionSnapshot(fixed);
             save(r);
         }
+        if (managed.getIfAvailable() != null) managed.getObject().register(userId,sessionId,"PRACTICE",Map.of("id","practice-v1"));
         return sessionId;
     }
 
@@ -99,6 +103,8 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
         if (r == null) {
             throw new ApiException(404, 404, "作答记录不存在");
         }
+        if (sessionId.startsWith("L-"))
+            throw new ApiException(400,"新批次请通过带clientRequestId的提交接口作答");
         if (r.getIsCorrect() != null) {
             throw new ApiException(409, 409, "该题已作答");
         }
@@ -129,7 +135,7 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
             userQuestionMarkService.markWrong(userId, questionId);
         }
         studyStatService.accumulate(userId, 1, correct ? 1 : 0, 0);
-        return new AnswerVO(questionId, selected, correct ? 1 : 0, expected, grading.getAnalysis());
+        return new AnswerVO(questionId, selected, correct ? 1 : 0, expected, grading.getAnalysis(), r.getId());
     }
 
     private static Map<String, Object> snapshot(Question q) {
@@ -199,10 +205,13 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
     @Override
     @Transactional
     public void abandonSession(Long userId, String sessionId) {
-        lambdaUpdate()
-                .eq(PracticeRecord::getUserId, userId)
-                .eq(PracticeRecord::getSessionId, sessionId)
-                .remove();
+        if (managed.getIfAvailable()!=null && managed.getObject().manages(userId,sessionId)) {
+            managed.getObject().finish(userId,sessionId);return;
+        }
+        if(sessionId.startsWith("L-"))throw new ApiException(503,"该批次需要启用诊断与学情功能后结束");
+        if(sessionDetail(userId,sessionId).isEmpty())throw new ApiException(404,"批次不存在");
+        lambdaUpdate().eq(PracticeRecord::getUserId,userId).eq(PracticeRecord::getSessionId,sessionId)
+            .isNull(PracticeRecord::getIsCorrect).set(PracticeRecord::getGradingStatus,"closed").update();
     }
 
     @Override
@@ -228,6 +237,7 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeRecordMapper, Pract
         }
         List<ReviewRecordVO> views = result.getRecords().stream().map(r -> {
             ReviewRecordVO view = new ReviewRecordVO();
+            view.setRecordId(r.getId());
             view.setSessionId(r.getSessionId()); view.setQuestionId(r.getQuestionId()); view.setOrderIndex(r.getOrderIndex());
             view.setUserAnswer(r.getUserAnswer()); view.setIsCorrect(r.getIsCorrect());
             QuestionHistoryView.populate(view, r, r.getIsCorrect() == null ? questionService.getById(r.getQuestionId()) : null);

@@ -7,9 +7,6 @@ import java.util.UUID;
  */
 public final class IdUtil {
 
-    private static final String BASE62 =
-            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
     private IdUtil() {
     }
 
@@ -23,27 +20,16 @@ public final class IdUtil {
     }
 
     /**
-     * 8 位 base62 短 ID
-     *
-     * @return 8 位字符串
-     */
-    public static String shortId() {
-        UUID u = UUID.randomUUID();
-        long n = u.getMostSignificantBits() ^ u.getLeastSignificantBits();
-        StringBuilder sb = new StringBuilder(8);
-        for (int i = 0; i < 8; i++) {
-            sb.append(BASE62.charAt((int) Math.floorMod(n, 62)));
-            n /= 62;
-        }
-        return sb.toString();
-    }
-
-    /**
      * 标准 UUID 格式（含横线）
      *
      * @return UUID 字符串
      */
     public static String sessionId() {
         return UUID.randomUUID().toString();
+    }
+
+    /** Managed sessions keep their route prefix and fit the existing VARCHAR(36) column. */
+    public static String managedSessionId() {
+        return "L-" + uuid();
     }
 }

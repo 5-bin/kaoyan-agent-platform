@@ -1,5 +1,6 @@
 <template>
   <div class="page">
+    <DiagnosticEntry />
     <div class="page-head">
       <h2 class="page-title">早上好，{{ userStore.userInfo?.username }} 👋</h2>
       <p class="page-sub">今天也要加油上岸</p>
@@ -43,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import DiagnosticEntry from '@/components/DiagnosticEntry.vue'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
