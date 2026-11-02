@@ -24,8 +24,11 @@ public class TaskStore {
         return exempt != null && !exempt.isBlank() && exempt.equals(mapper.quotaUsername(owner));
     }
 
+    /** Called inside the reservation transaction before reading private parent context. */
+    public void lockAccount(Long owner) { mapper.lockQuotaAccount(owner); }
+
     @Transactional
-    public synchronized void begin(Task task) {
+    public void begin(Task task) {
         mapper.lockQuotaAccount(task.getUserId());
         var instant = clock.instant();
         LocalDateTime now = LocalDateTime.ofInstant(instant, clock.getZone());

@@ -64,7 +64,8 @@ const onSubmit = async () => {
   try {
     await userStore.login(form.username, form.password)
     ElMessage.success('登录成功')
-    router.push((route.query.redirect as string) || '/')
+    const destination = route.query.redirect as string | undefined
+    router.push(destination && destination !== '/' ? destination : '/tasks')
   } finally {
     loading.value = false
   }

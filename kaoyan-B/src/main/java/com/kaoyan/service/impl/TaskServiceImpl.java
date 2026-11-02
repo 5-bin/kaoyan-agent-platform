@@ -24,24 +24,34 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements TaskService, ApplicationRunner {
-    private static final Set<String> TYPES = Set.of("KNOWLEDGE_QA", "SCHOOL_RECOMMEND", "PRACTICE_SUMMARY", "CHAT");
+    private static final Set<String> TYPES = Set.of("KNOWLEDGE_QA", "SCHOOL_RECOMMEND", "PRACTICE_SUMMARY", "CHAT", "WRONG_QUESTION_TUTOR");
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.beans.factory.ObjectProvider<com.kaoyan.learning.LearningProfiles> learningProfiles;
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.beans.factory.ObjectProvider<com.kaoyan.learning.LearningRecommendations> learningRecommendations;
     private final AgentFeignClient agentClient;
     private final AgentProperties agentProps;
     private final UserMapper userMapper;
     private final PracticeRecordMapper practiceRecordMapper;
-    private final QuestionMapper questionMapper;
     private final TaskStore store;
+    private final WrongQuestionTutorContext tutorContext;
     private final com.kaoyan.service.ReferenceSourcePolicy sourcePolicy;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private com.kaoyan.service.AssistantPrivacyService privacy;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private org.springframework.beans.factory.ObjectProvider<com.kaoyan.service.ConversationService> conversations;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.transaction.support.TransactionTemplate transactions;
+
+    private record Reservation(AgentRequest request, Map<String,Object> consent) {}
+
     @Override
     public Task submit(Long userId, String taskType, Map<String, Object> input) {
         if (taskType == null || !TYPES.contains(taskType)) throw new ApiException(400, "未知任务类型");
         Map<String, Object> fields = input == null ? Map.of() : input;
         Set<String> allowed = switch (taskType) {
+            case "WRONG_QUESTION_TUTOR" -> Set.of("recordId", "query", "parentTaskId");
             case "PRACTICE_SUMMARY" -> Set.of("sessionId");
             case "SCHOOL_RECOMMEND", "CHAT" -> Set.of("query", "preferences", "messages");
             default -> Set.of("query", "messages");
@@ -52,17 +62,13 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         task.setUserId(userId);
         task.setTaskType(taskType);
         task.setStatus("RUNNING");
-        AgentRequest request = buildRequest(userId, taskType, task.getId(), fields);
-        request.setQuotaExempt(store.isQuotaExempt(userId));
-        Map<String,Object> consent=privacy==null?Map.of("modelAllowed",false,"scopes",List.of(),"version",0):privacy.settings(userId);
-        request.setPrivacy(privacy==null?consent:privacy.wire(consent));
+        // Resolve the provider outside locks; consent is sampled after locking the account.
+        String provider=privacy==null?null:privacy.provider();
+        Reservation reserved=transactions==null?reserveRequest(userId,taskType,task,fields,provider)
+            :transactions.execute(tx -> reserveRequest(userId,taskType,task,fields,provider));
+        AgentRequest request=reserved.request();
+        Map<String,Object> consent=reserved.consent();
         Map<String,Object> grant=com.kaoyan.security.UserContext.sessionGrant();
-        // Save the exact authorized context, not a client-supplied profile or owner.
-        Map<String, Object> snapshot = new LinkedHashMap<>(fields);
-        snapshot.put("profileSnapshot", request.getProfile());
-        if (request.getQuestions() != null) snapshot.put("questions", request.getQuestions());
-        task.setInputPayload(snapshot);
-        synchronized (store) { store.begin(task); }
         try {
             if(privacy!=null) privacy.check(userId,grant,((Number)consent.get("version")).intValue());
             if(privacy!=null && Boolean.TRUE.equals(consent.get("modelAllowed")) && !privacy.provider().equals(consent.get("provider")))
@@ -78,6 +84,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             if ("SUCCESS".equals(response.getStatus())) {
                 Map<String, Object> result = new LinkedHashMap<>(asMap(response.getResult()));
                 result.put("references", response.getReferences());
+                if ("SCHOOL_RECOMMEND".equals(taskType) && request.getLearningSnapshot()!=null)
+                    learningRecommendations.getObject().enrich(userId,result,request.getLearningSnapshot(),"MANUAL");
                 task.setResultPayload(result);
             } else task.setErrorMessage("Agent处理失败，请稍后重试");
         } catch (Exception e) {
@@ -88,6 +96,27 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         if(privacy!=null) privacy.finishTask(task,grant,((Number)consent.get("version")).intValue());
         else store.finish(task);
         return task;
+    }
+
+    private Reservation reserveRequest(Long owner,String type,Task task,Map<String,Object> fields,String provider) {
+        store.lockAccount(owner);
+        Map<String,Object> consent=privacy==null?Map.of("modelAllowed",false,"scopes",List.of(),"version",0):privacy.settings(owner,provider);
+        AgentRequest request=buildRequest(owner,type,task.getId(),fields);
+        request.setQuotaExempt(store.isQuotaExempt(owner));
+        request.setPrivacy(privacy==null?consent:privacy.wire(consent));
+        Map<String,Object> snapshot=new LinkedHashMap<>(fields);
+        snapshot.put("profileSnapshot",request.getProfile());
+        if(request.getQuestions()!=null)snapshot.put("questions",request.getQuestions());
+        if(request.getAttempt()!=null)snapshot.put("attempt",request.getAttempt());
+        // Parent references retain original lifetimes. Messages are rebuilt, never copied.
+        task.setInputPayload(snapshot);
+        store.begin(task);
+        return new Reservation(request,consent);
+    }
+
+    @Override
+    public com.kaoyan.dto.response.TaskView view(Task task) {
+        return com.kaoyan.dto.response.TaskView.of(task,tutorContext.turn(task));
     }
 
     private AgentRequest buildRequest(Long userId, String type, String id, Map<String, Object> input) {
@@ -103,6 +132,14 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         profile.put("examYear", user.getExamYear());
         // Free-form background is unrelated to rule-based screening and never forwarded by default.
         request.setProfile(profile);
+        if ("SCHOOL_RECOMMEND".equals(type) && learningProfiles!=null && learningProfiles.getIfAvailable()!=null)
+            request.setLearningSnapshot(learningProfiles.getObject().snapshot(userId));
+        if ("WRONG_QUESTION_TUTOR".equals(type)) {
+            // This path accepts only record IDs and queries, never client-provided context.
+            request.setProfile(Map.of());
+            tutorContext.populate(request, userId, input);
+            return request;
+        }
         if (!"PRACTICE_SUMMARY".equals(type)) {
             Object query = input.get("query");
             if (!(query instanceof String text) || text.isBlank() || text.strip().length() > 8000)
@@ -185,6 +222,16 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         return (Map<String, Object>) map;
     }
 
+    /** Fixed public downgrade codes; see the 2026-11-02 fallback reason contract. */
+    public static final Set<String> FALLBACK_REASONS = Set.of("TIMEOUT", "UNAVAILABLE", "BUDGET_EXHAUSTED",
+            "INPUT_TOO_LONG", "INVALID_OUTPUT", "EVIDENCE_MISMATCH", "NUMBER_MISMATCH");
+
+    /** A reason is optional, but only a downgraded layer may carry one. */
+    public static boolean validFallbackReason(Map<?, ?> layer) {
+        if (!layer.containsKey("fallbackReason")) return true;
+        return "fallback".equals(layer.get("explanationMode")) && FALLBACK_REASONS.contains(layer.get("fallbackReason"));
+    }
+
     public static void validateResponse(Task task, AgentResponse response) {
         if (response == null || !task.getId().equals(response.getTaskId())
                 || response.getStatus() == null || !Set.of("SUCCESS", "FAILED").contains(response.getStatus())
@@ -192,6 +239,16 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             throw new IllegalStateException("Agent response mismatch");
         if (!"SUCCESS".equals(response.getStatus())) return;
         Map<String, Object> result = asMap(response.getResult());
+        if ("WRONG_QUESTION_TUTOR".equals(task.getTaskType())) {
+            Map<String, Object> attempt = asMap(task.getInputPayload().get("attempt"));
+            for (String field : List.of("standardAnswer", "userAnswer", "questionVersion", "recordId")) {
+                String source = field.equals("standardAnswer") ? "answer" : field.equals("questionVersion") ? "version" : field;
+                if (!Objects.toString(attempt.get(source)).equals(Objects.toString(result.get(field))))
+                    throw new IllegalStateException("Tutor changed authoritative result");
+            }
+            if (!(result.get("answer") instanceof String explanation) || explanation.isBlank() || explanation.length() > 4000
+                    || !response.getReferences().isEmpty()) throw new IllegalStateException("Invalid tutor result");
+        }
         if (result.get("outcome") == null || !Set.of("COMPLETED", "NEEDS_INPUT", "UNSUPPORTED").contains(result.get("outcome"))
                 || !response.getReleaseId().equals(result.get("releaseId"))
                 || result.get("explanationMode") == null || !Set.of("rules", "ai", "fallback").contains(result.get("explanationMode"))
@@ -200,6 +257,18 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
                 || !(result.get("answer") instanceof String answer) || answer.length() > 20000
                 || response.getReferences() == null || response.getReferences().size() > 20)
             throw new IllegalStateException("Agent result mismatch");
+        if (!validFallbackReason(result)) throw new IllegalStateException("Invalid fallback reason");
+        if (result.containsKey("clarificationOptions")) {
+            if (!(result.get("clarificationOptions") instanceof List<?> options) || options.isEmpty() || options.size() > 3)
+                throw new IllegalStateException("Invalid clarification options");
+            Set<String> labels = new HashSet<>();
+            for (Object item : options) {
+                if (!(item instanceof Map<?, ?> option) || !option.keySet().equals(Set.of("label", "reply"))
+                        || !(option.get("label") instanceof String label) || label.isBlank() || label.length() > 60 || !labels.add(label)
+                        || !(option.get("reply") instanceof String reply) || reply.isBlank() || reply.length() > 2000)
+                    throw new IllegalStateException("Invalid clarification option");
+            }
+        }
         Set<String> sourceIds = new HashSet<>();
         for (Object item : response.getReferences()) {
             Map<String, Object> ref = asMap(item);

@@ -4,7 +4,6 @@ import com.kaoyan.common.PageResult;
 import com.kaoyan.common.Result;
 import com.kaoyan.dto.query.PageQuery;
 import com.kaoyan.dto.request.TaskSubmitRequest;
-import com.kaoyan.entity.Task;
 import com.kaoyan.dto.response.TaskView;
 import com.kaoyan.security.UserContext;
 import com.kaoyan.service.TaskService;
@@ -14,7 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 /**
  * Agent 任务接口
@@ -33,7 +31,7 @@ public class TaskController {
     @Operation(summary = "提交任务")
     @PostMapping
     public Result<TaskView> submit(@Valid @RequestBody TaskSubmitRequest req) {
-        return Result.ok(TaskView.of(taskService.submit(UserContext.currentUserId(), req.taskType(), req.input())));
+        return Result.ok(taskService.view(taskService.submit(UserContext.currentUserId(), req.taskType(), req.input())));
     }
 
     /**
@@ -45,7 +43,7 @@ public class TaskController {
         int page = query.pageNum();
         int size = query.pageSize();
         var result=taskService.history(UserContext.currentUserId(), page, size);
-        return Result.ok(PageResult.of(result.getTotal(),result.getPage(),result.getSize(),result.getList().stream().map(TaskView::of).toList()));
+        return Result.ok(PageResult.of(result.getTotal(),result.getPage(),result.getSize(),result.getList().stream().map(taskService::view).toList()));
     }
 
     /**
@@ -54,6 +52,6 @@ public class TaskController {
     @Operation(summary = "任务详情")
     @GetMapping("/{taskId}")
     public Result<TaskView> detail(@PathVariable String taskId) {
-        return Result.ok(TaskView.of(taskService.detail(UserContext.currentUserId(), taskId)));
+        return Result.ok(taskService.view(taskService.detail(UserContext.currentUserId(), taskId)));
     }
 }

@@ -62,7 +62,7 @@ const onSubmit = async () => {
   try {
     await userStore.register(form.username, form.password)
     ElMessage.success('注册成功')
-    router.push('/')
+    router.push('/tasks')
   } finally { loading.value = false }
 }
 </script>

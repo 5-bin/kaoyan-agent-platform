@@ -30,6 +30,11 @@ public class AssistantSmokeServer {
                     if(jdbc.queryForObject("SELECT COUNT(*) FROM question WHERE id=?",Integer.class,id)==0)
                         jdbc.update("INSERT INTO question(id,subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES(?,'数据结构',?,?,'甲','乙','丙','丁','A','不得用于检索的解析','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')",id,i==0?"二叉树":i==1?"遍历":"队列",i==1?"左右孩子的访问顺序":"合成题目");
                 }
+                if(environment.getProperty("kaoyan.smoke.questions",Boolean.class,false))for(int i=0;i<6;i++) {
+                    long id=9031+i;
+                    if(jdbc.queryForObject("SELECT COUNT(*) FROM question WHERE id=?",Integer.class,id)==0)
+                        jdbc.update("INSERT INTO question(id,subject,knowledge_point,content,option_a,option_b,option_c,option_d,answer,analysis,difficulty,question_type,version,active,stable_order,review_status) VALUES(?,'数据结构','排序',?,'甲','乙','丙','丁','A','排序夹具解析','EASY','SINGLE_CHOICE',1,1,1,'APPROVED')",id,"隔离排序题"+i);
+                }
             };
         }
     }

@@ -1,0 +1,18 @@
+{
+  "subject": "数据结构",
+  "knowledgePoint": "栈的后进先出规则",
+  "difficulty": "EASY",
+  "content": "一个初始为空的栈，依次执行 push(2)、push(5)、pop()、push(8)，再执行一次 pop()。最后这次 pop() 返回哪个值？",
+  "optionA": "2",
+  "optionB": "5",
+  "optionC": "8",
+  "optionD": "栈为空，无法弹出元素",
+  "answer": "C",
+  "analysis": "栈遵循后进先出规则。push(2)、push(5) 后，栈从底到顶为 [2, 5]；第一次 pop() 弹出 5，剩余 [2]；push(8) 后为 [2, 8]；最后一次 pop() 弹出栈顶 8。因此正确答案为 C。",
+  "sourceType": "ORIGINAL",
+  "sourceName": "刷题 AI 辅导联调自编示例",
+  "sourceLocator": "docs/examples/practice-tutor-demo-question.json",
+  "sourceYear": null,
+  "sourceQuestionNo": null,
+  "permissionNote": "AI 辅助自编，仅用于本地功能测试，非历年真题或第三方题库摘录；正式使用前需人工核对并审核。"
+}

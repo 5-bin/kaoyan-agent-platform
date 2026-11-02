@@ -84,7 +84,7 @@ test('delete running current then last and send into a new conversation', async 
   await expect(page.getByRole('button', { name: '停止生成', exact: true })).toHaveCount(0); await expect(input(page)).toHaveValue('')
   dialog = await askDelete(page, 'b'); await dialog.getByRole('button', { name: '删除', exact: true }).click()
   await expect(page).toHaveURL(/\/tasks$/); expect(state.creates).toBe(0)
-  await expect(page.getByText('可以询问408知识、咨询择校，或创建和修改学习笔记')).toBeVisible()
+  await expect(page.getByText('可以询问408知识、分析学情、安排复习和练习、咨询择校，或整理学习笔记')).toBeVisible()
   await input(page).fill('新的问题'); await page.getByRole('button', { name: '发送', exact: true }).click()
   await expect(page).toHaveURL(/conversationId=new/); expect(state.creates).toBe(1)
 })
