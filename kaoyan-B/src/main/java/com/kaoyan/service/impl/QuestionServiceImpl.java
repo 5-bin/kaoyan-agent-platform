@@ -17,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 题库 Service 实现
@@ -46,14 +49,58 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     @Override
     @Transactional
     public Question create(QuestionEntryRequest request) {
+        Question question = unpublishedEntry(request);
+        save(question);
+        return question;
+    }
+
+    private Question unpublishedEntry(QuestionEntryRequest request) {
         Question question = entry(request);
         question.setActive(1);
         question.setVersion(1);
         question.setStableOrder(0);
         question.setQuestionType("SINGLE_CHOICE");
         question.setReviewStatus("PENDING_REVIEW");
-        save(question);
         return question;
+    }
+
+    @Override
+    public List<Question> previewImport(List<QuestionEntryRequest> entries) {
+        if (entries == null || entries.isEmpty() || entries.size() > 50)
+            throw new ApiException(400, 400, "每批请导入1至50道题目");
+        List<Question> result = new ArrayList<>();
+        Map<List<String>, Integer> seen = new HashMap<>();
+        for (int i = 0; i < entries.size(); i++) {
+            Question q;
+            try { q = unpublishedEntry(entries.get(i)); }
+            catch (ApiException error) {
+                throw new ApiException(400, 400, "第" + (i + 1) + "题：" + error.getMessage());
+            }
+            var key = List.of(q.getSubject(), q.getContent(), q.getOptionA(), q.getOptionB(), q.getOptionC(), q.getOptionD());
+            Integer first = seen.putIfAbsent(key, i + 1);
+            if (first != null)
+                throw new ApiException(400, 400, "第" + (i + 1) + "题与本批第" + first + "题重复，请核对题干和选项");
+            var existing = lambdaQuery().select(Question::getId)
+                .eq(Question::getSubject, q.getSubject()).eq(Question::getContent, q.getContent())
+                .eq(Question::getOptionA, q.getOptionA()).eq(Question::getOptionB, q.getOptionB())
+                .eq(Question::getOptionC, q.getOptionC()).eq(Question::getOptionD, q.getOptionD())
+                .orderByAsc(Question::getId).last("LIMIT 1").one();
+            if (existing != null)
+                throw new ApiException(409, 409, "第" + (i + 1) + "题已存在，题目ID为" + existing.getId() + "，请先查看已有题目");
+            result.add(q);
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public List<Question> importQuestions(List<QuestionEntryRequest> entries) {
+        // Validate all rows before the first INSERT; runtime write failures roll back the whole batch.
+        List<Question> questions = previewImport(entries);
+        for (Question question : questions) {
+            if (!save(question)) throw new ApiException(500, 500, "导入未完成，整批已回滚");
+        }
+        return questions;
     }
 
     @Override

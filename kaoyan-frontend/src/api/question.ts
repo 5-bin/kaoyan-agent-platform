@@ -1,12 +1,6 @@
 ﻿import request from './request'
 import type { StudentQuestion, PageResult } from '@/types/api'
-import type { QuestionEntry, QuestionUpdate, AdminQuestion } from '@/types/question-entry'
-
-export const getPracticeQuestions = (params: {
-  subject?: string
-  difficulty?: string
-  limit?: number
-}) => request.get<unknown, StudentQuestion[]>('/questions/practice', { params })
+import type { QuestionEntry, QuestionUpdate, AdminQuestion, QuestionImportResult, QuestionImportPreview } from '@/types/question-entry'
 
 export const getQuestionDetail = (id: number) =>
   request.get<unknown, StudentQuestion>(`/questions/${id}`)
@@ -19,6 +13,12 @@ export const getAdminQuestion = (id: number) =>
 
 export const createQuestion = (data: QuestionEntry) =>
   request.post<unknown, AdminQuestion>('/questions/admin', data)
+
+export const previewQuestionImport = (data: { questions: QuestionEntry[] }) =>
+  request.post<unknown, QuestionImportPreview>('/questions/admin/import/preview', data)
+
+export const importQuestions = (data: { questions: QuestionEntry[] }) =>
+  request.post<unknown, QuestionImportResult>('/questions/admin/import', data)
 
 export const updateQuestion = (id: number, data: QuestionUpdate) =>
   request.put<unknown, AdminQuestion>(`/questions/admin/${id}`, data)

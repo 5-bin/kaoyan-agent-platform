@@ -41,6 +41,12 @@ public interface QuestionService extends IService<Question> {
      */
     Question create(QuestionEntryRequest request);
 
+    /** Validates every row and existing duplicates without writing. */
+    List<Question> previewImport(List<QuestionEntryRequest> entries);
+
+    /** Revalidates and persists the entire batch in one transaction. */
+    List<Question> importQuestions(List<QuestionEntryRequest> entries);
+
     /**
      * 更新题目
      *

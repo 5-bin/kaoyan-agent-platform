@@ -78,6 +78,109 @@ class QuestionEntryReviewTest {
         return call(get("/api/questions/practice").param("knowledgePoint", body.get("knowledgePoint").toString()), student, null, 200);
     }
 
+    Map<String, Object> importEntry() {
+        var body = entry(); body.put("content", body.get("content") + " " + body.get("knowledgePoint"));
+        return body;
+    }
+    JsonNode importBatch(String token, Object rows, boolean preview, int expected) throws Exception {
+        return call(post("/api/questions/admin/import" + (preview ? "/preview" : "")), token, Map.of("questions", rows), expected);
+    }
+
+    @Test void batchPreviewDoesNotWriteAndImportRequiresReviewBeforePractice() throws Exception {
+        String admin = account(true), student = account(false);
+        var first = importEntry(); var second = importEntry();
+        second.put("sourceType", "REAL_EXAM"); second.put("sourceYear", 2024); second.put("sourceQuestionNo", "第2题");
+        // Synthetic provenance for isolated testing, not evidence of rights to a real paper.
+        var rows = List.of(first, second); long before = questions.selectCount(null);
+        var preview = importBatch(admin, rows, true, 200);
+        assertEquals(2, preview.path("count").asInt()); assertEquals(before, questions.selectCount(null));
+        assertTrue(preview.path("questions").get(0).path("id").isNull());
+        var imported = importBatch(admin, rows, false, 200).path("questions");
+        assertEquals(before + 2, questions.selectCount(null));
+        long firstId = imported.get(0).path("id").asLong();
+        for (JsonNode q : imported) {
+            assertEquals("PENDING_REVIEW", q.path("reviewStatus").asText());
+            assertEquals(1, q.path("version").asInt()); assertEquals("A", q.path("answer").asText());
+            call(get("/api/questions/" + q.path("id").asLong()), student, null, 404);
+        }
+        assertEquals(2024, detail(admin, imported.get(1).path("id").asLong()).path("sourceYear").asInt());
+        assertEquals(0, candidates(student, first).size());
+        review(admin, firstId, "APPROVED", "隔离测试核对", 1, 200);
+        var visible = candidates(student, first); assertEquals(1, visible.size());
+        assertFalse(visible.get(0).has("answer")); assertFalse(visible.get(0).has("analysis"));
+        importBatch(admin, rows, true, 409); importBatch(admin, rows, false, 409);
+        assertEquals(before + 2, questions.selectCount(null));
+    }
+
+    @Test void invalidBulkRowsBoundsAndForgedFieldsNeverPartiallyWrite() throws Exception {
+        String admin = account(true); long before = questions.selectCount(null);
+        importBatch(admin, List.of(), false, 400);
+        importBatch(admin, Collections.nCopies(51, importEntry()), false, 400);
+        importBatch(admin, Arrays.asList(importEntry(), null), false, 400);
+        for (boolean preview : List.of(true, false)) {
+            var invalid = importEntry(); invalid.put("analysis", " ");
+            var request = Map.of("questions", List.of(importEntry(), invalid));
+            String message = json.readTree(mvc.perform(post("/api/questions/admin/import" + (preview ? "/preview" : ""))
+                .header("Authorization", "Bearer " + admin).contentType("application/json").content(json.writeValueAsString(request)))
+                .andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString()).path("message").asText();
+            assertTrue(message.contains("第2题"));
+            var exam = importEntry(); exam.put("sourceType", "REAL_EXAM");
+            importBatch(admin, List.of(importEntry(), exam), preview, 400);
+            for (String field : List.of("id", "version", "reviewStatus", "active", "reviewerUserId")) {
+                var forged = importEntry(); forged.put(field, 1); importBatch(admin, List.of(forged), preview, 400);
+            }
+            for (Object year : List.of("2024", 2024.5, true, 1800)) {
+                var invalidYear = importEntry(); invalidYear.put("sourceYear", year);
+                importBatch(admin, List.of(invalidYear), preview, 400);
+            }
+        }
+        call(post("/api/questions/admin/import"), admin, Map.of("questions", List.of(importEntry()), "approve", true), 400);
+        assertEquals(before, questions.selectCount(null));
+    }
+
+    @Test void duplicateInBatchAndExistingQuestionBlockTheWholeBatch() throws Exception {
+        String admin = account(true); var body = importEntry();
+        var duplicate = new LinkedHashMap<>(body); duplicate.put("content", "  " + body.get("content") + "  ");
+        duplicate.put("answer", "B"); duplicate.put("sourceName", "不同来源仍需人工去重");
+        long before = questions.selectCount(null);
+        importBatch(admin, List.of(body, duplicate), true, 400);
+        importBatch(admin, List.of(body, duplicate), false, 400);
+        assertEquals(before, questions.selectCount(null));
+        create(admin, body);
+        importBatch(admin, List.of(importEntry(), duplicate), false, 409);
+        assertEquals(before + 1, questions.selectCount(null));
+    }
+
+    @Test void studentAndAnonymousCannotPreviewOrImportAnswerData() throws Exception {
+        String student = account(false); long before = questions.selectCount(null);
+        for (boolean preview : List.of(true, false)) {
+            importBatch(student, List.of(importEntry()), preview, 403);
+            importBatch(null, List.of(importEntry()), preview, 401);
+        }
+        assertEquals(before, questions.selectCount(null));
+    }
+
+    @Test void runtimeInsertFailureRollsBackEarlierRowsInTheBatch() throws Exception {
+        String admin = account(true); long before = questions.selectCount(null);
+        var rejected = importEntry(); String sentinel = "reject_import_" + UUID.randomUUID().toString().replace("-", "");
+        rejected.put("content", sentinel);
+        // Add a test-only database constraint to fail the second INSERT after the first has succeeded.
+        jdbc.execute("ALTER TABLE question ADD CONSTRAINT import_failure CHECK (content <> '" + sentinel + "')");
+        try { importBatch(admin, List.of(importEntry(), rejected), false, 500); }
+        finally { jdbc.execute("ALTER TABLE question DROP CONSTRAINT import_failure"); }
+        assertEquals(before, questions.selectCount(null));
+    }
+
+    @Test void downloadableExampleIsValidButDoesNotAutoPublish() throws Exception {
+        String admin = account(true);
+        var example = json.readTree(java.nio.file.Path.of("..", "kaoyan-frontend", "src", "assets", "question-import-example.json").toFile());
+        long before = questions.selectCount(null);
+        var result = call(post("/api/questions/admin/import/preview"), admin, example, 200);
+        assertEquals(8, result.path("count").asInt()); assertEquals(before, questions.selectCount(null));
+        assertEquals(4, result.path("questions").findValuesAsText("subject").stream().distinct().count());
+        for (JsonNode q : result.path("questions")) assertEquals("ORIGINAL", q.path("sourceType").asText());
+    }
+
     @Test void administratorCanEnterReviewAndPracticeWithoutLeakingAnswers() throws Exception {
         String admin = account(true), student = account(false);
         var body = entry(); long id = create(admin, body);

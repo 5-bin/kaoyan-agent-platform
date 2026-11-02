@@ -1,0 +1,68 @@
+{
+  "questions": [
+    {
+      "subject": "数据结构", "knowledgePoint": "栈", "difficulty": "EASY",
+      "content": "【自编练习】初始为空的栈依次执行 push(2)、push(5)、pop()、push(8)、pop()，最后一次 pop() 返回什么？",
+      "optionA": "2", "optionB": "5", "optionC": "8", "optionD": "栈为空，不能返回元素", "answer": "C",
+      "analysis": "第一次出栈移除5，栈中剩2；随后8入栈成为栈顶，最后一次出栈返回8。",
+      "sourceType": "ORIGINAL", "sourceName": "平台自编基础练习示例", "sourceLocator": "导入示例 DS-01",
+      "sourceQuestionNo": "DS-01", "permissionNote": "本项目自编基础练习，可用于本项目教学演示；非历年真题，发布前需人工审核。"
+    },
+    {
+      "subject": "数据结构", "knowledgePoint": "二分查找", "difficulty": "EASY",
+      "content": "【自编练习】在支持按下标随机访问的有序数组中，二分查找的最坏时间复杂度是什么？",
+      "optionA": "O(1)", "optionB": "O(log n)", "optionC": "O(n)", "optionD": "O(n²)", "answer": "B",
+      "analysis": "每次比较后待查找区间至多缩小为原来的一半，最坏比较次数随log n增长。",
+      "sourceType": "ORIGINAL", "sourceName": "平台自编基础练习示例", "sourceLocator": "导入示例 DS-02",
+      "sourceQuestionNo": "DS-02", "permissionNote": "本项目自编基础练习，可用于本项目教学演示；非历年真题，发布前需人工审核。"
+    },
+    {
+      "subject": "操作系统", "knowledgePoint": "进程与线程", "difficulty": "EASY",
+      "content": "【自编练习】在同一进程内，多个线程通常共享下列哪项资源？",
+      "optionA": "各线程的程序计数器", "optionB": "各线程的栈", "optionC": "进程的地址空间", "optionD": "各线程的寄存器现场", "answer": "C",
+      "analysis": "同一进程的线程共享地址空间等进程资源，但各自拥有程序计数器、寄存器现场和线程栈。",
+      "sourceType": "ORIGINAL", "sourceName": "平台自编基础练习示例", "sourceLocator": "导入示例 OS-01",
+      "sourceQuestionNo": "OS-01", "permissionNote": "本项目自编基础练习，可用于本项目教学演示；非历年真题，发布前需人工审核。"
+    },
+    {
+      "subject": "操作系统", "knowledgePoint": "页面置换", "difficulty": "MEDIUM",
+      "content": "【自编练习】某进程有3个物理页框，初始为空。采用FIFO页面置换，访问页号依次为1、2、3、1、4。访问4时淘汰哪一页？",
+      "optionA": "页1", "optionB": "页2", "optionC": "页3", "optionD": "不淘汰任何页", "answer": "A",
+      "analysis": "FIFO按进入内存的先后顺序淘汰。再次访问页1不会改变其入队顺序，页4到来时淘汰最早进入的页1。",
+      "sourceType": "ORIGINAL", "sourceName": "平台自编基础练习示例", "sourceLocator": "导入示例 OS-02",
+      "sourceQuestionNo": "OS-02", "permissionNote": "本项目自编基础练习，可用于本项目教学演示；非历年真题，发布前需人工审核。"
+    },
+    {
+      "subject": "计算机组成原理", "knowledgePoint": "Cache映射", "difficulty": "EASY",
+      "content": "【自编练习】与直接映射相比，全相联Cache允许一个主存块放置在哪里？",
+      "optionA": "只在唯一指定的Cache行", "optionB": "Cache中的任意一行", "optionC": "只能放在第0行", "optionD": "只能放在最后一行", "answer": "B",
+      "analysis": "全相联映射没有固定的行位置限制，一个主存块可以装入任意Cache行。",
+      "sourceType": "ORIGINAL", "sourceName": "平台自编基础练习示例", "sourceLocator": "导入示例 CO-01",
+      "sourceQuestionNo": "CO-01", "permissionNote": "本项目自编基础练习，可用于本项目教学演示；非历年真题，发布前需人工审核。"
+    },
+    {
+      "subject": "计算机组成原理", "knowledgePoint": "补码", "difficulty": "EASY",
+      "content": "【自编练习】8位二进制补码能够表示的有符号整数范围是什么？",
+      "optionA": "-127至127", "optionB": "0至255", "optionC": "-128至127", "optionD": "-128至128", "answer": "C",
+      "analysis": "n位补码的范围为-2^(n-1)至2^(n-1)-1，n=8时为-128至127。",
+      "sourceType": "ORIGINAL", "sourceName": "平台自编基础练习示例", "sourceLocator": "导入示例 CO-02",
+      "sourceQuestionNo": "CO-02", "permissionNote": "本项目自编基础练习，可用于本项目教学演示；非历年真题，发布前需人工审核。"
+    },
+    {
+      "subject": "计算机网络", "knowledgePoint": "传输层", "difficulty": "EASY",
+      "content": "【自编练习】TCP为应用程序提供哪种服务？",
+      "optionA": "可靠、有序的字节流传输", "optionB": "保留消息边界且不保证可靠的传输", "optionC": "只用于域名解析", "optionD": "直接完成物理信号编码", "answer": "A",
+      "analysis": "TCP是面向连接的可靠传输协议，对应用提供有序字节流，不保留应用消息边界。",
+      "sourceType": "ORIGINAL", "sourceName": "平台自编基础练习示例", "sourceLocator": "导入示例 CN-01",
+      "sourceQuestionNo": "CN-01", "permissionNote": "本项目自编基础练习，可用于本项目教学演示；非历年真题，发布前需人工审核。"
+    },
+    {
+      "subject": "计算机网络", "knowledgePoint": "IPv4子网", "difficulty": "MEDIUM",
+      "content": "【自编练习】普通IPv4单播子网采用/26前缀，扣除网络地址和广播地址后，通常有多少个可分配给主机的地址？",
+      "optionA": "26", "optionB": "32", "optionC": "64", "optionD": "62", "answer": "D",
+      "analysis": "主机位有32-26=6位，共64个地址；普通子网扣除网络和广播地址后为62个。",
+      "sourceType": "ORIGINAL", "sourceName": "平台自编基础练习示例", "sourceLocator": "导入示例 CN-02",
+      "sourceQuestionNo": "CN-02", "permissionNote": "本项目自编基础练习，可用于本项目教学演示；非历年真题，发布前需人工审核。"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 package com.kaoyan.dto.request;
 
 import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /** Whitelist for entering unpublished single-choice questions; publishing fields are server-owned. */
 public record QuestionEntryRequest(
@@ -17,7 +18,7 @@ public record QuestionEntryRequest(
     @NotBlank @Pattern(regexp="REAL_EXAM|MOCK|ORIGINAL|COURSE_EXERCISE", message="来源类别不合法") String sourceType,
     @NotBlank(message="来源名称不能为空") @Size(max=255) String sourceName,
     @NotBlank(message="来源定位不能为空") @Size(max=1000) String sourceLocator,
-    @Min(1900) @Max(2100) Integer sourceYear,
+    @JsonDeserialize(using=StrictIntegerDeserializer.class) @Min(1900) @Max(2100) Integer sourceYear,
     @Size(max=64) String sourceQuestionNo,
     @NotBlank(message="使用权限说明不能为空") @Size(max=2000) String permissionNote
 ) {}
