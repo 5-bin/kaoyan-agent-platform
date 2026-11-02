@@ -1,0 +1,99 @@
+{
+  "database": "kaoyan_dev",
+  "recordedAt": "2026-11-01T19:01:16.855219+08:00",
+  "schools": [
+    {
+      "total": 121,
+      "missingLevel": 0
+    }
+  ],
+  "legacyFields": [
+    {
+      "total": 797,
+      "scoreLineNull": 797,
+      "enrollmentNull": 797
+    }
+  ],
+  "metrics": [
+    {
+      "rows": 492,
+      "type": "CUTOFF_REFERENCE",
+      "year": null,
+      "status": "NOT_FOUND",
+      "numericRows": 0
+    },
+    {
+      "rows": 104,
+      "type": "CUTOFF_REFERENCE",
+      "year": null,
+      "status": "SCOPE_MISMATCH",
+      "numericRows": 0
+    },
+    {
+      "rows": 146,
+      "type": "CUTOFF_REFERENCE",
+      "year": 2026,
+      "status": "OFFICIAL",
+      "numericRows": 146
+    },
+    {
+      "rows": 55,
+      "type": "CUTOFF_REFERENCE",
+      "year": 2026,
+      "status": "UNVERIFIED",
+      "numericRows": 55
+    },
+    {
+      "rows": 723,
+      "type": "ENROLLMENT",
+      "year": 2027,
+      "status": "NOT_FOUND",
+      "numericRows": 0
+    },
+    {
+      "rows": 54,
+      "type": "ENROLLMENT",
+      "year": 2027,
+      "status": "OFFICIAL",
+      "numericRows": 54
+    },
+    {
+      "rows": 8,
+      "type": "ENROLLMENT",
+      "year": 2027,
+      "status": "SCOPE_MISMATCH",
+      "numericRows": 0
+    },
+    {
+      "rows": 12,
+      "type": "ENROLLMENT",
+      "year": 2027,
+      "status": "UNVERIFIED",
+      "numericRows": 12
+    }
+  ],
+  "sampleYanshan": [
+    {
+      "type": "CUTOFF_REFERENCE",
+      "year": 2026,
+      "basis": "NOT_APPLICABLE",
+      "level": "普通本科",
+      "value": 264,
+      "school": "燕山大学",
+      "status": "OFFICIAL",
+      "detailId": 22,
+      "majorCode": "081200"
+    },
+    {
+      "type": "ENROLLMENT",
+      "year": 2027,
+      "basis": "TOTAL_UNSPECIFIED",
+      "level": "普通本科",
+      "value": 77,
+      "school": "燕山大学",
+      "status": "OFFICIAL",
+      "detailId": 22,
+      "majorCode": "081200"
+    }
+  ]
+}

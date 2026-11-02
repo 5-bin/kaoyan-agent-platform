@@ -1,0 +1,26 @@
+{
+  "schools": 121,
+  "programs": 797,
+  "levelChanges": 115,
+  "levels": {
+    "普通本科": 5,
+    "双一流": 1,
+    "211": 76,
+    "985": 39
+  },
+  "statuses": {
+    "enrollment": {
+      "NOT_FOUND": 723,
+      "OFFICIAL": 54,
+      "SCOPE_MISMATCH": 8,
+      "UNVERIFIED": 12
+    },
+    "cutoff_reference": {
+      "UNVERIFIED": 55,
+      "OFFICIAL": 146,
+      "NOT_FOUND": 492,
+      "SCOPE_MISMATCH": 104
+    }
+  },
+  "manifestSha256": "7c7a735a784174013e42ddb61f38a5b8bc2280035bd02c2d75b4a659367d78ec"
+}
