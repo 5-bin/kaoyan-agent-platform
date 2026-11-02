@@ -1,0 +1,88 @@
+{
+  "sources": [
+    {
+      "lesson": "L01",
+      "pageUrl": "https://computationstructures.org/worksheets/L01.html",
+      "worksheetUrl": "https://computationstructures.org/worksheets/pdfs/information_worksheet.pdf",
+      "worksheetSha256": "2bf6fa66c4942a057b68c352ebc31de02e5aba037c4d8b139c248313f183c3ff",
+      "answersUrl": "https://computationstructures.org/worksheets/pdfs/information_answers.pdf",
+      "answersSha256": "9963720e3f996e3e67fec8256da8c919f920b1443304ef4c81a7632a4d80312d",
+      "author": "Chris Terman",
+      "retrievedAt": "2026-10-29"
+    },
+    {
+      "lesson": "L04",
+      "pageUrl": "https://computationstructures.org/worksheets/L04.html",
+      "worksheetUrl": "https://computationstructures.org/worksheets/pdfs/combinational_worksheet.pdf",
+      "worksheetSha256": "c7985d37c7d4442c4a339595061fffbfb80cfe58dedf393c893f07dd18a1fc1e",
+      "answersUrl": "https://computationstructures.org/worksheets/pdfs/combinational_answers.pdf",
+      "answersSha256": "465a215d8a9b698ae2ef21062fc1c5a540ba074fb2fc386d7694e47d892a3a08",
+      "author": "Chris Terman",
+      "retrievedAt": "2026-10-29"
+    },
+    {
+      "lesson": "L07",
+      "pageUrl": "https://computationstructures.org/worksheets/L07.html",
+      "worksheetUrl": "https://computationstructures.org/worksheets/pdfs/pipelined_worksheet.pdf",
+      "worksheetSha256": "ba5c5a7779e914d1c50c2d782f899486888410e1c90c7a4c0d0fc98249f6350b",
+      "answersUrl": "https://computationstructures.org/worksheets/pdfs/pipelined_answers.pdf",
+      "answersSha256": "7b5a802a70183943254cf93f8d19d8890007c5cbb9ac7d584270d4722d20d13f",
+      "author": "Chris Terman",
+      "retrievedAt": "2026-10-29"
+    },
+    {
+      "lesson": "L09",
+      "pageUrl": "https://computationstructures.org/worksheets/L09.html",
+      "worksheetUrl": "https://computationstructures.org/worksheets/pdfs/isa_worksheet.pdf",
+      "worksheetSha256": "717ca85aa9b5983c0cb89d18fe1a576d8c912995ac532400842453bbc5bea9a9",
+      "answersUrl": "https://computationstructures.org/worksheets/pdfs/isa_answers.pdf",
+      "answersSha256": "f80bd45bd00e3596290209f891d2812215ffe505846eb7b3a61c5195b52b7e73",
+      "author": "Chris Terman",
+      "retrievedAt": "2026-10-29"
+    },
+    {
+      "lesson": "L13",
+      "pageUrl": "https://computationstructures.org/worksheets/L13.html",
+      "worksheetUrl": "https://computationstructures.org/worksheets/pdfs/beta_worksheet.pdf",
+      "worksheetSha256": "713de267bc4b0163ee905579983cd3a10fcc55512536fc4d687f90b7f28c8637",
+      "answersUrl": "https://computationstructures.org/worksheets/pdfs/beta_answers.pdf",
+      "answersSha256": "5825704eb0cea7d59a863948f0e08b675e906c5005603285be1bdc3c3dcb7bf7",
+      "author": "Chris Terman",
+      "retrievedAt": "2026-10-29"
+    },
+    {
+      "lesson": "L14",
+      "pageUrl": "https://computationstructures.org/worksheets/L14.html",
+      "worksheetUrl": "https://computationstructures.org/worksheets/pdfs/caches_worksheet.pdf",
+      "worksheetSha256": "ec7ca6df4f4a07315fd08fb17ca0a76aa1b2b95ef10794e5b43ed7821c74499e",
+      "answersUrl": "https://computationstructures.org/worksheets/pdfs/caches_answers.pdf",
+      "answersSha256": "86ed07f45402d2f62082cb56f3e401a2586d69c0289942fddbb4a344392255db",
+      "author": "Chris Terman",
+      "retrievedAt": "2026-10-29"
+    },
+    {
+      "lesson": "L15",
+      "pageUrl": "https://computationstructures.org/worksheets/L15.html",
+      "worksheetUrl": "https://computationstructures.org/worksheets/pdfs/pipelinedbeta_worksheet.pdf",
+      "worksheetSha256": "ae72d6baa8fdb0d01b27376ea97d2e6e946badbe9d191622db668ad747098378",
+      "answersUrl": "https://computationstructures.org/worksheets/pdfs/pipelinedbeta_answers.pdf",
+      "answersSha256": "77447cdc75f7b7068f74c3417470162a6ea027e3340d7c72e5bbc2a22c97f66f",
+      "author": "Chris Terman",
+      "retrievedAt": "2026-10-29"
+    },
+    {
+      "lesson": "L18",
+      "pageUrl": "https://computationstructures.org/worksheets/L18.html",
+      "worksheetUrl": "https://computationstructures.org/worksheets/pdfs/interrupts_worksheet.pdf",
+      "worksheetSha256": "4a2d61402c880435555069b19ec887724089a3dc1d05e7dafd295a9db190957d",
+      "answersUrl": "https://computationstructures.org/worksheets/pdfs/interrupts_answers.pdf",
+      "answersSha256": "5ddf9cf562afb7823a5254358051790596ea4960d1f22ee9321848b7f3b891e7",
+      "author": "Chris Terman",
+      "retrievedAt": "2026-10-29"
+    }
+  ],
+  "licenseUrl": "https://computationstructures.org/terms.html",
+  "licenseSha256": "af3db926ded429992ab6e1ab95863d9522fcd1ed09e0cdc9ba6589ef6e80da44",
+  "license": "MIT License; exclude any all-rights-reserved third-party content",
+  "sourceCache": "/Users/bin/projects/ruanjiangongcheng/Projects/kaoyan-agent-platform-adaptation/.cache/co-questions-20261029/sources"
+}

@@ -1,0 +1,68 @@
+{
+  "allApprovedQuestions": 404,
+  "addedCourseExercises": 40,
+  "paidModelCalls": 0,
+  "questionSubjects": {
+    "数据结构": 144,
+    "操作系统": 120,
+    "计算机网络": 100,
+    "计算机组成原理": 40
+  },
+  "practicePools": {
+    "EASY": 11,
+    "MEDIUM": 19,
+    "HARD": 10
+  },
+  "studentDetailsWithoutAnswers": 40,
+  "knowledgeRagReleaseId": "rag-v1-a476bf509577d904",
+  "questionIndex": {
+    "releaseId": "questions-61a43a79e166fc054b2f3fd3d84efe12",
+    "status": "READY",
+    "questionCount": 404
+  },
+  "localTopicRetrieval": {
+    "补码": [
+      553,
+      554,
+      555,
+      556,
+      557,
+      558,
+      559,
+      560,
+      562
+    ],
+    "Cache": [
+      581,
+      582,
+      583,
+      584,
+      585,
+      586,
+      587,
+      588
+    ],
+    "中断": [
+      589,
+      590,
+      591,
+      592
+    ]
+  },
+  "businessDataUnchangedDuringHttpVerification": true,
+  "browser": {
+    "passed": true,
+    "checks": [
+      "学生可预览新增补码题，题干选项显示正确，未展示标准答案解析",
+      "组成原理入口可选，完整许可及40题来源公开可读且不包含本地答案",
+      "管理页显示课程习题审核通过、Cache答案、逐题定位和完整许可",
+      "390像素宽度可阅读新题，无整页横向溢出；非真实手机验收"
+    ],
+    "privateHistoryStubbed": true,
+    "businessWrites": 0
+  },
+  "businessDataUnchangedDuringBrowserVerification": true,
+  "frontendProductionBuildPassed": true,
+  "sourceNoticesHaveNoAnswerFields": true,
+  "screenshotsVisuallyChecked": true
+}
