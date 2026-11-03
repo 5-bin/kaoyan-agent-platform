@@ -280,7 +280,8 @@ public class ConversationService {
         request.put("userId",owner); request.put("taskType","CHAT"); request.put("userInput",query);
         // References, not copied historical prose: expiry of an older turn cannot be extended by a newer snapshot.
         request.put("_historyRefs",history);
-        request.put("profile",db.one("SELECT target_school,target_major,exam_year FROM `user` WHERE id=?",owner));
+        // Read every turn, so profile edits reach existing conversations without rewriting their conditions.
+        request.put("profile",db.one("SELECT target_school,target_major,exam_year,degree_type FROM `user` WHERE id=?",owner));
         request.put("conditions",conv.get("conditions"));
         request.put("privacy",privacy.wire(settings));
         request.put("_grant",com.kaoyan.security.UserContext.sessionGrant());

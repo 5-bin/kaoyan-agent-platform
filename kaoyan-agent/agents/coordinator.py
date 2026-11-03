@@ -29,14 +29,16 @@ from core.runtime import (
     execution_budget,
     model_timeout,
     phase_budget,
+    step_rules_reason,
     stream_sink,
 )
-from core.scheduling import schedule_steps
+from core.scheduling import MIN_MODEL_SECONDS, schedule_steps
 from core.model import prepare_input
 from grounding import numbers_supported, verify
 from learning import (
     has_scope,
     model_allowed,
+    rules_notice,
     safe_learning_context,
 )
 from prompts import get
@@ -52,6 +54,8 @@ from schemas import (
 
 log = logging.getLogger(__name__)
 ANSWER_LIMIT = 20000
+# 2026-11-03: learning, school and study plan can each use one attempt (was 2 in total).
+EXPERT_MODEL_LIMIT = 3
 EXCERPT_MARK = "\n[该项内容较长，已节选；可单独提问获取完整回答]"
 
 
@@ -192,7 +196,7 @@ class ConversationCoordinator(StructuredAgent):
         """Schedule ready experts while keeping display order and model priority stable."""
         self.base(req, resolution)
         sink = stream_sink.get()
-        allowance = CallBudget(2)
+        allowance = CallBudget(EXPERT_MODEL_LIMIT)
         phase_token = phase_budget.set(allowance)
         labels = {
             "LEARNING": "学情分析",
@@ -230,13 +234,27 @@ class ConversationCoordinator(StructuredAgent):
                 await sink({"type": "stage", "stage": "正在处理" + labels[step.agent]})
             return await self._execute_step(req, resolution, step, completed)
 
+        reasons: dict[str, str] = {}
         try:
             completed = await schedule_steps(
                 resolution.steps, execute, eligible, pure_rule, allowance,
                 self.settings.CONVERSATION_EXPERT_TIMEOUT, self.settings.CONVERSATION_STEP_TIMEOUT,
+                MIN_MODEL_SECONDS, reasons,
             )
         finally:
             phase_budget.reset(phase_token)
+        for agent, scopes in self.rules_scopes(req).items():
+            value = completed.get(agent) or {}
+            unexplained = (value.get("outcome") == "COMPLETED" and not value.get("notice")
+                           and value.get("explanationMode", "rules") == "rules")
+            if unexplained:
+                token = step_rules_reason.set(reasons.get(agent))
+                try:
+                    notice = rules_notice(req, self.settings, scopes)
+                finally:
+                    step_rules_reason.reset(token)
+                if notice:
+                    value["notice"] = notice
         sections = [(step.agent, completed[step.agent]) for step in resolution.steps]
         states = [value["outcome"] for _, value in sections]
         result = {
@@ -406,6 +424,17 @@ class ConversationCoordinator(StructuredAgent):
             return await expert(self).execute((child_req, child_plan))
         finally:
             stream_sink.reset(token)
+
+    @staticmethod
+    def rules_scopes(req: ConversationRequest) -> dict[str, list[str]]:
+        """Experts whose rule results get a reason notice, with the categories their model input needs.
+
+        LEARNING and NOTE explain themselves; PRACTICE never uses the model.
+        """
+        scopes = {"STUDY_PLAN": ["stats"], "KNOWLEDGE": ["wrong"] if req.attempt is not None else []}
+        if req.preferences.explainWithAi:
+            scopes["SCHOOL"] = ["profile"]
+        return scopes
 
     def base(
         self, req: ConversationRequest, resolution: ConversationResolution

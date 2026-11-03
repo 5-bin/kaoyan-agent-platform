@@ -91,7 +91,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional
     public void updateProfile(Long userId, String avatarUrl, String targetSchool,
-                              String targetMajor, Integer examYear, String background) {
+                              String targetMajor, Integer examYear, String degreeType, String background) {
         User u = getById(userId);
         if (u == null) {
             throw new ApiException(404, 404, "用户不存在");
@@ -104,6 +104,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         u.setExamYear(examYear);
         u.setBackground(background);
         updateById(u);
+        // updateById skips nulls; write the degree type explicitly so "未设置" can clear it.
+        lambdaUpdate().eq(User::getId, userId)
+                .set(User::getDegreeType, degreeType == null || degreeType.isBlank() ? null : degreeType)
+                .update();
     }
 
     @Override

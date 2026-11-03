@@ -93,6 +93,35 @@ async def test_compliant_model_plan_is_kept():
     assert sent == {"hoursKnown": True, "availableMinutesPerDay": 120.0, "maxMinutesPerDay": 720}
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("task", ["限时20分钟完成5道线程练习", "每题5分钟，完成线程专题", "复习线程约1h"])
+async def test_timeboxed_tasks_without_stated_hours_fall_back(task):
+    """2026-11-03: a timebox is still an invented duration when no daily time was given."""
+    service = engine()
+    service.model.generate.return_value = model_plan(task)
+    result = await ConversationWorkflow(service).run(study_request("分析我的薄弱点，安排3天复习"))
+    section = study_section(result)
+    assert section["explanationMode"] == "fallback" and section["fallbackReason"] == "INVALID_OUTPUT"
+
+
+@pytest.mark.asyncio
+async def test_quantity_based_plan_without_stated_hours_is_kept():
+    service = engine()
+    plan = model_plan("完成5道线程相关审核练习", "整理2道错题的错因")
+    service.model.generate.return_value = plan
+    result = await ConversationWorkflow(service).run(study_request("分析我的薄弱点，安排3天复习"))
+    assert study_section(result)["explanationMode"] == "ai"
+    assert result["studyPlan"] == plan.model_dump()
+    sent = service.model.generate.call_args.args[1]["constraints"]
+    assert sent == {"hoursKnown": False, "availableMinutesPerDay": None, "maxMinutesPerDay": 720}
+
+
+def test_planner_prompt_names_forbidden_timeboxes():
+    from prompts import get
+    text = get("study_planner")
+    assert all(term in text for term in ("hoursKnown为false", "限时20分钟", "每题5分钟", "题量"))
+
+
 @pytest.mark.parametrize("text", COMPOUND)
 def test_compound_admission_detection(text):
     assert admission_compound(text)

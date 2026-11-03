@@ -103,9 +103,9 @@ async def test_rule_answer_labels_interval_attempts_and_profile_samples_separate
         preparedPlan={"action": "LEARNING_ANALYSIS", "standaloneQuery": "分析统计", "reads": ["stats"]},
     )
     answer = (await ConversationWorkflow(service).run(req))["answer"]
-    assert "直接插入排序：区间内有效作答16次（同题重复作答分别计数），正确5次" in answer
-    assert "两组次数不能直接比较" in answer
-    assert answer.index("区间内有效作答16次") < answer.index("口径不同") < answer.index("独立样本8条")
+    assert "直接插入排序：作答16次，错11次，正确率31.2%" in answer
+    assert "同题重复作答分别计数" in answer and "次数不能直接比较" in answer
+    assert answer.index("作答16次") < answer.index("口径与上面的区间统计不同") < answer.index("画像复习优先")
 
 
 @pytest.mark.asyncio
@@ -121,8 +121,8 @@ async def test_model_receives_code_computed_wrong_attempts_and_may_cite_them():
     assert stats["wrongAttempts"] == 44
     assert stats["knowledgePoints"][0]["wrongAttempts"] == 11
     assert result["explanationMode"] == "ai"
-    assert "区间内错误作答44次" in result["answer"]
-    assert "直接插入排序：区间内错误作答11次" in result["answer"]
+    assert "错误44次" in result["answer"]
+    assert "直接插入排序：作答16次，错11次" in result["answer"]
 
 
 @pytest.mark.asyncio

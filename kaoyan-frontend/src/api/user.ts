@@ -12,5 +12,6 @@ export const updateProfile = (data: {
   targetSchool?: string
   targetMajor?: string
   examYear?: number
+  degreeType?: 'academic' | 'professional' | ''
   background?: string
 }) => request.put('/users/profile', data)

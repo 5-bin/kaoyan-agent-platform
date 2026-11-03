@@ -270,7 +270,8 @@ def test_timeout_configuration_and_tool_instruction_bounds():
 
 
 @pytest.mark.asyncio
-async def test_three_experts_get_two_model_attempts_by_priority():
+async def test_three_experts_get_three_model_attempts_by_priority():
+    """2026-11-03: the expert stage allows three attempts, still serial and by priority."""
     for _ in range(3):
         flow = workflow(enabled=True)
         config = flow.engine.settings
@@ -323,13 +324,11 @@ async def test_three_experts_get_two_model_attempts_by_priority():
         token = execution_budget.set(budget)
         try:
             result = await flow.run(req)
-            assert calls == ["LEARNING", "STUDY_PLAN"]
-            assert budget.used == 2
-            assert [item["explanationMode"] for item in result["sections"]] == [
-                "ai",
-                "ai",
-                "rules",
-            ]
+            # The NOTE request is the third attempt; the fake classifies it as "LEARNING".
+            assert calls == ["LEARNING", "STUDY_PLAN", "LEARNING"]
+            assert budget.used == 3
+            # The fake's learning-shaped reply is not a valid note, so NOTE degrades.
+            assert [item["explanationMode"] for item in result["sections"]] == ["ai", "ai", "fallback"]
             assert result["partial"] and "documentProposal" not in result
         finally:
             execution_budget.reset(token)

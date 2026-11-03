@@ -52,7 +52,7 @@ DELETE /api/conversations/{id}清除单会话；DELETE /api/conversations清除�
 
 统计接口新增`GET /api/stats/learning?from&to&subject`，返回questionCount/correctCount/uniqueQuestions/wrongCount/accuracy、daily、knowledgePoints、from/to；仅有效已提交作答。默认上海日期近30天（包含今天）。
 
-2026-11-02口径说明（Java接口不变）：统计及knowledgePoints的questionCount是所选区间内全部有效作答次数，同题重复作答分别计数，不区分提示辅助；learningProfile.groups的samples是全部历史中的独立作答，同一题7天内只计1次，不含提示辅助及未记录提示情况的作答，按难度分组且每组最多取最近50条。同一知识点因此可能同时出现“区间作答16次”和“某难度独立样本8条”，两者不能并列比较或相加。规则回答为知识点行标注“区间内有效作答（同题重复作答分别计数）”及正确次数，并在画像前说明口径差异；学习专家提示词写明两种口径。Python在发给模型的统计、每日及知识点行中按代码补充`wrongAttempts`（questionCount减correctCount），模型不再自行做减法，避免算出的错误次数被数字校验拒绝；超出所给数据的运算（如把两种口径相加）仍会降级为规则结果。
+2026-11-02口径说明（Java接口不变）：统计及knowledgePoints的questionCount是所选区间内全部有效作答次数，同题重复作答分别计数，不区分提示辅助；learningProfile.groups的samples是全部历史中的独立作答，同一题7天内只计1次，不含提示辅助及未记录提示情况的作答，按难度分组且每组最多取最近50条。同一知识点因此可能同时出现“区间作答16次”和“某难度独立样本8条”，两者不能并列比较或相加。规则回答为知识点行标注“区间内有效作答（同题重复作答分别计数）”及正确次数，并在画像前说明口径差异（2026-11-03起改为前8个薄弱点各一行，标注位置移至记录事实行，见[学情精简契约](../考研Agent平台搭建文档.md#学情精简与档案学位类型契约2026-11-03)）；学习专家提示词写明两种口径。Python在发给模型的统计、每日及知识点行中按代码补充`wrongAttempts`（questionCount减correctCount），模型不再自行做减法，避免算出的错误次数被数字校验拒绝；超出所给数据的运算（如把两种口径相加）仍会降级为规则结果。
 
 创建练习请求扩展source=NORMAL|WRONG|FAVORITE和可选questionIds；保留原subject/difficulty/count，count上限50。新批次创建时固定快照，不能向未答DTO泄露答案。
 

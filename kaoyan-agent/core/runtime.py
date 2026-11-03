@@ -16,6 +16,8 @@ execution_budget = ContextVar("execution_budget", default=None)
 phase_budget = ContextVar("phase_budget", default=None)
 model_timeout = ContextVar("model_timeout", default=None)
 step_model_allowed: ContextVar[bool] = ContextVar("step_model_allowed", default=True)
+# Why an otherwise eligible step was denied the model: "BUDGET" or "TIME" (None when not denied).
+step_rules_reason: ContextVar[str | None] = ContextVar("step_rules_reason", default=None)
 retrieval_budget = ContextVar("retrieval_budget", default=None)
 admission_budget: ContextVar["CallBudget | None"] = ContextVar("admission_budget", default=None)
 

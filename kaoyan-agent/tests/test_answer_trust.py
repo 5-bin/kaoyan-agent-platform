@@ -102,7 +102,7 @@ async def test_rule_facts_survive_successful_enrichment_and_suggestions_do_not_c
                                   context={"statistics": {"questionCount": 3, "correctCount": 1, "accuracy": 1 / 3}})
     assert result["explanationMode"] == "ai"
     assert "有效作答3次，正确1次" in result["answer"]
-    assert "错误作答2次" in result["answer"] and "正确率33.3%" in result["answer"]
+    assert "错误2次" in result["answer"] and "正确率33.3%" in result["answer"]
     assert "样本不足5次" in result["answer"]
     assert result["citationSupport"]["status"] == "NOT_CHECKED"
     assert "actions" not in result and len(model.payloads) == 1

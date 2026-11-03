@@ -102,6 +102,8 @@ async function openRecommendation() {
   result.value = null
   profile.value = await getCurrentUser()
   if (profile.value.targetMajor === '085404' || profile.value.targetMajor === '计算机技术') { form.majorCode = '085404'; form.degreeType = 'professional' }
+  // An explicit profile degree type wins over the major-based guess.
+  if (profile.value.degreeType) form.degreeType = profile.value.degreeType
   dialog.value = true
 }
 function showHistory(task: Task) { historyTask.value = task }

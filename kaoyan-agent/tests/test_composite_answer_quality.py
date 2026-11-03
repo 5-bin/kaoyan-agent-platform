@@ -37,21 +37,22 @@ def rule_text() -> str:
 
 def test_rule_text_lists_judgeable_points_first_and_merges_small_samples():
     lines = rule_text().splitlines()
-    insertion = next(i for i, line in enumerate(lines) if line.startswith("直接插入排序："))
-    selection = next(i for i, line in enumerate(lines) if line.startswith("简单选择排序："))
+    assert "薄弱知识点（按区间错误率，前2个）：" in lines
+    insertion = lines.index("直接插入排序：作答16次，错14次，正确率12.5%")
+    selection = lines.index("简单选择排序：作答5次，错2次，正确率60.0%")
     assert insertion < selection
-    merged = [line for line in lines if line.startswith("以下3个知识点")]
-    assert len(merged) == 1 and "样本不足5次" in merged[0]
-    assert merged[0].index("堆排序（3次") < merged[0].index("栈（2次") < merged[0].index("调度时机（1次")
+    merged = [line for line in lines if line.startswith("3个知识点作答样本不足5次")]
+    assert len(merged) == 1
+    assert merged[0].index("堆排序") < merged[0].index("栈") < merged[0].index("调度时机")
     assert not any(line.startswith("调度时机：") for line in lines)
 
 
 def test_rule_text_has_no_conflicting_independent_line_or_raw_difficulty():
     text = rule_text()
-    assert "学习时长与提示辅助：未记录；区间作答次数不区分是否独立完成。" in text
+    assert "学习时长与提示辅助未记录。" in text
     assert "独立作答：未记录" not in text
     assert "MEDIUM" not in text and "EASY" not in text and "HARD" not in text
-    assert "直接插入排序（简单）：独立样本8条" in text
+    assert "画像复习优先（各组独立样本均不少于5条）：直接插入排序（简单）。" in text
     assert "串（困难）：独立样本2条，近期表现异常" in text
     assert "以下画像分组独立样本不足5条，建议补充独立样本：调度时机（中等，1条）。" in text
 
@@ -60,7 +61,21 @@ def test_merged_line_states_omitted_names():
     points = [{"knowledgePoint": f"知识点{i:02d}", "questionCount": 1, "correctCount": 0} for i in range(40)]
     plan = ConversationResolution(action="LEARNING_ANALYSIS", standaloneQuery="分析")
     text = rule_learning_answer({"statistics": {"questionCount": 40, "correctCount": 0, "knowledgePoints": points}}, plan)
-    assert "等40个，其余10个未在文字中展示" in text
+    assert "等40个，其余30个未在文字中展示" in text
+
+
+def test_many_points_show_only_the_weakest_and_skip_perfect_ones():
+    """2026-11-03: 80 judgeable points render as a short list instead of 160 lines."""
+    points = [{"knowledgePoint": f"弱{i:02d}", "questionCount": 5, "correctCount": i % 5} for i in range(60)]
+    points += [{"knowledgePoint": f"全对{i:02d}", "questionCount": 5, "correctCount": 5} for i in range(20)]
+    plan = ConversationResolution(action="LEARNING_ANALYSIS", standaloneQuery="分析")
+    stats = {"questionCount": 400, "correctCount": 220, "knowledgePoints": points}
+    lines = rule_learning_answer({"statistics": stats}, plan).splitlines()
+    shown = [line for line in lines if line.startswith("弱") or line.startswith("全对")]
+    assert len(shown) == 8
+    assert all("错5次" in line for line in shown)
+    assert "另有72个作答满5次的知识点未列出（其中20个区间内全部答对），完整分布见学习统计。" in lines
+    assert len(lines) == 12  # facts, heading, 8 points, remainder, duration
 
 
 def test_retrieval_topics_follow_weakness_not_alphabet():

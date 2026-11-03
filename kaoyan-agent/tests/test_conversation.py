@@ -111,8 +111,9 @@ async def test_compound_clarification_choices_are_resolvable_without_inventing_f
 
 def test_options_for_partial_and_degree_conditions():
     from agents.clarification import clarification_options
+    from agents.school import DEGREE_FOLLOW_UP
     plan = ConversationResolution(action="SCHOOL_RECOMMEND", standaloneQuery="推荐院校")
-    result = {"outcome": "COMPLETED", "sections": [{"outcome": "NEEDS_INPUT"}], "followUp": ["请选择学硕或专硕"]}
+    result = {"outcome": "COMPLETED", "sections": [{"outcome": "NEEDS_INPUT"}], "followUp": [DEGREE_FOLLOW_UP]}
     assert [item["reply"] for item in clarification_options(result, plan)] == ["推荐院校；报考学硕", "推荐院校；报考专硕"]
     assert not clarification_options({"outcome": "COMPLETED"}, plan)
 

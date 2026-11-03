@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `user` (
  id BIGINT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(64) UNIQUE NOT NULL,
  password_hash VARCHAR(255), role VARCHAR(32), avatar_url VARCHAR(500),
- target_school VARCHAR(100), target_major VARCHAR(100), exam_year INT,
+ target_school VARCHAR(100), target_major VARCHAR(100), exam_year INT, degree_type VARCHAR(16),
  background VARCHAR(2000), status INT, created_at TIMESTAMP, updated_at TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS task (

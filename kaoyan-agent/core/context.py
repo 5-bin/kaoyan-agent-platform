@@ -41,10 +41,14 @@ class PreparedModelInput:
 class AuthorizedContextBuilder(ContextBuilder):
     """Collect, select, organize and trim granted inputs without model summaries."""
 
-    def __init__(self, max_tokens: int = 12000, counter: TokenCounter | None = None) -> None:
+    def __init__(
+        self, max_tokens: int = 12000, counter: TokenCounter | None = None,
+        payload_projector: Callable[[dict[str, JsonValue]], None] | None = None,
+    ) -> None:
         """Avoid the framework constructor's cold tokenizer network download."""
         self.memory_tool = self.rag_tool = None
         self.counter = counter or TokenCounter()
+        self.payload_projector = payload_projector
         self.config = ContextConfig(max_tokens=max_tokens, reserve_ratio=0, min_relevance=0, enable_compression=True)
         self.removed_history = self.shortened_excerpts = self.removed_statistics = 0
 
@@ -98,6 +102,8 @@ class AuthorizedContextBuilder(ContextBuilder):
         payload = json.loads(messages[1]["content"])
 
         def fits() -> bool:
+            if self.payload_projector is not None:
+                self.payload_projector(payload)
             messages[1]["content"] = wire_json(payload)
             return self._count(messages) <= self.config.max_tokens
 
