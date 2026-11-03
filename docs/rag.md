@@ -68,7 +68,7 @@ Java校验任务编号、版本一致性、结果结构、HTTPS来源、来源�
 
 Java外部入口 `POST /api/recommends/generate` 接收 `{query,preferences}`，等同于向 `/api/tasks` 提交 `SCHOOL_RECOMMEND`。两者使用同一条流程和task表，不再向旧 `recommend_record` 写占位推荐。
 
-`preferences` 支持 `majorCodes`（最多10个六位代码）、`degreeType`、`regions`（最多30个）、`regionConstraint`、`studyMode`、`examSubjects`（最多4个三位代码）、`explainWithAi`。年份由已保存档案决定。专业优先用明确的本次代码，否则匹配档案中的代码或完整专业名；缺少年份、专业或学位类型时追问。自由文本是补充问题，不偷偷覆盖结构条件。
+`preferences` 支持 `majorCodes`（最多10个六位代码）、`degreeType`、`regions`（最多30个）、`regionConstraint`、`studyMode`、`examSubjects`（最多4个三位代码）、`explainWithAi`。年份由已保存档案决定。专业优先用明确的本次代码，否则匹配档案中的代码或完整专业名；学位类型依次取本次偏好、档案`degreeType`、院校库按专业代码推断（2026-11-03）；缺少年份、专业或仍无法确定学位类型时追问。自由文本是补充问题，不偷偷覆盖结构条件。
 
 硬筛选：年份、专业、学位、明确的学习方式和考试科目、required地区。preferred地区用于排序；同分按资料记录更新时间降序及programId升序。最多5个候选。首批记录均有完整基本字段；字段缺失的记录不允许进入这批已核验资料。未核验资料不导入正式索引，因此当前unverifiedCandidates为空。
 

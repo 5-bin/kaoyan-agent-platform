@@ -1,5 +1,20 @@
 # 考研 Agent 智能备考平台
 
+## 已部署服务器的V15增量升级（2026-11-03）
+
+`scripts/upgrade-server-release.py` 是本次Ubuntu实例的增量入口，保留首次切换工具。默认只读；需要当前／新版目录、可信运行文件清单及哈希、已通过的恢复预演与计划哈希，只有显式 `--activate` 执行维护、备份恢复预演、V15和程序切换。使用已有服务配置的精确备份回退，不重复公共资料导入；已提交V15不自动撤销。运行约定和实际结果见[增量上线记录](docs/server-release-activation-2026-11-03.md#v15增量上线2026-11-03)。 本轮已直接完成V15及新版三端切换，原字段指纹保持、公网TLS／新版首页与静态资源哈希、未认证API边界检查通过；模型仍关闭。登录后业务与真实模型未运行。
+
+
+## 学情精简与档案学位类型（2026-11-03）
+
+学情分析只列错误率最高的8个知识点（每点一行），其余汇总为一句；审核资料正文只在“查看依据”展示。个人档案新增学硕／专硕选项，院校比较依次使用本轮说明、档案、院校库按专业代码推断，不再每次追问。需先在V14后手工执行一次[V15迁移](kaoyan-B/src/main/resources/db/V15__profile_degree_type.sql)，再同时加载新版Java、Python与前端；未执行V15的库不能运行本版Java。服务器可用`scripts/prepare-server-data.py --rehearse`在隔离库预演V15（按原有核对清单），正式执行仍需另行确认。契约见[搭建文档](考研Agent平台搭建文档.md#学情精简与档案学位类型契约2026-11-03)。
+
+## 学情补样建议修复（2026-11-03）
+
+学情建议改为从代码生成的合法候选中选择，分别标明区间总样本、知识点区间作答及画像分组独立样本，避免总作答61次时因局部小样本误选整体补样建议而降级。裁剪上下文时同步重建候选，未知编号及非法解释仍整段拒绝；公开结果、历史兼容与模型预算保持原约定，无数据库迁移。
+
+本轮Python全量963项通过（含新增16项回归）；已重新加载本机Agent，三端连通检查及招生MCP就绪检查通过，真实模型与登录后页面回归未运行。其他环境需按原入口重新加载Python。契约见[搭建文档](考研Agent平台搭建文档.md#学情建议候选约束修复契约2026-11-03)，范围及限制见[验证记录](docs/learning-suggestions-verification-2026-11-03.md)。
+
 ## 知识与学情回答可信度修复（2026-11-02）
 
 知识问答核对正文与逐条结论是否完整对应，任一结论未通过则整段AI降级。学情的作答次数、区间错误次数、正确率和画像由代码生成；AI仅提供逐条核验的公开概念解释及代码生成文案的受限建议，旧自由回答降级。知识问答及学情在校验完成前只显示阶段状态，最终返回完整结果；包含学情的复合回答本地拼接，规则事实不再二次交给模型改写。
@@ -95,6 +110,7 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 - [学情与隐私验证记录](docs/assistant-learning-verification-2026-10-23.md)：三端实际链路、分类授权、清除、定向练习及隔离MySQL验证。
 - [本机测试数据](docs/local-test-data-2026-10-22.md)：已写入的数据、待审核边界、备份及可重复执行的补充脚本。
 - [其他功能测试数据](docs/feature-test-data-2026-10-23.md)：独立学生测试账号、模拟练习／错题／收藏／统计、任务历史及个人文档版本。
+- [2026-11-03本机学情测试账号](docs/study-test-account-2026-11-03.md)：四科400次模拟作答、400条独立证据、78个样本充足分组及私密登录方式。
 - [日常开发库数据合并](docs/development-data-merge-2026-10-23.md)：已合并到`kaoyan_dev`的院校、可练习题库、资料、V12及正常启动方式。
 - [PR #8修复验证](docs/pr8-fix-verification-2026-10-15.md)：删除后的配额、历史快照及页面联调修复。
 - [Issue #9验证记录](docs/practice-answer-safety-verification.md)：学生答案隐藏、服务端判分展示与历史回顾安全。
@@ -166,6 +182,26 @@ Vue 3 / TypeScript → Spring Boot 3.5 / MyBatis-Plus / MySQL → FastAPI RAG。
 这是独立测试环境，模型关闭。其数据不会自动同步；2026-10-23已按用户后续授权将公共院校、题库和资料另行合并到日常`kaoyan_dev`，正常5173页面也可使用，详见[日常库合并记录](docs/development-data-merge-2026-10-23.md)。预览使用 `python scripts/feature-test.py`，实际写入／启动须明确使用对应子命令和 `--apply`；完整入口见上述说明。独立环境脚本当前支持macOS/Linux，不改写日常`.env`或覆盖人工修改。
 
 ## 准备环境
+
+### 服务器旧版公共资料合并预演（2026-11-03）
+
+`scripts/prepare-server-data.py` 用于本次部署包的公共资料合并。默认只读预览；显式 `--rehearse` 使用服务器本机 MySQL root socket 备份现有库，在新建的独立库中恢复、执行缺失的 V13/V14/V15（2026-11-03起含V15；V15只有列或只有约束时拒绝）、验证编号映射、失败回滚及个人记录原有字段不变，最后仅清理本次独立库。**没有生产写入模式**，不会切换服务；备份及生成的 SQL 保存在指定的私密输出目录，不能作为自动上线命令执行。
+
+```bash
+python scripts/prepare-server-data.py --release-root /opt/kaoyan-releases/实际版本目录 --env-file /opt/kaoyan/.env --output /root/新的预览目录
+# 确认使用服务器本机 MySQL root socket，在独立库中预演：
+python scripts/prepare-server-data.py --release-root /opt/kaoyan-releases/实际版本目录 --env-file /opt/kaoyan/.env --output /root/新的预演目录 --rehearse
+# 已有题目或资料不一致时，只读输出差异字段及有限的公开文本样本：
+python scripts/prepare-server-data.py --release-root /opt/kaoyan-releases/实际版本目录 --env-file /opt/kaoyan/.env --output /root/新的诊断目录 --diagnose
+```
+
+需要已安装项目依赖的 Python、mysql、mysqldump；输出目录必须尚不存在。服务器采用其他管理认证时先核对连接，不修改认证设置。规则测试、本机独立 MySQL 验证及用户回传的服务器预演见[部署预演记录](docs/deployment-data-verification-2026-11-03.md)；服务器隔离预演通过，V13/V14和公共资料已提交，新版程序已切换、HTTPS公网入口已验证，登录业务待验收。
+
+合并时，题目其余字段完全一致且仅 `permission_note` 不同时，保留服务器非空许可说明及原题编号，并在报告中单独计数；新增的当前版本快照同步保留该说明。已有版本快照及其他版本的原始说明不修改，答案、正文、解析、版本或其他来源字段不同仍拒绝覆盖。
+
+2027专业备注比对仅兼容已观察到的“【2027官方来源核验摘要】／【官方招生事实】”及版本字段前“核验／核验日期”标签差异；其余学院、方向、考试条件、来源、版本及日期逐字比对。匹配后保留服务器原备注和编号，不更新备注，避免把原15条专业重复导入。规则pytest 15项及完整CLI隔离MySQL验证通过，服务器仍须使用更新工具重新预演并核对复用15条、新增782条。
+
+`scripts/activate-server-release.py` 是上述已预演Ubuntu实例的受限正式更新工具，默认只读；显式 `--activate` 才开启维护、停项目服务、新备份及程序切换。首次更新已提交V13/V14和公共资料，但错误的Java探测导致程序回退；修复后用户使用 `--committed-activation` 成功切换新版且未重复导入。旧目录与凭证保留；诊断／学情与只读招生链接开关已启用，用户选择LLM暂时关闭。新IP HTTPS公网入口已检查；用户回传证书续期模拟及公开Embedding权重下载、512维本地编码通过。首次定时续期、题目索引和登录后业务验收仍待完成。真实范围及回退边界见[正式更新记录](docs/server-release-activation-2026-11-03.md)。
 
 需要 Java 17、Python 3.13、Node.js 22（含 npm）；业务运行另需 MySQL 8 和 Redis。
 
@@ -274,7 +310,7 @@ MCP仅接收query和可选subject，固定检索当前版本审核知识，最�
 
 聊天入口为 `/tasks`，登录／注册默认进入助手，原首页 `/` 与业务深链接保留。可以跳过诊断，直接聊天或提出“分析薄弱点，安排7天复习，并推荐院校”等复合请求；专家结果中的练习与笔记仍按现有确认流程执行。
 
-在根 `.env` 填写供应商 `LLM_API_KEY`、HTTPS `LLM_BASE_URL`、模型名称，再设置 `LLM_ENABLED=true`。这将产生外部请求与可能的费用。代码关闭SDK重试。旧同步入口保持单次20秒、全流程42秒及最多2次尝试；复合聊天共享解析1次／10秒、专家阶段2次／20秒、可选汇总1次／10秒，Java保留48秒流程保护和浏览器55秒。 2026-11-01起使用统一PlanResolver与依赖调度：模型按专家优先级串行使用最多2次额度，只有无未完成依赖的纯规则步骤可并行；分项仍按计划顺序展示。单步`CONVERSATION_STEP_TIMEOUT`默认12秒（2026-11-02由8秒调整：DeepSeek学情步骤实测6.4—8.5秒；须小于专家阶段时限），超时保留独立步骤结果；阶段超时分别由`CONVERSATION_PARSE_TIMEOUT`、`CONVERSATION_EXPERT_TIMEOUT`、`CONVERSATION_SUMMARY_TIMEOUT`及`AGENT_TASK_TIMEOUT`配置，默认10/20/10/42秒，阶段之和须不超过总超时且总超时小于48秒。结果可含分项状态与部分完成提示，旧历史兼容；详见[专家编排审核修复记录](docs/expert-audit-verification-2026-10-30.md)。
+在根 `.env` 填写供应商 `LLM_API_KEY`、HTTPS `LLM_BASE_URL`、模型名称，再设置 `LLM_ENABLED=true`。这将产生外部请求与可能的费用。代码关闭SDK重试。旧同步入口保持单次20秒、全流程42秒及最多2次尝试；复合聊天共享解析1次／10秒、专家阶段3次／28秒（2026-11-03由2次／20秒调整，剩余不足8秒不再发起模型请求）、可选汇总1次／4秒，Java保留48秒流程保护和浏览器55秒。 2026-11-01起使用统一PlanResolver与依赖调度：模型按专家优先级串行使用最多2次额度，只有无未完成依赖的纯规则步骤可并行；分项仍按计划顺序展示。单步`CONVERSATION_STEP_TIMEOUT`默认12秒（2026-11-02由8秒调整：DeepSeek学情步骤实测6.4—8.5秒；须小于专家阶段时限），超时保留独立步骤结果；阶段超时分别由`CONVERSATION_PARSE_TIMEOUT`、`CONVERSATION_EXPERT_TIMEOUT`、`CONVERSATION_SUMMARY_TIMEOUT`及`AGENT_TASK_TIMEOUT`配置，默认10/28/4/42秒，阶段之和须不超过总超时且总超时小于48秒。结果可含分项状态与部分完成提示，旧历史兼容；详见[专家编排审核修复记录](docs/expert-audit-verification-2026-10-30.md)。
 
 上下文已增加离线输入预算与确定性裁剪，原始授权快照不改写；整篇笔记及必要错题内容超限时零模型请求降级。输出按能力分配，拒绝供应商长度终止的结果，不自动续写或重试。预算默认值与配置关系统一见[搭建文档](考研Agent平台搭建文档.md#统一规划与执行预算契约2026-11-01)，示例变量在`.env.example`；本地token估计不等于供应商实际用量。旧同步CHAT只兼容单任务，复合／学情／笔记请求提示转到`/tasks`。本轮实现、验证及未运行范围见[P0验证记录](docs/planning-budget-scheduling-verification-2026-11-01.md)。
 

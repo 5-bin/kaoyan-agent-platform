@@ -378,6 +378,16 @@ class ConversationIntegrationTest {
         assertNull(jdbc.queryForObject("SELECT result_payload FROM task WHERE id=?",String.class,task));
     }
 
+    @Test void authorizationChangeSeenByWorkerBeforeStopEventStillCancels() throws Exception {
+        String token=account(),id=conversation(token);
+        long owner=call(token,"GET","/users/me",null,200).path("id").asLong();
+        send(token,id,"进程与线程，等待停止","withdraw-race");
+        // The privacy save commits before its stop event; freeze that window by changing only the version.
+        jdbc.update("UPDATE assistant_privacy SET version=version+1 WHERE user_id=?",owner);
+        var output=finish(token,id);
+        assertEquals("CANCELLED",output.path("status").asText());
+    }
+
     @Test void explicitSortingRequestCreatesOnlyFiveQuestionsAfterConfirmation() throws Exception {
         String token=privateAccount(),id=conversation(token);
         long owner=call(token,"GET","/users/me",null,200).path("id").asLong();

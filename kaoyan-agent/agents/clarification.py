@@ -1,6 +1,7 @@
 """Conservative, request-scoped choices for recoverable ambiguities."""
 
 from agents.guidance import bare_school
+from agents.school import DEGREE_FOLLOW_UP
 from schemas import ConversationResolution
 
 
@@ -19,7 +20,7 @@ def clarification_options(result: dict, plan: ConversationResolution) -> list[di
             for label in ("知识讲解", "练习题目", "已完成作答")
         ]
     if (
-        "请选择学硕或专硕" in result.get("followUp", [])
+        DEGREE_FOLLOW_UP in result.get("followUp", [])
         and "学硕" not in query and "专硕" not in query
     ):
         return [

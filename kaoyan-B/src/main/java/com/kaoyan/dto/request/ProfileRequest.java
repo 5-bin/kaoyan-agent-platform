@@ -1,6 +1,7 @@
 package com.kaoyan.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * 更新档案请求
@@ -18,6 +19,10 @@ public record ProfileRequest(
 
         @Schema(description = "考试年份", example = "2026")
         Integer examYear,
+
+        @Schema(description = "报考学位类型：academic 学硕／professional 专硕（空表示未设置）", example = "academic")
+        @Pattern(regexp = "|academic|professional", message = "学位类型只能为学硕或专硕")
+        String degreeType,
 
         @Schema(description = "考生背景")
         String background

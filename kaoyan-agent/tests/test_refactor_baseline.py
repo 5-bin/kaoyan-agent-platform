@@ -21,12 +21,27 @@ async def test_frozen_legacy_behavior(case):
     # P0 adds provenance to model-visible sources. The historical fixtures stay
     # unchanged; compare their original logical fields and full public results.
     for call in actual["calls"]:
+        # 2026-11-03: the new internal advice menu is not a public contract change.
+        # This historical case has three attempts and no sources or snapshots.
+        if call["schema"] == "LearningAnswer":
+            menu = call["payload"].pop("suggestionCandidates")
+            assert [row["action"] for row in menu] == ["COLLECT_SAMPLES", "PRACTICE_RELATED"]
+            assert all(not row["sourceIds"] and not row["evidenceRefs"] for row in menu)
+            assert "本轮区间统计样本不足5次" in menu[0]["text"]
         for key in ("references", "sources"):
             if key in call["payload"]:
                 for row in call["payload"][key]:
                     assert row.get("version") and row.get("locator")
                 call["payload"][key] = [{"id": row["id"], "content": row["content"]} for row in call["payload"][key]]
+        # 2026-11-03: the profile carries an optional degreeType; legacy cases leave it unset.
+        if isinstance(call["payload"].get("profile"), dict) and call["payload"]["profile"]:
+            assert call["payload"]["profile"].pop("degreeType") is None
+    if "profileSnapshot" in actual["result"]:
+        assert actual["result"]["profileSnapshot"].pop("degreeType") is None
     expected = copy.deepcopy(case["expected"])
+    # 2026-11-03: a missing degree type points to the personal profile first.
+    if case["case"]["name"] == "schools_missing":
+        expected["result"]["followUp"][-1] = "请在个人档案选择学硕或专硕（也可在本轮说明）"
     # 2026-11-02: unsupported admission prose no longer replaces the rule
     # explanation. The frozen fixture keeps the historical AI result.
     if case["case"]["name"] == "schools_ai":
@@ -54,10 +69,14 @@ async def test_frozen_legacy_behavior(case):
     # 2026-11-02: the fixed line no longer says independent attempts are unrecorded,
     # because the rule profile below does count them under its own basis.
     if case["case"]["name"] in {"learning_False", "learning_True"}:
-        rule_answer = ("记录事实：至有效作答3次，正确1次，去重题数未记录。\n"
-                       "区间内错误作答2次；与当前错题本题数分别统计。\n"
-                       "学习时长与提示辅助：未记录；区间作答次数不区分是否独立完成。")
+        # 2026-11-03: the concise rule text merges totals into one line.
+        rule_answer = ("记录事实：至有效作答3次，正确1次，错误2次，去重题数未记录"
+                       "（同题重复作答分别计数；与错题本题数分别统计）。\n"
+                       "学习时长与提示辅助未记录。")
         expected["result"]["answer"] = rule_answer
+        # 2026-11-03: the notice names the real blocker; this case has the model disabled on the server.
+        if case["case"]["name"] == "learning_False":
+            expected["result"]["notice"] = "外部模型未在服务端启用，本项使用本地规则。"
         if case["case"]["name"] == "learning_True":
             expected["result"].update(explanationMode="fallback", fallbackReason="INVALID_OUTPUT",
                                       notice="AI分析不可用，已保留本地记录摘要。")

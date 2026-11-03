@@ -52,7 +52,8 @@ def prepare_input(settings: Settings, instruction: str, payload: dict[str, JsonV
         "不得补造来源、招生事实或录取概率。仅输出符合以下schema的JSON："
         + json.dumps(schema.model_json_schema(), ensure_ascii=False)
     )
-    return AuthorizedContextBuilder(input_limit).prepare(system, payload)
+    projector = getattr(schema, "project_model_payload", None)
+    return AuthorizedContextBuilder(input_limit, payload_projector=projector).prepare(system, payload)
 
 
 class AsyncHelloAgentsLLM(HelloAgentsLLM):

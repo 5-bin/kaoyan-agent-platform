@@ -38,9 +38,10 @@ class Settings(BaseSettings):
     LLM_THINKING_MODE: Literal["default", "enabled", "disabled"] = "default"
     LLM_TIMEOUT: float = Field(default=20, ge=1, le=30)
     CONVERSATION_PARSE_TIMEOUT: float = Field(default=10, gt=0)
-    CONVERSATION_EXPERT_TIMEOUT: float = Field(default=20, gt=0)
+    # 2026-11-03: three serial expert attempts (measured 2–8.5 s each) need a longer stage.
+    CONVERSATION_EXPERT_TIMEOUT: float = Field(default=28, gt=0)
     CONVERSATION_STEP_TIMEOUT: float = Field(default=12, gt=0)
-    CONVERSATION_SUMMARY_TIMEOUT: float = Field(default=10, gt=0)
+    CONVERSATION_SUMMARY_TIMEOUT: float = Field(default=4, gt=0)
     AGENT_TASK_TIMEOUT: float = Field(default=42, gt=0, lt=48)
     MAX_MODEL_CALLS_PER_DAY: int = Field(default=100, ge=1)
     MODEL_CONTEXT_WINDOW: int = Field(default=32768, ge=1)

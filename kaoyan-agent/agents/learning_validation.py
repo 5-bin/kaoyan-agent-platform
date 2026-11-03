@@ -9,6 +9,13 @@ from core.context import JsonValue, PreparedModelInput
 from core.errors import InvalidModelOutput
 from grounding import aggregate, fully_supported, numbers_supported, verify
 from learning import LearningAnswer, LearningSuggestion
+from learning_suggestions import (
+    SuggestionCandidate,
+    count as _count,
+    graded_attempt,
+    rows as _rows,
+    suggestion_candidates,
+)
 
 PERSONAL_FACT = re.compile(
     r"正确率|有效作答|答对|答错|参考分|掌握指数|独立(?:证据|样本)|"
@@ -25,20 +32,6 @@ class LearningEnrichment:
     source_ids: frozenset[str]
     evidence_refs: frozenset[str]
     citation_support: dict[str, JsonValue]
-
-
-def _rows(value: JsonValue) -> list[dict[str, JsonValue]]:
-    """Read only structured rows from a model-visible JSON collection."""
-    return [row for row in value if isinstance(row, dict)] if isinstance(value, list) else []
-
-
-def _count(row: dict[str, JsonValue], *keys: str) -> int | None:
-    """Return an explicit nonnegative count, never infer one from prose or IDs."""
-    for key in keys:
-        value = row.get(key)
-        if type(value) is int and value >= 0:
-            return value
-    return None
 
 
 def _numeric_facts(context: dict[str, JsonValue]) -> list[int | float]:
@@ -67,11 +60,13 @@ def _numeric_facts(context: dict[str, JsonValue]) -> list[int | float]:
     return values
 
 
-def _suggestion(
+def _legacy_suggestion(
     suggestion: LearningSuggestion, context: dict[str, JsonValue],
     sources: dict[str, dict[str, JsonValue]], evidence: dict[str, dict[str, JsonValue]],
 ) -> str:
     """Validate the requested suggestion against visible records and author its text."""
+    if suggestion.action is None:
+        raise InvalidModelOutput("suggestion_action_required")
     if not set(suggestion.sourceIds) <= sources.keys() or not set(suggestion.evidenceRefs) <= evidence.keys():
         raise InvalidModelOutput("unknown_evidence")
     items = {str(row["ref"]): row for row in _rows(context.get("items")) if "ref" in row}
@@ -86,11 +81,7 @@ def _suggestion(
             raise InvalidModelOutput("suggestion_source_required")
         return f"建议复习{topic}的审核资料，核对定义与适用条件。"
     if suggestion.action == "REVIEW_ATTEMPT":
-        if not selected or len(selected) != len(suggestion.evidenceRefs) or any(
-            row.get("answered") is not True or row.get("snapshotMissing") or row.get("snapshotStatus") in {"MISSING", "WITHDRAWN", "INVALID"}
-            or not (_count(row, "version") or 0)
-            or row.get("answer") not in {"A", "B", "C", "D"} for row in selected
-        ):
+        if not selected or len(selected) != len(suggestion.evidenceRefs) or not all(graded_attempt(row) for row in selected):
             raise InvalidModelOutput("suggestion_requires_graded_evidence")
         return "建议回顾" + "、".join(f"[{ref}]" for ref in suggestion.evidenceRefs) + "的已保存作答及该版本解析，核对可能错因。"
     if suggestion.action == "COLLECT_SAMPLES":
@@ -105,6 +96,26 @@ def _suggestion(
     if not suggestion.sourceIds and not selected and not (_count(stats, "questionCount") or 0):
         raise InvalidModelOutput("suggestion_requires_learning_evidence")
     return f"建议围绕{topic}选择审核练习；请通过练习入口预览并确认后开始。"
+
+
+def _suggestion(
+    suggestion: LearningSuggestion, context: dict[str, JsonValue],
+    sources: dict[str, dict[str, JsonValue]], evidence: dict[str, dict[str, JsonValue]],
+    candidates: dict[str, SuggestionCandidate],
+) -> SuggestionCandidate:
+    """Resolve only a current candidate or the strictly checked legacy format."""
+    if suggestion.candidateId is not None:
+        if suggestion.model_fields_set & {"action", "evidenceRefs", "sourceIds"}:
+            raise InvalidModelOutput("mixed_suggestion_candidate")
+        if suggestion.candidateId not in candidates:
+            raise InvalidModelOutput("unknown_suggestion_evidence")
+        return candidates[suggestion.candidateId]
+    if suggestion.action is None:
+        raise InvalidModelOutput("suggestion_action_required")
+    text = _legacy_suggestion(suggestion, context, sources, evidence)
+    return SuggestionCandidate(
+        suggestion.action, text, tuple(suggestion.evidenceRefs), tuple(suggestion.sourceIds),
+    )
 
 
 def validate_enrichment(answer: LearningAnswer, prepared: PreparedModelInput) -> LearningEnrichment:
@@ -126,6 +137,11 @@ def validate_enrichment(answer: LearningAnswer, prepared: PreparedModelInput) ->
     source_ids: set[str] = set()
     evidence_refs: set[str] = set()
     reports = []
+    # Rebuild from records rather than trusting a supplied menu or model text.
+    offered = {row.get("candidateId") for row in _rows(prepared.payload.get("suggestionCandidates"))
+               if isinstance(row.get("candidateId"), str)}
+    candidates = {candidate.candidate_id: candidate for candidate in suggestion_candidates(context, sources)
+                  if candidate.candidate_id in offered}
     for explanation in answer.explanations:
         if not set(explanation.sourceIds) <= sources.keys():
             raise InvalidModelOutput("unknown_source")
@@ -138,8 +154,9 @@ def validate_enrichment(answer: LearningAnswer, prepared: PreparedModelInput) ->
         source_ids.update(explanation.sourceIds)
         lines.append("概念解释：" + explanation.text)
     for suggestion in answer.suggestions:
-        lines.append(_suggestion(suggestion, context, sources, evidence))
-        source_ids.update(suggestion.sourceIds)
-        evidence_refs.update(suggestion.evidenceRefs)
+        candidate = _suggestion(suggestion, context, sources, evidence, candidates)
+        lines.append(candidate.text)
+        source_ids.update(candidate.source_ids)
+        evidence_refs.update(candidate.evidence_refs)
     return LearningEnrichment(tuple(dict.fromkeys(lines)), frozenset(source_ids), frozenset(evidence_refs),
                               cast(dict[str, JsonValue], aggregate(reports)))

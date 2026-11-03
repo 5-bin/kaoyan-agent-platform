@@ -130,6 +130,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         profile.put("targetSchool", user.getTargetSchool());
         profile.put("targetMajor", user.getTargetMajor());
         profile.put("examYear", user.getExamYear());
+        profile.put("degreeType", user.getDegreeType());
         // Free-form background is unrelated to rule-based screening and never forwarded by default.
         request.setProfile(profile);
         if ("SCHOOL_RECOMMEND".equals(type) && learningProfiles!=null && learningProfiles.getIfAvailable()!=null)

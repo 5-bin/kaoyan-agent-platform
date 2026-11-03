@@ -108,6 +108,23 @@ class AgentChainTest {
             ? ((Map<?, ?>) tasks.selectById(id).getResultPayload().get("profileSnapshot")).get("examYear") : 0);
     }
 
+    @Test void profileDegreeTypeReachesSchoolRecommendWithoutTaskPreference() throws Exception {
+        String token = account();
+        mvc.perform(put("/api/users/profile").header("Authorization", "Bearer " + token).contentType("application/json")
+            .content("{\"examYear\":2027,\"targetMajor\":\"085404\",\"degreeType\":\"doctor\"}")).andExpect(status().isBadRequest());
+        mvc.perform(put("/api/users/profile").header("Authorization", "Bearer " + token).contentType("application/json")
+            .content("{\"examYear\":2027,\"targetMajor\":\"085404\",\"degreeType\":\"professional\"}")).andExpect(status().isOk());
+        JsonNode task = submit(token, "SCHOOL_RECOMMEND", Map.of("query", "比较目标专业"));
+        assertEquals("COMPLETED", task.path("resultPayload").path("outcome").asText());
+        assertEquals("professional", task.path("resultPayload").path("profileSnapshot").path("degreeType").asText());
+        assertTrue(task.path("resultPayload").path("answer").asText().startsWith("学位类型：专硕（来自个人档案"));
+        mvc.perform(put("/api/users/profile").header("Authorization", "Bearer " + token).contentType("application/json")
+            .content("{\"examYear\":2027,\"targetMajor\":\"085404\",\"degreeType\":\"\"}")).andExpect(status().isOk());
+        JsonNode me = json.readTree(mvc.perform(get("/api/users/me").header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).path("data");
+        assertTrue(me.path("degreeType").isNull() || me.path("degreeType").isMissingNode());
+    }
+
     @Test void shortKnowledgeQueryHasSourcesAndUnknownTopicDoesNot() throws Exception {
         String token = account();
         JsonNode known = submit(token, "KNOWLEDGE_QA", Map.of("query", "进程与线程"));

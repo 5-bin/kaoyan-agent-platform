@@ -26,10 +26,31 @@ log = logging.getLogger(__name__)
 
 
 DEGREE_LABELS = {"academic": "学硕", "professional": "专硕"}
+DEGREE_FOLLOW_UP = "请在个人档案选择学硕或专硕（也可在本轮说明）"
+DEGREE_SOURCES = {"profile": "来自个人档案", "catalog": "按目标专业代码在院校库中推断"}
 
 
 class SchoolAgent(StructuredAgent):
     """One request-scoped domain expert."""
+
+    def resolve_degree(
+        self, profile: Profile, pref: Preferences, majors: list[str]
+    ) -> tuple[str | None, str | None]:
+        """Return the degree type and its source: this turn, the profile, then the catalog.
+
+        The catalog is used only when every program of the target majors (in the
+        exam year when such programs exist) has one and the same degree type.
+        """
+        if pref.degreeType:
+            return pref.degreeType, None
+        if profile.degreeType:
+            return profile.degreeType, "profile"
+        matching = [p for p, _ in self.programs if p.majorCode in majors]
+        same_year = [p for p in matching if p.year == profile.examYear]
+        degrees = {p.degreeType for p in same_year or matching}
+        if len(degrees) == 1:
+            return degrees.pop(), "catalog"
+        return None, None
 
     def explain_empty(
         self, profile: Profile, pref: Preferences, majors: list[str], excluded: list[dict]
@@ -134,13 +155,16 @@ class SchoolAgent(StructuredAgent):
                     if profile.targetMajor in {p.majorCode, p.major}
                 }
             )
+        degree, degree_source = self.resolve_degree(profile, pref, majors)
+        if degree_source:
+            pref = pref.model_copy(update={"degreeType": degree})
         missing = []
         if not profile.examYear:
             missing.append("请在个人档案填写报考年份")
         if not majors:
             missing.append("请选择目标专业代码（首批081200、085404）")
-        if not pref.degreeType:
-            missing.append("请选择学硕或专硕")
+        if not degree:
+            missing.append(DEGREE_FOLLOW_UP)
         if missing:
             return {
                 "outcome": "NEEDS_INPUT",
@@ -178,6 +202,11 @@ class SchoolAgent(StructuredAgent):
             + "；专业："
             + "/".join(sorted({p.majorCode for p, _ in self.programs})),
         }
+        if degree_source:
+            result["answer"] = (
+                f"学位类型：{DEGREE_LABELS[degree]}（{DEGREE_SOURCES[degree_source]}，可在本轮说明改选）。\n"
+                + result["answer"]
+            )
         if not candidates and empty_hints:
             result["followUp"] = empty_hints
         if req.learningSnapshot is not None:

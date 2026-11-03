@@ -8,13 +8,15 @@ from agents.learning_result import local_learning_result
 from agents.learning_validation import validate_enrichment
 from core.errors import MODEL_FAILURES, InvalidModelOutput, ToolUnavailable, fallback_reason, failure_reason
 from core.model import prepare_input
-from core.runtime import step_model_allowed, withhold_model_deltas
+from core.runtime import withhold_model_deltas
 from core.mcp_runtime import McpCallError
 from learning import (
     LearningAnswer,
+    learning_scopes,
     model_allowed,
     model_messages,
     rule_learning_answer,
+    rules_notice,
     safe_learning_context,
     weak_point_topics,
 )
@@ -102,11 +104,11 @@ class LearningAgent(StructuredAgent):
                     result["references"] = [
                         doc.reference().model_dump() for doc in docs
                     ]
+                    # Excerpts are shown once under the references panel, not repeated in the body.
                     result["answer"] += (
-                        "\n相关审核资料（用于概念复习，不代替本题历史答案）：\n"
-                        + "\n".join(
-                            (f"[{doc.id}] {doc.title}：{doc.content}" for doc in docs)
-                        )
+                        f"\n相关审核资料{len(docs)}条（用于概念复习，不代替本题历史答案），见下方“查看依据”："
+                        + "、".join(doc.title for doc in docs)
+                        + "。"
                     )
             except (McpCallError, ToolUnavailable, TimeoutError) as error:
                 log.warning("learningRetrievalFailure=%s", type(error).__name__)
@@ -155,11 +157,10 @@ class LearningAgent(StructuredAgent):
                     fallbackReason=fallback_reason(error),
                     notice="AI分析不可用，已保留本地记录摘要。",
                 )
-        elif not resolution.clarification and (
-            not model_allowed(req, self.engine.settings)
-        ):
+        elif not resolution.clarification:
+            # State the actual blocker (consent, provider, category, budget or time).
             result.setdefault(
-                "notice", "当前使用本地规则；外部模型分析需要先开启授权。"
-                if step_model_allowed.get() else "本轮使用规则学情结果，未追加模型请求。"
+                "notice", rules_notice(req, self.engine.settings, learning_scopes(resolution))
+                or "本轮使用规则学情结果，未追加模型请求。"
             )
         return result

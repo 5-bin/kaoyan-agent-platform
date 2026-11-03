@@ -1,23 +1,64 @@
 """Bounded request planning and model projections. Never executes business tools."""
+
 import re
-from typing import Literal
-from schemas import StrictModel
-from intents import chinese_number, local_document_plan, local_learning_plan, requested_knowledge_point
+
 from pydantic import Field, GetJsonSchemaHandler
 from pydantic.json_schema import JsonSchemaValue
 from pydantic_core import CoreSchema
+
 from config import provider_identifier
-from core.runtime import step_model_allowed
+from core.context import JsonValue
+from core.runtime import step_model_allowed, step_rules_reason
+from intents import chinese_number, local_document_plan, local_learning_plan, requested_knowledge_point
+from learning_suggestions import SuggestionAction, project_suggestion_candidates
+from schemas import StrictModel
 
 __all__ = ["chinese_number", "requested_knowledge_point", "local_document_plan", "local_learning_plan",
-           "model_allowed", "has_scope", "model_messages", "clarification_with_example",
+           "model_allowed", "consent_allowed", "rules_notice", "learning_scopes", "has_scope", "model_messages", "clarification_with_example",
            "safe_learning_context", "LearningAnswer", "rule_learning_answer", "weak_point_topics"]
 
 
-def model_allowed(req, settings):
-    return (step_model_allowed.get() and settings.LLM_ENABLED and req.privacy.modelAllowed
+def consent_allowed(req, settings) -> bool:
+    """Return whether the server and the user's saved consent permit external model use."""
+    return (settings.LLM_ENABLED and req.privacy.modelAllowed
             and req.privacy.provider == provider_identifier(settings.LLM_BASE_URL)
             and req.privacy.provider != "unconfigured")
+
+
+def model_allowed(req, settings):
+    return step_model_allowed.get() and consent_allowed(req, settings)
+
+
+SCOPE_LABELS = {"stats": "学习统计", "profile": "个人档案", "wrong": "错题", "favorite": "收藏", "document": "个人笔记"}
+RULES_REASONS = {"BUDGET": "本轮模型额度已用完，本项使用规则结果。",
+                 "TIME": "专家阶段剩余时间不足，本项使用规则结果。"}
+
+
+READ_SCOPES = {"stats": "stats", "wrong": "wrong", "practice": "wrong", "favorite": "favorite", "documents": "document"}
+
+
+def learning_scopes(plan) -> list[str]:
+    """Map the plan's requested reads to the outbound privacy categories they need."""
+    reads = plan.reads if plan else []
+    return list(dict.fromkeys(READ_SCOPES[value] for value in reads if value in READ_SCOPES))
+
+
+def rules_notice(req, settings, scopes: list[str]) -> str | None:
+    """Explain truthfully why a model-capable step used rules; None when nothing blocked it.
+
+    Order: server switch, user consent, consent bound to another provider, missing
+    outbound categories, then the scheduler's budget or time reason.
+    """
+    if not settings.LLM_ENABLED or provider_identifier(settings.LLM_BASE_URL) == "unconfigured":
+        return "外部模型未在服务端启用，本项使用本地规则。"
+    if not req.privacy.modelAllowed:
+        return "未开启外部模型授权，本项使用本地规则；可在对话“隐私”中开启。"
+    if req.privacy.provider != provider_identifier(settings.LLM_BASE_URL):
+        return "外部模型授权已失效（模型供应商已变更），请在对话“隐私”中重新保存授权；本项使用本地规则。"
+    missing = [SCOPE_LABELS.get(scope, scope) for scope in scopes if not has_scope(req, scope)]
+    if missing:
+        return "未授权外发" + "、".join(f"“{name}”" for name in missing) + "，本项使用本地规则；可在对话“隐私”中勾选。"
+    return RULES_REASONS.get(step_rules_reason.get() or "")
 
 
 def has_scope(req, scope):
@@ -140,9 +181,10 @@ class LearningExplanation(StrictModel):
 
 
 class LearningSuggestion(StrictModel):
-    """A bounded suggestion selection; the service authors all displayed prose."""
+    """Select a server candidate; retain the original internal format for validation."""
 
-    action: Literal["REVIEW_CONCEPT", "REVIEW_ATTEMPT", "COLLECT_SAMPLES", "PRACTICE_RELATED"]
+    candidateId: str | None = Field(default=None, pattern=r"^advice_[a-f0-9]{24}$")
+    action: SuggestionAction | None = None
     evidenceRefs: list[str] = Field(default_factory=list, max_length=5)
     sourceIds: list[str] = Field(default_factory=list, max_length=5)
 
@@ -156,18 +198,27 @@ class LearningAnswer(StrictModel):
     evidenceRefs: list[str] = Field(default_factory=list, max_length=30)
     sourceIds: list[str] = Field(default_factory=list, max_length=5)
 
+    @staticmethod
+    def project_model_payload(payload: dict[str, JsonValue]) -> None:
+        """Keep the bounded advice menu synchronized with actual visible evidence."""
+        project_suggestion_candidates(payload)
+
     @classmethod
     def __get_pydantic_json_schema__(cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler) -> JsonSchemaValue:
         """Do not invite new providers to populate legacy free-form fields."""
         schema = handler.resolve_ref_schema(handler(core_schema))
         for name in ("answer", "evidenceRefs", "sourceIds"):
             schema["properties"].pop(name, None)
+        schema["properties"]["suggestions"]["items"] = {
+            "type": "object", "additionalProperties": False,
+            "properties": {"candidateId": {"type": "string", "pattern": "^advice_[a-f0-9]{24}$"}},
+            "required": ["candidateId"],
+        }
         return schema
 
 
 # Mirrors LearningProfileEngine: the profile is not the interval statistics above.
-PROFILE_BASIS = ("以下规则画像与上面的区间统计口径不同：统计全部历史中的独立作答，同一题7天内只计1次，"
-                 "不含提示辅助及未记录提示情况的作答，按难度分组且每组最多取最近50条；两组次数不能直接比较。")
+PROFILE_BASIS = "规则画像只计独立作答（同题7天计1次、按难度分组），口径与上面的区间统计不同，次数不能直接比较。"
 
 
 def rule_learning_answer(context, plan):
@@ -184,14 +235,13 @@ def rule_learning_answer(context, plan):
         if not count:
             lines.append("所选区间暂无有效已提交作答，不能据此判断掌握程度。")
         else:
-            lines.append(f"记录事实：{stats.get('from', '')}至{stats.get('to', '')}有效作答{count}次，正确{stats.get('correctCount', 0)}次，去重题数{stats.get('uniqueQuestions', '未记录')}。")
-            if "wrongAttempts" in stats:
-                lines.append(f"区间内错误作答{stats['wrongAttempts']}次；与当前错题本题数分别统计。")
             accuracy = stats.get("accuracy")
-            if type(accuracy) in (int, float) and 0 <= accuracy <= 1:
-                lines.append(f"区间正确率{accuracy * 100:.1f}%，口径为全部有效已提交作答。")
+            lines.append(f"记录事实：{stats.get('from', '')}至{stats.get('to', '')}有效作答{count}次，正确{stats.get('correctCount', 0)}次"
+                         + (f"，错误{stats['wrongAttempts']}次" if "wrongAttempts" in stats else "")
+                         + (f"，正确率{accuracy * 100:.1f}%" if type(accuracy) in (int, float) and 0 <= accuracy <= 1 else "")
+                         + f"，去重题数{stats.get('uniqueQuestions', '未记录')}（同题重复作答分别计数；与错题本题数分别统计）。")
         lines.extend(_knowledge_point_lines(stats.get("knowledgePoints", [])))
-        lines.append("学习时长与提示辅助：未记录；区间作答次数不区分是否独立完成。")
+        lines.append("学习时长与提示辅助未记录。")
         profile = stats.get("learningProfile", {})
         if profile:
             lines.append(PROFILE_BASIS)
@@ -221,8 +271,10 @@ def rule_learning_answer(context, plan):
 
 
 SMALL_SAMPLE = 5
-# Keeps the merged small-sample line well inside one bounded answer line.
-MERGED_NAME_LIMIT = 30
+# Keeps the merged small-sample line short; the statistics page holds the full distribution.
+MERGED_NAME_LIMIT = 10
+# Only the weakest judgeable points are spelled out in the chat answer.
+WEAK_POINT_LIMIT = 8
 DIFFICULTY_LABELS = {"EASY": "简单", "MEDIUM": "中等", "HARD": "困难"}
 
 
@@ -246,27 +298,36 @@ def _merged_names(items: list[str]) -> str:
                     if len(items) > MERGED_NAME_LIMIT else "")
 
 
+def _point_line(point: dict) -> str:
+    """Render one interval point as a single line of attempts, errors and accuracy."""
+    name, count, correct = _point_counts(point)
+    if correct is None:
+        return f"{name}：作答{count}次"
+    return f"{name}：作答{count}次，错{count - correct}次，正确率{correct / count * 100:.1f}%"
+
+
 def _knowledge_point_lines(points: list[dict]) -> list[str]:
-    """List judgeable points by error rate first and merge small samples into one line."""
+    """Show the weakest judgeable points only; summarize the rest instead of listing them."""
     lines: list[str] = []
     enough = [p for p in points if _point_counts(p)[1] >= SMALL_SAMPLE]
     small = [p for p in points if _point_counts(p)[1] < SMALL_SAMPLE]
-    for point in sorted(enough, key=lambda p: (-_error_rate(p), -_point_counts(p)[1])):
-        name, count, correct = _point_counts(point)
-        lines.append(f"{name}：区间内有效作答{count}次（同题重复作答分别计数）"
-                     + (f"，正确{correct}次" if correct is not None else "") + "；可结合具体错题分析可能错因。")
-        if "wrongAttempts" in point:
-            lines.append(f"{name}：区间内错误作答{point['wrongAttempts']}次。")
+    # A known zero error rate is not a weak point; unknown correctness still ranks last.
+    weak = sorted((p for p in enough if _error_rate(p) != 0),
+                  key=lambda p: (-_error_rate(p), -_point_counts(p)[1]))
+    shown = weak[:WEAK_POINT_LIMIT]
+    if shown:
+        lines.append(f"薄弱知识点（按区间错误率，前{len(shown)}个）：")
+        lines.extend(_point_line(point) for point in shown)
+    rest = len(enough) - len(shown)
+    if rest:
+        perfect = sum(1 for p in enough if _error_rate(p) == 0)
+        lines.append(f"另有{rest}个作答满5次的知识点未列出"
+                     + (f"（其中{perfect}个区间内全部答对）" if perfect else "")
+                     + "，完整分布见学习统计。")
     if small:
         small.sort(key=lambda p: -_point_counts(p)[1])
-        names = []
-        for point in small:
-            name, count, correct = _point_counts(point)
-            wrong = point.get("wrongAttempts")
-            detail = f"，错误{wrong}次" if wrong is not None else f"，正确{correct}次" if correct is not None else ""
-            names.append(f"{name}（{count}次{detail}）")
-        lines.append(f"以下{len(small)}个知识点区间内有效作答均样本不足5次，暂不判断掌握程度，可作为补练候选："
-                     + _merged_names(names) + "。")
+        names = [_point_counts(point)[0] for point in small]
+        lines.append(f"{len(small)}个知识点作答样本不足5次，暂不判断掌握程度：" + _merged_names(names) + "。")
     return lines
 
 
@@ -289,8 +350,9 @@ def weak_point_topics(points: list[dict], limit: int = 5) -> list[str]:
 
 
 def _profile_group_lines(groups: list[dict]) -> list[str]:
-    """Keep anomalies and sufficient groups apart; merge groups that only need more samples."""
+    """List anomalies one by one; merge priority groups and small-sample groups into one line each."""
     lines: list[str] = []
+    priority: dict[str, list[str]] = {}
     small = []
     for group in groups:
         name = group.get("knowledgePoint", "知识点")
@@ -301,7 +363,10 @@ def _profile_group_lines(groups: list[dict]) -> list[str]:
         elif samples < SMALL_SAMPLE:
             small.append(f"{name}（{difficulty}，{samples}条）")
         else:
-            lines.append(f"{name}（{difficulty}）：独立样本{samples}条，按复习优先级安排巩固与进阶练习。")
+            priority.setdefault(name, []).append(difficulty)
+    if priority:
+        lines.append("画像复习优先（各组独立样本均不少于5条）："
+                     + "、".join(f"{name}（{'、'.join(levels)}）" for name, levels in priority.items()) + "。")
     if small:
         lines.append("以下画像分组独立样本不足5条，建议补充独立样本：" + _merged_names(small) + "。")
     return lines

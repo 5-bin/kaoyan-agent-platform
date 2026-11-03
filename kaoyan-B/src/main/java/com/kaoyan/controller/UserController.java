@@ -59,7 +59,7 @@ public class UserController {
         validateAvatar(userId, req.avatarUrl());
         userService.updateProfile(userId,
                 req.avatarUrl(), req.targetSchool(), req.targetMajor(),
-                req.examYear(), req.background());
+                req.examYear(), req.degreeType(), req.background());
         return Result.ok();
     }
 

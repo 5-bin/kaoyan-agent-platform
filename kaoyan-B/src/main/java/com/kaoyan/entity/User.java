@@ -45,6 +45,9 @@ public class User {
     /** 考试年份 */
     private Integer examYear;
 
+    /** 报考学位类型：academic 学硕／professional 专硕 */
+    private String degreeType;
+
     /** 考生背景 */
     private String background;
 

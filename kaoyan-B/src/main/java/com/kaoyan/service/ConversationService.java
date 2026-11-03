@@ -280,7 +280,8 @@ public class ConversationService {
         request.put("userId",owner); request.put("taskType","CHAT"); request.put("userInput",query);
         // References, not copied historical prose: expiry of an older turn cannot be extended by a newer snapshot.
         request.put("_historyRefs",history);
-        request.put("profile",db.one("SELECT target_school,target_major,exam_year FROM `user` WHERE id=?",owner));
+        // Read every turn, so profile edits reach existing conversations without rewriting their conditions.
+        request.put("profile",db.one("SELECT target_school,target_major,exam_year,degree_type FROM `user` WHERE id=?",owner));
         request.put("conditions",conv.get("conditions"));
         request.put("privacy",privacy.wire(settings));
         request.put("_grant",com.kaoyan.security.UserContext.sessionGrant());
@@ -313,7 +314,7 @@ public class ConversationService {
             var saved=db.one("SELECT user_id,conversation_id,context_json FROM chat_generation WHERE task_id=?",live.taskId);
             Long owner=((Number)saved.get("userId")).longValue();
             var context=db.object(saved.get("context"));
-            checkAuthorization(owner,context,true);
+            authorizeGeneration(owner,context);
             Map<String,Object> planRequest=wireContext(context);
             var page=db.object(context.get("_pageContext"));
             Map<String,Object> publicPage=new LinkedHashMap<>();
@@ -340,9 +341,9 @@ public class ConversationService {
                     if(db.jdbc().update("UPDATE chat_generation SET context_json=? WHERE task_id=? AND status='RUNNING'",
                         db.encode(context),live.taskId)!=1) return;
                 }
-                checkAuthorization(owner,context,true);
+                authorizeGeneration(owner,context);
                 var output=schoolCatalog.answer(plan,db.object(context.get("profile")),db.object(context.get("conditions")));
-                checkAuthorization(owner,context,true);
+                authorizeGeneration(owner,context);
                 terminate(live,"SUCCESS",null,output);
                 return;
             }
@@ -355,7 +356,7 @@ public class ConversationService {
                 plan.put("ordinal",null);plan.put("questionRefs",List.of());page=Map.of();
                 context.put("_pageContext",page);
             }
-            checkAuthorization(owner,context,true);
+            authorizeGeneration(owner,context);
             var data=learning.read(owner,plan,page);
             var storedPlan=new LinkedHashMap<>(plan);
             storedPlan.put("standaloneQuery",context.get("userInput"));
@@ -365,7 +366,7 @@ public class ConversationService {
                 int changed=db.jdbc().update("UPDATE chat_generation SET context_json=? WHERE task_id=? AND status='RUNNING'",db.encode(context),live.taskId);
                 if(changed!=1) return;
             }
-            checkAuthorization(owner,context,true);
+            authorizeGeneration(owner,context);
             var streamContext=wireContext(context);
             streamContext.put("preparedPlan",plan); // Expanded historical query exists only for this live request.
             failureCode = Code.UPSTREAM_FAILED;
@@ -426,6 +427,10 @@ public class ConversationService {
                 }
             }
             throw new IOException("upstream_incomplete");
+        } catch(AuthorizationChanged changed) {
+            // Privacy saves commit before their stop event, so the worker may notice first; end it the same way.
+            log.warn("task={} chatStopped=AUTHORIZATION_CHANGED",live.taskId);
+            terminate(live,"CANCELLED","登录或授权已变化，生成已停止",null);
         } catch(Exception error) {
             Code code = error instanceof AgentValidationException validation ? validation.getCode() : failureCode;
             log.warn("task={} chatFailure={} errorCode={}",live.taskId,error.getClass().getSimpleName(),code.name());
@@ -1056,6 +1061,14 @@ public class ConversationService {
         plan.put("operation","NONE");plan.put("clarification",(message.length()>750?message.substring(0,750)+"…":message)+hint);
     }
 
+    /** Signals that login, consent or provider changed while a generation was running. */
+    private static final class AuthorizationChanged extends RuntimeException {
+        AuthorizationChanged(ApiException cause) { super(cause); }
+    }
+    private void authorizeGeneration(Long owner,Map<String,Object> context) {
+        try { checkAuthorization(owner,context,true); }
+        catch(ApiException error) { throw new AuthorizationChanged(error); }
+    }
     private void checkAuthorization(Long owner,Map<String,Object> context,boolean checkProvider) {
         var consent=db.object(context.get("privacy"));
         int version=((Number)consent.getOrDefault("version",0)).intValue();

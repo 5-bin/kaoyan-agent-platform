@@ -373,4 +373,4 @@ async def test_compound_summary_with_unsupported_additions_is_rejected():
 def test_step_timeout_must_be_shorter_than_expert_stage():
     assert settings().CONVERSATION_STEP_TIMEOUT == 12
     with pytest.raises(ValueError, match="INVALID_STEP_TIMEOUT"):
-        settings(CONVERSATION_STEP_TIMEOUT=20)
+        settings(CONVERSATION_STEP_TIMEOUT=28)

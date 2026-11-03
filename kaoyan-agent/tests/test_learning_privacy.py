@@ -491,4 +491,6 @@ async def test_learning_model_cannot_fabricate_public_sources():
     assert result["explanationMode"]=="fallback"
     assert "fabricated-concept-marker" not in result["answer"]
     assert result["references"][0]["id"]=="os-threads#0"
-    assert "共享地址空间" in result["answer"]
+    # 2026-11-03: the excerpt is shown once under the references, not pasted into the body.
+    assert "共享地址空间" in result["references"][0]["excerpt"]
+    assert "共享地址空间" not in result["answer"] and "见下方“查看依据”" in result["answer"]

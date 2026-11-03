@@ -49,10 +49,11 @@ public interface UserService extends IService<User> {
      * @param targetSchool 目标院校
      * @param targetMajor  目标专业
      * @param examYear     考试年份
+     * @param degreeType   报考学位类型（academic／professional，空表示未设置）
      * @param background   考生背景
      */
     void updateProfile(Long userId, String avatarUrl, String targetSchool,
-                       String targetMajor, Integer examYear, String background);
+                       String targetMajor, Integer examYear, String degreeType, String background);
 
     /**
      * 更新头像

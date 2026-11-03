@@ -14,6 +14,7 @@ export interface User {
   targetSchool?: string
   targetMajor?: string
   examYear?: number
+  degreeType?: 'academic' | 'professional' | null
   background?: string
 }
 

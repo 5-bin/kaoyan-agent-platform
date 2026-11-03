@@ -30,6 +30,14 @@
         <el-form-item label="考试年份">
           <el-input v-model.number="profile.examYear" type="number" />
         </el-form-item>
+        <el-form-item label="学位类型">
+          <el-select v-model="profile.degreeType" style="width:100%">
+            <el-option label="学硕" value="academic" />
+            <el-option label="专硕" value="professional" />
+            <el-option label="未设置" value="" />
+          </el-select>
+          <div class="form-hint">院校比较默认使用这里的学位类型，单次对话中说明学硕／专硕时以对话为准。</div>
+        </el-form-item>
         <el-form-item label="背景说明">
           <el-input v-model="profile.background" type="textarea" :rows="3" />
         </el-form-item>
@@ -54,6 +62,7 @@ const profile = reactive({
   targetSchool: userStore.userInfo?.targetSchool || '',
   targetMajor: userStore.userInfo?.targetMajor || '',
   examYear: userStore.userInfo?.examYear as any,
+  degreeType: (userStore.userInfo?.degreeType || '') as 'academic' | 'professional' | '',
   background: userStore.userInfo?.background || ''
 })
 
@@ -80,4 +89,5 @@ const upload = async (opt: any) => {
 .head-info { margin-left: 16px; flex: 1; }
 .uname { font-size: 18px; font-weight: 700; }
 .sec-title { font-size: 15px; font-weight: 600; margin: 0 0 16px; }
+.form-hint { font-size: 12px; line-height: 1.5; color: var(--el-text-color-secondary); margin-top: 4px; }
 </style>

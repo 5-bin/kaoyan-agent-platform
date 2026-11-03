@@ -5,8 +5,8 @@ import logging
 from agents.base import StructuredAgent
 from agents.results import StepContext
 from core.errors import MODEL_FAILURES, ModelUnavailable, fallback_reason, failure_reason
-from core.runtime import step_model_allowed
-from learning import has_scope, model_allowed, model_messages, safe_learning_context
+from core.runtime import step_rules_reason
+from learning import consent_allowed, has_scope, model_allowed, model_messages, safe_learning_context
 from prompts import get
 from schemas import (
     ConversationRequest,
@@ -82,7 +82,10 @@ class NoteAgent(StructuredAgent):
             result.update(
                 outcome="UNSUPPORTED",
                 answer="AI笔记生成未启用或未获得外发授权；你仍可在个人笔记中手动创建和编辑。"
-                if step_model_allowed.get() else "本轮模型额度已分配给优先专家，未生成笔记建议；可单独发起笔记请求。",
+                if not consent_allowed(req, self.engine.settings)
+                else "专家阶段剩余时间不足，未生成笔记建议；可单独发起笔记请求。"
+                if step_rules_reason.get() == "TIME"
+                else "本轮模型额度已分配给优先专家，未生成笔记建议；可单独发起笔记请求。",
             )
         elif req.document is not None and (not has_scope(req, "document")):
             result.update(
