@@ -1,0 +1,23 @@
+{
+  "result": "PASS",
+  "commit": "ffb6b49c14f2d7dbbb5d798ea08fa73b269afece",
+  "tables": 28,
+  "columns": 264,
+  "entities": 10,
+  "jdbc_tables": 18,
+  "native_json": 13,
+  "longtext_json": 8,
+  "source_links_checked": 592,
+  "markdown_table_lines_checked": 686,
+  "column_source_anchors_checked": 264,
+  "checks": [
+    "独立正则提取累计SQL表与列类型",
+    "字段来源行及DDL约束定位",
+    "实体全部持久属性对照",
+    "28表文档覆盖",
+    "18张无实体表均有直接SQL证据",
+    "固定版本源码链接路径与行号",
+    "相对链接目标",
+    "Markdown表格列数/围栏/编码/尾随空格"
+  ]
+}

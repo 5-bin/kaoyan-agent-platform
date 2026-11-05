@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-05",
+  "result": "PASS",
+  "checks": {
+    "artifactsCompared": 22,
+    "byteIdenticalToAcceptedV2": true,
+    "isolatedArchiveRebuild": true,
+    "buildWithSitePackagesDisabled": true,
+    "markdownLocalLinks": "PASS",
+    "obsoleteNativeFilesAndOldZipExcluded": true
+  },
+  "scope": "local delivery cleanup and packaging; prototype behavior and Modao project unchanged",
+  "previousBehaviorReports": [
+    "acceptance-validation.json",
+    "validation.json",
+    "public-acceptance-validation.json"
+  ],
+  "liveModaoRecheckPerformed": false,
+  "gitCommitOrPushPerformed": false
+}
