@@ -1,5 +1,13 @@
 <template>
   <div class="layout">
+    <!-- 装饰背景（仅柔光）：首页四团光晕，其余页面只保留顶部两团且更淡 -->
+    <div class="backdrop" :class="{ home: isHome }" aria-hidden="true">
+      <span class="glow glow-bridge" />
+      <span class="glow glow-top" />
+      <span v-if="isHome" class="glow glow-mid" />
+      <span v-if="isHome" class="glow glow-bottom" />
+    </div>
+
     <aside class="sidebar">
       <div class="logo">
         <span class="logo-mark">考</span>
@@ -14,7 +22,7 @@
           <div class="group-label">学习</div>
           <el-menu-item :index="navigationPath('HOME')"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
           <el-menu-item :index="navigationPath('PRACTICE')"><el-icon><EditPen /></el-icon><span>刷题</span></el-menu-item>
-          <el-menu-item :index="navigationPath('ASSISTANT')"><el-icon><Notebook /></el-icon><span>Agent 助手</span></el-menu-item>
+          <el-menu-item :index="navigationPath('ASSISTANT')"><el-icon><ChatDotRound /></el-icon><span>Agent 助手</span></el-menu-item>
         </div>
         <div class="menu-group">
           <div class="group-label">复习</div>
@@ -76,7 +84,7 @@ import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import {
   HomeFilled, EditPen, Notebook, Star, TrendCharts,
-  School, Folder, Setting, Document
+  School, Folder, Setting, Document, ChatDotRound
 } from '@element-plus/icons-vue'
 
 const assistant = useAssistantStore()
@@ -85,6 +93,7 @@ const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
 const assistantMounted = ref(false)
+const isHome = computed(() => route.path === '/')
 watch([() => route.path, () => assistant.open], ([path, open]) => { if (path === '/tasks' || open) assistantMounted.value = true }, { immediate: true })
 
 const activeMenu = computed(() => route.path.startsWith('/admin/')
@@ -111,30 +120,67 @@ const onLogout = async () => {
 
 <style scoped lang="scss">
 .assistant-launch { position:fixed; right:20px; bottom:24px; z-index:20 }
-.layout { display: flex; height: 100vh; overflow: hidden; }
+.layout { display: flex; height: 100vh; overflow: hidden; position: relative; background: var(--c-bg); }
+
+/* 背景层固定在布局内，不随内容滚动；侧栏与主区共用，避免两块区域割裂 */
+.backdrop { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.backdrop > span { position: absolute; }
+.glow-bridge {
+  left: 40px; top: -160px; width: 560px; height: 440px; opacity: .6;
+  background:
+    radial-gradient(40% 45% at 45% 50%, var(--fx-glow-blue), transparent 72%),
+    radial-gradient(30% 34% at 70% 62%, var(--fx-glow-violet), transparent 72%);
+}
+.glow-top {
+  right: -60px; top: -140px; width: 760px; height: 520px; opacity: .6;
+  background:
+    radial-gradient(40% 46% at 62% 42%, var(--fx-glow-blue), transparent 72%),
+    radial-gradient(34% 40% at 34% 64%, var(--fx-glow-violet), transparent 72%);
+}
+.home .glow-bridge, .home .glow-top { opacity: 1; }
+.glow-mid {
+  left: 40px; top: 44%; width: 620px; height: 460px;
+  background: radial-gradient(40% 45% at 45% 50%, var(--fx-glow-violet), transparent 72%);
+}
+.glow-bottom {
+  right: -120px; bottom: -160px; width: 700px; height: 480px;
+  background:
+    radial-gradient(42% 46% at 55% 50%, var(--fx-glow-blue), transparent 72%),
+    radial-gradient(30% 34% at 30% 40%, var(--fx-glow-violet), transparent 72%);
+}
 
 .sidebar {
   width: 220px; flex-shrink: 0;
   height: 100vh; overflow-y: auto;
-  background: var(--c-surface);
-  border-right: 1px solid var(--c-line);
-  padding: 20px 12px;
+  background: var(--fx-glass);
+  padding: 0 12px 20px;
   display: flex; flex-direction: column;
-  position: sticky; top: 0;
+  position: relative; z-index: 1;
 }
-.logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 24px; }
+/* 侧栏右侧淡出分隔线，从顶带下方开始 */
+.sidebar::after {
+  content: ''; position: absolute; top: 57px; bottom: 32px; right: 0; width: 1px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(214, 222, 240, .9), rgba(214, 222, 240, .5) 60%, transparent);
+}
+/* 与顶栏同高、同底线，组成横贯全宽的顶带 */
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 56px; margin: 0 -12px 8px; padding: 0 20px;
+  border-bottom: 1px solid var(--fx-line);
+}
 .logo-mark {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: var(--c-primary); color: #fff;
-  display: grid; place-items: center; font-weight: 700;
+  width: 36px; height: 36px; border-radius: 10px; color: #fff;
+  display: grid; place-items: center; font-weight: 700; flex-shrink: 0;
+  background: linear-gradient(140deg, #4d7bff 0%, var(--c-primary-strong) 55%, #4b46e0 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 14px -6px rgba(43, 90, 230, .7);
 }
 .logo-name { font-weight: 700; font-size: 15px; }
-.logo-slogan { font-size: 11px; color: var(--c-ink-3); margin-top: 2px; }
+.logo-slogan { font-size: 12px; color: var(--c-ink-2); margin-top: 2px; }
 
 .menu { background: transparent; flex: 1; padding: 0 4px; }
 .menu-group { margin-bottom: 8px; }
 .group-label {
-  font-size: 11px; color: var(--c-ink-3); padding: 12px 12px 6px;
+  font-size: 12px; color: var(--c-ink-2); padding: 12px 12px 6px;
   letter-spacing: 1px;
 }
 :deep(.el-menu-item) {
@@ -144,37 +190,55 @@ const onLogout = async () => {
   color: var(--c-ink-2);
   font-size: 14px;
   display: flex; align-items: center;
+  background: transparent;
+  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
-:deep(.el-menu-item:hover) { background: var(--c-bg); color: var(--c-ink); }
+:deep(.el-menu-item:hover) {
+  background: rgba(255, 255, 255, .75);
+  box-shadow: inset 0 0 0 1px #e3e8f4;
+  color: var(--c-ink);
+}
 :deep(.el-menu-item.is-active) {
-  background: var(--c-primary-light) !important;
-  color: var(--c-primary) !important;
+  background: linear-gradient(90deg, #eaf0ff, #f3f5ff) !important;
+  box-shadow: inset 0 0 0 1px #d6e0ff, 0 6px 16px -12px rgba(43, 90, 230, .55);
+  color: var(--c-primary-deep) !important;
   font-weight: 600;
 }
+:deep(.el-menu-item.is-active .el-icon) { filter: drop-shadow(0 2px 4px rgba(43, 90, 230, .35)); }
 :deep(.el-menu-item .el-icon) { margin-right: 12px; font-size: 18px; flex-shrink: 0; }
 :deep(.el-menu-item span) { line-height: 1; }
 
-.main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100vh; overflow: hidden; }
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100vh; overflow: hidden; position: relative; z-index: 1; }
 .topbar {
-  height: 56px; flex-shrink: 0; background: var(--c-surface);
-  border-bottom: 1px solid var(--c-line);
+  height: 56px; flex-shrink: 0;
+  background: var(--fx-glass);
+  border-bottom: 1px solid var(--fx-line);
+  backdrop-filter: saturate(1.6) blur(14px);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 24px;
 }
+@supports not (backdrop-filter: blur(1px)) {
+  .topbar { background: var(--c-surface); }
+}
 .crumb { font-weight: 600; font-size: 15px; }
 .user { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-.avatar { background: var(--c-primary); color: #fff; }
+.avatar { background: var(--c-primary-strong); color: #fff; }
 .uname { font-weight: 600; font-size: 14px; }
 .content { flex: 1; overflow-y: auto; padding-bottom: 40px; }
+
+@media (prefers-reduced-motion: reduce) {
+  :deep(.el-menu-item) { transition: none; }
+}
 @media(max-width:640px) {
-  .sidebar { width: 64px; padding: 12px 6px; }
-  .logo { padding: 0 0 12px; justify-content: center; }
+  .sidebar { width: 64px; padding: 0 6px 12px; }
+  .sidebar::after { top: 57px; }
+  .logo { margin: 0 -6px 8px; padding: 0; justify-content: center; }
   .logo > div, .group-label { display: none; }
   :deep(.el-menu-item) { padding: 0 !important; justify-content: center; }
   :deep(.el-menu-item > span) { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
   :deep(.el-menu-item .el-icon) { margin: 0; }
   .topbar { padding: 0 12px; }
   .user .el-tag { display: none; }
-  .uname { max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+  .uname { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 </style>
