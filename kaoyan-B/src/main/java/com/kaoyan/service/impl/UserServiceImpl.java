@@ -2,6 +2,7 @@ package com.kaoyan.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kaoyan.common.ApiException;
+import com.kaoyan.config.AuthProperties;
 import com.kaoyan.entity.User;
 import com.kaoyan.mapper.UserMapper;
 import com.kaoyan.security.JwtService;
@@ -21,12 +22,16 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
+    private final AuthProperties authProperties;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     @Override
     @Transactional
     public User register(String username, String rawPassword) {
+        if (!authProperties.isRegistrationEnabled()) {
+            throw new ApiException(403, 403, "当前暂不开放注册");
+        }
         String name = username == null ? "" : username.trim();
         if (name.isEmpty()) {
             throw new ApiException(400, 400, "用户名不能为空");

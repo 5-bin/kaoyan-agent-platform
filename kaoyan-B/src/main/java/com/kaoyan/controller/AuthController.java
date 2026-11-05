@@ -1,6 +1,8 @@
 package com.kaoyan.controller;
 
 import com.kaoyan.common.Result;
+import com.kaoyan.config.AuthProperties;
+import com.kaoyan.dto.response.RegistrationResponse;
 import com.kaoyan.dto.request.LoginRequest;
 import com.kaoyan.dto.request.RefreshRequest;
 import com.kaoyan.dto.request.RegisterRequest;
@@ -25,14 +27,21 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
+    private final AuthProperties authProperties;
+
+    /** Only public authentication capabilities, never runtime secrets. */
+    @GetMapping("/config")
+    public Result<Map<String, Boolean>> config() {
+        return Result.ok(Map.of("registrationEnabled", authProperties.isRegistrationEnabled()));
+    }
 
     /**
      * 注册
      */
     @Operation(summary = "注册", description = "用户名唯一，密码 6-32 位")
     @PostMapping("/register")
-    public Result<?> register(@Valid @RequestBody RegisterRequest req) {
-        return Result.ok(userService.register(req.username(), req.password()));
+    public Result<RegistrationResponse> register(@Valid @RequestBody RegisterRequest req) {
+        return Result.ok(RegistrationResponse.from(userService.register(req.username(), req.password())));
     }
 
     /**

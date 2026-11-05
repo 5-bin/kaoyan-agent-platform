@@ -69,6 +69,8 @@ knife4j:
     language: zh_cn
 
 kaoyan:
+  auth:
+    registration-enabled: ${REGISTRATION_ENABLED:true}
   agent:
     base-url: ${AGENT_BASE_URL:http://127.0.0.1:8001}
     internal-key: ${AGENT_INTERNAL_KEY:}
