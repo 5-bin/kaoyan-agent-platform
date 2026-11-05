@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-05",
+  "version": "2026-11-05-v2",
+  "url": "https://modao.cc/proto/1tGSwIfito0m4mcLTVKiI2/sharing?view_mode=device&screen=rbpVa4sEZCiOAvssl&canvasId=rcVa4sEZO8ScRh77&device=industrial_hmi_16_10&orientation=portrait",
+  "context": "new isolated Edge context, no cookies or saved account state",
+  "permissionsChanged": false,
+  "passed": [
+    "匿名访问 v2 与目录可见",
+    "练习判分 → 错题上下文 → Agent 辅导",
+    "学情分析 → 确认创建补强练习",
+    "笔记建议预览 → 同一笔记保存 v2",
+    "后台批量校验 → 整批送审 → 审核通过",
+    "后台资料审核确认与取消",
+    "页面规则与目录返回"
+  ],
+  "anonymousAccess": true,
+  "result": "PASS"
+}
