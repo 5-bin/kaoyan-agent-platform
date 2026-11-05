@@ -1,0 +1,60 @@
+@startuml T04-06 院校推荐活动图
+' 图源：docs/coursework-02/system/uml/T04-06_院校推荐活动图.puml
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng 本文件（活动图不依赖 Graphviz）
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 160
+skinparam ActivityBackgroundColor #F7FAFD
+skinparam ActivityBorderColor #3C5A80
+skinparam ActivityDiamondBackgroundColor #FFF8E6
+skinparam ActivityDiamondBorderColor #8A6D1F
+
+|学生|
+start
+:在院校页点击“条件推荐”;
+|前端|
+:用档案预填专业与学位，\n提交 POST /api/recommends/generate;
+|Java 后端|
+if (query 长度与偏好白名单合法？) then (否)
+  :返回 400 参数错误;
+  stop
+endif
+if (当日配额足够？) then (否)
+  :返回 429 配额超限;
+  stop
+endif
+:记录隐私同意范围，\n创建 SCHOOL_RECOMMEND 任务（RUNNING）;
+|MySQL|
+:保存 task 与 input_payload\n（含档案快照）;
+|Python Agent|
+:补全专业码、学位类型与报考年份;
+if (年份／专业／学位缺失？) then (是)
+  :返回 NEEDS_INPUT＋followUp\n（前端追问，学生补充后重新提交）;
+  stop
+endif
+:硬过滤：年份等值、方向、学位、地区;
+if (当年无项目或全部被排除？) then (是)
+  :返回 UNSUPPORTED＋排除原因\n（前端展示“当年无匹配”及原因）;
+  stop
+endif
+:排序：地区匹配→更新时间→编号，取前 5;
+if (允许模型解释且模型可用？) then (是)
+  :生成解释并核验引用;
+  :引用不通过则回退为规则解释;
+endif
+:返回 outcome／references／coverage;
+|Java 后端|
+:校验响应契约、状态与资料版本;
+if (校验通过？) then (否)
+  :任务置 FAILED 并记录原因\n（前端提示稍后重试）;
+  stop
+endif
+:保存 task.result_payload\n（学情启用时追加院校×学情对比）;
+|前端|
+:展示候选、匹配条件、待确认项与来源;
+|学生|
+:查看历史推荐;
+|Java 后端|
+:GET /api/recommends：本人前 100 条，\n删除仅隐藏、不返还配额;
+stop
+@enduml

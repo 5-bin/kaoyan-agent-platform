@@ -1,0 +1,75 @@
+@startuml T04-01 学生用例图
+' 图源：docs/coursework-02/system/uml/T04-01_学生用例图.puml
+' 渲染：需 Graphviz(dot)，或用 PlantUML 在线服务器；已导出 PNG/SVG 至 export/。
+' 说明：学生与平台的全部交互；登录是各业务用例的前置条件，单独建模，不重复 include。
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 180
+skinparam usecase {
+  BackgroundColor #F4F7FB
+  BorderColor #3C5A80
+  FontSize 13
+}
+skinparam rectangle {
+  BorderColor #3C5A80
+  BackgroundColor #FFFFFF
+}
+skinparam package {
+  BorderColor #8FA5BF
+  BackgroundColor #FAFBFD
+}
+
+actor "学生" as S
+
+rectangle "考研 Agent 平台（学生端）" {
+  package "账号与档案" {
+    usecase "注册账号" as UC01
+    usecase "登录" as UC02
+    usecase "退出登录" as UC03
+    usecase "维护备考档案" as UC04
+  }
+  package "练习与诊断" {
+    usecase "创建练习批次" as UC05
+    usecase "抽题并固定题目快照" as UC06
+    usecase "作答题目" as UC07
+    usecase "服务端判分" as UC08
+    usecase "保存草稿并续做" as UC09
+    usecase "查看两级提示" as UC10
+    usecase "查看解析与批次回顾" as UC11
+    usecase "查看错题与收藏" as UC12
+  }
+  package "学情补强" {
+    usecase "查看学情画像与补强建议" as UC13
+  }
+  package "院校查询与推荐" {
+    usecase "查询院校与专业" as UC14
+    usecase "生成院校推荐" as UC15
+  }
+  package "Agent 助手与记录" {
+    usecase "与 Agent 助手对话" as UC16
+    usecase "管理个人笔记" as UC17
+    usecase "查看任务历史" as UC18
+  }
+}
+
+S --> UC01
+S --> UC02
+S --> UC03
+S --> UC04
+S --> UC05
+S --> UC07
+S --> UC12
+S --> UC13
+S --> UC14
+S --> UC15
+S --> UC16
+S --> UC17
+S --> UC18
+
+UC05 ..> UC06 : <<include>>
+UC07 ..> UC08 : <<include>>
+UC09 ..> UC07 : <<extend>>
+UC10 ..> UC07 : <<extend>>
+UC11 ..> UC07 : <<extend>>
+@enduml

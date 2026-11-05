@@ -1,0 +1,45 @@
+@startuml T04-05 院校查询活动图
+' 图源：docs/coursework-02/system/uml/T04-05_院校查询活动图.puml
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng 本文件（活动图不依赖 Graphviz）
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 160
+skinparam ActivityBackgroundColor #F7FAFD
+skinparam ActivityBorderColor #3C5A80
+skinparam ActivityDiamondBackgroundColor #FFF8E6
+skinparam ActivityDiamondBorderColor #8A6D1F
+
+|学生|
+start
+:进入院校页;
+|前端|
+:并发请求 GET /api/schools/options\n与 GET /api/schools;
+|Java 后端|
+:查询院校库：省份、层次精确匹配，\n专业名对 school_detail 模糊匹配;
+|MySQL|
+:school LEFT JOIN school_detail\nSELECT DISTINCT s.*，ORDER BY s.id;
+|前端|
+:展示院校列表与筛选项;
+|学生|
+:按省份／层次／专业名筛选;
+|前端|
+:GET /api/schools?province&level&majorName;
+|Java 后端|
+:返回过滤结果（不分页、无匹配分）;
+|学生|
+:点击院校查看详情;
+|前端|
+:GET /api/schools/{id};
+|Java 后端|
+if (院校存在？) then (否)
+  :返回 404 院校不存在;
+  stop
+endif
+:读取专业详情（按年份降序）\n补充招生指标与口径提醒;
+:返回 school＋details＋warnings;
+|前端|
+:展示院校、专业、年份与来源;
+|学生|
+:查看具体专业与往年指标;
+stop
+@enduml

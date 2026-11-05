@@ -1,0 +1,68 @@
+@startuml T04-04 学情补强活动图
+' 图源：docs/coursework-02/system/uml/T04-04_学情补强活动图.puml
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng 本文件（活动图不依赖 Graphviz）
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 160
+skinparam ActivityBackgroundColor #F7FAFD
+skinparam ActivityBorderColor #3C5A80
+skinparam ActivityDiamondBackgroundColor #FFF8E6
+skinparam ActivityDiamondBorderColor #8A6D1F
+
+|学生|
+start
+:完成一次练习或诊断批次;
+|Java 后端|
+:写入 learning_event（PENDING）;
+:Worker 轮询待处理事件\n（每 5 秒，单轮≤20 人，attempts<3）;
+:锁定账号与画像行;
+:筛选有效证据\n（valid、已判分、快照完整）;
+:按 科目×知识点×难度 分桶;
+:提示辅助样本单列，不计入独立证据;
+:同题 7 天内重复只取最近一次;
+:计算掌握度 (正确+1)/(样本+2)\n样本<5 记“样本不足”;
+:计算蓝图覆盖率与参考分\n（覆盖满且每格≥5 条才输出）;
+if (画像相对上一版有变化？) then (否)
+  :标记事件完成，不写历史;
+  stop
+endif
+:写入新 revision 与画像历史;
+|MySQL|
+:保存画像、历史与待生成标记;
+|学生|
+:打开统计页;
+|前端|
+:GET /learning/profile 与 /history;
+:展示参考分、覆盖率、热力图、\n优先补强 Top6、科目证据;
+|学生|
+:查看薄弱点;
+if (该知识点独立样本≥5？) then (否)
+  :仅显示“样本不足／待验证”，\n不判定为薄弱;
+else (是)
+  :显示掌握度与优先补强顺序;
+endif
+:点击“让助手分析”并提问;
+|Java 后端|
+:构造授权学情快照\n（不含账号与他人数据）;
+|Python Agent|
+:LEARNING／STUDY_PLAN 专家生成建议候选\n（补样、概念、练习方向）;
+:校验候选编号、引用与样本条件;
+|Java 后端|
+:保存任务结果（result_payload）;
+|前端|
+:展示建议与可执行操作;
+|学生|
+if (采纳建议？) then (是)
+  :选择补强练习（错题／指定题）;
+  |Java 后端|
+  :按 T04-03 创建练习批次;
+  |学生|
+  :重练并复测;
+  :产生新的作答事件;
+  |Java 后端|
+  :写入新的 learning_event，\n等待下一轮画像重算;
+else (否)
+  :仅浏览，不产生练习;
+endif
+stop
+@enduml

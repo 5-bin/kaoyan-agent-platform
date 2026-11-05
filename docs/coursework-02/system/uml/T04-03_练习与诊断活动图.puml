@@ -1,0 +1,77 @@
+@startuml T04-03 练习与诊断活动图
+' 图源：docs/coursework-02/system/uml/T04-03_练习与诊断活动图.puml
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng 本文件（活动图不依赖 Graphviz）
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 160
+skinparam ActivityBackgroundColor #F7FAFD
+skinparam ActivityBorderColor #3C5A80
+skinparam ActivityDiamondBackgroundColor #FFF8E6
+skinparam ActivityDiamondBorderColor #8A6D1F
+
+|学生|
+start
+:进入刷题页;
+:选择练习方式（普通／错题／收藏）\n与科目、难度、题量（1—50）;
+|前端|
+:校验题量，提交\nPOST /api/practice/sessions;
+|Java 后端|
+if (来源与题量合法？) then (否)
+  :返回 400 参数错误;
+  stop
+endif
+if (是否为诊断模式？) then (是)
+  :读取已发布诊断蓝图\n无蓝图时按默认 2／2／1 抽取;
+else (否)
+  :按来源抽题\n（active=1 且 APPROVED 且单选）;
+endif
+if (候选题目为空？) then (是)
+  :返回 404 没有符合条件的题目;
+  stop
+endif
+:创建批次（RUNNING、revision=0）\n逐题写入固定版本快照;
+|MySQL|
+:保存 practice_session、项目与快照;
+|前端|
+:GET /sessions/{id}/state;
+:展示题目（未提交不返回答案）;
+repeat
+  |学生|
+  :选择选项;
+  |前端|
+  :（可选）PUT /progress 保存草稿\nrevision 过期则 409 并重新读取;
+  |学生|
+  :点击提交;
+  |前端|
+  :POST /sessions/{id}/answer\n携带 clientRequestId;
+  |Java 后端|
+  :幂等校验：同编号同内容返回原结果，\n同编号不同内容返回 409;
+  if (批次 RUNNING 且项目可作答？) then (否)
+    :返回 409 已提交／已撤回;
+  else (是)
+    :校验题目快照与选项;
+    if (是否为诊断批次？) then (否)
+      :按快照判分并保存作答\n错答写入错题本;
+    else (是)
+      :仅保存作答，不返回正误;
+    endif
+    :写入幂等记录并递增 revision;
+  endif
+  |前端|
+  :展示判分、标准答案与解析\n（诊断批次除外）;
+repeat while (仍有未提交题且学生继续作答？) is (是)
+|学生|
+:结束批次\n（全部提交后自动结束）;
+|Java 后端|
+:finish：状态置 FINISHED\n未答项不计入错题;
+:统计 total／answered／correct／accuracy\n辅助题数与独立正确率;
+if (诊断且四科均有有效作答？) then (是)
+  :输出实验性参考分\n（未经整卷校准）;
+endif
+:写入 learning_event（PENDING）;
+|MySQL|
+:保存结果、统计与事件;
+|学情 Worker|
+:异步重算学情画像\n（见 T04-04）;
+stop
+@enduml
