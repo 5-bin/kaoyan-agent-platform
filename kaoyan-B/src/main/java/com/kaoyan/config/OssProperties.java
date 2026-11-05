@@ -16,9 +16,11 @@ public class OssProperties {
     private String endpoint;
 
     /** AccessKey ID */
+    @lombok.ToString.Exclude
     private String accessKeyId;
 
     /** AccessKey Secret */
+    @lombok.ToString.Exclude
     private String accessKeySecret;
 
     /** Bucket 名称 */
@@ -26,4 +28,17 @@ public class OssProperties {
 
     /** 访问 URL 前缀 */
     private String urlPrefix;
+
+    /** Object namespace; empty preserves existing local object keys. */
+    private String keyPrefix = "";
+
+    /** Validate and normalize a namespace without reflecting configuration values. */
+    public String normalizedKeyPrefix() {
+        if (keyPrefix == null || keyPrefix.isEmpty()) return "";
+        String value = keyPrefix.endsWith("/") ? keyPrefix.substring(0, keyPrefix.length() - 1) : keyPrefix;
+        if (value.length() > 128 || !value.matches("[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*")) {
+            throw new IllegalStateException("OSS_KEY_PREFIX 格式无效");
+        }
+        return value + "/";
+    }
 }

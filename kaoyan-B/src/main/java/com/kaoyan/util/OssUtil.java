@@ -1,6 +1,8 @@
 package com.kaoyan.util;
 
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSException;
+import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClientBuilder;
 import com.kaoyan.common.ApiException;
 import com.kaoyan.config.OssProperties;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.regex.Pattern;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
@@ -37,6 +41,7 @@ public class OssUtil {
 
     @PostConstruct
     public void init() {
+        props.normalizedKeyPrefix();
         if (!org.springframework.util.StringUtils.hasText(props.getEndpoint())
                 || !org.springframework.util.StringUtils.hasText(props.getAccessKeyId())
                 || !org.springframework.util.StringUtils.hasText(props.getAccessKeySecret())
@@ -82,12 +87,17 @@ public class OssUtil {
         }
         String safeModule = (module == null || module.isBlank())
                 ? "common" : module.replaceAll("[^a-zA-Z0-9_-]", "");
+        if (safeModule.isEmpty()) safeModule = "common";
+        String namespace = props.normalizedKeyPrefix();
+        if (!namespace.isEmpty() && (userId == null || userId <= 0)) {
+            throw new ApiException(400, 400, "上传账号无效");
+        }
         String ownerPath = userId != null ? userId + "/" : "";
-        String objectKey = safeModule + "/" + ownerPath + LocalDate.now().format(DATE_FMT)
+        String objectKey = namespace + safeModule + "/" + ownerPath + LocalDate.now().format(DATE_FMT)
                 + "/" + IdUtil.uuid() + "." + ext;
-        try {
-            ossClient.putObject(props.getBucketName(), objectKey, file.getInputStream());
-        } catch (IOException e) {
+        try (InputStream input = file.getInputStream()) {
+            ossClient.putObject(props.getBucketName(), objectKey, input);
+        } catch (IOException | OSSException | ClientException e) {
             throw new ApiException(500, 500, "上传失败");
         }
         return objectKey;
@@ -104,7 +114,7 @@ public class OssUtil {
     public void delete(String objectKey, Long userId, String currentAvatarUrl) {
         requireConfigured();
         if (objectKey == null || userId == null || !objectKey.matches(
-                "[a-zA-Z0-9_-]+/" + userId + "/[0-9]{8}/[a-zA-Z0-9-]+\\.(?:jpg|jpeg|png|gif|webp)")) {
+                Pattern.quote(props.normalizedKeyPrefix()) + "[a-zA-Z0-9_-]+/" + userId + "/[0-9]{8}/[a-zA-Z0-9-]+\\.(?:jpg|jpeg|png|gif|webp)")) {
             throw new ApiException(404, 404, "文件不存在");
         }
         if (buildUrl(objectKey).equals(currentAvatarUrl)) {
@@ -112,7 +122,7 @@ public class OssUtil {
         }
         try {
             ossClient.deleteObject(props.getBucketName(), objectKey);
-        } catch (Exception e) {
+        } catch (OSSException | ClientException e) {
             throw new ApiException(500, 500, "删除失败");
         }
     }
@@ -130,26 +140,30 @@ public class OssUtil {
     /** 只读取已保存的合法头像对象，限制返回大小。 */
     public byte[] readAvatar(String url) {
         requireConfigured();
-        String prefix = buildUrl("avatar/");
+        String namespace = props.normalizedKeyPrefix();
+        String prefix = buildUrl(namespace + "avatar/");
         if (url == null || !url.startsWith(prefix)) throw new ApiException(404, 404, "头像不存在");
-        String key = "avatar/" + url.substring(prefix.length());
-        if (!key.matches("avatar/(?:[0-9]+/)?[0-9]{8}/[a-zA-Z0-9-]+\\.(?:jpg|jpeg|png|gif|webp)")) {
+        String key = namespace + "avatar/" + url.substring(prefix.length());
+        String owner = namespace.isEmpty() ? "(?:[0-9]+/)?" : "[0-9]+/";
+        if (!key.matches(Pattern.quote(namespace) + "avatar/" + owner + "[0-9]{8}/[a-zA-Z0-9-]+\\.(?:jpg|jpeg|png|gif|webp)")) {
             throw new ApiException(404, 404, "头像不存在");
         }
         try (OSSObject object = ossClient.getObject(props.getBucketName(), key)) {
             byte[] bytes = object.getObjectContent().readNBytes((int) MAX_SIZE + 1);
             if (bytes.length > MAX_SIZE) throw new ApiException(400, 400, "头像文件过大");
             return bytes;
-        } catch (IOException e) {
+        } catch (IOException | OSSException | ClientException e) {
             throw new ApiException(503, 503, "头像读取失败");
         }
     }
 
     /** 仅允许绑定本账号新上传的头像，或保留本人已有头像。 */
     public boolean isAllowedAvatar(String url, Long userId, String currentUrl) {
-        if (url == null || url.isBlank() || url.equals(currentUrl)) return true;
-        if (ossClient == null || userId == null) return false;
-        String prefix = buildUrl("avatar/" + userId + "/");
+        if (url == null || url.isBlank()) return true;
+        String namespace = props.normalizedKeyPrefix();
+        if (namespace.isEmpty() && url.equals(currentUrl)) return true;
+        if (ossClient == null || userId == null || userId <= 0) return false;
+        String prefix = buildUrl(namespace + "avatar/" + userId + "/");
         if (!url.startsWith(prefix)) return false;
         return url.substring(prefix.length()).matches("[0-9]{8}/[a-zA-Z0-9-]+\\.(?:jpg|jpeg|png|gif|webp)");
     }

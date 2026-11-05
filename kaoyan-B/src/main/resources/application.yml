@@ -44,6 +44,7 @@ oss:
   access-key-secret: ${kaoyan.alioss.access-key-secret:${OSS_ACCESS_KEY_SECRET:}}
   bucket-name: ${kaoyan.alioss.bucket-name:${OSS_BUCKET_NAME:}}
   url-prefix: ${OSS_URL_PREFIX:}
+  key-prefix: ${OSS_KEY_PREFIX:}
 
 logging:
   level:
