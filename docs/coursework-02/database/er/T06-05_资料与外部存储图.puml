@@ -1,0 +1,44 @@
+@startuml T06-05_资料与外部存储图
+' 图源：docs/coursework-02/database/er/T06-05_资料与外部存储图.puml
+' 范围：MySQL 之外的持久化位置与资料版本（非 ER 图，用组件图表达存储归属）
+' 依据：docs/rag.md、ExportCache、JwtService、OssUtil、QuestionSearchService、kaoyan-agent/config.py
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng -o export 本文件；SVG 将 -tpng 换成 -tsvg 再执行一次
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #F7FAFD
+  BorderColor #3C5A80
+}
+skinparam database {
+  BackgroundColor #FFF8E6
+  BorderColor #8A6D1F
+}
+
+rectangle "Java 业务后端（kaoyan-B）\n唯一的业务库读写方" as java
+rectangle "Python Agent（kaoyan-agent）\n不连接业务库" as python
+
+database "MySQL 业务库\n28 张表（V1、V7—V15）" as mysql
+database "Redis\n· kaoyan:exports:v1:{userId} 导出快照（≤5 条，15 分钟）\n· jwt:blacklist:{jti} 注销黑名单（按令牌剩余有效期）" as redis
+database "阿里云 OSS\n{OSS_KEY_PREFIX}{module}/{userId}/{yyyyMMdd}/{uuid}.{ext}\n头像等图片，≤5MB" as oss
+rectangle "版本化资料副本（文件）\nknowledge/*.json\nreleaseId = rag-v1-{SHA256 前 16 位}" as corpus
+database "Qdrant 向量库\n· 资料集合：绑定语料 checksum 与 Embedding 模型\n· 题目集合：questions-{SHA256 前 32 位}" as qdrant
+rectangle "本地缓存（文件）\n.cache/rag、.cache/questions\n就绪标记与清单" as cache
+
+java --> mysql : 读写（MyBatis-Plus／JdbcTemplate）
+java --> redis : 读写
+java --> oss : 上传／读取／删除本人对象
+java --> python : 内部凭证 HTTP\n只传本人档案、判分快照、公开题目字段
+python --> corpus : 只读
+python --> qdrant : 建索引／检索
+python --> cache : 写就绪标记
+mysql ..> qdrant : 已审核可练习题（不含答案）\n经 Java 推送后建题目索引
+
+note bottom of mysql
+  · task.release_id 与 learning_recommendation_settings.last_release_id
+    保存资料副本的 releaseId 字符串，是跨存储的逻辑引用，没有外键。
+  · document 表（备考资料）不会自动进入资料副本，副本按 RAG 契约离线修订发布。
+end note
+@enduml

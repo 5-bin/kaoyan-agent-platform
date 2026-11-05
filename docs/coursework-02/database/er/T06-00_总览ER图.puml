@@ -1,0 +1,115 @@
+@startuml T06-00_总览ER图
+' 图源：docs/coursework-02/database/er/T06-00_总览ER图.puml
+' 依据：kaoyan-B/src/main/resources/db/V1__init.sql、V7—V15 增量迁移（V2—V6 为演示种子，不含结构）
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng -o export 本文件；SVG 将 -tpng 换成 -tsvg 再执行一次（smetana 布局，不依赖 Graphviz）
+' 图例：实线 = 数据库物理外键（全库仅 1 条）；虚线 = 应用层逻辑关联（无外键约束）
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+skinparam linetype ortho
+hide circle
+hide empty members
+skinparam class {
+  BackgroundColor #F7FAFD
+  BorderColor #3C5A80
+  ArrowColor #3C5A80
+}
+skinparam package {
+  BorderColor #8AA4C8
+  FontColor #24364F
+}
+
+package "D1 账号与授权" {
+  entity "user\n用户账号与档案" as user
+  entity "assistant_privacy\n助手外发授权" as assistant_privacy
+}
+
+package "D2 题库与版本" {
+  entity "question\n题库（当前版）" as question
+  entity "question_version\n题目不可变版本" as question_version
+}
+
+package "D3 练习与作答" {
+  entity "practice_session\n受管练习批次" as practice_session
+  entity "practice_session_item\n批次项目扩展" as practice_session_item
+  entity "practice_record\n作答记录" as practice_record
+  entity "practice_request\n提交幂等记录" as practice_request
+  entity "user_question_mark\n错题与收藏" as user_question_mark
+  entity "study_stat\n每日学习统计" as study_stat
+}
+
+package "D4 学情与自动推荐" {
+  entity "learning_blueprint\n诊断蓝图" as learning_blueprint
+  entity "learning_profile\n当前学情画像" as learning_profile
+  entity "learning_profile_history\n学情历史版本" as learning_profile_history
+  entity "learning_event\n学情重算事件" as learning_event
+  entity "learning_recommendation_settings\n自动推荐设置与游标" as learning_recommendation_settings
+  entity "school_historical_metric\n历史408单科线" as school_historical_metric
+}
+
+package "D5 院校与招生" {
+  entity "school\n院校" as school
+  entity "school_detail\n院校专业年份" as school_detail
+  entity "school_admission_metric\n招生指标投影" as school_admission_metric
+  entity "recommend_record\n旧推荐占位表" as recommend_record
+}
+
+package "D6 Agent 任务与会话" {
+  entity "task\nAgent 任务" as task
+  entity "chat_conversation\n会话" as chat_conversation
+  entity "chat_message\n用户消息" as chat_message
+  entity "chat_generation\n生成尝试" as chat_generation
+  entity "assistant_action\n待确认操作" as assistant_action
+}
+
+package "D7 资料与个人笔记" {
+  entity "document\n备考资料" as document
+  entity "personal_document\n个人笔记" as personal_document
+  entity "personal_document_version\n笔记版本" as personal_document_version
+}
+
+' 为保证可读性，总览图省略各表指向 user 的归属连线（见下方注释与分域图）
+' ---- D1
+user ||..o| assistant_privacy
+' ---- D2
+question ||..o{ question_version
+' ---- D3
+practice_session ||..o{ practice_session_item
+practice_record ||..o| practice_session_item : record_id
+question ||..o{ practice_record
+question_version ..> practice_record : 快照按值复制
+question ||..o{ user_question_mark
+' ---- D4
+user ||..o| learning_profile
+learning_profile ||..o{ learning_profile_history
+learning_recommendation_settings }o..o| task : last/pending_task_id
+' ---- D5
+school ||..o{ school_detail
+school_detail ||--o{ school_admission_metric : 物理外键 CASCADE
+school ||..o{ recommend_record
+' ---- D6
+chat_conversation ||..o{ chat_message
+chat_message ||..o{ chat_generation
+task ||..o| chat_generation : task_id 共享主键
+chat_conversation ||..o{ assistant_action
+task ||..o| assistant_action : task_id 唯一
+' ---- D7
+personal_document ||..o{ personal_document_version
+personal_document |o..o{ chat_message : document_id
+task |o..o| personal_document_version : source_task_id 唯一
+
+' 隐藏连线只用于分行排版：第 1 行 D1＋D2＋D5，第 2 行 D3＋D4，第 3 行 D6＋D7
+assistant_privacy -[hidden]down- practice_session
+question_version -[hidden]down- learning_blueprint
+school_admission_metric -[hidden]down- learning_event
+practice_session_item -[hidden]down- chat_conversation
+learning_profile_history -[hidden]down- personal_document
+
+note as owner_note
+  <b>账号归属（图中省略连线）</b>
+  D3、D4、D6、D7 的私有表与 recommend_record 均以 user_id 逻辑关联 user.id（N:1）；
+  question、document、learning_blueprint、school_historical_metric 以审核人／创建人列关联 user.id。
+  全库唯一物理外键：school_admission_metric.school_detail_id → school_detail.id（实线）。
+end note
+@enduml

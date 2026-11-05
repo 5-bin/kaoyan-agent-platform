@@ -1,0 +1,87 @@
+@startuml T06-03_院校招生ER图
+' 图源：docs/coursework-02/database/er/T06-03_院校招生ER图.puml
+' 范围：D5 院校与招生（4 张表），user 仅作关联端
+' 依据：V1__init.sql、V14__school_admission_metrics.sql
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng -o export 本文件；SVG 将 -tpng 换成 -tsvg 再执行一次
+' 图例：实线 = 物理外键（fk_admission_detail，全库唯一一条）；虚线 = 逻辑关联
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+skinparam linetype ortho
+hide circle
+hide empty members
+skinparam class {
+  BackgroundColor #F7FAFD
+  BorderColor #3C5A80
+  ArrowColor #3C5A80
+}
+
+entity "user" as user {
+  * id : BIGINT UNSIGNED <<PK>>
+}
+
+entity "school\n院校" as school {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  * name : VARCHAR(255)
+  province : VARCHAR(50)
+  level : VARCHAR(20)
+  created_at / updated_at
+}
+
+entity "school_detail\n院校专业年份" as school_detail {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  * school_id : BIGINT UNSIGNED <<LFK>>
+  * major_name : VARCHAR(255)
+  major_code : VARCHAR(50)
+  * year : INT
+  enrollment_count : INT
+  score_line : INT
+  remark : TEXT
+  created_at / updated_at
+}
+
+entity "school_admission_metric\n招生指标投影" as school_admission_metric {
+  * school_detail_id : BIGINT UNSIGNED <<PK,FK>>
+  * metric_type : VARCHAR(24) <<PK>>
+  --
+  metric_year : INT
+  metric_value : INT
+  * status : VARCHAR(24)
+  * scope_key : VARCHAR(64)
+  * scope_label : VARCHAR(500)
+  * basis : VARCHAR(40)
+  * context_json / sources_json : JSON
+  * notice : VARCHAR(2000)
+  * content_sha256 : CHAR(64)
+  * imported_at : DATETIME
+}
+
+entity "recommend_record\n旧推荐占位表" as recommend_record {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  * user_id : BIGINT UNSIGNED <<LFK>>
+  * school_id : BIGINT UNSIGNED <<LFK>>
+  reason : TEXT
+  score : DECIMAL(5,2)
+  * created_at : DATETIME
+}
+
+school ||..o{ school_detail : school_id
+school_detail ||--o{ school_admission_metric : FK ON DELETE CASCADE（每专业至多 2 行）
+user ||..o{ recommend_record
+school ||..o{ recommend_record
+
+note bottom of school_admission_metric
+  CHECK：metric_type ∈ {ENROLLMENT, CUTOFF_REFERENCE}；
+  status ∈ {OFFICIAL, UNVERIFIED, NOT_PUBLISHED, NOT_FOUND, SCOPE_MISMATCH, CONFLICT}；
+  仅 OFFICIAL／UNVERIFIED 可有非负 metric_value 且必须有 metric_year。
+end note
+
+note bottom of recommend_record
+  仅保留实体与 Mapper，当前业务不读写；
+  院校推荐结果保存在 task.result_payload。
+end note
+@enduml
