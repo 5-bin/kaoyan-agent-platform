@@ -1,0 +1,86 @@
+{
+  "baseline": "94b8a9fbcba2ae7ad6a9895a9623a0572ca18bf4",
+  "mode": "offline HTML interactive prototype; no business API or model requests",
+  "pages": [
+    {
+      "file": "00_交互演示入口.html",
+      "route": "index"
+    },
+    {
+      "file": "A01_登录.html",
+      "route": "login"
+    },
+    {
+      "file": "A02_注册.html",
+      "route": "register"
+    },
+    {
+      "file": "A03_首页.html",
+      "route": "home"
+    },
+    {
+      "file": "A04_个人中心.html",
+      "route": "profile"
+    },
+    {
+      "file": "A05_院校列表.html",
+      "route": "schools"
+    },
+    {
+      "file": "A06_备考资料.html",
+      "route": "documents"
+    },
+    {
+      "file": "A07_个人笔记.html",
+      "route": "notes"
+    },
+    {
+      "file": "A08_院校详情.html",
+      "route": "school-detail"
+    },
+    {
+      "file": "L01_练习首页.html",
+      "route": "practice"
+    },
+    {
+      "file": "L02_答题未判分.html",
+      "route": "practice-session"
+    },
+    {
+      "file": "L03_答题已判分.html",
+      "route": "practice-session-answered"
+    },
+    {
+      "file": "L04_错题本.html",
+      "route": "wrong"
+    },
+    {
+      "file": "L05_收藏.html",
+      "route": "favorite"
+    },
+    {
+      "file": "L06_Agent助手.html",
+      "route": "assistant"
+    },
+    {
+      "file": "L07_学习统计.html",
+      "route": "stat"
+    },
+    {
+      "file": "M01_题目录入与审核.html",
+      "route": "admin-questions"
+    },
+    {
+      "file": "M02_资料审核.html",
+      "route": "admin-documents"
+    },
+    {
+      "file": "L08_单选诊断.html",
+      "route": "diagnostic"
+    },
+    {
+      "file": "L09_批次结果.html",
+      "route": "result"
+    }
+  ]
+}
