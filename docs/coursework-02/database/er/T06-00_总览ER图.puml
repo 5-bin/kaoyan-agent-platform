@@ -36,7 +36,7 @@ package "D3 练习与作答" {
   entity "practice_record\n作答记录" as practice_record
   entity "practice_request\n提交幂等记录" as practice_request
   entity "user_question_mark\n错题与收藏" as user_question_mark
-  entity "study_stat\n每日学习统计" as study_stat
+  entity "study_stat\n旧每日汇总" as study_stat
 }
 
 package "D4 学情与自动推荐" {

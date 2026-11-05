@@ -112,7 +112,7 @@ entity "user_question_mark\n错题与收藏" as user_question_mark {
   created_at / updated_at
 }
 
-entity "study_stat\n每日学习统计" as study_stat {
+entity "study_stat\n旧每日汇总" as study_stat {
   * id : BIGINT UNSIGNED <<PK>>
   --
   * user_id : BIGINT UNSIGNED <<UK1,LFK>>
