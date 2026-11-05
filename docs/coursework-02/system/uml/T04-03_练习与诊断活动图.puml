@@ -11,22 +11,17 @@ skinparam ActivityDiamondBorderColor #8A6D1F
 
 |学生|
 start
-:进入刷题页;
-:选择练习方式（普通／错题／收藏）\n与科目、难度、题量（1—50）;
+:进入刷题页\n（练习或诊断入口）;
 |前端|
-:校验题量，提交\nPOST /api/practice/sessions;
+if (入口？) then (诊断)
+  :POST /api/diagnostics/sessions;
+else (普通练习)
+  :校验题量（1—50）后提交\nPOST /api/practice/sessions\n（范围：普通／错题／收藏）;
+endif
 |Java 后端|
-if (来源与题量合法？) then (否)
-  :返回 400 参数错误;
-  stop
-endif
-if (是否为诊断模式？) then (是)
-  :读取已发布诊断蓝图\n无蓝图时按默认 2／2／1 抽取;
-else (否)
-  :按来源抽题\n（active=1 且 APPROVED 且单选）;
-endif
+:诊断：读取已发布诊断蓝图\n（无蓝图按默认 2／2／1）\n练习：按来源与科目、难度抽题;
 if (候选题目为空？) then (是)
-  :返回 404 没有符合条件的题目;
+  :诊断返回 409／练习返回 404\n不创建空批次;
   stop
 endif
 :创建批次（RUNNING、revision=0）\n逐题写入固定版本快照;
@@ -53,24 +48,25 @@ repeat
     if (是否为诊断批次？) then (否)
       :按快照判分并保存作答\n错答写入错题本;
     else (是)
-      :仅保存作答，不返回正误;
+      :仅保存作答，不判分、不返回正误;
     endif
     :写入幂等记录并递增 revision;
   endif
   |前端|
-  :展示判分、标准答案与解析\n（诊断批次除外）;
+  :展示判分、标准答案与解析\n（诊断批次在结束时才可见）;
 repeat while (仍有未提交题且学生继续作答？) is (是)
 |学生|
 :结束批次\n（全部提交后自动结束）;
 |Java 后端|
-:finish：状态置 FINISHED\n未答项不计入错题;
+:对已提交未判分项统一判分\n（诊断批次在此判分，错答入错题本）;
+:状态置 FINISHED，未答不计错题;
 :统计 total／answered／correct／accuracy\n辅助题数与独立正确率;
-if (诊断且四科均有有效作答？) then (是)
-  :输出实验性参考分\n（未经整卷校准）;
+if (诊断批次且四科均有有效作答？) then (是)
+  :计算诊断参考分\n（未经整卷校准）;
 endif
 :写入 learning_event（PENDING）;
 |MySQL|
-:保存结果、统计与事件;
+:保存判分、结果、统计与事件;
 |学情 Worker|
 :异步重算学情画像\n（见 T04-04）;
 stop

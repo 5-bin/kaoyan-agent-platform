@@ -32,8 +32,8 @@ rectangle "考研 Agent 平台（学生端）" {
   package "练习与诊断" {
     usecase "创建练习批次" as UC05
     usecase "抽题并固定题目快照" as UC06
-    usecase "作答题目" as UC07
-    usecase "服务端判分" as UC08
+    usecase "作答题目（练习）" as UC07
+    usecase "提交即判分" as UC08
     usecase "保存草稿并续做" as UC09
     usecase "查看两级提示" as UC10
     usecase "查看解析与批次回顾" as UC11
@@ -70,6 +70,6 @@ S --> UC18
 UC05 ..> UC06 : <<include>>
 UC07 ..> UC08 : <<include>>
 UC09 ..> UC07 : <<extend>>
-UC10 ..> UC07 : <<extend>>
-UC11 ..> UC07 : <<extend>>
+UC10 .> UC07 : <<extend>>
+UC11 .> UC07 : <<extend>>
 @enduml
