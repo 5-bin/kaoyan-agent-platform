@@ -33,7 +33,7 @@
           <div
             v-for="opt in optionsFor(rec)"
             :key="opt.key"
-            class="opt"
+            class="opt static"
             :class="optClass(rec, opt.key)"
           >
             <span class="opt-key">{{ opt.key }}</span>
@@ -65,19 +65,26 @@
           <span class="p-text">第 {{ idx + 1 }} / {{ records.length }} 题</span>
           <el-progress :percentage="percent" :stroke-width="6" style="flex:1; margin-left:16px" />
         </div>
-        <h3 class="q-title">{{ cur?.content }}</h3>
-        <div class="opts">
-          <div
-            v-for="opt in optionsFor(cur)"
+        <div v-if="cur?.subject || cur?.difficulty" class="q-tags">
+          <el-tag v-if="cur?.subject" size="small" round>{{ cur.subject }}</el-tag>
+          <el-tag v-if="cur?.difficulty" size="small" type="info" round>{{ difficultyLabels[cur.difficulty] }}</el-tag>
+        </div>
+        <h3 id="q-title" class="q-title">{{ cur?.content }}</h3>
+        <!-- 原生单选框：方向键切换，读屏可读出选中状态；视觉上由整行卡片表示 -->
+        <div class="opts" role="radiogroup" aria-labelledby="q-title">
+          <label
+            v-for="(opt, i) in optionsFor(cur)"
             :key="opt.key"
             class="opt"
-            :class="{ picked: answer === opt.key }"
-            @click="!revealed && !busy && !loadError && (answer = opt.key)"
+            :class="{ picked: answer === opt.key, locked: optionsLocked }"
           >
+            <input v-model="answer" class="sr-only" type="radio" name="practice-answer" :value="opt.key" :disabled="optionsLocked">
             <span class="opt-key">{{ opt.key }}</span>
             <span class="opt-text">{{ opt.text }}</span>
-          </div>
+            <kbd class="opt-kbd" aria-hidden="true">{{ i + 1 }}</kbd>
+          </label>
         </div>
+        <p class="answer-status" role="status">{{ answerStatus }}</p>
         <div v-if="revealed" class="feedback" :class="lastCorrect ? 'ok' : 'bad'">
           {{ lastCorrect ? '回答正确' : `回答错误，正确答案：${feedback?.answer}` }}
           <p v-if="feedback?.analysis">解析：{{ feedback.analysis }}</p>
@@ -90,6 +97,9 @@
           </el-button>
           <el-button :disabled="busy" @click="enterReview">查看已保存作答</el-button>
         </div>
+        <p class="kbd-hint">
+          快捷键：<kbd>A</kbd>–<kbd>D</kbd> 或 <kbd>1</kbd>–<kbd>4</kbd> 选择 · <kbd>Enter</kbd> 提交或进入下一题 · 输入框中不生效
+        </p>
       </div>
 
       <div v-else class="card q-card">
@@ -109,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAssistantPage } from '@/composables/assistant-page'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
@@ -165,6 +175,33 @@ const optionsFor = (q?: StudentQuestion | ReviewRecord) => [
   { key: 'D', text: q?.optionD }
 ].filter(opt => opt.text != null)
 const percent = computed(() => Math.round((idx.value / (records.value.length || 1)) * 100))
+const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
+const optionsLocked = computed(() => revealed.value || busy.value || Boolean(loadError.value))
+const answerStatus = computed(() => !revealed.value && answer.value
+  ? `已选择 ${answer.value}，按 Enter 或点击“提交答案”；提交前可以修改。`
+  : '')
+
+// 答题快捷键：A–D / 1–4 选择，Enter 提交或进入下一题。
+// 焦点在输入框、按钮、链接内时交给浏览器默认行为，避免与追问输入、按钮回车重复触发。
+function onKeydown(event: KeyboardEvent) {
+  if (reviewMode.value || finished.value || event.defaultPrevented || event.isComposing) return
+  if (event.altKey || event.ctrlKey || event.metaKey) return
+  const target = event.target instanceof HTMLElement ? event.target : null
+  const onAnswerRadio = target instanceof HTMLInputElement && target.name === 'practice-answer'
+  if (target && !onAnswerRadio && (target.isContentEditable || target.closest('input, textarea, select, button, a, [role="dialog"]'))) return
+  const options = optionsFor(cur.value)
+  const key = event.key.toUpperCase()
+  const option = /^[1-4]$/.test(key) ? options[Number(key) - 1] : options.find(opt => opt.key === key)
+  if (option) {
+    if (!optionsLocked.value) answer.value = option.key
+    event.preventDefault()
+    return
+  }
+  if (event.key !== 'Enter' || event.repeat) return
+  if (busy.value || loadError.value || !cur.value || (!revealed.value && !answer.value)) return
+  event.preventDefault()
+  void submit()
+}
 const correctCount = computed(() => records.value.filter(r => r.isCorrect === 1).length)
 const wrongCount = computed(() => records.value.filter(r => r.isCorrect === 0).length)
 const unansweredCount = computed(() => records.value.filter(r => r.isCorrect == null).length)
@@ -340,7 +377,11 @@ const doAiSummary = async () => {
 }
 
 useAssistantPage(() => ({ page: 'practice', sessionId, selectedQuestionIds: !reviewMode.value && cur.value ? [cur.value.id] : [], visibleQuestionIds: reviewMode.value ? reviewItems.value.map(item => item.questionId) : (cur.value ? [cur.value.id] : []) }))
-onMounted(() => navigate(true, true))
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+  void navigate(true, true)
+})
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <style scoped lang="scss">
@@ -355,7 +396,8 @@ onMounted(() => navigate(true, true))
 .sum-num { font-size: 26px; font-weight: 700; }
 .sum-lbl { color: var(--c-ink-2); font-size: 13px; margin-top: 4px; }
 
-.q-card { padding: 24px; margin-bottom: 16px; }
+.q-card { padding: 24px; margin-bottom: 16px; border-radius: var(--r-lg); box-shadow: var(--fx-shadow-card); }
+.q-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .progress-row { display: flex; align-items: center; margin-bottom: 20px; }
 .p-text { color: var(--c-ink-2); font-size: 13px; white-space: nowrap; }
 .q-title { font-size: 17px; margin: 0 0 20px; line-height: 1.6; }
@@ -370,18 +412,34 @@ onMounted(() => navigate(true, true))
 
 .opts { display: flex; flex-direction: column; gap: 10px; }
 .opt {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px; border: 1px solid var(--c-line);
-  border-radius: var(--r-sm); cursor: pointer; transition: all .15s;
+  position: relative; display: flex; align-items: center; gap: 12px;
+  min-height: 52px; padding: 12px 16px; box-sizing: border-box;
+  border: 1.5px solid var(--c-line); border-radius: var(--r-md);
+  background: var(--c-surface); cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
 }
-.opt:hover { border-color: var(--c-primary); background: var(--c-primary-light); }
-.opt.picked { border-color: var(--c-primary); background: var(--c-primary-light); }
+.opt:not(.static):not(.locked):hover { border-color: #9db4ff; }
+.opt.picked { border-color: var(--c-primary-strong); background: var(--c-primary-light); }
+.opt.locked { cursor: default; }
+.opt.static { cursor: default; }
+.opt:has(input:focus-visible) { outline: 3px solid var(--c-primary-strong); outline-offset: 2px; }
 .opt-key {
-  width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--c-line);
-  display: grid; place-items: center; font-size: 12px; font-weight: 600;
+  width: 28px; height: 28px; border-radius: 8px; background: #f0f2f5;
+  display: grid; place-items: center; font-size: 13px; font-weight: 700;
   flex-shrink: 0;
 }
-.opt-text { flex: 1; }
+.opt.picked .opt-key { background: var(--c-primary-strong); color: #fff; }
+.opt-text { flex: 1; line-height: 1.6; }
+kbd, .opt-kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--c-ink-2);
+  border: 1px solid #d5d9e0; border-bottom-width: 2px; border-radius: 6px; padding: 0 6px; background: var(--c-surface);
+}
+.answer-status { min-height: 20px; margin: 12px 0 0; font-size: 13px; color: var(--c-ink-2); }
+.kbd-hint { margin: 16px 0 0; font-size: 12px; color: var(--c-ink-2); text-align: right; line-height: 2; }
+@media (prefers-reduced-motion: reduce) { .opt { transition: none; } }
+@media (max-width: 640px) {
+  .opt-kbd, .kbd-hint { display: none; }
+}
 .opt-mark { font-size: 12px; font-weight: 600; }
 .opt-correct { background: var(--c-success-light); border-color: var(--c-success); }
 .opt-correct .opt-key { background: var(--c-success); color: #fff; border-color: var(--c-success); }
@@ -391,7 +449,7 @@ onMounted(() => navigate(true, true))
 .opt-wrong .opt-mark { color: var(--c-danger); }
 
 .feedback { margin-top: 16px; padding: 14px; border-radius: var(--r-sm); font-weight: 500; }
-.feedback.ok { background: var(--c-success-light); color: var(--c-success); }
+.feedback.ok { background: var(--c-success-light); color: #15803d; }
 .feedback.bad { background: var(--c-danger-light); color: var(--c-danger); }
 .feedback p { margin: 8px 0 0; font-weight: 400; }
 .actions { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }
