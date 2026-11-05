@@ -1,0 +1,4349 @@
+{
+  "repository": "fzu-404-team/kaoyan-agent-platform",
+  "commit": "ffb6b49c14f2d7dbbb5d798ea08fa73b269afece",
+  "table_count": 28,
+  "column_count": 264,
+  "tables": {
+    "user": {
+      "name": "user",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 6,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "用户主键"
+        },
+        {
+          "name": "username",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 7,
+          "keys": [
+            "UK:uk_user_username"
+          ],
+          "meaning": "登录用户名；唯一"
+        },
+        {
+          "name": "password_hash",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "BCrypt",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 8,
+          "keys": [],
+          "meaning": "BCrypt密码哈希"
+        },
+        {
+          "name": "role",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": "'STUDENT'",
+          "auto": false,
+          "on_update": false,
+          "comment": "STUDENT/ADMIN",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 9,
+          "keys": [],
+          "meaning": "角色STUDENT／ADMIN；公开注册仅创建STUDENT"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "default": "1",
+          "auto": false,
+          "on_update": false,
+          "comment": "1正常 0禁用",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 10,
+          "keys": [],
+          "meaning": "1正常／0禁用"
+        },
+        {
+          "name": "avatar_url",
+          "type": "VARCHAR(500)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "头像 URL",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 11,
+          "keys": [],
+          "meaning": "头像访问地址"
+        },
+        {
+          "name": "target_school",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "目标院校",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 12,
+          "keys": [],
+          "meaning": "用户填写的目标院校"
+        },
+        {
+          "name": "target_major",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "目标专业",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 13,
+          "keys": [],
+          "meaning": "目标专业名称或代码，不是school_detail外键"
+        },
+        {
+          "name": "exam_year",
+          "type": "INT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "考试年份",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 14,
+          "keys": [],
+          "meaning": "报考年份"
+        },
+        {
+          "name": "degree_type",
+          "type": "VARCHAR(16)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "报考学位类型：academic学硕／professional专硕",
+          "source": "kaoyan-B/src/main/resources/db/V15__profile_degree_type.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "academic学硕／professional专硕；旧档案可空"
+        },
+        {
+          "name": "background",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "考生背景",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 15,
+          "keys": [],
+          "meaning": "考生背景文本"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 16,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": true,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 17,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 18
+        },
+        {
+          "sql": "UNIQUE KEY `uk_user_username` (`username`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 19
+        },
+        {
+          "sql": "CONSTRAINT ck_user_degree_type CHECK (degree_type IS NULL OR degree_type IN ('academic','professional'))",
+          "source": "kaoyan-B/src/main/resources/db/V15__profile_degree_type.sql",
+          "line": 5
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户账号与档案'",
+      "title": "用户账号与报考档案",
+      "entity": "User",
+      "service": "service/impl/UserServiceImpl.java",
+      "note": "账号、角色与个人档案；V15增加学位类型。password_hash只存BCrypt哈希，不对外展示。"
+    },
+    "task": {
+      "name": "task",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "UUID",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 24,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "任务编号；Java生成UUID"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ user.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 25,
+          "keys": [
+            "IX:idx_task_user_created(1/2)"
+          ],
+          "meaning": "所属用户；逻辑关联user.id"
+        },
+        {
+          "name": "task_type",
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "KNOWLEDGE_QA/SCHOOL_RECOMMEND",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 26,
+          "keys": [],
+          "meaning": "当前KNOWLEDGE_QA／SCHOOL_RECOMMEND／PRACTICE_SUMMARY／CHAT／WRONG_QUESTION_TUTOR"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": "'PENDING'",
+          "auto": false,
+          "on_update": false,
+          "comment": "PENDING/RUNNING/SUCCESS/FAILED",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 27,
+          "keys": [],
+          "meaning": "RUNNING／SUCCESS／FAILED／CANCELLED，兼容旧PENDING；VARCHAR无枚举CHECK"
+        },
+        {
+          "name": "input_payload",
+          "type": "JSON",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "请求参数",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 28,
+          "keys": [],
+          "meaning": "任务输入快照对象；隐私清理可置空"
+        },
+        {
+          "name": "result_payload",
+          "type": "JSON",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "Agent 返回结果",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 29,
+          "keys": [],
+          "meaning": "校验后的Agent结果及引用对象；失败或清理可空"
+        },
+        {
+          "name": "release_id",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "版本标识",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 30,
+          "keys": [],
+          "meaning": "资料发布版本，不是SQL迁移版本"
+        },
+        {
+          "name": "error_message",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "失败原因",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 31,
+          "keys": [],
+          "meaning": "失败说明"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 32,
+          "keys": [
+            "IX:idx_task_user_created(2/2)"
+          ],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": true,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 33,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        },
+        {
+          "name": "deleted_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "Hidden recommendation history; still counted toward task quotas",
+          "source": "kaoyan-B/src/main/resources/db/V8__task_soft_delete.sql",
+          "line": 2,
+          "keys": [],
+          "meaning": "历史隐藏时间；NULL未隐藏，隐藏不退配额"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 34
+        },
+        {
+          "sql": "KEY `idx_task_user_created` (`user_id`, `created_at`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 35
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Agent 任务'",
+      "title": "Agent任务与历史结果",
+      "entity": "Task",
+      "service": "service/impl/TaskStore.java",
+      "note": "同步任务、聊天和自动推荐共用；软删除仍计配额。V1默认PENDING是旧值，当前创建显式写RUNNING。"
+    },
+    "document": {
+      "name": "document",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 40,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "平台资料主键"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 41,
+          "keys": [],
+          "meaning": "资料标题"
+        },
+        {
+          "name": "subject",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "数据结构/操作系统/计算机网络/计算机组成原理",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 42,
+          "keys": [
+            "IX:idx_doc_subject_status(1/2)"
+          ],
+          "meaning": "数据结构／操作系统／计算机网络／计算机组成原理"
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 43,
+          "keys": [],
+          "meaning": "资料正文"
+        },
+        {
+          "name": "source_url",
+          "type": "VARCHAR(500)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 44,
+          "keys": [],
+          "meaning": "原文地址，可空不代表来源已核实"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": "'DRAFT'",
+          "auto": false,
+          "on_update": false,
+          "comment": "DRAFT/PENDING_REVIEW/PUBLISHED/REJECTED",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 45,
+          "keys": [
+            "IX:idx_doc_subject_status(2/2)"
+          ],
+          "meaning": "DRAFT／PENDING_REVIEW／PUBLISHED／REJECTED"
+        },
+        {
+          "name": "creator_user_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "→ user.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 46,
+          "keys": [
+            "IX:idx_doc_creator"
+          ],
+          "meaning": "创建人；逻辑关联user.id"
+        },
+        {
+          "name": "reviewer_user_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "→ user.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 47,
+          "keys": [],
+          "meaning": "审核人；逻辑关联user.id"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 48,
+          "keys": [],
+          "meaning": "审核时间"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 49,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": true,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 50,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 51
+        },
+        {
+          "sql": "KEY `idx_doc_subject_status` (`subject`, `status`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 52
+        },
+        {
+          "sql": "KEY `idx_doc_creator` (`creator_user_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 53
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='备考资料'",
+      "title": "审核备考资料",
+      "entity": "Document",
+      "service": "service/impl/DocumentServiceImpl.java",
+      "note": "平台备考资料与审核状态，区别于个人笔记personal_document。"
+    },
+    "school": {
+      "name": "school",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 58,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "院校主键"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 59,
+          "keys": [],
+          "meaning": "院校名称"
+        },
+        {
+          "name": "province",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 60,
+          "keys": [
+            "IX:idx_school_province"
+          ],
+          "meaning": "所在省份"
+        },
+        {
+          "name": "level",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "985/211/双一流",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 61,
+          "keys": [
+            "IX:idx_school_level"
+          ],
+          "meaning": "层次，如985／211／双一流"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 62,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": true,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 63,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 64
+        },
+        {
+          "sql": "KEY `idx_school_province` (`province`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 65
+        },
+        {
+          "sql": "KEY `idx_school_level` (`level`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 66
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='院校基础信息'",
+      "title": "院校基础信息",
+      "entity": "School",
+      "service": "service/impl/SchoolServiceImpl.java",
+      "note": "院校列表和筛选目录；可见不代表进入审核招生RAG。"
+    },
+    "school_detail": {
+      "name": "school_detail",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 71,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "专业年度详情主键"
+        },
+        {
+          "name": "school_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ school.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 72,
+          "keys": [
+            "IX:idx_detail_school",
+            "IX:idx_detail_school_year(1/2)"
+          ],
+          "meaning": "所属院校；逻辑关联school.id"
+        },
+        {
+          "name": "major_name",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "专业名",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 73,
+          "keys": [],
+          "meaning": "专业名称"
+        },
+        {
+          "name": "major_code",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "专业代码",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 74,
+          "keys": [
+            "IX:idx_detail_major_code"
+          ],
+          "meaning": "专业代码；DDL容量50，不等于应用六位代码限制"
+        },
+        {
+          "name": "year",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "招生年份",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 75,
+          "keys": [
+            "IX:idx_detail_school_year(2/2)"
+          ],
+          "meaning": "招生年份"
+        },
+        {
+          "name": "enrollment_count",
+          "type": "INT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "招生人数",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 76,
+          "keys": [],
+          "meaning": "旧招生人数；来源与口径另核验"
+        },
+        {
+          "name": "score_line",
+          "type": "INT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "复试分数线",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 77,
+          "keys": [],
+          "meaning": "旧复试线，不能直接当作当年度官方指标"
+        },
+        {
+          "name": "remark",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "备注",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 78,
+          "keys": [],
+          "meaning": "备注及采集说明"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 79,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": true,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 80,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 81
+        },
+        {
+          "sql": "KEY `idx_detail_school` (`school_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 82
+        },
+        {
+          "sql": "KEY `idx_detail_school_year` (`school_id`, `year`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 83
+        },
+        {
+          "sql": "KEY `idx_detail_major_code` (`major_code`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 84
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='院校专业与分数线详情'",
+      "title": "院校专业年度详情",
+      "entity": "SchoolDetail",
+      "service": "service/impl/SchoolDetailServiceImpl.java",
+      "note": "按院校、专业和招生年记录；旧分数人数与V14带口径的新指标分开。"
+    },
+    "recommend_record": {
+      "name": "recommend_record",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 89,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "旧推荐记录主键"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ user.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 90,
+          "keys": [
+            "IX:idx_recommend_user"
+          ],
+          "meaning": "旧推荐用户；逻辑关联user.id"
+        },
+        {
+          "name": "school_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ school.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 91,
+          "keys": [
+            "IX:idx_recommend_school"
+          ],
+          "meaning": "旧推荐院校；逻辑关联school.id"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "推荐理由",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 92,
+          "keys": [],
+          "meaning": "旧推荐理由"
+        },
+        {
+          "name": "score",
+          "type": "DECIMAL(5,2)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "匹配分",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 93,
+          "keys": [],
+          "meaning": "旧匹配分DECIMAL(5,2)，不是录取概率"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 94,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 95
+        },
+        {
+          "sql": "KEY `idx_recommend_user` (`user_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 96
+        },
+        {
+          "sql": "KEY `idx_recommend_school` (`school_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 97
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='择校推荐记录'",
+      "title": "旧择校记录（保留结构）",
+      "entity": "RecommendRecord",
+      "service": "service/impl/RecommendServiceImpl.java",
+      "note": "旧实体和Mapper保留；当前推荐委托TaskService，主线不写本表，不是当前推荐历史来源。"
+    },
+    "question": {
+      "name": "question",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 102,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "题目主键"
+        },
+        {
+          "name": "subject",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 103,
+          "keys": [
+            "IX:idx_question_subject_active(1/2)"
+          ],
+          "meaning": "题目科目"
+        },
+        {
+          "name": "knowledge_point",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "知识点",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 104,
+          "keys": [],
+          "meaning": "知识点名称或标签"
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "题干",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 105,
+          "keys": [],
+          "meaning": "题干"
+        },
+        {
+          "name": "option_a",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 106,
+          "keys": [],
+          "meaning": "选项A"
+        },
+        {
+          "name": "option_b",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 107,
+          "keys": [],
+          "meaning": "选项B"
+        },
+        {
+          "name": "option_c",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 108,
+          "keys": [],
+          "meaning": "选项C"
+        },
+        {
+          "name": "option_d",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 109,
+          "keys": [],
+          "meaning": "选项D"
+        },
+        {
+          "name": "answer",
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "正确答案",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 110,
+          "keys": [],
+          "meaning": "标准答案；当前单选为A—D，提交前不公开"
+        },
+        {
+          "name": "analysis",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "解析",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 111,
+          "keys": [],
+          "meaning": "标准解析；按作答及权限控制展示"
+        },
+        {
+          "name": "difficulty",
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "default": "'MEDIUM'",
+          "auto": false,
+          "on_update": false,
+          "comment": "EASY/MEDIUM/HARD",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 112,
+          "keys": [
+            "IX:idx_question_difficulty"
+          ],
+          "meaning": "EASY／MEDIUM／HARD"
+        },
+        {
+          "name": "question_type",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": "'SINGLE_CHOICE'",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 113,
+          "keys": [],
+          "meaning": "题型，当前SINGLE_CHOICE"
+        },
+        {
+          "name": "version",
+          "type": "INT",
+          "nullable": false,
+          "default": "1",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 114,
+          "keys": [],
+          "meaning": "当前版本号；编辑审核用于并发版本校验"
+        },
+        {
+          "name": "active",
+          "type": "TINYINT",
+          "nullable": false,
+          "default": "1",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 115,
+          "keys": [
+            "IX:idx_question_subject_active(2/2)"
+          ],
+          "meaning": "1启用／0停用"
+        },
+        {
+          "name": "stable_order",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 116,
+          "keys": [],
+          "meaning": "抽题稳定排序值"
+        },
+        {
+          "name": "review_status",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": "'PENDING_REVIEW'",
+          "auto": false,
+          "on_update": false,
+          "comment": "PENDING_REVIEW/APPROVED/REJECTED",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 117,
+          "keys": [
+            "IX:idx_question_review_status"
+          ],
+          "meaning": "PENDING_REVIEW／APPROVED／REJECTED"
+        },
+        {
+          "name": "reviewer_user_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "→ user.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 118,
+          "keys": [],
+          "meaning": "审核人；逻辑关联user.id"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 119,
+          "keys": [],
+          "meaning": "审核时间"
+        },
+        {
+          "name": "review_comment",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 120,
+          "keys": [],
+          "meaning": "审核意见"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 121,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": true,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 122,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        },
+        {
+          "name": "source_type",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "REAL_EXAM / MOCK / ORIGINAL; NULL for undocumented legacy sources",
+          "source": "kaoyan-B/src/main/resources/db/V9__question_source.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "REAL_EXAM／MOCK／ORIGINAL；旧题NULL表示未登记"
+        },
+        {
+          "name": "source_name",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "Paper, publication or original author record",
+          "source": "kaoyan-B/src/main/resources/db/V9__question_source.sql",
+          "line": 6,
+          "keys": [],
+          "meaning": "试卷、出版物或原创作者记录名称"
+        },
+        {
+          "name": "source_locator",
+          "type": "VARCHAR(1000)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "Traceable URL, page, section or author record location",
+          "source": "kaoyan-B/src/main/resources/db/V9__question_source.sql",
+          "line": 8,
+          "keys": [],
+          "meaning": "可追溯网址、页码、章节或作者记录位置"
+        },
+        {
+          "name": "source_year",
+          "type": "INT",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "Exam or source year when known",
+          "source": "kaoyan-B/src/main/resources/db/V9__question_source.sql",
+          "line": 10,
+          "keys": [],
+          "meaning": "已知试题或来源年份"
+        },
+        {
+          "name": "source_question_no",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "Original question number when applicable",
+          "source": "kaoyan-B/src/main/resources/db/V9__question_source.sql",
+          "line": 12,
+          "keys": [],
+          "meaning": "原题号，真题登记时需要"
+        },
+        {
+          "name": "permission_note",
+          "type": "VARCHAR(2000)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "Permission or original authorship evidence",
+          "source": "kaoyan-B/src/main/resources/db/V9__question_source.sql",
+          "line": 14,
+          "keys": [],
+          "meaning": "使用许可或原创证据说明"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 123
+        },
+        {
+          "sql": "KEY `idx_question_subject_active` (`subject`, `active`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 124
+        },
+        {
+          "sql": "KEY `idx_question_difficulty` (`difficulty`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 125
+        },
+        {
+          "sql": "KEY `idx_question_review_status` (`review_status`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 126
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='题库'",
+      "title": "题库与当前题目版本",
+      "entity": "Question",
+      "service": "service/impl/QuestionServiceImpl.java",
+      "note": "当前题目及来源审核元数据；历史依据存question_version和作答快照。V9增加六项来源字段。"
+    },
+    "practice_record": {
+      "name": "practice_record",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 131,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "作答项目主键；practice_session_item.record_id的逻辑依据"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ user.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 132,
+          "keys": [
+            "IX:idx_practice_user"
+          ],
+          "meaning": "作答用户；逻辑关联user.id"
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "一次刷题批次",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 133,
+          "keys": [
+            "UK:uk_practice_session_question(1/2)",
+            "IX:idx_practice_session"
+          ],
+          "meaning": "批次号；旧UUID36字符，管理批次L-加32位UUID共34字符，可放入本列"
+        },
+        {
+          "name": "question_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ question.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 134,
+          "keys": [
+            "UK:uk_practice_session_question(2/2)",
+            "IX:idx_practice_question"
+          ],
+          "meaning": "题目；逻辑关联question.id，历史内容以快照为准"
+        },
+        {
+          "name": "order_index",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 135,
+          "keys": [],
+          "meaning": "批次内题序，从0开始"
+        },
+        {
+          "name": "user_answer",
+          "type": "VARCHAR(10)",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 136,
+          "keys": [],
+          "meaning": "正式提交答案，草稿不写本列"
+        },
+        {
+          "name": "is_correct",
+          "type": "TINYINT",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 137,
+          "keys": [],
+          "meaning": "1正确／0错误／NULL未判分；NULL不能算错题"
+        },
+        {
+          "name": "grading_status",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": "'valid'",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 138,
+          "keys": [],
+          "meaning": "valid有效／withdrawn撤回；VARCHAR无CHECK"
+        },
+        {
+          "name": "answered_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 139,
+          "keys": [],
+          "meaning": "判分时写入的时间，诊断统一判分才写"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 140,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "question_snapshot",
+          "type": "JSON",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "Immutable question version captured at grading; legacy rows remain NULL",
+          "source": "kaoyan-B/src/main/resources/db/V7__practice_snapshot.sql",
+          "line": 2,
+          "keys": [],
+          "meaning": "历史题目快照；旧行可NULL，不按现行题目补造"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 141
+        },
+        {
+          "sql": "UNIQUE KEY `uk_practice_session_question` (`session_id`, `question_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 142
+        },
+        {
+          "sql": "KEY `idx_practice_user` (`user_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 143
+        },
+        {
+          "sql": "KEY `idx_practice_question` (`question_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 144
+        },
+        {
+          "sql": "KEY `idx_practice_session` (`session_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 145
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='刷题记录'",
+      "title": "作答与判分记录",
+      "entity": "PracticeRecord",
+      "service": "service/impl/PracticeServiceImpl.java",
+      "note": "每批每题一条；区分未答、诊断已提交未判分和已判分。V7新增JSON快照，V13管理批次创建时固定，旧流程可在判分时捕获。"
+    },
+    "user_question_mark": {
+      "name": "user_question_mark",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 150,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "标记主键"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ user.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 151,
+          "keys": [
+            "UK:uk_mark_user_question(1/2)",
+            "IX:idx_mark_user_wrong(1/2)",
+            "IX:idx_mark_user_favorite(1/2)"
+          ],
+          "meaning": "所属用户；逻辑关联user.id"
+        },
+        {
+          "name": "question_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ question.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 152,
+          "keys": [
+            "UK:uk_mark_user_question(2/2)"
+          ],
+          "meaning": "题目；逻辑关联question.id"
+        },
+        {
+          "name": "is_favorite",
+          "type": "TINYINT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 153,
+          "keys": [
+            "IX:idx_mark_user_favorite(2/2)"
+          ],
+          "meaning": "1收藏／0未收藏"
+        },
+        {
+          "name": "is_wrong",
+          "type": "TINYINT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 154,
+          "keys": [
+            "IX:idx_mark_user_wrong(2/2)"
+          ],
+          "meaning": "1在错题本／0不在"
+        },
+        {
+          "name": "wrong_count",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 155,
+          "keys": [],
+          "meaning": "错误累计次数，撤回时按有效历史重算"
+        },
+        {
+          "name": "last_wrong_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": "NULL",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 156,
+          "keys": [],
+          "meaning": "最近做错时间"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 157,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": true,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 158,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 159
+        },
+        {
+          "sql": "UNIQUE KEY `uk_mark_user_question` (`user_id`, `question_id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 160
+        },
+        {
+          "sql": "KEY `idx_mark_user_wrong` (`user_id`, `is_wrong`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 161
+        },
+        {
+          "sql": "KEY `idx_mark_user_favorite` (`user_id`, `is_favorite`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 162
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='错题与收藏'",
+      "title": "个人错题与收藏",
+      "entity": "UserQuestionMark",
+      "service": "service/impl/UserQuestionMarkServiceImpl.java",
+      "note": "每人每题最多一条；当前错题本标记与历史错误次数不是同一口径。"
+    },
+    "study_stat": {
+      "name": "study_stat",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": true,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 167,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "汇总主键"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "→ user.id",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 168,
+          "keys": [
+            "UK:uk_stat_user_date(1/2)"
+          ],
+          "meaning": "所属用户；逻辑关联user.id"
+        },
+        {
+          "name": "stat_date",
+          "type": "DATE",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 169,
+          "keys": [
+            "UK:uk_stat_user_date(2/2)"
+          ],
+          "meaning": "统计日期"
+        },
+        {
+          "name": "question_count",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 170,
+          "keys": [],
+          "meaning": "旧汇总做题数"
+        },
+        {
+          "name": "correct_count",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 171,
+          "keys": [],
+          "meaning": "旧汇总正确数"
+        },
+        {
+          "name": "study_minutes",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 172,
+          "keys": [],
+          "meaning": "旧汇总学习分钟；当前接口未记录时返回NULL，默认0不等于实测"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 173,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": true,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 174,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (`id`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 175
+        },
+        {
+          "sql": "UNIQUE KEY `uk_stat_user_date` (`user_id`, `stat_date`)",
+          "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+          "line": 176
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V1__init.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='每日学习统计'",
+      "title": "旧每日汇总（保留结构）",
+      "entity": "StudyStat",
+      "service": "service/impl/StudyStatServiceImpl.java",
+      "note": "保留accumulate写汇总方法；当前today/range/overview/learning从有效已判分practice_record计算，不以本表推算时长。"
+    },
+    "chat_conversation": {
+      "name": "chat_conversation",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 3,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "会话UUID"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 3,
+          "keys": [
+            "IX:idx_conversation_owner(1/2)"
+          ],
+          "meaning": "所属用户；逻辑关联user.id"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 3,
+          "keys": [],
+          "meaning": "会话标题，首轮可按问题更新"
+        },
+        {
+          "name": "conditions_json",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "已解析条件对象，LONGTEXT存JSON"
+        },
+        {
+          "name": "profile_json",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "保留档案对象槽位，当前创建为{}"
+        },
+        {
+          "name": "next_sequence",
+          "type": "INT",
+          "nullable": false,
+          "default": "1",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "下一用户消息序号，从1开始，事务内递增"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 5,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 5,
+          "keys": [
+            "IX:idx_conversation_owner(2/2)"
+          ],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (id)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 3,
+          "inline": true
+        },
+        {
+          "sql": "INDEX idx_conversation_owner (user_id, updated_at)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 6
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+      "options": "",
+      "title": "聊天会话",
+      "entity": null,
+      "service": "service/ConversationService.java",
+      "note": "会话入口、解析条件及序号；profile_json创建为{}，每轮实际档案另从user组装。"
+    },
+    "chat_message": {
+      "name": "chat_message",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 9,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "用户消息UUID"
+        },
+        {
+          "name": "conversation_id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 9,
+          "keys": [
+            "UK:uq_message_sequence(1/2)"
+          ],
+          "meaning": "会话；逻辑关联chat_conversation.id"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 9,
+          "keys": [],
+          "meaning": "所属用户，归属核验"
+        },
+        {
+          "name": "sequence_no",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 10,
+          "keys": [
+            "UK:uq_message_sequence(2/2)"
+          ],
+          "meaning": "会话内序号，与会话ID组成唯一键"
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 10,
+          "keys": [],
+          "meaning": "用户输入，应用最多8000字符"
+        },
+        {
+          "name": "document_id",
+          "type": "VARCHAR(36)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 10,
+          "keys": [],
+          "meaning": "选定个人文档；逻辑关联personal_document.id，可空"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 11,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (id)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 9,
+          "inline": true
+        },
+        {
+          "sql": "UNIQUE KEY uq_message_sequence (conversation_id, sequence_no)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 12
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+      "options": "",
+      "title": "用户消息",
+      "entity": null,
+      "service": "service/ConversationService.java",
+      "note": "保存用户输入；无role字段，助手草稿和回答在chat_generation，不虚构助手消息实体。"
+    },
+    "chat_generation": {
+      "name": "chat_generation",
+      "columns": [
+        {
+          "name": "task_id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 15,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "主键；逻辑关联task.id"
+        },
+        {
+          "name": "conversation_id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 15,
+          "keys": [
+            "UK:uq_generation_request(1/2)",
+            "IX:idx_generation_conversation(1/2)"
+          ],
+          "meaning": "会话；逻辑关联chat_conversation.id"
+        },
+        {
+          "name": "message_id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 15,
+          "keys": [
+            "UK:uq_generation_attempt(1/2)"
+          ],
+          "meaning": "用户消息；逻辑关联chat_message.id"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 16,
+          "keys": [],
+          "meaning": "所属用户，归属与隐私校验"
+        },
+        {
+          "name": "attempt_no",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 16,
+          "keys": [
+            "UK:uq_generation_attempt(2/2)"
+          ],
+          "meaning": "同消息生成尝试编号"
+        },
+        {
+          "name": "client_request_id",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 16,
+          "keys": [
+            "UK:uq_generation_request(2/2)"
+          ],
+          "meaning": "客户端幂等请求号，同会话唯一"
+        },
+        {
+          "name": "request_hash",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 17,
+          "keys": [],
+          "meaning": "规范化请求SHA-256指纹；同号异内容冲突"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 17,
+          "keys": [],
+          "meaning": "RUNNING／SUCCESS／FAILED／CANCELLED"
+        },
+        {
+          "name": "active_conversation_id",
+          "type": "VARCHAR(36)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 18,
+          "keys": [
+            "UK:uq_generation_active"
+          ],
+          "meaning": "运行时占位会话ID，终态NULL"
+        },
+        {
+          "name": "context_json",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 18,
+          "keys": [],
+          "meaning": "上下文、计划、授权等服务端私有对象"
+        },
+        {
+          "name": "draft_json",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 18,
+          "keys": [],
+          "meaning": "流式草稿对象，终态通常清为{}"
+        },
+        {
+          "name": "result_json",
+          "type": "LONGTEXT",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 19,
+          "keys": [],
+          "meaning": "校验后的最终结果对象，可空"
+        },
+        {
+          "name": "version",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 19,
+          "keys": [],
+          "meaning": "流式快照递增版本，用于恢复及排除旧事件"
+        },
+        {
+          "name": "stage",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 19,
+          "keys": [],
+          "meaning": "生成阶段说明"
+        },
+        {
+          "name": "error_message",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 19,
+          "keys": [],
+          "meaning": "生成失败或中断说明"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 20,
+          "keys": [
+            "IX:idx_generation_conversation(2/2)"
+          ],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 20,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (task_id)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 15,
+          "inline": true
+        },
+        {
+          "sql": "UNIQUE KEY uq_generation_request (conversation_id, client_request_id)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 21
+        },
+        {
+          "sql": "UNIQUE KEY uq_generation_active (active_conversation_id)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 22
+        },
+        {
+          "sql": "UNIQUE KEY uq_generation_attempt (message_id, attempt_no)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 23
+        },
+        {
+          "sql": "INDEX idx_generation_conversation (conversation_id, created_at)",
+          "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+          "line": 24
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V10__chat_conversation.sql",
+      "options": "",
+      "title": "生成尝试与流式恢复",
+      "entity": null,
+      "service": "service/ConversationService.java",
+      "note": "每次尝试对应task，同一消息可重试。active_conversation_id运行时写会话ID、终态清空，用可空唯一键限制单会话单活动生成。"
+    },
+    "personal_document": {
+      "name": "personal_document",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 2,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "个人文档UUID"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 2,
+          "keys": [
+            "IX:idx_personal_document_owner(1/2)"
+          ],
+          "meaning": "所属用户；逻辑关联user.id"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 2,
+          "keys": [],
+          "meaning": "标题，应用1—100字符"
+        },
+        {
+          "name": "content",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 3,
+          "keys": [],
+          "meaning": "Markdown正文；应用最多40000字符，DDL为LONGTEXT"
+        },
+        {
+          "name": "version",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 3,
+          "keys": [],
+          "meaning": "当前版号，应用首次1并递增，DDL无默认值"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 4,
+          "keys": [
+            "IX:idx_personal_document_owner(2/2)"
+          ],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (id)",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 2,
+          "inline": true
+        },
+        {
+          "sql": "INDEX idx_personal_document_owner (user_id, updated_at)",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 5
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+      "options": "",
+      "title": "个人Markdown文档当前版",
+      "entity": null,
+      "service": "service/PersonalDocumentService.java",
+      "note": "手写笔记与确认保存的助手建议共用；校验baseVersion、更新当前版并追加历史。"
+    },
+    "personal_document_version": {
+      "name": "personal_document_version",
+      "columns": [
+        {
+          "name": "document_id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 8,
+          "keys": [
+            "PK(1/2)"
+          ],
+          "meaning": "个人文档；与version组成主键，逻辑关联personal_document.id"
+        },
+        {
+          "name": "version",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 8,
+          "keys": [
+            "PK(2/2)"
+          ],
+          "meaning": "历史版号"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 8,
+          "keys": [],
+          "meaning": "所属用户，历史归属校验"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 9,
+          "keys": [],
+          "meaning": "该版标题快照"
+        },
+        {
+          "name": "content",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 9,
+          "keys": [],
+          "meaning": "该版Markdown正文快照"
+        },
+        {
+          "name": "source_task_id",
+          "type": "VARCHAR(36)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 9,
+          "keys": [
+            "UK:uq_document_source_task"
+          ],
+          "meaning": "确认依据任务；逻辑关联task.id，手动保存可空"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 10,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (document_id, version)",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 11
+        },
+        {
+          "sql": "UNIQUE KEY uq_document_source_task (source_task_id)",
+          "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+          "line": 11
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V11__personal_document.sql",
+      "options": "",
+      "title": "个人文档不可变历史版",
+      "entity": null,
+      "service": "service/PersonalDocumentService.java",
+      "note": "复合主键存每版，source_task_id可空唯一键保证同任务重复确认不重复创建版本。"
+    },
+    "assistant_privacy": {
+      "name": "assistant_privacy",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 3,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "授权用户主键；逻辑关联user.id"
+        },
+        {
+          "name": "model_allowed",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "default": "FALSE",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 3,
+          "keys": [],
+          "meaning": "是否允许外发；MySQL BOOLEAN为TINYINT(1)，默认FALSE"
+        },
+        {
+          "name": "scopes_json",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "wrong／favorite／stats／profile／document类别布尔授权对象"
+        },
+        {
+          "name": "provider",
+          "type": "VARCHAR(500)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "模型接收端点标识，不是密钥"
+        },
+        {
+          "name": "version",
+          "type": "INT",
+          "nullable": false,
+          "default": "1",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 5,
+          "keys": [],
+          "meaning": "授权版号，每次保存递增，阻止旧授权继续生效"
+        },
+        {
+          "name": "consented_at",
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 5,
+          "keys": [],
+          "meaning": "最近保存设置时间，是否同意仍看model_allowed"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 6,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (user_id)",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 3,
+          "inline": true
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+      "options": "",
+      "title": "模型外发隐私授权",
+      "entity": null,
+      "service": "service/AssistantPrivacyService.java",
+      "note": "每人一条当前授权；无记录或接收端点变化时不能凭旧授权外发。"
+    },
+    "assistant_action": {
+      "name": "assistant_action",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 9,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "操作UUID"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 9,
+          "keys": [
+            "IX:idx_assistant_action_owner(1/2)"
+          ],
+          "meaning": "所属用户"
+        },
+        {
+          "name": "conversation_id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 9,
+          "keys": [],
+          "meaning": "来源会话；逻辑关联chat_conversation.id"
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 10,
+          "keys": [
+            "UK"
+          ],
+          "meaning": "来源任务；逻辑关联task.id，本列唯一"
+        },
+        {
+          "name": "operation",
+          "type": "VARCHAR(32)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 10,
+          "keys": [],
+          "meaning": "FAVORITE_ADD／FAVORITE_REMOVE／WRONG_REMOVE／PRACTICE_CREATE"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 10,
+          "keys": [],
+          "meaning": "PENDING待确认／SUCCESS已执行／DISMISSED已忽略"
+        },
+        {
+          "name": "payload_json",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 11,
+          "keys": [],
+          "meaning": "题目、快照、指纹及参数对象"
+        },
+        {
+          "name": "result_json",
+          "type": "LONGTEXT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 11,
+          "keys": [],
+          "meaning": "执行结果对象，如sessionId/actualCount，初始写{}"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 12,
+          "keys": [
+            "IX:idx_assistant_action_owner(2/2)"
+          ],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 12,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (id)",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 9,
+          "inline": true
+        },
+        {
+          "sql": "UNIQUE (task_id)",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 10,
+          "inline": true
+        },
+        {
+          "sql": "INDEX idx_assistant_action_owner (user_id, created_at)",
+          "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+          "line": 13
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V12__assistant_privacy.sql",
+      "options": "",
+      "title": "助手待确认业务操作",
+      "entity": null,
+      "service": "service/AssistantLearningService.java",
+      "note": "保存参数、归属和结果，task_id唯一；学习操作走白名单，文档保存走个人文档服务。"
+    },
+    "practice_session": {
+      "name": "practice_session",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 4,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "管理批次号，当前L-加32位UUID"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 4,
+          "keys": [
+            "IX:ix_session_owner(1/2)"
+          ],
+          "meaning": "所属用户"
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 4,
+          "keys": [],
+          "meaning": "DIAGNOSTIC诊断／PRACTICE练习；NORMAL/WRONG/FAVORITE是抽题来源，不是此列当前值"
+        },
+        {
+          "name": "state",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 5,
+          "keys": [],
+          "meaning": "RUNNING／FINISHED"
+        },
+        {
+          "name": "revision",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 5,
+          "keys": [],
+          "meaning": "批次并发版本，保存草稿、提交、结束时递增"
+        },
+        {
+          "name": "current_index",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 5,
+          "keys": [],
+          "meaning": "当前题下标，从0开始"
+        },
+        {
+          "name": "blueprint_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 6,
+          "keys": [],
+          "meaning": "本批蓝图与抽题情况对象"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 6,
+          "keys": [
+            "IX:ix_session_owner(2/2)"
+          ],
+          "meaning": "记录创建时间"
+        },
+        {
+          "name": "finished_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 6,
+          "keys": [],
+          "meaning": "结束时间，未结束为空"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 4,
+          "inline": true
+        },
+        {
+          "sql": "INDEX ix_session_owner (user_id, created_at)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 7
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "受管理练习或诊断批次",
+      "entity": null,
+      "service": "learning/ManagedPracticeService.java",
+      "note": "V13学习闭环批次；当前生成34字符而DDL容量64，不代表代码生成64字符ID。"
+    },
+    "practice_session_item": {
+      "name": "practice_session_item",
+      "columns": [
+        {
+          "name": "record_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 10,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "主键，逻辑关联practice_record.id；本列有符号而目标UNSIGNED"
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 10,
+          "keys": [
+            "IX:ix_item_session"
+          ],
+          "meaning": "批次；逻辑关联practice_session.id"
+        },
+        {
+          "name": "hint_level",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 11,
+          "keys": [],
+          "meaning": "0无提示／1概念／2思路，诊断禁用提示"
+        },
+        {
+          "name": "draft_answer",
+          "type": "VARCHAR(10)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 11,
+          "keys": [],
+          "meaning": "未正式提交的草稿，提交后清空"
+        },
+        {
+          "name": "submitted_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 11,
+          "keys": [],
+          "meaning": "正式提交时间，诊断可已提交未判分"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (record_id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 10,
+          "inline": true
+        },
+        {
+          "sql": "INDEX ix_item_session (session_id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 12
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "批次项目补充状态",
+      "entity": null,
+      "service": "learning/ManagedPracticeService.java",
+      "note": "对practice_record一对一逻辑扩展，无user_id，须经批次与作答核验归属。"
+    },
+    "practice_request": {
+      "name": "practice_request",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 15,
+          "keys": [
+            "PK(1/2)"
+          ],
+          "meaning": "所属用户；与request_id组成主键"
+        },
+        {
+          "name": "request_id",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 15,
+          "keys": [
+            "PK(2/2)"
+          ],
+          "meaning": "请求号，应用1—64位字母数字下划线连字符"
+        },
+        {
+          "name": "fingerprint",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 15,
+          "keys": [],
+          "meaning": "批次、题号、项目号和答案拼接后SHA-256"
+        },
+        {
+          "name": "response_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 16,
+          "keys": [],
+          "meaning": "首次响应，诊断可尚无判分，非自动更新的最终成绩"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 16,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (user_id, request_id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 17
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "作答请求幂等结果",
+      "entity": null,
+      "service": "learning/ManagedPracticeService.java",
+      "note": "按用户和请求号重放首次响应；同号异内容409，不能跨账号复用。"
+    },
+    "question_version": {
+      "name": "question_version",
+      "columns": [
+        {
+          "name": "question_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 20,
+          "keys": [
+            "PK(1/2)"
+          ],
+          "meaning": "题号；与version组成主键，逻辑关联question.id，有符号性与原表不同"
+        },
+        {
+          "name": "version",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 20,
+          "keys": [
+            "PK(2/2)"
+          ],
+          "meaning": "题目版号"
+        },
+        {
+          "name": "snapshot_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 20,
+          "keys": [],
+          "meaning": "固定题目、答案解析、来源及可选两级提示对象"
+        },
+        {
+          "name": "withdrawn",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 21,
+          "keys": [],
+          "meaning": "0未撤回／1已撤回"
+        },
+        {
+          "name": "withdrawal_reason",
+          "type": "VARCHAR(2000)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 21,
+          "keys": [],
+          "meaning": "撤回原因"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 22,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (question_id, version)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 22
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "不可变题目版本与撤回",
+      "entity": null,
+      "service": "learning/ManagedPracticeService.java",
+      "note": "以题号版号固定内容；撤回改状态并使关联作答失效，不用现行正文覆盖历史。"
+    },
+    "learning_blueprint": {
+      "name": "learning_blueprint",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 25,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "发布编号，应用1—64位字母数字下划线连字符"
+        },
+        {
+          "name": "version",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 25,
+          "keys": [],
+          "meaning": "蓝图版号，应用至少1"
+        },
+        {
+          "name": "config_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 25,
+          "keys": [],
+          "meaning": "cells对象；四科、权重和1、最多50题由应用校验"
+        },
+        {
+          "name": "reviewer_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 26,
+          "keys": [],
+          "meaning": "审核发布管理员；逻辑关联user.id"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 26,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 25,
+          "inline": true
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "审核诊断蓝图",
+      "entity": null,
+      "service": "learning/LearningProfiles.java",
+      "note": "发布不可覆盖，按created_at降序及id选择当前蓝图，不是取MAX(version)。"
+    },
+    "learning_profile": {
+      "name": "learning_profile",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 29,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "所属用户主键；逻辑关联user.id"
+        },
+        {
+          "name": "revision",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 29,
+          "keys": [],
+          "meaning": "修订号，可比较业务内容变化时递增"
+        },
+        {
+          "name": "data_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 29,
+          "keys": [],
+          "meaning": "LearningContracts.Profile对象，参考分不是实测考试成绩"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 30,
+          "keys": [],
+          "meaning": "记录最后更新时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (user_id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 29,
+          "inline": true
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "当前学情画像",
+      "entity": null,
+      "service": "learning/LearningProfiles.java",
+      "note": "有效判分证据重算的每人当前画像，与推荐设置以短事务行锁更新。"
+    },
+    "learning_profile_history": {
+      "name": "learning_profile_history",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 33,
+          "keys": [
+            "PK(1/2)"
+          ],
+          "meaning": "所属用户；与revision组成主键"
+        },
+        {
+          "name": "revision",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 33,
+          "keys": [
+            "PK(2/2)"
+          ],
+          "meaning": "该次画像修订，逻辑对应该次当前画像"
+        },
+        {
+          "name": "data_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 33,
+          "keys": [],
+          "meaning": "该次完整Profile快照"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 34,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (user_id, revision)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 34
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "画像修订历史",
+      "entity": null,
+      "service": "learning/LearningProfiles.java",
+      "note": "按用户及修订存快照，初始化revision=0当前行不必有同号历史。"
+    },
+    "learning_event": {
+      "name": "learning_event",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 37,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "事件UUID"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 37,
+          "keys": [],
+          "meaning": "受影响用户"
+        },
+        {
+          "name": "event_key",
+          "type": "VARCHAR(150)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 37,
+          "keys": [
+            "UK"
+          ],
+          "meaning": "用户ID加事件语义键，全局唯一，如用户ID:answer:作答ID"
+        },
+        {
+          "name": "state",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 38,
+          "keys": [
+            "IX:ix_event_due(1/2)"
+          ],
+          "meaning": "当前worker写PENDING／DONE；部分查询兼容PROCESSING，不代表已实现租约状态"
+        },
+        {
+          "name": "attempts",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 38,
+          "keys": [],
+          "meaning": "失败次数，worker查询小于3"
+        },
+        {
+          "name": "next_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 39,
+          "keys": [
+            "IX:ix_event_due(2/2)"
+          ],
+          "meaning": "下次最早处理时间"
+        },
+        {
+          "name": "lease_until",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 39,
+          "keys": [],
+          "meaning": "DDL保留租约列，当前LearningWorker未读写"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 39,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 37,
+          "inline": true
+        },
+        {
+          "sql": "UNIQUE (event_key)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 37,
+          "inline": true
+        },
+        {
+          "sql": "INDEX ix_event_due (state, next_at)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 40
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "画像重算事件",
+      "entity": null,
+      "service": "learning/LearningWorker.java",
+      "note": "作答、结束、撤回、蓝图发布触发，worker按用户锁定重算，不是通用消息队列。"
+    },
+    "learning_recommendation_settings": {
+      "name": "learning_recommendation_settings",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 43,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "所属用户主键"
+        },
+        {
+          "name": "revision",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 43,
+          "keys": [],
+          "meaning": "设置并发版本，保存或来源条件变化时递增"
+        },
+        {
+          "name": "enabled",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 43,
+          "keys": [],
+          "meaning": "0关闭／1开启"
+        },
+        {
+          "name": "preferences_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 44,
+          "keys": [],
+          "meaning": "择校偏好对象，白名单由应用校验"
+        },
+        {
+          "name": "pending_reason",
+          "type": "VARCHAR(40)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 44,
+          "keys": [],
+          "meaning": "CONDITIONS_CHANGED／SOURCE_CHANGED／INITIAL_PROFILE／ABILITY_CHANGED／BLUEPRINT_CHANGED／EVIDENCE_INVALIDATED"
+        },
+        {
+          "name": "not_before",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 44,
+          "keys": [],
+          "meaning": "最早允许执行时间"
+        },
+        {
+          "name": "last_task_id",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 45,
+          "keys": [],
+          "meaning": "已成功接纳的任务；逻辑关联task.id，容量64而task.id36"
+        },
+        {
+          "name": "last_profile_revision",
+          "type": "INT",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 45,
+          "keys": [],
+          "meaning": "已接纳推荐所用画像修订"
+        },
+        {
+          "name": "last_score",
+          "type": "DOUBLE",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 45,
+          "keys": [],
+          "meaning": "已接纳参考分，可空"
+        },
+        {
+          "name": "last_sufficient",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 46,
+          "keys": [],
+          "meaning": "已接纳画像样本充分标志0/1"
+        },
+        {
+          "name": "last_completed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 46,
+          "keys": [],
+          "meaning": "最近接纳推荐完成时间"
+        },
+        {
+          "name": "last_release_id",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 47,
+          "keys": [],
+          "meaning": "最近接纳资料发布版本"
+        },
+        {
+          "name": "last_profile_hash",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 47,
+          "keys": [],
+          "meaning": "账号条件哈希，含status/target_school/target_major/exam_year，不是画像JSON哈希"
+        },
+        {
+          "name": "run_token",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 48,
+          "keys": [],
+          "meaning": "执行令牌，用于完成时比较并交换"
+        },
+        {
+          "name": "run_until",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 48,
+          "keys": [],
+          "meaning": "本次执行租约截止"
+        },
+        {
+          "name": "pending_task_id",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 48,
+          "keys": [],
+          "meaning": "进行中或可复用任务；逻辑关联task.id，容量64"
+        },
+        {
+          "name": "attempts",
+          "type": "INT",
+          "nullable": false,
+          "default": "0",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 48,
+          "keys": [],
+          "meaning": "本轮待办失败次数，达3显示失败"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (user_id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 43,
+          "inline": true
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "自动推荐设置与执行游标",
+      "entity": null,
+      "service": "learning/LearningRecommendations.java",
+      "note": "每人一条设置、触发原因、结果指针及租约；自动推荐用规则，代码强制explainWithAi=false。"
+    },
+    "school_historical_metric": {
+      "name": "school_historical_metric",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 51,
+          "keys": [
+            "PK"
+          ],
+          "meaning": "指标UUID（容量64）"
+        },
+        {
+          "name": "program_id",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 51,
+          "keys": [],
+          "meaning": "审核语料专业标识，不是school_detail.id"
+        },
+        {
+          "name": "school",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 51,
+          "keys": [],
+          "meaning": "院校名快照"
+        },
+        {
+          "name": "college",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 52,
+          "keys": [],
+          "meaning": "学院名快照"
+        },
+        {
+          "name": "major_code",
+          "type": "VARCHAR(6)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 52,
+          "keys": [],
+          "meaning": "六位专业代码"
+        },
+        {
+          "name": "metric_year",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 52,
+          "keys": [],
+          "meaning": "历史指标年"
+        },
+        {
+          "name": "metric_type",
+          "type": "VARCHAR(40)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 53,
+          "keys": [],
+          "meaning": "TOTAL_CUTOFF／SUBJECT_CUTOFF／ADMISSION_MIN／ADMISSION_MEAN"
+        },
+        {
+          "name": "exam_subject",
+          "type": "VARCHAR(3)",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 53,
+          "keys": [],
+          "meaning": "三位科目号；单科指标必需，其他可空"
+        },
+        {
+          "name": "max_score",
+          "type": "INT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 54,
+          "keys": [],
+          "meaning": "满分，请求校验1—500"
+        },
+        {
+          "name": "score",
+          "type": "DOUBLE",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 54,
+          "keys": [],
+          "meaning": "历史分数；应用校验有限数且0至满分"
+        },
+        {
+          "name": "source_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 54,
+          "keys": [],
+          "meaning": "经校验来源对象"
+        },
+        {
+          "name": "reviewer_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 55,
+          "keys": [],
+          "meaning": "审核管理员；逻辑关联user.id"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 55,
+          "keys": [],
+          "meaning": "记录创建时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (id)",
+          "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+          "line": 51,
+          "inline": true
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V13__learning_loop.sql",
+      "options": "",
+      "title": "审核历史分数指标",
+      "entity": null,
+      "service": "learning/LearningRecommendations.java",
+      "note": "V13推荐对照，不同于V14目录指标。当前只比较更早年份408单科线且满分150，不据此删候选。"
+    },
+    "school_admission_metric": {
+      "name": "school_admission_metric",
+      "columns": [
+        {
+          "name": "school_detail_id",
+          "type": "BIGINT UNSIGNED",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 4,
+          "keys": [
+            "PK(1/2)"
+          ],
+          "meaning": "专业年度详情；本项目唯一声明物理外键，删除详情级联"
+        },
+        {
+          "name": "metric_type",
+          "type": "VARCHAR(24)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 5,
+          "keys": [
+            "PK(2/2)"
+          ],
+          "meaning": "ENROLLMENT计划／CUTOFF_REFERENCE往年线；与详情ID组成主键"
+        },
+        {
+          "name": "metric_year",
+          "type": "INT",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 6,
+          "keys": [],
+          "meaning": "指标年，有值必填；参考线早于招生年由应用校验"
+        },
+        {
+          "name": "metric_value",
+          "type": "INT",
+          "nullable": true,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 7,
+          "keys": [],
+          "meaning": "非负整数；OFFICIAL/UNVERIFIED必填，其他必须NULL"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(24)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 8,
+          "keys": [],
+          "meaning": "OFFICIAL／UNVERIFIED／NOT_PUBLISHED／NOT_FOUND／SCOPE_MISMATCH／CONFLICT"
+        },
+        {
+          "name": "scope_key",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 9,
+          "keys": [],
+          "meaning": "适用范围稳定键"
+        },
+        {
+          "name": "scope_label",
+          "type": "VARCHAR(500)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 10,
+          "keys": [],
+          "meaning": "适用范围可读说明"
+        },
+        {
+          "name": "basis",
+          "type": "VARCHAR(40)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 11,
+          "keys": [],
+          "meaning": "ORDINARY_EXAM／TOTAL_INCLUDING_RECOMMENDED／TOTAL_UNSPECIFIED／NOT_APPLICABLE；参考线必须NOT_APPLICABLE由应用校验"
+        },
+        {
+          "name": "context_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 12,
+          "keys": [],
+          "meaning": "学院、方向、学习方式、招生类别对象"
+        },
+        {
+          "name": "sources_json",
+          "type": "JSON",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 13,
+          "keys": [],
+          "meaning": "证据数组，区别于ChatRepository对象型解析"
+        },
+        {
+          "name": "notice",
+          "type": "VARCHAR(2000)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 14,
+          "keys": [],
+          "meaning": "限制或待核实提示"
+        },
+        {
+          "name": "content_sha256",
+          "type": "CHAR(64)",
+          "nullable": false,
+          "default": null,
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 15,
+          "keys": [],
+          "meaning": "内容SHA-256指纹，不是唯一键"
+        },
+        {
+          "name": "imported_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "auto": false,
+          "on_update": false,
+          "comment": "",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 16,
+          "keys": [],
+          "meaning": "导入时间"
+        }
+      ],
+      "constraints": [
+        {
+          "sql": "PRIMARY KEY (school_detail_id, metric_type)",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 17
+        },
+        {
+          "sql": "CONSTRAINT fk_admission_detail FOREIGN KEY (school_detail_id) REFERENCES school_detail(id) ON DELETE CASCADE",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 18
+        },
+        {
+          "sql": "CONSTRAINT ck_admission_type CHECK (metric_type IN ('ENROLLMENT','CUTOFF_REFERENCE'))",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 19
+        },
+        {
+          "sql": "CONSTRAINT ck_admission_status CHECK (status IN ('OFFICIAL','UNVERIFIED','NOT_PUBLISHED','NOT_FOUND','SCOPE_MISMATCH','CONFLICT'))",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 20
+        },
+        {
+          "sql": "CONSTRAINT ck_admission_value CHECK (\n   (status IN ('OFFICIAL','UNVERIFIED') AND metric_value IS NOT NULL AND metric_value >= 0 AND metric_year IS NOT NULL)\n   OR (status NOT IN ('OFFICIAL','UNVERIFIED') AND metric_value IS NULL)\n )",
+          "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+          "line": 21
+        }
+      ],
+      "source": "kaoyan-B/src/main/resources/db/V14__school_admission_metrics.sql",
+      "options": "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+      "title": "院校目录招生指标",
+      "entity": null,
+      "service": "service/SchoolAdmissionMetrics.java",
+      "note": "V14按详情和指标类型各一条，不自动扩充RAG或推荐对照；Java只读，维护工具写入。"
+    }
+  },
+  "sql_sha256": {
+    "V1__init.sql": "6873b97c43c5dcfa2afaf4c2b911e768cae12e315c6eb1af31cfc955b4c3c2ee",
+    "V2__seed.sql": "bf852c74c129c1e3c90e96cefd553bdbaa9e4fd3c5698fc3cf82a023c93cf43f",
+    "V3_user3_seed.sql": "e0a1d124d15b809cc5fc7a82227a4727d44f95eddd80ab0910c00a82fec2cb63",
+    "V4_network_seed.sql": "c2de7f03a47dabc7c7e3adc3b361c4cbbe698751613294c7634df0ffd83cacd6",
+    "V5_school_seed.sql": "4172bf7a8890a325865d493c4f6dac39f87d8c3cba66464950f7756d4da2f587",
+    "V6_school_detail_seed.sql": "c819090a668049b9ddec0f4c165e190abb7452acbcae085ca7fd50bb0152d57b",
+    "V7__practice_snapshot.sql": "ccd1bc1895ee72e6184ae6d7533579619235df76244c2a22c9bb050146384258",
+    "V8__task_soft_delete.sql": "1405915fdc16b5bdb16560275ae39046a322976a420bd4569b20b667a9343777",
+    "V9__question_source.sql": "1e49bfc42aa594c80a54983592b883378ed04f4c6a8d3823e8fbfc7b01fbed5b",
+    "V10__chat_conversation.sql": "81507a435147be33597473e2d8efbed108dc5dcc7a9d44897ec05feb94919752",
+    "V11__personal_document.sql": "c337d9006a4057bed6d62bcdec91f95267ca16b26c248008f671546fb70078d0",
+    "V12__assistant_privacy.sql": "22d780352555bec81b3257b21452cac41b8eff21c0cbedab5e811e747fa70502",
+    "V13__learning_loop.sql": "08c4f3365c0b6323d39735a1a915585abf57f2ddc01b6c21d6a090a545a72907",
+    "V14__school_admission_metrics.sql": "596e85784221eeab3cd1561b5205b61763cba4e9b4b1391d5fd4cce56bc9e1ea",
+    "V15__profile_degree_type.sql": "480746af70a9864ec1fe1d14438c1445d9286dccb683074a761a12daf9d4acb5"
+  }
+}
