@@ -1,7 +1,8 @@
 # T09 后端 API 接口索引（Java / Python）
 
 > 任务：Issue #26 · 负责人 S2（kwndl108）· 交付位置 `docs/coursework-02/evidence/T09_API接口索引.md`
-> 代码基线：`fzu-404-team/kaoyan-agent-platform` main @ `db1c040 (main, 2026-11-05)`
+> 设计基线：`94b8a9f`（任务约定的设计依据）；工作分支基于其后的 main `db1c040`（2026-11-05）。
+> 两者差异仅为后续合并，Java 端点数与路径已逐条复核与 `94b8a9f` 一致；行号取自 `db1c040` 工作树。
 > 生成方式：静态扫描源码注解（脚本口径见文末），**未展开 DTO 字段、不分析深层业务**。
 
 ## 0. 一页速览
@@ -90,7 +91,7 @@
 | 3 | GET | `/api/practice/sessions/{sessionId}/summary` | `summary` | @PathVariable String sessionId | `Result<Map<String, Object>>` | `PracticeService` | `PracticeController.java:65` |
 | 4 | POST | `/api/practice/sessions/{sessionId}/ai-summary` | `aiSummary` | @PathVariable String sessionId | `Result<TaskView>` | `TaskService` | `PracticeController.java:71` |
 | 5 | GET | `/api/practice/sessions` | `sessions` | — | `Result<List<String>>` | `PracticeService` | `PracticeController.java:83` |
-| 6 | GET | `/api/practice/sessions/page` | `sessionsPage` | @RequestParam(defaultValue = "1") int pageNum, @Req… | `Result<PageResult<SessionSummaryV…` | `PracticeService` | `PracticeController.java:89` |
+| 6 | GET | `/api/practice/sessions/page` | `sessionsPage` | int pageNum（默认 1）, int pageSize（默认 10） | `Result<PageResult<SessionSummaryVO>>` | `PracticeService` | `PracticeController.java:89` |
 | 7 | GET | `/api/practice/sessions/{sessionId}` | `detail` | @PathVariable String sessionId | `Result<List<PracticeRecordVO>>` | `PracticeService` | `PracticeController.java:100` |
 | 8 | GET | `/api/practice/sessions/{sessionId}/review` | `review` | @PathVariable String sessionId, @RequestParam(defau… | `Result<PageResult<ReviewRecordVO>>` | `PracticeService` | `PracticeController.java:106` |
 | 9 | DELETE | `/api/practice/sessions/{sessionId}` | `abandon` | @PathVariable String sessionId | `Result<Void>` | `PracticeService` | `PracticeController.java:118` |
@@ -101,7 +102,7 @@
 
 | # | 方法 | 路径 | Controller 方法 | 请求参数 | 返回类型 | 首个 Service | 源码位置 |
 |---|---|---|---|---|---|---|---|
-| 1 | GET | `/api/learning/status` | `status` | — | `Result<Map<String,Object>>` | `ManagedPracticeService` | `LearningController.java:21` |
+| 1 | GET | `/api/learning/status` | `status` | — | `Result<Map<String,Object>>` | 无业务 Service：`ObjectProvider.getIfAvailable` 状态探测（不调用业务方法） | `LearningController.java:21` |
 | 2 | POST | `/api/diagnostics/sessions` | `diagnose` | — | `Result<Map<String,Object>>` | `ManagedPracticeService` | `LearningController.java:22` |
 | 3 | GET | `/api/practice/sessions/{id}/state` | `state` | @PathVariable String id | `Result<State>` | `ManagedPracticeService` | `LearningController.java:23` |
 | 4 | PUT | `/api/practice/sessions/{id}/progress` | `progress` | @PathVariable String id,@Valid @RequestBody Progres… | `Result<State>` | `ManagedPracticeService` | `LearningController.java:24` |
@@ -182,7 +183,7 @@
 | # | 方法 | 路径 | Controller 方法 | 请求参数 | 返回类型 | 首个 Service | 源码位置 |
 |---|---|---|---|---|---|---|---|
 | 1 | POST | `/api/files/upload` | `upload` | @RequestParam("file") MultipartFile file, @RequestP… | `Result<Map<String, String>>` | `OssUtil` | `FileController.java:37` |
-| 2 | DELETE | `/api/files` | `delete` | @RequestParam("objectKey") String objectKey | `Result<Void>` | `OssUtil` | `FileController.java:51` |
+| 2 | DELETE | `/api/files` | `delete` | @RequestParam("objectKey") String objectKey | `Result<Void>` | `UserService`（随后 `OssUtil`） | `FileController.java:52`（`getById`@54，`OssUtil.delete`@56） |
 
 ### 1.12 `ExportController` · 数据导出（3 个）
 
@@ -293,13 +294,15 @@
 | `POST /api/questions/admin/{id}/versions` | 题目版本（管理员） | `LearningController.java:38` |
 | `POST /api/questions/admin/{id}/versions/{version}/withdraw` | 题目版本（管理员） | `LearningController.java:41` |
 
-> 注意：该类全部端点由 `ObjectProvider<...>` 条件装配，**迁移未启用时返回 503**（`诊断与学情功能尚未启用`），T05 画时序时要体现这个降级分支。
+> 注意：该类**除 `GET /api/learning/status` 外**的业务端点由 `ObjectProvider<...>` 条件装配，**功能未启用／条件服务不可用**时返回 503（`诊断与学情功能尚未启用，请先完成V13迁移并配置开关`）。
+> **例外**：`status` 不调用 `enabled()`，开关关闭时**仍返回 200**，body 中 `enabled=false`。T05 画时序时要把这两条分支区分开。
 
 ### 3.2 聊天流（Agent 会话）
 
 | 层级 | 端点 | 说明 | 源码 |
 |---|---|---|---|
-| Java | `GET /api/conversations/{id}/generations/{taskId}/stream` | 前端入口，转发到 Agent | `ConversationController.java:38` |
+| Java | `POST /api/conversations/{id}/messages` | **发起聊天**：落消息并启动生成，由此触发 Java 调用 Python | `ConversationController.java:32` |
+| Java | `GET /api/conversations/{id}/generations/{taskId}/stream` | **订阅/回放**：`subscribe` 只挂 SSE 并推送快照，**不发起也不重发** Python 请求 | `ConversationController.java:38` · `ConversationService.java:607-623` |
 | Python | `POST /internal/rag/chat` | 非流式：一次性返回 `ChatResponse` | `main.py:186` |
 | Python | `POST /internal/rag/conversation/stream` | **流式（SSE）**：逐条推送 stage / 增量文本 | `main.py:217` |
 
@@ -329,7 +332,7 @@
 - `DELETE /api/documents/admin/{id}` → `DocumentService` · `DocumentController.java:72`
 - `POST /api/documents/admin/{id}/review` → `DocumentService` · `DocumentController.java:82`
 - `POST /api/files/upload` → `OssUtil` · `FileController.java:37`
-- `DELETE /api/files` → `OssUtil` · `FileController.java:51`
+- `DELETE /api/files` → `UserService`（随后 `OssUtil`）· `FileController.java:52`（`getById` 在 :54）
 - `GET /api/personal-documents` → `PersonalDocumentService` · `PersonalDocumentController.java:15`
 - `GET /api/personal-documents/{id}` → `PersonalDocumentService` · `PersonalDocumentController.java:19`
 - `GET /api/personal-documents/{id}/versions` → `PersonalDocumentService` · `PersonalDocumentController.java:21`
@@ -351,7 +354,8 @@
 
 - 开始批次 → `POST /api/practice/sessions`（`PracticeController.java:40`）
 - 作答 → `POST /api/practice/sessions/{sessionId}/answer`（`PracticeController.java:51`）
-- 聊天流 → `GET /api/conversations/{id}/generations/{taskId}/stream`（Java，`ConversationController.java:38`）→ `POST /internal/rag/conversation/stream`（Python SSE）
+- 聊天发起 → `POST /api/conversations/{id}/messages`（`ConversationController.java:32`）→ 启动生成 → Java 调 `POST /internal/rag/conversation/stream`（Python SSE，`ConversationService.java:373`）
+- 聊天订阅 → `GET /api/conversations/{id}/generations/{taskId}/stream`（`ConversationController.java:38`）：只订阅/回放 Java 事件，**不触发 Python 调用**（`ConversationService.java:607-623`）
 
 **核对提示**：若发现本表缺项，请在下游 Issue 留言，我按 `文件:行` 补齐。
 
@@ -362,7 +366,7 @@
 | 要求覆盖 16 个 Controller | ✅ 16/16 |
 | 要求覆盖 Python 端点 | ✅ 7 个（`main.py` 全部 `@app` 路由） |
 | learning 链路 | ✅ 第 3.1 节，15 个端点 |
-| 聊天流 | ✅ 第 3.2 节，Java 入口 + Python 执行端 |
+| 聊天流 | ✅ 第 3.2 节，**发起**（`POST .../messages`）与**订阅**（`GET .../stream`）分开标注 + Python 执行端 |
 | 隐私 | ✅ 第 3.3 节，2 个端点 |
 | 文件 | ✅ 第 3.4 节，15 个端点（File / PersonalDocument / Document） |
 | 导出 | ✅ 第 3.5 节，3 个端点 |
@@ -375,3 +379,4 @@
 3. **首个 Service**：按方法体里第一个出现的注入字段判定，遇到 `ObjectProvider<T>` 时取 `T`；它只表示「第一跳」，不代表完整依赖图。
 4. **未覆盖**：DTO 字段明细、参数校验注解语义、Service 内部实现、拦截器/过滤器链——按任务要求不展开。
 5. **复现方式**：`tools/scan_api.py`（本地脚本，扫描 tar 快照后生成 `api-index.json` 再渲染本文件）；如需重跑，把仓库解压后改 `ROOT` 即可。
+6. **表格压缩口径**：请求参数列只保留「参数名 + 类型」（注解里的 `defaultValue` 等细节省略，参数多时以 `…` 收尾），**路径与返回类型一律完整不截断**；需要完整签名时按 `文件:行` 直接看源码。
