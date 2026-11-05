@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AdmissionLinksView: typeof import('./src/components/AdmissionLinksView.vue')['default']
+    AuthLayout: typeof import('./src/components/AuthLayout.vue')['default']
     ChartFrame: typeof import('./src/components/learning-profile/ChartFrame.vue')['default']
     ConversationListItem: typeof import('./src/components/ConversationListItem.vue')['default']
     DiagnosticEntry: typeof import('./src/components/DiagnosticEntry.vue')['default']
@@ -51,6 +52,7 @@ declare module 'vue' {
     LearningProfilePanel: typeof import('./src/components/LearningProfilePanel.vue')['default']
     LearningRecommendationPanel: typeof import('./src/components/LearningRecommendationPanel.vue')['default']
     MasteryHeatmap: typeof import('./src/components/learning-profile/MasteryHeatmap.vue')['default']
+    PixelField: typeof import('./src/components/PixelField.vue')['default']
     ProfileHistory: typeof import('./src/components/learning-profile/ProfileHistory.vue')['default']
     ProfileKpi: typeof import('./src/components/learning-profile/ProfileKpi.vue')['default']
     QuestionBatchImport: typeof import('./src/components/QuestionBatchImport.vue')['default']

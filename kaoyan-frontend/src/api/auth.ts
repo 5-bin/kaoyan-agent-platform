@@ -15,3 +15,6 @@ export const refresh = (refreshToken: string) =>
   request.post<unknown, LoginResult>('/auth/refresh', { refreshToken })
 
 export const logout = () => request.post('/auth/logout')
+
+export const getAuthConfig = () =>
+  request.get<unknown, { registrationEnabled: boolean }>('/auth/config')

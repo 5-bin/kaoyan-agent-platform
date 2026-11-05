@@ -86,3 +86,13 @@
 公网以正常TLS校验访问 `https://47.83.150.142/` 返回200，首页SHA256为 `6bb790935e9dd7bfcc2d0920dd4b39903636e53cd2de9c49dca706079de2852e`，与本地新版一致；首页引用的JS/CSS及新版个人档案JS逐字节哈希相符，未认证API探测为401。未使用证书校验豁免。公共探测报告 `.cache/deployment/v15-upgrade-public-verification-20261103.json`。
 
 本轮未重复运行此前已经通过且未再修改的业务三端验证（Python981项、Java230项中2项跳过、前端生产构建）；运维验证单独如上。登录后档案保存、真实模型、真实手机和业务全流程未运行；没有创建线上测试账号或复制本机模拟作答。旧程序目录、服务器凭证、公共资料与共享索引保留，不自动撤销已提交V15。
+
+## 暂停注册版本与测试账号发布
+
+2026-11-03，经用户明确授权，已从 `kaoyan-release-20261103-local-sync` 升级到 `/opt/kaoyan-releases/kaoyan-release-20261103-test-access`。升级结果为SUCCESS，V15只核验未重跑，未执行公共资料合并，原有列指纹保持，三项服务active；配置仅新增REGISTRATION_ENABLED=false，模型仍关闭。发布清单166项，SHA256为 `7c5d072a09928e70775125097e6fc5b4fcd32185a7355eadf66f8234b0194229`。
+
+切换前创建指定账号时由Nginx临时保护公网注册；新后端确认注册关闭后已撤除该临时块，实际后端及公网注册均返回403，正常登录保留。切换输出、配置原件及新备份为 `/root/kaoyan-test-access-activation-20261103`，备份SHA256为 `f4ea05ee6b0d9719f9f640a6620b70c283ac27ae8a2c5e22e2ee7b22758e6600`。本轮没有新建数据库结构或改动服务器密钥／模型额度。账号数据、公网浏览器、测试范围及恢复边界见[本轮记录](server-test-accounts-2026-11-03.md)。
+
+## OSS图片上传发布
+
+2026-11-03，已切换至 `/opt/kaoyan-releases/kaoyan-release-20261103-oss-upload`，真实OSS维护验收通过后解除维护。现有共享Bucket使用prod/目录隔离，注册／模型保持关闭，其余配置保持。无额外迁移及公共资料写入；完整备份、配置恢复、三条目增量JAR与公网头像验证详见[OSS发布记录](server-oss-verification-2026-11-03.md)。

@@ -44,6 +44,7 @@ oss:
   access-key-secret: ${kaoyan.alioss.access-key-secret:${OSS_ACCESS_KEY_SECRET:}}
   bucket-name: ${kaoyan.alioss.bucket-name:${OSS_BUCKET_NAME:}}
   url-prefix: ${OSS_URL_PREFIX:}
+  key-prefix: ${OSS_KEY_PREFIX:}
 
 logging:
   level:
@@ -68,6 +69,8 @@ knife4j:
     language: zh_cn
 
 kaoyan:
+  auth:
+    registration-enabled: ${REGISTRATION_ENABLED:true}
   agent:
     base-url: ${AGENT_BASE_URL:http://127.0.0.1:8001}
     internal-key: ${AGENT_INTERNAL_KEY:}
