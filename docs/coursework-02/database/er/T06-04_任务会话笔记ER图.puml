@@ -1,0 +1,138 @@
+@startuml T06-04_任务会话笔记ER图
+' 图源：docs/coursework-02/database/er/T06-04_任务会话笔记ER图.puml
+' 范围：D6 Agent 任务与会话（5 张表）、D7 个人笔记（2 张表）、assistant_privacy；user 仅作关联端
+' 依据：V1__init.sql、V8、V10、V11、V12；ConversationService、PersonalDocumentService、AssistantLearningService
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng -o export 本文件；SVG 将 -tpng 换成 -tsvg 再执行一次
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+skinparam linetype ortho
+hide circle
+hide empty members
+skinparam class {
+  BackgroundColor #F7FAFD
+  BorderColor #3C5A80
+  ArrowColor #3C5A80
+}
+
+entity "user" as user {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  target_school / target_major / exam_year / degree_type …
+}
+
+entity "assistant_privacy\n助手外发授权" as assistant_privacy {
+  * user_id : BIGINT <<PK,LFK>>
+  --
+  * model_allowed : BOOLEAN
+  * scopes_json : LONGTEXT
+  * provider : VARCHAR(500)
+  * version : INT
+  consented_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "task\nAgent 任务" as task {
+  * id : VARCHAR(36) <<PK>>
+  --
+  * user_id : BIGINT UNSIGNED <<LFK>>
+  * task_type : VARCHAR(50)
+  * status : VARCHAR(20)
+  input_payload : JSON
+  result_payload : JSON
+  release_id : VARCHAR(64)
+  error_message : TEXT
+  created_at / updated_at
+  deleted_at : DATETIME
+}
+
+entity "chat_conversation\n会话" as chat_conversation {
+  * id : VARCHAR(36) <<PK>>
+  --
+  * user_id : BIGINT <<LFK>>
+  * title : VARCHAR(100)
+  * conditions_json : LONGTEXT
+  * profile_json : LONGTEXT
+  * next_sequence : INT
+  created_at / updated_at : TIMESTAMP
+}
+
+entity "chat_message\n用户消息" as chat_message {
+  * id : VARCHAR(36) <<PK>>
+  --
+  * conversation_id : VARCHAR(36) <<UK1,LFK>>
+  * user_id : BIGINT <<LFK>>
+  * sequence_no : INT <<UK1>>
+  * content : TEXT
+  document_id : VARCHAR(36) <<LFK>>
+  * created_at : TIMESTAMP
+}
+
+entity "chat_generation\n生成尝试" as chat_generation {
+  * task_id : VARCHAR(36) <<PK,LFK>>
+  --
+  * conversation_id : VARCHAR(36) <<UK1,LFK>>
+  * message_id : VARCHAR(36) <<UK3,LFK>>
+  * user_id : BIGINT <<LFK>>
+  * attempt_no : INT <<UK3>>
+  * client_request_id : VARCHAR(64) <<UK1>>
+  * request_hash : VARCHAR(64)
+  * status : VARCHAR(20)
+  active_conversation_id : VARCHAR(36) <<UK2>>
+  * context_json / draft_json : LONGTEXT
+  result_json : LONGTEXT
+  * version : BIGINT
+  stage : VARCHAR(100)
+  error_message : VARCHAR(255)
+  created_at / updated_at : TIMESTAMP
+}
+
+entity "assistant_action\n待确认操作" as assistant_action {
+  * id : VARCHAR(36) <<PK>>
+  --
+  * user_id : BIGINT <<LFK>>
+  * conversation_id : VARCHAR(36) <<LFK>>
+  * task_id : VARCHAR(36) <<UK,LFK>>
+  * operation : VARCHAR(32)
+  * status : VARCHAR(20)
+  * payload_json / result_json : LONGTEXT
+  created_at / updated_at : TIMESTAMP
+}
+
+entity "personal_document\n个人笔记当前版" as personal_document {
+  * id : VARCHAR(36) <<PK>>
+  --
+  * user_id : BIGINT <<LFK>>
+  * title : VARCHAR(100)
+  * content : LONGTEXT
+  * version : INT
+  created_at / updated_at : TIMESTAMP
+}
+
+entity "personal_document_version\n笔记不可变版本" as personal_document_version {
+  * document_id : VARCHAR(36) <<PK,LFK>>
+  * version : INT <<PK>>
+  --
+  * user_id : BIGINT <<LFK>>
+  * title : VARCHAR(100)
+  * content : LONGTEXT
+  source_task_id : VARCHAR(36) <<UK,LFK>>
+  * created_at : TIMESTAMP
+}
+
+user ||..o| assistant_privacy
+user ||..o{ task
+user ||..o{ chat_conversation
+chat_conversation ||..o{ chat_message
+chat_message ||..|{ chat_generation : 每条消息 1..n 次尝试
+chat_conversation ||..o{ chat_generation
+chat_conversation |o..o| chat_generation : active_conversation_id（同时至多 1 个 RUNNING）
+task ||..o| chat_generation : task_id 共享主键
+chat_conversation ||..o{ assistant_action
+task ||..o| assistant_action : 每任务至多 1 项操作
+user ||..o{ personal_document
+personal_document ||..|{ personal_document_version
+personal_document |o..o{ chat_message : 引用笔记
+task |o..o| personal_document_version : 确认 Agent 建议生成的版本
+@enduml

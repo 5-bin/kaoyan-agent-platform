@@ -1,0 +1,142 @@
+@startuml T06-01_题库练习ER图
+' 图源：docs/coursework-02/database/er/T06-01_题库练习ER图.puml
+' 范围：D2 题库与版本、D3 练习与作答（8 张表），user 仅作关联端
+' 依据：V1__init.sql、V7__practice_snapshot.sql、V9__question_source.sql、V13__learning_loop.sql
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng -o export 本文件；SVG 将 -tpng 换成 -tsvg 再执行一次
+' 图例：<<PK>> 主键，<<UK>> 唯一键，<<LFK>> 逻辑外键（无约束）；虚线 = 逻辑关联
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+skinparam linetype ortho
+hide circle
+hide empty members
+skinparam class {
+  BackgroundColor #F7FAFD
+  BorderColor #3C5A80
+  ArrowColor #3C5A80
+}
+
+entity "user" as user {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  username / role / status …
+}
+
+entity "question\n题库当前版" as question {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  * subject : VARCHAR(20)
+  knowledge_point : VARCHAR(255)
+  * content : TEXT
+  option_a…option_d : TEXT
+  * answer : VARCHAR(10)
+  analysis : TEXT
+  * difficulty : VARCHAR(10)
+  * question_type : VARCHAR(20)
+  * version : INT
+  * active : TINYINT
+  * stable_order : INT
+  * review_status : VARCHAR(20)
+  reviewer_user_id : BIGINT UNSIGNED <<LFK>>
+  reviewed_at / review_comment
+  source_type / source_name / source_locator
+  source_year / source_question_no / permission_note
+  created_at / updated_at
+}
+
+entity "question_version\n题目不可变版本" as question_version {
+  * question_id : BIGINT <<PK,LFK>>
+  * version : INT <<PK>>
+  --
+  * snapshot_json : JSON
+  * withdrawn : INT
+  withdrawal_reason : VARCHAR(2000)
+  * created_at : DATETIME
+}
+
+entity "practice_session\n受管练习批次" as practice_session {
+  * id : VARCHAR(64) <<PK>>
+  --
+  * user_id : BIGINT <<LFK>>
+  * kind : VARCHAR(20)
+  * state : VARCHAR(20)
+  * revision : INT
+  * current_index : INT
+  * blueprint_json : JSON
+  * created_at : DATETIME
+  finished_at : DATETIME
+}
+
+entity "practice_record\n作答记录" as practice_record {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  * user_id : BIGINT UNSIGNED <<LFK>>
+  * session_id : VARCHAR(36) <<UK1>>
+  * question_id : BIGINT UNSIGNED <<UK1,LFK>>
+  * order_index : INT
+  user_answer : VARCHAR(10)
+  is_correct : TINYINT
+  * grading_status : VARCHAR(20)
+  answered_at : DATETIME
+  question_snapshot : JSON
+  * created_at : DATETIME
+}
+
+entity "practice_session_item\n批次项目扩展" as practice_session_item {
+  * record_id : BIGINT <<PK,LFK>>
+  --
+  * session_id : VARCHAR(64) <<LFK>>
+  * hint_level : INT
+  draft_answer : VARCHAR(10)
+  submitted_at : DATETIME
+}
+
+entity "practice_request\n提交幂等记录" as practice_request {
+  * user_id : BIGINT <<PK,LFK>>
+  * request_id : VARCHAR(64) <<PK>>
+  --
+  * fingerprint : VARCHAR(64)
+  * response_json : JSON
+  * created_at : DATETIME
+}
+
+entity "user_question_mark\n错题与收藏" as user_question_mark {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  * user_id : BIGINT UNSIGNED <<UK1,LFK>>
+  * question_id : BIGINT UNSIGNED <<UK1,LFK>>
+  * is_favorite / is_wrong : TINYINT
+  * wrong_count : INT
+  last_wrong_at : DATETIME
+  created_at / updated_at
+}
+
+entity "study_stat\n旧每日汇总" as study_stat {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  * user_id : BIGINT UNSIGNED <<UK1,LFK>>
+  * stat_date : DATE <<UK1>>
+  * question_count / correct_count : INT
+  * study_minutes : INT
+  created_at / updated_at
+}
+
+user |o..o{ question : 审核人
+question ||..o{ question_version : 发布或撤回时归档
+user ||..o{ practice_session
+user ||..o{ practice_record
+question ||..o{ practice_record
+practice_session ||..o{ practice_session_item
+practice_record ||..o| practice_session_item : 受管批次才有扩展行
+question_version ..> practice_record : snapshot 按值复制到 question_snapshot
+user ||..o{ practice_request
+user ||..o{ user_question_mark
+question ||..o{ user_question_mark
+user ||..o{ study_stat
+
+note bottom of practice_record
+  session_id 是批次标识：受管批次以 "L-" 开头并对应 practice_session.id；
+  未启用学练闭环时为普通 UUID，没有 practice_session 行。
+end note
+@enduml

@@ -1,0 +1,127 @@
+@startuml T06-02_学情推荐ER图
+' 图源：docs/coursework-02/database/er/T06-02_学情推荐ER图.puml
+' 范围：D4 学情与自动推荐（6 张表），user、task、practice_record 仅作关联端
+' 依据：V13__learning_loop.sql；LearningProfiles、LearningWorker、LearningRecommendations
+' 渲染：java -jar plantuml.jar -charset UTF-8 -tpng -o export 本文件；SVG 将 -tpng 换成 -tsvg 再执行一次
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+skinparam linetype ortho
+hide circle
+hide empty members
+skinparam class {
+  BackgroundColor #F7FAFD
+  BorderColor #3C5A80
+  ArrowColor #3C5A80
+}
+
+entity "user" as user {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  target_school / target_major / exam_year …
+}
+
+entity "task" as task {
+  * id : VARCHAR(36) <<PK>>
+  --
+  task_type = SCHOOL_RECOMMEND …
+}
+
+entity "practice_record" as practice_record {
+  * id : BIGINT UNSIGNED <<PK>>
+  --
+  grading_status / is_correct …
+}
+
+entity "learning_blueprint\n诊断蓝图（只增不改）" as learning_blueprint {
+  * id : VARCHAR(64) <<PK>>
+  --
+  * version : INT
+  * config_json : JSON
+  * reviewer_id : BIGINT <<LFK>>
+  * created_at : DATETIME(6)
+}
+
+entity "learning_profile\n当前学情画像" as learning_profile {
+  * user_id : BIGINT <<PK,LFK>>
+  --
+  * revision : INT
+  * data_json : JSON
+  * updated_at : DATETIME
+}
+
+entity "learning_profile_history\n学情历史版本" as learning_profile_history {
+  * user_id : BIGINT <<PK,LFK>>
+  * revision : INT <<PK>>
+  --
+  * data_json : JSON
+  * created_at : DATETIME
+}
+
+entity "learning_event\n学情重算事件" as learning_event {
+  * id : VARCHAR(64) <<PK>>
+  --
+  * user_id : BIGINT <<LFK>>
+  * event_key : VARCHAR(150) <<UK>>
+  * state : VARCHAR(20)
+  * attempts : INT
+  * next_at : DATETIME
+  lease_until : DATETIME
+  * created_at : DATETIME
+}
+
+entity "learning_recommendation_settings\n自动推荐设置与游标" as settings {
+  * user_id : BIGINT <<PK,LFK>>
+  --
+  * revision : INT
+  * enabled : INT
+  * preferences_json : JSON
+  pending_reason : VARCHAR(40)
+  not_before : DATETIME
+  last_task_id : VARCHAR(64) <<LFK>>
+  last_profile_revision : INT
+  last_score : DOUBLE
+  * last_sufficient : INT
+  last_completed_at : DATETIME
+  last_release_id : VARCHAR(64)
+  last_profile_hash : VARCHAR(64)
+  run_token : VARCHAR(64)
+  run_until : DATETIME
+  pending_task_id : VARCHAR(64) <<LFK>>
+  * attempts : INT
+}
+
+entity "school_historical_metric\n历史408单科线" as school_historical_metric {
+  * id : VARCHAR(64) <<PK>>
+  --
+  * program_id : VARCHAR(100)
+  * school / college : VARCHAR(255)
+  * major_code : VARCHAR(6)
+  * metric_year : INT
+  * metric_type : VARCHAR(40)
+  exam_subject : VARCHAR(3)
+  * max_score : INT
+  * score : DOUBLE
+  * source_json : JSON
+  * reviewer_id : BIGINT <<LFK>>
+  * created_at : DATETIME
+}
+
+user ||..o| learning_profile : 首次进入学练闭环时创建
+user ||..o{ learning_profile_history
+learning_profile ||..o{ learning_profile_history : revision 递增时追加
+user ||..o{ learning_event
+practice_record ..> learning_event : 判分／撤回产生 event_key
+user ||..o| settings
+settings }o..o| task : last_task_id / pending_task_id
+user |o..o{ learning_blueprint : 审核人
+user |o..o{ school_historical_metric : 审核人
+learning_blueprint ..> learning_profile : 最新蓝图参与重算
+
+note right of school_historical_metric
+  program_id／school／college／major_code 对应
+  Python 资料副本中的推荐候选，不关联 school_detail；
+  与 V14 school_admission_metric 是两套口径。
+end note
+@enduml
