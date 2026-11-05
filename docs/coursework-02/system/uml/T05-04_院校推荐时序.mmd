@@ -1,0 +1,55 @@
+sequenceDiagram
+    actor U as 学生
+    participant UI as SchoolList.vue
+    participant RC as RecommendController
+    participant TS as TaskServiceImpl
+    participant ST as TaskStore
+    participant DB as MySQL
+    participant AF as AgentFeignClient
+    participant PY as FastAPI main.py
+    participant WF as Workflows
+    participant SA as SchoolAgent
+    participant TR as StrictToolRegistry
+    participant C as 版本化招生语料
+    participant M as 模型供应商
+    participant G as grounding
+
+    U->>UI: 推荐2027年081200学硕院校
+    UI->>RC: POST /api/recommends/generate
+    RC->>TS: submit(SCHOOL_RECOMMEND)
+    TS->>DB: 读取档案；组装 profile/preferences/messages/learningSnapshot
+    TS->>ST: begin(task) 配额检查
+    TS->>AF: chat(internalKey, AgentRequest)
+    AF->>PY: POST /internal/rag/chat
+    PY->>WF: run(req)（42s）
+    WF->>SA: schools(req)
+    SA->>SA: resolve_degree：本轮 → 档案 → 目录唯一推断
+    alt 缺年份/专业/学位
+        SA-->>WF: NEEDS_INPUT + followUp
+        WF-->>PY: ChatResponse
+        PY-->>AF: ChatResponse
+        AF-->>TS: ChatResponse
+        TS-->>UI: TaskView
+    else 条件齐全
+        SA->>TR: filter_programs(profile, preferences)
+        TR->>C: 使用启动时加载的版本化副本
+        TR-->>SA: accepted + excluded（硬条件原因）
+        SA->>TR: rank_programs(rows)
+        TR-->>SA: 按地区匹配、更新时间、programId 排序，最多5项
+        opt explainWithAi 且模型可用且已授权 profile
+            SA->>M: Explanations（候选+来源）
+            M-->>SA: 每候选解释与 sourceIds
+            SA->>SA: 候选集合必须完全一致；sourceIds 必须属于候选来源
+            SA->>G: verify(解释, sourceIds, 来源原文)
+            G-->>SA: SUPPORTED/PARTIAL/UNSUPPORTED
+            SA->>SA: 仅采纳 SUPPORTED/PARTIAL；否则回退规则说明
+        end
+        SA-->>WF: candidates/references/citationSupport/explanationMode
+        WF-->>PY: ChatResponse
+        PY-->>AF: ChatResponse
+        AF-->>TS: ChatResponse
+        TS->>TS: validateResponse + sourcePolicy
+        TS->>DB: 保存 task 结果；可选 LearningRecommendations.enrich
+        TS-->>UI: TaskView
+    end
+    UI-->>U: 候选、排除原因、来源、AI/规则说明

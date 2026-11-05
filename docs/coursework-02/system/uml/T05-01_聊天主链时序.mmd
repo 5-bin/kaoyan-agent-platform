@@ -1,0 +1,56 @@
+sequenceDiagram
+    actor U as 学生
+    participant UI as ChatAssistant.vue
+    participant API as ConversationController
+    participant CS as ConversationService
+    participant DB as MySQL
+    participant TS as TaskStore
+    participant LS as AssistantLearningService
+    participant PY as FastAPI main.py
+    participant CO as ConversationCoordinator
+    participant EX as 领域专家/工具
+    participant M as 模型供应商
+
+    U->>UI: 输入问题、页面上下文、可选笔记
+    UI->>API: POST /api/conversations/{id}/messages
+    API->>CS: send(owner, id, Send)
+    CS->>DB: 短事务：锁账号与会话、幂等检查、写 chat_message
+    CS->>TS: begin(CHAT 任务)，检查日/分钟配额
+    TS->>DB: INSERT task(RUNNING)
+    CS->>DB: 保存 context（最近3轮历史引用、档案、条件、隐私）
+    CS-->>UI: taskId, messageId
+    UI->>API: GET /generations/{taskId}/stream
+    API->>CS: subscribe(owner, id, taskId)
+    CS-->>UI: SSE snapshot
+    CS->>PY: POST /internal/rag/conversation/plan（22s）
+    PY->>CO: ConversationWorkflow.plan()
+    CO->>CO: PlanResolver：本地规则/一次模型解析，校验计划
+    CO-->>PY: ConversationResolution + modelCallsUsed
+    PY-->>CS: 计划 JSON
+    CS->>CS: validatePlan / validatePlanConsistency
+    alt 本地院校目录查询 SCHOOL_LOOKUP
+        CS->>CS: SchoolCatalogService.answer()
+        CS->>DB: 保存 SUCCESS 结果
+        CS-->>UI: SSE completed
+    else 需要 Python 执行
+        CS->>LS: read(owner, plan, pageContext)
+        LS-->>CS: 授权业务快照（错题/收藏/学情/练习/文档/题目）
+        CS->>DB: 保存 preparedPlan 与 learningContext
+        CS->>PY: POST /internal/rag/conversation/stream（47s）
+        PY->>PY: 设置总预算4、检索3、招生1；发送 stage
+        PY->>CO: ConversationWorkflow.run()
+        CO->>CO: handle → validate_plan → 单专家或协作调度
+        CO->>EX: 执行必要专家
+        EX->>EX: 检索/筛选/排序/可选模型生成
+        EX->>M: 模型请求（启用且授权时）
+        M-->>EX: 结构化输出
+        EX->>EX: 结构、来源、引用支持度校验
+        EX-->>CO: 专家结果
+        CO-->>PY: 合并结果、references、sections
+        PY-->>CS: SSE stage/delta/result
+        CS->>CS: AgentResponse / 来源域名 / 条件 / 分项 / 建议校验
+        CS->>DB: 事务：更新 task 与 chat_generation，保存正式结果
+        CS->>DB: learning.finalizeActions() 生成待确认动作
+        CS-->>UI: SSE completed / failed / cancelled
+    end
+    UI-->>U: 展示回答、来源、待确认操作

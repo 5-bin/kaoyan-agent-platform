@@ -1,0 +1,41 @@
+flowchart LR
+    Student(("学生"))
+    UI["ChatAssistant.vue"]
+    API["ConversationController"]
+    CS["ConversationService"]
+    DB[("MySQL")]
+    TS["TaskStore"]
+    LS["AssistantLearningService"]
+    PY["FastAPI main.py"]
+    CO["ConversationCoordinator"]
+    EX["领域专家"]
+    TL["白名单工具"]
+    CT[("版本化语料 / Qdrant")]
+    M["模型供应商"]
+
+    Student -->|"1: 提交问题"| UI
+    UI -->|"2: POST 消息"| API
+    API -->|"3: send()"| CS
+    CS -->|"4: 短事务校验并写消息"| DB
+    CS -->|"5: begin(task)"| TS
+    CS -->|"6: 返回 taskId/messageId"| UI
+    UI -->|"7: 订阅 SSE"| CS
+    CS -->|"8: plan(wireContext)"| PY
+    PY -->|"9: ConversationWorkflow.plan"| CO
+    CO -->|"10: 规则/模型解析并校验 DAG"| CO
+    CO -->|"11: 返回计划"| PY
+    PY -->|"12: ConversationResolution"| CS
+    CS -->|"13: read(owner, plan, page)"| LS
+    LS -->|"14: 授权业务快照"| CS
+    CS -->|"15: stream(preparedPlan)"| PY
+    PY -->|"16: ConversationWorkflow.run"| CO
+    CO -->|"17: 执行必要专家"| EX
+    EX -->|"18: 检索/筛选/排序"| TL
+    TL -->|"19: 读取只读证据"| CT
+    EX -->|"20: 可选模型生成"| M
+    EX -->|"21: 专家结果"| CO
+    CO -->|"22: 合并 sections/references"| PY
+    PY -->|"23: SSE stage/delta/result"| CS
+    CS -->|"24: 校验并保存正式结果"| DB
+    CS -->|"25: SSE completed"| UI
+    UI -->|"26: 展示回答/来源/操作"| Student

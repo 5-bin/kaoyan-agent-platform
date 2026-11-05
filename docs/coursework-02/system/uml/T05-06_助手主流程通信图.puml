@@ -1,0 +1,70 @@
+@startuml T05_06_assistant_communication
+' T05 助手主流程通信图（对象—编号消息）
+' 编号与 docs/coursework-02/system/T05_Agent与调用设计.md §8.2 一致。
+' 消息 2、3、6、7、25 实际经 ConversationController 转发，图中合并为相邻消息。
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam object {
+  BackgroundColor #F8FAFC
+  BorderColor #475569
+}
+skinparam database {
+  BackgroundColor #EEF2FF
+  BorderColor #475569
+}
+
+actor "学生" as Student
+object "ChatAssistant.vue" as UI
+object "ConversationController" as API
+object "ConversationService" as CS
+database "MySQL" as DB
+object "TaskStore" as TS
+object "AssistantLearningService" as LS
+object "FastAPI main.py" as PY
+object "ConversationCoordinator" as CO
+object "领域专家" as EX
+object "白名单工具" as TL
+database "版本化语料 / Qdrant" as CT
+object "模型供应商" as M
+
+Student -- UI
+UI -- API
+API -- CS
+CS -- DB
+CS -- TS
+CS -- LS
+CS -- PY
+PY -- CO
+CO -- EX
+EX -- TL
+TL -- CT
+EX -- M
+
+Student -> UI : 1: 提交问题
+UI -> API : 2: POST 消息
+API -> CS : 3: send()
+CS -> DB : 4: 短事务校验并写消息
+CS -> TS : 5: begin(task)
+CS -> UI : 6: 返回 taskId/messageId
+UI -> CS : 7: 订阅 SSE
+CS -> PY : 8: plan(wireContext)
+PY -> CO : 9: ConversationWorkflow.plan
+CO -> CO : 10: 规则/模型解析并校验 DAG
+CO -> PY : 11: 返回计划
+PY -> CS : 12: ConversationResolution
+CS -> LS : 13: read(owner, plan, page)
+LS -> CS : 14: 授权业务快照
+CS -> PY : 15: stream(preparedPlan)
+PY -> CO : 16: ConversationWorkflow.run
+CO -> EX : 17: 执行必要专家
+EX -> TL : 18: 检索/筛选/排序
+TL -> CT : 19: 读取只读证据
+EX -> M : 20: 可选模型生成
+EX -> CO : 21: 专家结果
+CO -> PY : 22: 合并 sections/references
+PY -> CS : 23: SSE stage/delta/result
+CS -> DB : 24: 校验并保存正式结果
+CS -> UI : 25: SSE completed
+UI -> Student : 26: 展示回答/来源/操作
+
+@enduml
