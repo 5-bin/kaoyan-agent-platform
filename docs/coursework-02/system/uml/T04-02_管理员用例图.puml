@@ -1,0 +1,78 @@
+@startuml T04-02 管理员用例图
+' 图源：docs/coursework-02/system/uml/T04-02_管理员用例图.puml
+' 渲染：需 Graphviz(dot)，或用 PlantUML 在线服务器；已导出 PNG/SVG 至 export/。
+' 说明：管理员同时拥有学生前台的全部用例（见 T04-01），本图只画管理端新增部分。
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 180
+skinparam nodesep 35
+skinparam ranksep 45
+skinparam usecase {
+  BackgroundColor #FBF7F2
+  BorderColor #8A5A2B
+  FontSize 13
+}
+skinparam rectangle {
+  BorderColor #8A5A2B
+  BackgroundColor #FFFFFF
+}
+skinparam package {
+  BorderColor #C2A184
+  BackgroundColor #FEFCFA
+}
+
+actor "管理员" as A
+
+rectangle "考研 Agent 平台（管理端）" {
+  package "后台账号" {
+    usecase "登录（管理员）" as AC01
+    usecase "退出登录" as AC02
+  }
+  package "题目管理" {
+    usecase "新增题目" as AQ00
+    usecase "录入单选题" as AQ01
+    usecase "批量导入题目" as AQ02
+    usecase "预览导入校验结果" as AQ03
+    usecase "查看待审题目" as AQ04
+    usecase "审核题目" as AQ05
+    usecase "驳回并填写原因" as AQ06
+    usecase "上架／下架题目" as AQ07
+    usecase "修订并发布题目版本" as AQ08
+    usecase "撤回题目版本" as AQ09
+    usecase "重算错题与统计" as AQ11
+  }
+  package "资料管理" {
+    usecase "查看资料列表" as AD01
+    usecase "新建／编辑资料" as AD02
+    usecase "审核资料" as AD03
+  }
+  package "学情与院校基础数据" {
+    usecase "发布诊断蓝图" as AL01
+    usecase "录入院校历史指标" as AL02
+    usecase "维护院校与专业\n（未实现）" as AL03
+  }
+}
+
+A --> AC01
+A --> AC02
+A --> AQ01
+A --> AQ02
+A --> AQ04
+A --> AQ05
+A --> AQ07
+A --> AQ08
+A --> AQ09
+A --> AD01
+A --> AD02
+A --> AD03
+A --> AL01
+A --> AL02
+
+AQ01 --|> AQ00
+AQ02 --|> AQ00
+AQ02 ..> AQ03 : <<include>>
+AQ06 .> AQ05 : <<extend>>
+AQ08 ..> AQ05 : <<include>>
+AQ09 ..> AQ11 : <<include>>
+@enduml
