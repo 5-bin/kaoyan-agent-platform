@@ -1,0 +1,35 @@
+sequenceDiagram
+    actor U as 学生
+    participant UI as ChatAssistant.vue
+    participant CS as ConversationService
+    participant DB as MySQL
+    participant PY as FastAPI main.py
+    participant CO as ConversationCoordinator
+    participant EX as 专家
+    participant M as 模型供应商
+
+    alt 用户点击停止
+        U->>UI: 停止生成
+        UI->>CS: POST /generations/{taskId}/cancel
+        CS->>CS: terminate(live, CANCELLED)
+        CS->>DB: 事务：仅当 RUNNING 时更新终态
+        alt 竞争失败（已终态）
+            CS-->>UI: 返回已有快照
+        else 竞争成功
+            CS->>PY: 关闭上游 HTTP 响应流
+            PY->>CO: 生成器 finally 取消 worker
+            CO->>EX: CancelledError 向上传播
+            EX->>EX: finally clear_history()
+            EX->>M: 关闭异步流上下文
+            CS-->>UI: SSE cancelled
+        end
+    else 48秒计时器
+        CS->>CS: terminate(live, FAILED, "生成超时")
+        CS->>PY: 关闭上游流并中断 worker
+        CS-->>UI: SSE failed
+    else 授权变化
+        CS->>DB: 心跳/写结果前再次校验隐私与登录
+        CS->>CS: terminate(live, CANCELLED, "登录或授权已变化")
+        CS-->>UI: SSE cancelled
+    end
+    Note over PY,EX: 模型/工具故障在专家内降级为 rules/fallback；<br/>未知异常导致 Python error → Java FAILED

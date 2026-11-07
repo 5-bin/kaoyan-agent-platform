@@ -76,7 +76,9 @@ async def test_startup_failure_is_isolated_and_reaps_child(kind: Kind, mode: str
     events = tmp_path / "events"
     client = make_client(kind, events, mode)
     if mode == "startup-timeout":
-        client.startup_timeout = .7
+        # Give the real child time to import and write its pid before the deadline;
+        # 0.7s is too tight on CI and made assert_reaped race the child.
+        client.startup_timeout = 5
     async with client.connect(isolate_failure=True):
         assert client.status.snapshot() == {"enabled": True, "state": "UNAVAILABLE", "errorCode": code.value}
         with pytest.raises(McpCallError) as caught:

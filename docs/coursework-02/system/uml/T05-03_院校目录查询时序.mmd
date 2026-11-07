@@ -1,0 +1,30 @@
+sequenceDiagram
+    actor U as 学生
+    participant UI as ChatAssistant.vue
+    participant CS as ConversationService
+    participant SCS as SchoolCatalogService
+    participant ALV as AdmissionLinksValidator
+    participant SS as SchoolService
+    participant DB as MySQL
+
+    Note over UI,CS: 本图聚焦 Java 目录查询；发送与订阅路径见 §3
+    U->>UI: “查询北京大学2027年081200招生信息”
+    UI->>CS: 发送消息（见聊天主链 §3）
+    CS->>SCS: plan(query)（在调用 Python 之前）
+    SCS->>ALV: requested()/explicitSchoolNames()/compound()
+    alt 缺院校、多个院校或条件冲突
+        SCS-->>CS: SCHOOL_LOOKUP + clarification
+    else 单一院校且条件可解析
+        SCS-->>CS: SCHOOL_LOOKUP + schoolLookup{schoolName,year,majorCode}
+    end
+    CS->>CS: validatePlan/validatePlanConsistency（按当前原文重建并比对）
+    CS->>SCS: answer(plan, profile, conditions)
+    SCS->>ALV: linksForName(schoolName)
+    SCS->>SS: 按名称查询院校 + detail(schoolId)
+    SS->>DB: SELECT school, school_detail
+    DB-->>SS: 公开目录行
+    SCS->>SCS: 年份选择（显式 → 档案 → 最新）；按专业过滤；稳定排序；最多10条
+    SCS-->>CS: result（rules, school-catalog-v1, schoolCatalog）
+    CS->>DB: 保存 SUCCESS（不调用 Python stream/模型）
+    CS-->>UI: SSE completed
+    UI-->>U: 展示库内记录、年份、待核实提示、登记官网链接

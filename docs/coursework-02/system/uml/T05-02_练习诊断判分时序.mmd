@@ -1,0 +1,64 @@
+sequenceDiagram
+    actor U as 学生
+    participant UI as ManagedPracticeSession.vue
+    participant LC as LearningController
+    participant PC as PracticeController
+    participant MP as ManagedPracticeService
+    participant LP as LearningProfiles
+    participant QS as QuestionService/QuestionMapper
+    participant UM as UserQuestionMarkService
+    participant DB as MySQL
+
+    rect rgb(245,248,255)
+    Note over U,DB: 阶段A：诊断抽题与建卷
+    U->>UI: 开始诊断
+    UI->>LC: POST /api/diagnostics/sessions
+    LC->>MP: diagnose(owner)
+    MP->>LP: cells() 读取诊断蓝图
+    alt 蓝图为空
+        MP->>MP: 回退20题（四科×易2/中2/难1）
+    end
+    loop 每个蓝图单元
+        MP->>QS: pick(subject, knowledgePoint, difficulty, count)
+        QS-->>MP: 已审核单选题目池（active=1, APPROVED）
+        MP->>MP: 排除已选与已撤回版本，稳定顺序后洗牌，取 count
+    end
+    MP->>DB: INSERT practice_record（grading_status=valid）
+    MP->>QS: selectForUpdate(questionId) 校验版本未变化
+    MP->>DB: 读取/写入 question_version 不可变快照
+    MP->>DB: INSERT practice_session(RUNNING)、practice_session_item
+    MP-->>LC: sessionId, actualCount, missing, blueprintVersion
+    LC-->>UI: 诊断批次信息
+    UI->>LC: GET /api/practice/sessions/{id}/state
+    LC->>MP: state(owner, id)
+    MP-->>LC: State（运行中隐藏答案/解析/对错）
+    LC-->>UI: State
+    end
+
+    rect rgb(245,255,245)
+    Note over U,DB: 阶段B：提交与确定性判分
+    U->>UI: 选择 A-D 并提交
+    UI->>PC: POST /api/practice/sessions/{id}/answer
+    PC->>MP: manages() 为真 → submit(...)
+    MP->>LP: lock(owner) 账号行锁
+    MP->>DB: SELECT practice_session FOR UPDATE
+    MP->>DB: 查询 practice_request（requestId 幂等）
+    alt 重复请求且指纹一致
+        MP-->>PC: 已保存的 Submission
+        PC-->>UI: 返回已保存结果
+    else 新请求
+        MP->>DB: 读取 record/item，校验 RUNNING/未提交/未撤回/快照完整
+        MP->>MP: 写入 userAnswer；非诊断模式调用 grade()
+        MP->>MP: 比较快照标准答案，设置 isCorrect
+        opt 答错
+            MP->>UM: markWrong(owner, questionId)
+        end
+        MP->>LP: event("answer:"+recordId)
+        MP->>DB: 更新 record、item.submitted_at、revision，写 practice_request
+        alt 无待提交项
+            MP->>MP: finish()：补判已作答项，状态 FINISHED
+        end
+        MP-->>PC: Submission（isCorrect/标准答案/解析）
+        PC-->>UI: Result
+    end
+    end
