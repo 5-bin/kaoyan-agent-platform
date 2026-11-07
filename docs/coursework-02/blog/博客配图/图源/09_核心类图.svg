@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1380" height="850" viewBox="0 0 1380 850">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#526985"/></marker></defs>
+<rect width="1380" height="850" fill="#ffffff"/>
+<style>text{font-family:"Microsoft YaHei","Segoe UI",sans-serif;fill:#20344c} .small{font-size:18px} .label{font-size:20px}</style>
+<text x="42" y="48" font-size="30" font-weight="700" text-anchor="start">核心类图：会话服务与智能体编排</text>
+<text x="42" y="82" font-size="18" font-weight="400" text-anchor="start">按 T03 / T05 选取核心类；省略参数、字段与次要依赖</text>
+<rect x="60" y="125" width="360" height="140" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="240.0" y="159" font-size="21" font-weight="700" text-anchor="middle">ConversationController</text>
+<text x="240.0" y="192" font-size="18" font-weight="400" text-anchor="middle">+ send()  + stream()</text>
+<text x="240.0" y="221" font-size="18" font-weight="400" text-anchor="middle">+ cancel()</text>
+<rect x="510" y="125" width="360" height="160" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="690.0" y="159" font-size="21" font-weight="700" text-anchor="middle">ConversationService</text>
+<text x="690.0" y="192" font-size="18" font-weight="400" text-anchor="middle">+ send()  + generate()</text>
+<text x="690.0" y="221" font-size="18" font-weight="400" text-anchor="middle">+ subscribe()  + cancel()</text>
+<rect x="960" y="125" width="360" height="150" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="1140.0" y="159" font-size="21" font-weight="700" text-anchor="middle">AssistantLearningService</text>
+<text x="1140.0" y="192" font-size="18" font-weight="400" text-anchor="middle">+ read()</text>
+<text x="1140.0" y="221" font-size="18" font-weight="400" text-anchor="middle">+ finalizeActions()</text>
+<rect x="60" y="510" width="360" height="150" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="240.0" y="544" font-size="21" font-weight="700" text-anchor="middle">ConversationWorkflow</text>
+<text x="240.0" y="577" font-size="18" font-weight="400" text-anchor="middle">+ plan()</text>
+<text x="240.0" y="606" font-size="18" font-weight="400" text-anchor="middle">+ run()</text>
+<rect x="510" y="510" width="360" height="170" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="690.0" y="544" font-size="21" font-weight="700" text-anchor="middle">ConversationCoordinator</text>
+<text x="690.0" y="577" font-size="18" font-weight="400" text-anchor="middle">+ plan()  + handle()</text>
+<text x="690.0" y="606" font-size="18" font-weight="400" text-anchor="middle">+ collaborate()</text>
+<rect x="960" y="510" width="360" height="150" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="1140.0" y="544" font-size="21" font-weight="700" text-anchor="middle">KnowledgeAgent</text>
+<text x="1140.0" y="577" font-size="18" font-weight="400" text-anchor="middle">+ handle()</text>
+<text x="1140.0" y="606" font-size="18" font-weight="400" text-anchor="middle">知识问答与错题辅导</text>
+<polyline points="420,195 510,195" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="439" y="157" width="46" height="27" fill="white" opacity="0.96"/>
+<text x="443" y="178" font-size="18" font-weight="400" text-anchor="start">调用</text>
+<polyline points="870,195 960,195" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="876" y="154" width="82" height="27" fill="white" opacity="0.96"/>
+<text x="880" y="175" font-size="18" font-weight="400" text-anchor="start">读取快照</text>
+<polyline points="600,285 600,370 240,370 240,510" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<rect x="276" y="329" width="139.0" height="27" fill="white" opacity="0.96"/>
+<text x="280" y="350" font-size="18" font-weight="400" text-anchor="start">内部 HTTP 调用</text>
+<polyline points="420,585 510,585" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="438" y="544" width="46" height="27" fill="white" opacity="0.96"/>
+<text x="442" y="565" font-size="18" font-weight="400" text-anchor="start">委派</text>
+<polyline points="870,585 960,585" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="888" y="544" width="46" height="27" fill="white" opacity="0.96"/>
+<text x="892" y="565" font-size="18" font-weight="400" text-anchor="start">调度</text>
+<text x="65" y="735" font-size="22" font-weight="700" text-anchor="start">Java 业务层</text>
+<text x="65" y="770" font-size="19" font-weight="400" text-anchor="start">接收请求、管理任务、读取数据并保存结果。</text>
+<text x="720" y="735" font-size="22" font-weight="700" text-anchor="start">Python 编排层</text>
+<text x="720" y="770" font-size="19" font-weight="400" text-anchor="start">解析意图并调度领域专家；知识专家为示例。</text></svg>

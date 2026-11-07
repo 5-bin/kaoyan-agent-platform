@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1040" viewBox="0 0 1440 1040">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#526985"/></marker></defs>
+<rect width="1440" height="1040" fill="#ffffff"/>
+<style>text{font-family:"Microsoft YaHei","Segoe UI",sans-serif;fill:#20344c} .small{font-size:18px} .label{font-size:20px}</style>
+<text x="42" y="48" font-size="30" font-weight="700" text-anchor="start">协作图：助手任务中的对象与消息</text>
+<text x="42" y="82" font-size="18" font-weight="400" text-anchor="start">依据 T05 编号通信图简化；只展开主要调用，编号表示消息先后</text>
+<rect x="60" y="150" width="340" height="100" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="230.0" y="184" font-size="21" font-weight="700" text-anchor="middle">:ChatAssistant.vue</text>
+<text x="230.0" y="217" font-size="18" font-weight="400" text-anchor="middle">前端对象</text>
+<rect x="540" y="150" width="350" height="100" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="715.0" y="184" font-size="21" font-weight="700" text-anchor="middle">:ConversationService</text>
+<text x="715.0" y="217" font-size="18" font-weight="400" text-anchor="middle">Java 会话对象</text>
+<rect x="1050" y="150" width="330" height="100" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="1215.0" y="184" font-size="21" font-weight="700" text-anchor="middle">:MySQL</text>
+<text x="1215.0" y="217" font-size="18" font-weight="400" text-anchor="middle">业务持久化</text>
+<rect x="540" y="440" width="350" height="100" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="715.0" y="474" font-size="21" font-weight="700" text-anchor="middle">:AssistantLearningService</text>
+<text x="715.0" y="507" font-size="18" font-weight="400" text-anchor="middle">授权数据读取</text>
+<rect x="60" y="740" width="340" height="110" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="230.0" y="774" font-size="21" font-weight="700" text-anchor="middle">:ConversationWorkflow</text>
+<text x="230.0" y="807" font-size="18" font-weight="400" text-anchor="middle">Python 请求入口</text>
+<rect x="540" y="740" width="350" height="110" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="715.0" y="774" font-size="21" font-weight="700" text-anchor="middle">:ConversationCoordinator</text>
+<text x="715.0" y="807" font-size="18" font-weight="400" text-anchor="middle">请求级协调器</text>
+<rect x="1050" y="740" width="330" height="110" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="1215.0" y="774" font-size="21" font-weight="700" text-anchor="middle">:领域专家</text>
+<text x="1215.0" y="807" font-size="18" font-weight="400" text-anchor="middle">知识 / 学情 / 院校等</text>
+<rect x="1050" y="440" width="330" height="110" rx="12" fill="#eef5ff" stroke="#b5c7db" stroke-width="1.5"/>
+<text x="1215.0" y="474" font-size="21" font-weight="700" text-anchor="middle">:领域工具</text>
+<text x="1215.0" y="507" font-size="18" font-weight="400" text-anchor="middle">检索 / 筛选 / 排序</text>
+<polyline points="400,180 540,180" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="406" y="104" width="110.5" height="27" fill="white" opacity="0.96"/>
+<text x="410" y="125" font-size="18" font-weight="400" text-anchor="start">1. 提交问题</text>
+<polyline points="600,250 600,440" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="606" y="324" width="146.5" height="27" fill="white" opacity="0.96"/>
+<text x="610" y="345" font-size="18" font-weight="400" text-anchor="start">4. 读取数据快照</text>
+<polyline points="570,250 455,350 230,350 230,740" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="61" y="369" width="190.5" height="27" fill="white" opacity="0.96"/>
+<text x="65" y="390" font-size="18" font-weight="400" text-anchor="start">2. plan / 5. stream</text>
+<polyline points="400,780 540,780" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="401" y="694" width="133.5" height="27" fill="white" opacity="0.96"/>
+<text x="405" y="715" font-size="18" font-weight="400" text-anchor="start">3. plan / run</text>
+<polyline points="890,780 1050,780" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="896" y="694" width="110.5" height="27" fill="white" opacity="0.96"/>
+<text x="900" y="715" font-size="18" font-weight="400" text-anchor="start">6. 调度专家</text>
+<polyline points="1215,740 1215,550" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1226" y="629" width="110.5" height="27" fill="white" opacity="0.96"/>
+<text x="1230" y="650" font-size="18" font-weight="400" text-anchor="start">7. 调用工具</text>
+<polyline points="890,180 1050,180" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="896" y="104" width="110.5" height="27" fill="white" opacity="0.96"/>
+<text x="900" y="125" font-size="18" font-weight="400" text-anchor="start">8. 保存结果</text>
+<polyline points="540,225 400,225" fill="none" stroke="#526985" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="406" y="259" width="110.5" height="27" fill="white" opacity="0.96"/>
+<text x="410" y="280" font-size="18" font-weight="400" text-anchor="start">9. 返回结果</text>
+<text x="55" y="955" font-size="20" font-weight="400" text-anchor="start">阅读方式：前端发起任务 → Java 读取快照 → Python 调度专家和工具 → Java 保存与返回。</text>
+<text x="55" y="993" font-size="18" font-weight="400" text-anchor="start">完整的返回消息、任务状态与外部模型交互见 T05 原始通信图及消息表。</text></svg>
