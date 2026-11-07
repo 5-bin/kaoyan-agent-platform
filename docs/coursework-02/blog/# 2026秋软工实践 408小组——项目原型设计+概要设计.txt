@@ -1,0 +1,379 @@
+# 2026秋软工实践 408小组——项目原型设计+概要设计
+
+| 项目 | 内容 |
+| :--- | :--- |
+| 作业所属课程 | [2026秋软件工程与软件工程实践](https://edu.cnblogs.com/campus/fzu/2026-01SoftwareEngineeringandSoftwareEngineeringPractice/) |
+| 作业要求 | [第二次团队作业（原型设计+概要设计）](https://edu.cnblogs.com/campus/fzu/2026-01SoftwareEngineeringandSoftwareEngineeringPractice/homework/16774) |
+| 作业的目标 | 在第一次需求分析的基础上，完成可交互原型、系统分层架构、UML 与数据库设计；明确领域智能体与业务功能的协作方式，并通过 GitHub 留下可追踪的任务、评审和交付记录，为后续开发与测试提供依据。 |
+| 团队名称 | 408小组 |
+| 团队成员学号-名字 | 102401614-林志涛；102401512-任奥辉；102401509-吴瑞鹏；102401625-朱铮睿；102401635-尼玛顿珠；102401510-林富强；102401525-丁鑫河；102401526-林鹏远；102401511-何锦宏；102401519-曾林远见；102401623-杜佳伟；102401632-翁斌；102401633-严科儒 |
+
+> 本文为截至 2026 年 11 月 6 日的整理稿，依据团队仓库 `docs/coursework-02/` 中已提交的原型、系统设计及数据库设计资料编写。团队统一业务设计基线为 `94b8a9f`，本次资料整理快照为 `650556d`。后续开发安排为团队拟定计划。
+
+## 一、从需求分析走向可交互、可开发的设计
+
+我们的项目“408-Agent 智能备考平台”面向计算机考研学生，希望将刷题、错题复盘、学情分析、院校查询和资料整理连接起来。学生既可以直接使用页面功能，也可以带着当前题目、学习记录或笔记向领域智能体（Agent）提问。
+
+第一次作业主要回答“用户需要什么”，这次作业进一步回答三个问题：用户怎样完成任务，系统内部怎样协作，以及数据怎样保存和关联。我们围绕两条主线组织设计：
+
+- **学练闭环：**选择练习 → 提交作答 → 查看判分 → 错题复盘 → 学情分析 → 确认补强练习。
+- **备考决策与整理：**完善报考条件 → 查询院校或获取推荐 → 查看依据 → 整理资料与个人笔记。
+
+本文使用以下缩写，后文图表沿用相同含义：
+
+| 缩写 | 全称与含义 |
+| :--- | :--- |
+| UI | User Interface，用户界面 |
+| UML | Unified Modeling Language，统一建模语言 |
+| API | Application Programming Interface，应用程序接口 |
+| AI | Artificial Intelligence，人工智能 |
+| LLM | Large Language Model，大语言模型 |
+| RAG | Retrieval-Augmented Generation，检索增强生成 |
+| SSE | Server-Sent Events，服务端向浏览器持续推送事件的机制 |
+| ER | Entity–Relationship，实体联系模型 |
+| ORM | Object–Relational Mapping，对象关系映射 |
+| SQL | Structured Query Language，结构化查询语言 |
+| JDBC | Java Database Connectivity，Java 数据库连接接口 |
+| OSS | Object Storage Service，对象存储服务 |
+
+## 二、原型设计：围绕完整任务组织页面
+
+### 2.1 原型工具与在线展示
+
+我们使用**墨刀**组织和分享交互原型，项目名称为 `408agent`，展示画布为 `T01_T02_交互原型`。本轮复用已有页面设计，完善导航、业务规则和任务状态，再以 HTML 交互组件导入墨刀的 1280 × 800 演示画板，形成统一的可点击入口。
+
+**[点击打开墨刀原型](https://modao.cc/proto/1tGSwIfito0m4mcLTVKiI2/sharing?view_mode=device&screen=rbpVa4sEZCiOAvssl&canvasId=rcVa4sEZO8ScRh77&device=industrial_hmi_16_10&orientation=portrait)**
+
+进入后可从目录选择体验路径。页面顶部的“验收版 v2 · 模拟数据”用于区分演示环境；原型展示模拟账号、学习记录和智能体输出，刷新后恢复初始状态。
+
+
+![01_墨刀原型总览](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107002701204-550792926.png)
+
+
+### 2.2 用户端与后台范围
+
+原型按账号资源、学习闭环和后台管理划分，共提供 20 个独立 HTML 入口；墨刀内通过统一组件连续导航。部分入口表示同一业务的不同状态，例如答题前后、诊断中和批次结束后。
+
+| 页面分组 | 主要内容 | 用户可以完成的任务 |
+| :--- | :--- | :--- |
+| 账号与首页 | 登录、注册、首页、个人中心 | 进入系统，维护备考档案与报考条件 |
+| 练习与复盘 | 练习首页、答题、判分、错题本、收藏 | 按条件练习，检查结果，从错题继续复盘 |
+| 诊断与学情 | 单选诊断、批次结果、学习统计 | 完成诊断，查看薄弱知识点，进入补强练习 |
+| 智能助手 | 带上下文对话、建议操作、来源展示 | 解释错题、分析学习情况、制定计划、辅助整理笔记 |
+| 院校与资料 | 院校列表、院校详情、备考资料、个人笔记 | 查询招生信息，阅读资料，保存和回看笔记 |
+| 管理后台 | 题目录入与审核、资料审核 | 单题录入、批量预览与送审、审核通过或退回 |
+
+### 2.3 重点交互一：从错题进入上下文辅导
+
+学生提交答案后，页面展示判分、标准答案和解析。对于答错的题目，可以从错题本进入“带上下文辅导”，继续询问“我的选项错在哪里”。助手接收题目与作答背景，围绕本题解释思路，减少用户重复复制题干和描述过程的操作。
+
+这条路径将“答错了”进一步连接到“理解为什么错”。练习判分由业务服务完成，智能体负责解释和辅导；诊断模式则在批次结束后统一展示结果，避免提前揭示答案影响诊断过程。
+
+
+![02_错题上下文辅导](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107002849447-534743381.png)
+
+
+### 2.4 重点交互二：学情分析连接补强练习
+
+学生在学习统计页查看知识点表现后，可请求助手分析薄弱环节。助手将分析结果和可执行的补强练习建议一起展示，学生确认后再创建练习批次。
+
+这条路径中，学习记录提供分析依据，智能体将结果转化为学习建议，业务系统负责创建和管理练习。学生可以直接从建议进入下一轮练习，形成“记录—分析—练习—再记录”的闭环。
+
+### 2.5 重点交互三：笔记建议先预览，再保存新版本
+
+学生先选定已保存的笔记，再请求助手整理内容或提出修改建议。原型展示建议预览，由用户决定是否接受；确认后保存为同一篇笔记的新版本，并可查看历史版本。
+
+我们为这一流程设计了未保存离开提示和版本冲突反馈，使学生能够清楚区分当前正文、助手建议和已保存版本。
+
+
+![03_笔记建议预览](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107003758510-841098183.png)
+
+
+### 2.6 重点交互四：后台录入、预览与审核
+
+后台原型覆盖题目录入、批量数据预览、整批送审和审核处理。录入时展示必要字段与来源规则，批量操作先呈现预览；审核人员可以通过或退回，并填写相应意见。资料审核也设置确认与取消路径。
+
+
+![04_后台批量送审](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107003833755-135315698.png)
+
+
+### 2.7 视觉规范与原型检查
+
+界面采用蓝白配色、固定侧栏与卡片布局，筛选、按钮、表格和状态标签保持一致。对答题、生成中、停止、重试、空数据、未保存和审核等状态给出明确文字反馈，关键页面提供“页面规则”说明。
+
+根据仓库中 **2026 年 11 月 5 日的原型验收记录**，本地完整交互检查为 27/27 通过，原有交互回归为 13/13 通过，墨刀实际分享页面的匿名访问与关键路径检查为 7/7 通过。该记录说明了检查对象与复现方式，可在[原型验收报告](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/prototype/原型验收报告_v2.md)查看。
+
+## 三、概要设计：从系统分层到对象协作
+
+### 3.1 总体架构与功能模块
+
+系统由 Vue 前端、Java 业务后端、Python Agent 服务和数据基础设施组成。前端统一访问 Java 服务；Java 管理业务数据和正式结果，Python 根据当前任务解析意图、调度领域专家和调用检索工具。
+
+
+![05_系统总体架构](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107003947751-431021098.png)
+
+
+| 层次 | 技术与组件 | 主要职责 |
+| :--- | :--- | :--- |
+| 表现层 | Vue 3、TypeScript、Vite、Element Plus | 页面展示、表单交互、练习作答、助手流式回答、后台审核 |
+| 业务服务层 | Java、Spring Boot、MyBatis-Plus | 认证、档案、题库、判分、学情数据、会话任务、院校目录、笔记与审核 |
+| 智能体服务层 | Python、FastAPI、会话协调器、领域专家 | 意图解析、任务编排、知识检索、院校筛选、解释与建议生成 |
+| 数据与资源层 | MySQL、Redis、Qdrant、OSS、版本化语料 | 业务持久化、令牌撤销与导出缓存、向量检索、头像文件与知识资料管理 |
+
+这种分工使各部分有明确的职责：Java 处理判分、事务和记录保存，Python 处理领域任务与内容生成。Python 使用 Java 提供的个人数据快照以及独立知识资料完成请求，不直接连接业务 MySQL。
+
+### 3.2 领域 Agent 怎样融入系统
+
+在需求层面，我们围绕学情分析与院校推荐组织智能能力；在内部设计中，将任务细分为六类专家，由协调器按当前请求选择执行。
+
+| 专家 | 主要任务 | 与软件功能的连接 |
+| :--- | :--- | :--- |
+| 知识专家 | 知识问答、错题上下文辅导 | 从题目、错题或助手页面进入，展示解释与相应依据 |
+| 学情专家 | 解释学习表现、归纳薄弱环节 | 使用 Java 提供的学习画像与有效作答快照 |
+| 院校专家 | 按报考条件筛选、排序和解释候选 | 连接院校推荐页面，展示候选及来源 |
+| 练习专家 | 提出补强练习建议 | 用户确认后，由 Java 创建练习批次 |
+| 笔记专家 | 生成整理或修改建议 | 在个人笔记中预览，确认后追加版本 |
+| 学习计划专家 | 根据目标和学习表现安排复习 | 在助手中展示分天任务与复习建议 |
+
+知识问答通过 RAG 从版本化资料中检索相关证据，再组织回答并附带来源。院校推荐先完成条件筛选和排序，再按需生成解释；单所院校的目录事实查询由 Java 的院校目录服务处理。两类入口分别服务“查某校信息”和“比较候选院校”的需求。
+
+对于“分析我的薄弱点，并安排下一阶段复习”这样的复合请求，协调器按数据需求和步骤依赖安排专家协作。练习创建、笔记保存等操作以用户确认作为交互节点，最终由 Java 执行并保存。
+
+### 3.3 用例图：明确参与者与系统能力
+
+用例图以学生和管理员为主要参与者。学生侧覆盖账号、练习、复盘、学情、院校和助手功能；管理员侧覆盖内容录入、审核和维护。图中通过包含、扩展关系区分必要步骤与条件触发的功能。
+
+
+![06_学生用例图](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004006653-1211685444.png)
+
+
+
+![07_管理员用例图](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004017042-1852515924.png)
+
+
+用例设计帮助我们检查入口是否完整。例如“错题复盘”既需要作答记录和判分结果，也需要进入解析与上下文辅导的路径；“内容审核”则需要待审核列表、查看内容和处理意见等配套操作。完整需求映射见 [T04 用例与业务活动设计](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/system/T04_用例与业务活动.md)。
+
+### 3.4 活动图：描述练习与诊断的业务流程
+
+活动图展示从进入练习到结束批次的业务过程，并区分普通练习与诊断模式。普通练习强调提交后的即时反馈，诊断强调批次完成后的集中反馈；草稿、提示、判分与结果统计在流程中分别有明确位置。
+
+
+![08_练习诊断活动图](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004032475-1250792378.png)
+
+
+除本图外，仓库还提供学情补强、院校查询和院校推荐的活动图。它们分别对应原型中的“统计—分析—创建练习”“院校目录查询”和“推荐条件—候选结果”路径，可在 [T04 图表目录](https://github.com/fzu-404-team/kaoyan-agent-platform/tree/main/docs/coursework-02/system/uml/export)查看清晰原图。
+
+### 3.5 类图：划分会话入口、业务控制与专家职责
+
+博客选取会话主链的核心类展示结构。`ConversationController` 提供请求入口；`ConversationService` 组织消息、任务与结果；`AssistantLearningService` 按计划读取个人数据并整理建议操作。Python 侧由 `ConversationWorkflow` 进入 `ConversationCoordinator`，再调度知识等领域专家。
+
+
+![09_核心类图](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004047085-1097222298.png)
+
+
+图中省略了参数和次要依赖，Java 与 Python 之间的依赖通过内部服务调用实现。题库练习等其他模块的类与职责可查看 [T03 架构与核心类图](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/system/T03_架构与核心类图.md)。
+
+### 3.6 时序图：说明助手请求与关键算法交互
+
+助手请求采用“计划解析—读取数据—流式执行”的两段式调用。Java 先获取任务需要的专家与数据类别，再读取对应的个人数据快照，最后将计划和快照交给 Python 执行。结果持续推送到页面，并由 Java 保存为正式记录。
+
+
+![10_助手主链时序图](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004058278-345977050.png)
+
+
+关键算法在这条链路中的作用如下：
+
+1. **意图解析与专家调度：**将用户问题转为结构化任务，依据步骤依赖选择专家。
+2. **知识检索：**根据问题检索版本化语料，使用关键词或向量检索结果组织有来源的回答。
+3. **院校筛选与排序：**先按年份、专业、学位类型、考试科目和地区等条件形成候选，再展示排序与可选解释。
+4. **练习判分：**Java 根据题目版本快照和标准答案判分，将有效作答纳入学习统计，供后续分析使用。
+
+完整设计还包含练习诊断判分、院校目录查询、院校推荐及取消处理等时序，见 [T05 Agent 与调用设计](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/system/T05_Agent与调用设计.md)。
+
+### 3.7 协作图：从对象连接理解消息传递
+
+协作图将同一任务中的关键对象放在一张图内，用编号表达主要消息顺序。与时序图相比，它更便于观察前端、会话服务、数据读取、协调器和领域工具之间的连接关系。
+
+
+![11_助手对象协作图](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004108645-1768267624.png)
+
+
+Java 会话服务是业务协调中心，Python 协调器负责领域任务内部的专家协作。完整编号消息和返回关系保留在 T05 原始通信图中，博客图仅展开主干调用。
+
+## 四、数据库设计：支撑学习记录、领域任务与历史追踪
+
+### 4.1 数据域与存储分工
+
+数据库设计围绕 28 张表划分为七个业务域，并配套字段字典、实体映射及 SQL 结构索引。通过按域分层，先说明全局关系，再展开具体表和字段。
+
+| 业务域 | 代表表 | 保存的内容 |
+| :--- | :--- | :--- |
+| 账号与授权 | `user`、`assistant_privacy` | 账号、备考档案、助手数据使用范围 |
+| 题库与版本 | `question`、`question_version` | 题目内容、来源、审核状态及历史版本 |
+| 练习与作答 | `practice_session`、`practice_record`、`user_question_mark` | 练习批次、作答判分、错题与收藏 |
+| 学情与自动推荐 | `learning_profile`、`learning_profile_history`、`learning_event` | 当前画像、历史变化、重算事件和推荐设置 |
+| 院校与招生 | `school`、`school_detail`、`school_admission_metric` | 院校、专业年份、招生指标与来源口径 |
+| Agent 任务与会话 | `task`、`chat_conversation`、`chat_message`、`chat_generation` | 任务输入输出、会话消息、生成尝试与终态 |
+| 资料与个人笔记 | `document`、`personal_document`、`personal_document_version` | 审核资料、个人笔记正文与版本历史 |
+
+MySQL 保存业务事实；Redis 保存令牌撤销信息和导出缓存；Qdrant 保存独立的知识向量索引；OSS 保存头像文件。领域知识以版本化语料管理，检索证据保留来源和版本，便于将回答与具体资料对应起来。
+
+### 4.2 ER 图：先看全局，再看学习主链
+
+总览图展示七个业务域与表之间的联系，分域图补充具体字段和关联。图中实线表示数据库物理外键，虚线表示应用层使用的逻辑关联，具体基数和归属以图例及说明书为准。
+
+
+![12_数据库总览ER图](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004125448-1047535374.png)
+
+
+题库练习域体现了平台最核心的数据链：用户建立练习批次，批次包含作答项目；作答保留判分所依据的题目快照；错题和收藏通过用户与题目的关联记录管理。
+
+
+![13_题库练习ER图](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004135805-1308003387.png)
+
+
+其余学情推荐、院校招生、任务会话笔记、资料与外部存储分域图可在 [ER 图目录](https://github.com/fzu-404-team/kaoyan-agent-platform/tree/main/docs/coursework-02/database/er/export)查看。
+
+### 4.3 关系数据模型
+
+下面列出核心关系模式的字段节选。`PK` 表示主键（Primary Key）；`UK` 表示唯一键（Unique Key）。省略号表示未在博客展开的字段，完整类型、默认值、索引和约束见数据字典。
+
+```text
+user(id [PK], username [UK], role, target_school, target_major, exam_year, ...)
+question(id [PK], subject, difficulty, review_status, ...)
+question_version(question_id + version [联合PK], ...)
+practice_session(id [PK], user_id, kind, state, ...)
+practice_record(id [PK], user_id, question_id, session_id, question_snapshot, ...)
+user_question_mark(id [PK], user_id + question_id [联合UK], ...)
+school(id [PK], ...)
+school_detail(id [PK], school_id, ...)
+school_admission_metric(school_detail_id + metric_type [联合PK], status, ...)
+task(id [PK], user_id, task_type, status, input_payload, result_payload, release_id, ...)
+chat_conversation(id [PK], user_id, ...)
+chat_message(id [PK], conversation_id, ...)
+chat_generation(task_id [PK], message_id, attempt_no, status, ...)
+personal_document(id [PK], user_id, ...)
+personal_document_version(document_id + version [联合PK], ...)
+```
+
+主要联系包括用户与任务的一对多、院校与专业年份的一对多、会话与消息的一对多、笔记与版本的一对多，以及用户和题目通过错题收藏记录建立的多对多关系。题目版本和作答快照使历史作答能够按当时的题目内容回顾。
+
+### 4.4 对象与库表映射
+
+系统同时使用 MyBatis-Plus 的 ORM 映射和基于 JDBC 的直接 SQL 访问。已有 10 张表具有实体与 Mapper；会话、个人笔记及学习闭环等新增表通过相应服务直接访问。
+
+| 对象或服务 | 对应表 | 映射方式与用途 |
+| :--- | :--- | :--- |
+| `User` / `UserMapper` | `user` | 实体映射，管理账号与备考档案 |
+| `Question` / `QuestionMapper` | `question` | 实体映射，管理题目与审核信息 |
+| `PracticeRecord` / `PracticeRecordMapper` | `practice_record` | 实体映射，保存作答与判分记录 |
+| `UserQuestionMark` / `UserQuestionMarkMapper` | `user_question_mark` | 实体映射，管理错题和收藏 |
+| `Task` / `TaskMapper` | `task` | 实体映射，保存任务及结构化输入输出 |
+| `School`、`SchoolDetail` 及其 Mapper | `school`、`school_detail` | 实体映射，管理院校目录 |
+| `ChatRepository` | `chat_conversation`、`chat_message`、`chat_generation` 等 | 直接 SQL，管理会话与生成记录 |
+| `ManagedPracticeService` | `practice_session`、`practice_session_item`、`question_version` 等 | 直接 SQL，管理受管练习与题目版本 |
+| `PersonalDocumentService` | `personal_document`、`personal_document_version` | 直接 SQL，管理个人笔记与历史 |
+
+例如 Java 属性 `userId` 对应数据库列 `user_id`，`Task` 的输入输出对象对应结构化数据列。完整逐字段映射见 [T07 实体表映射](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/database/T07_实体表映射.md)，字段定义见 [T07 数据字典](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/database/T07_数据字典.md)。
+
+### 4.5 领域知识、用户交互与任务结果怎样管理
+
+- **领域知识：**语料按版本发布，保留来源定位；知识检索使用独立索引，回答携带本轮检索来源。
+- **用户交互：**会话、消息和生成尝试分别保存，能够区分连续对话、重试和最终结果。
+- **任务执行：**`task` 保存任务类型、输入、结果和状态；建议操作通过业务记录管理，确认后执行。
+- **学习证据：**作答保存题目快照与判分状态，学习画像保存当前值和历史变化，使分析能够关联到有效作答。
+- **个人笔记：**每次保存追加历史版本，助手建议确认后进入同一套版本管理流程。
+- **院校信息：**专业年份与指标状态分开记录，展示时保留信息来源、统计口径与更新状态。
+
+完整结构和存储策略见[数据库设计说明书](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/database/408小组_数据库设计说明书.md)。
+
+## 五、团队协作记录与后续开发计划
+
+### 5.1 任务组织方式
+
+我们将设计工作拆为 T01—T13，采用“核心设计任务 + 辅助交付任务”的组织方式。核心任务负责原型、系统设计、UML 和数据库；辅助任务整理页面、接口、SQL 依据，并负责博客、排版和交付检查。公共口径先统一，设计任务并行推进，再通过交叉核对完成整合。
+
+本次 13 项任务由 12 位成员承担，林志涛同时负责 T01、T02。以下分工根据实际认领情况整理，提交状态以仓库 Issue 和合并请求为准。
+
+| 成员 | 任务 | 本次具体工作 | 后续开发拟负责部分 |
+| :--- | :--- | :--- | :--- |
+| 林志涛 | C1/T01、C2/T02 | 学练闭环、账号资源与后台原型，统一墨刀交互入口 | 前端任务流程、原型与页面交互的一致性、关键路径联调 |
+| 严科儒 | C3/T03 | 系统架构、核心类图、系统设计说明书主编 | Java/Python 服务集成、模块边界与系统设计维护 |
+| 朱铮睿 | C4/T04 | 学生与管理员用例图、业务活动图 | 用例驱动的流程测试、需求与实现对照 |
+| 任奥辉 | C5/T05 | Agent 时序、关键算法交互和协作图 | Agent 编排、检索与领域任务交互验证 |
+| 翁斌 | C6/T06 | ER、关系模型、存储设计、数据库说明书主编 | 数据结构与迁移维护、业务数据一致性 |
+| 何锦宏 | C7/T07 | 数据字典、实体与库表映射 | 字段约束核对、持久化映射和数据库回归检查 |
+| 林富强 | S1/T08 | 前端页面、路由与组件清单 | 页面入口清单维护、导航与展示问题复核 |
+| 尼玛顿珠 | S2/T09 | Java/Python API 接口定位索引 | 接口清单维护、前后端对接记录与接口冒烟检查 |
+| 吴瑞鹏 | S3/T10 | SQL 结构摘录、迁移索引 | 迁移执行说明、结构变更记录与部署材料 |
+| 曾林远见 | S4/T11 | 团队博客、周计划与协作记录 | 周进度汇总、项目记录与成果说明 |
+| 杜佳伟 | S5/T12 | 两份说明书的格式统一及 Word/PDF 交付 | 文档发布、版本整理与演示材料排版 |
+| 林鹏远 | S6/T13 | 原型走查、链接检查与最终交付核对 | 用户路径验收、缺陷清单与提交材料复核 |
+
+表中的后续职责为拟定安排，将根据实际开发进度调整。
+
+### 5.2 GitHub 上的实际协作过程
+
+团队使用 [Issues](https://github.com/fzu-404-team/kaoyan-agent-platform/issues)记录任务范围和验收条件，使用 [Projects](https://github.com/fzu-404-team/kaoyan-agent-platform/projects)跟踪进度，使用 [Milestones](https://github.com/fzu-404-team/kaoyan-agent-platform/milestones)归集本次作业节点。成员在工作分支提交文件，并通过合并请求（Pull Request，简称 PR）提交评审与整合。
+
+以下记录展示本次作业已经发生的协作，读者可以点击查看作者、提交、修改文件与讨论：
+
+| 工作记录 | 仓库记录 | 协作用途 |
+| :--- | :--- | :--- |
+| 建立作业文档入口 | [PR #27](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/27) | 统一原型、系统、数据库与辅助资料的存放位置 |
+| 原型设计交付 | [PR #35](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/35) | 提交可点击原型、说明、分享链接与检查证据 |
+| 用例与业务活动图 | [PR #29](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/29) | 将需求细化为角色能力与业务流程，供系统设计整合 |
+| Agent 交互设计 | [PR #38](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/38) | 说明对象调用、专家调度和关键算法步骤 |
+| 数据库模型与说明书 | [PR #36](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/36) | 提交 ER、关系模型和存储设计 |
+| 字段与实体映射 | [PR #39](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/39) | 为数据库说明书提供字段、类型与持久化映射依据 |
+| 接口定位索引 | [PR #31](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/31) | 为系统和交互设计提供 Java/Python 接口入口 |
+| SQL 结构与迁移索引 | [PR #41](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/41) | 便于数据库设计与实际建表脚本交叉核对 |
+| 系统设计说明书初版 | [PR #42](https://github.com/fzu-404-team/kaoyan-agent-platform/pull/42) | 汇总系统架构、模块、接口与运行设计 |
+
+协作过程中，T04 和 T05 核对了用例编号及练习、院校、助手流程；T06 和 T07 交叉核对了关系模型与字段映射；接口、页面和 SQL 清单则为主编提供可直接引用的依据。这样既保留每位成员的独立交付，也降低了多人修改同一文件的成本。
+
+截至本稿整理时，页面清单、博客计划、PDF 排版与最终交付检查等任务仍需继续收口。成员应随进度更新 Project 状态，并在 Issue 中附上文件或 PR 链接，评审通过并合并后再标记完成。课程要求每位成员具有贡献记录，最终统计将依据实际提交核对。
+
+![project1](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004753378-2099592567.png)
+
+![project2](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107004800158-142072226.png)
+
+### 5.3 本次作业收口节点
+
+| 日期 | 工作重点 | 预期产出 |
+| :--- | :--- | :--- |
+| 11 月 5 日 | 原型交互完善，各设计任务提交初稿 | 原型链接、UML、数据库模型及辅助清单初稿 |
+| 11 月 6 日 | 交叉核对与文档整合 | 系统与数据库说明书修订稿、博客初稿 |
+| 11 月 7 日 | 补齐资料、统一排版、导出 PDF | 两份 PDF 候选稿、博客配图与引用链接 |
+| 11 月 8 日 | 原型走查、图片与公开链接检查 | 交付检查记录、可发布博客稿 |
+| 11 月 9 日 | 最终整理、团队博客发布并提交作业 | 团队博客、两份 PDF、原型链接及仓库材料 |
+
+### 5.4 截止日期之后的每周开发计划
+
+后续开发以现有成果为基础，优先完善关键用户路径、数据质量与系统联调。下表为预期安排，里程碑按可检查的产出定义。
+
+| 周次与日期 | 预期开发内容 | 主要负责人及协作 | 里程碑 | 预期产出 |
+| :--- | :--- | :--- | :--- | :--- |
+| 第 1 周：11/09—11/15 | 完成本次课程交付；汇总原型与实现差异，整理练习、助手、院校与笔记的联调问题 | 林志涛、严科儒；朱铮睿、林富强、尼玛顿珠协作；曾林远见整理记录 | M1：确定下一阶段开发范围 | 作业归档、差异与缺陷清单、更新后的页面/API 清单 |
+| 第 2 周：11/16—11/22 | 完善练习、判分、错题和学情主链；复核题目版本、画像与数据库关联 | 林志涛、翁斌、何锦宏；朱铮睿、吴瑞鹏协作 | M2：学练闭环通过集成验收 | 修复 PR、关键流程检查记录、结构及迁移说明 |
+| 第 3 周：11/23—11/29 | 联调 Agent、知识检索、院校查询推荐与笔记建议；优化来源展示和确认操作 | 任奥辉、严科儒、林志涛；尼玛顿珠、林富强协作 | M3：智能体与页面任务形成完整演示 | Agent 联调记录、检索与推荐样例、更新后的交互演示 |
+| 第 4 周：11/30—12/06 | 开展完整路径回归，整理部署和演示材料，按问题优先级收口 | 林鹏远、朱铮睿组织走查；各模块负责人修复；杜佳伟、曾林远见、吴瑞鹏整理材料 | M4：形成可演示、可交付版本 | 回归记录、发布说明、部署材料、最终演示与更新文档 |
+
+协作记录部分展示：
+
+![discuss1](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107005030647-76564658.png)
+
+![discuss2](https://img2024.cnblogs.com/blog/3849112/202611/3849112-20261107005036955-418810336.png)
+
+
+## 六、成果入口与文档下载
+
+| 成果 | 在线入口 |
+| :--- | :--- |
+| GitHub 团队仓库 | [fzu-404-team/kaoyan-agent-platform](https://github.com/fzu-404-team/kaoyan-agent-platform) |
+| 本次作业文档目录 | [docs/coursework-02](https://github.com/fzu-404-team/kaoyan-agent-platform/tree/main/docs/coursework-02) |
+| 墨刀在线原型 | [408agent 可点击原型](https://modao.cc/proto/1tGSwIfito0m4mcLTVKiI2/sharing?view_mode=device&screen=rbpVa4sEZCiOAvssl&canvasId=rcVa4sEZO8ScRh77&device=industrial_hmi_16_10&orientation=portrait) |
+| 408小组_系统设计说明书.pdf | https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/system/408%E5%B0%8F%E7%BB%84_%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E8%AF%B4%E6%98%8E%E4%B9%A6.docx |
+| 408小组_数据库设计说明书.pdf | https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/database/408%E5%B0%8F%E7%BB%84_%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E8%AF%B4%E6%98%8E%E4%B9%A6.md |
+| 系统设计说明书在线文本 | [查看 Markdown 版本](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/system/408小组_系统设计说明书.md) |
+| 数据库设计说明书在线文本 | [查看 Markdown 版本](https://github.com/fzu-404-team/kaoyan-agent-platform/blob/main/docs/coursework-02/database/408小组_数据库设计说明书.md) |
