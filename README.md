@@ -401,7 +401,7 @@ Java测试在独立H2库启动真实Python子进程，不读日常MySQL，也不
 
 报告路径已存在时拒绝覆盖；本轮结果与限制见[质量评测记录](docs/quality-eval-2026-10-24.md)。
 
-浏览器也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定本机Chrome或Edge；不读取日常浏览器资料。CI已按三个新目录执行Python、Java真实链路、前端构建与浏览器测试。实际验证结果见 [本轮验证记录](docs/validation-rag.md)。
+浏览器也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定本机Chrome或Edge；不读取日常浏览器资料。CI运行系统固定为 `ubuntu-24.04`，与当前锁定的 Playwright 1.58.2 兼容，避免 `ubuntu-latest` 切换至 Ubuntu 26.04 后无法安装 Chromium。CI已按三个新目录执行Python、Java真实链路、前端构建与浏览器测试。实际验证结果见 [本轮验证记录](docs/validation-rag.md)；本次运行系统修复后的远端CI尚未运行。
 
 ## 隔离HTTP与真实后端浏览器检查
 
